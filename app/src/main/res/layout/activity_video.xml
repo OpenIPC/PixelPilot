@@ -5,12 +5,7 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="0dp"
-    android:paddingTop="0dp"
-    android:paddingRight="0dp"
-    android:paddingBottom="0dp"
     tools:context="com.geehe.fpvue.VideoActivity">
-
 
     <SurfaceView
         android:id="@+id/sv_h265"
@@ -38,13 +33,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:icon="@drawable/baseline_settings_24"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Loading...."
+        android:text="Loading..."
         android:textColor="@color/colorWhite"
         android:translationZ="10dp"
         android:visibility="visible"
@@ -55,7 +51,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
         tools:ignore="HardcodedText" />
-
 
     <FrameLayout
         android:id="@+id/osdLayout"
@@ -74,7 +69,7 @@
             android:id="@+id/itemVideoStats"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -99,7 +94,7 @@
             android:id="@+id/itemRecIndicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -109,14 +104,13 @@
                 android:layout_height="38dp"
                 android:src="@drawable/baseline_fiber_manual_record_24"
                 android:visibility="invisible" />
-
         </com.geehe.fpvue.osd.MovableLayout>
 
         <com.geehe.fpvue.osd.MovableLayout
             android:id="@+id/itemLinkStatusChart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -130,7 +124,7 @@
             android:id="@+id/itemLinkStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -152,27 +146,27 @@
         </com.geehe.fpvue.osd.MovableLayout>
 
         <com.geehe.fpvue.osd.MovableLayout
-            android:id="@+id/itemSats"
+            android:id="@+id/itemSat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
             <ImageView
-                android:id="@+id/imgSats1"
+                android:id="@+id/imgSat1"
                 android:layout_width="16dp"
                 android:layout_height="38dp"
                 android:src="@drawable/sat1" />
 
             <ImageView
-                android:id="@+id/imgSats2"
+                android:id="@+id/imgSat2"
                 android:layout_width="16dp"
                 android:layout_height="38dp"
                 android:src="@drawable/sat2" />
 
             <TextView
-                android:id="@+id/tvSats"
+                android:id="@+id/tvSat"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginStart="5dp"
@@ -180,14 +174,13 @@
                 android:text="0"
                 android:textColor="@color/colorWhite"
                 android:textSize="14sp" />
-
         </com.geehe.fpvue.osd.MovableLayout>
 
         <com.geehe.fpvue.osd.MovableLayout
             android:id="@+id/itemLon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -212,7 +205,7 @@
             android:id="@+id/itemLat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -237,7 +230,7 @@
             android:id="@+id/itemAlt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -262,7 +255,7 @@
             android:id="@+id/itemThrottle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -287,7 +280,7 @@
             android:id="@+id/itemBat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -312,7 +305,7 @@
             android:id="@+id/itemBatCell"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -337,7 +330,7 @@
             android:id="@+id/itemDis"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -362,7 +355,7 @@
             android:id="@+id/itemTotDis"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -387,7 +380,7 @@
             android:id="@+id/itemTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -412,7 +405,7 @@
             android:id="@+id/itemRCLink"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -437,7 +430,7 @@
             android:id="@+id/itemHomeNav"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -472,7 +465,7 @@
             android:id="@+id/itemGndSpeed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -497,7 +490,7 @@
             android:id="@+id/itemAirSpeed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -522,7 +515,7 @@
             android:id="@+id/itemRoll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -547,7 +540,7 @@
             android:id="@+id/itemPitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -572,7 +565,7 @@
             android:id="@+id/itemStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -590,7 +583,7 @@
             android:id="@+id/itemCurrent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -608,7 +601,7 @@
             android:id="@+id/itemFlightMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -626,7 +619,7 @@
             android:id="@+id/itemGSBattery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -646,8 +639,6 @@
                 android:textColor="@color/colorWhite"
                 android:textSize="14sp" />
         </com.geehe.fpvue.osd.MovableLayout>
-
     </FrameLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

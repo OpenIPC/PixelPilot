@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FPVue 0.19</string>
+    <string name="app_name">PixelPilot</string>
     <string-array name="codecs">
         <item>h265</item>
         <item>h264</item>

@@ -25,9 +25,8 @@ public class OSDManager {
     private final ActivityVideoBinding binding;
     private final Context context;
     private final Handler handler = new Handler();
-    private final byte FLIGHT_MODE_MANUAL = 1, FLIGHT_MODE_STAB = 2, FLIGHT_MODE_ALTH = 3, FLIGHT_MODE_LOITER = 4, FLIGHT_MODE_RTL = 5, FLIGHT_MODE_LAND = 6, FLIGHT_MODE_POSHOLD = 7, FLIGHT_MODE_AUTOTUNE = 8, FLIGHT_MODE_ACRO = 9, FLIGHT_MODE_FBWA = 10, FLIGHT_MODE_FBWB = 11, FLIGHT_MODE_CRUISE = 12, FLIGHT_MODE_TAKEOFF = 13, FLIGHT_MODE_RATE = 15, FLIGHT_MODE_HORZ = 16, FLIGHT_MODE_CIRCLE = 17, FLIGHT_MODE_AUTO = 18, FLIGHT_MODE_QSTAB = 20, FLIGHT_MODE_QHOVER = 21, FLIGHT_MODE_QLOITER = 22, FLIGHT_MODE_QLAND = 23, FLIGHT_MODE_QRTL = 24;
     public List<OSDElement> listOSDItems;
-    private String currentFCStatus = "";
+    private String currentFCStatus;
     private boolean isFlying = false;
     private CountDownTimer mCountDownTimer;
     private boolean osdLocked = true;
@@ -72,7 +71,7 @@ public class OSDManager {
             }
         };
 
-        listOSDItems = new ArrayList<OSDElement>();
+        listOSDItems = new ArrayList<>();
         listOSDItems.add(new OSDElement("Air Speed", binding.itemAirSpeed));
         listOSDItems.add(new OSDElement("Altitude", binding.itemAlt));
         listOSDItems.add(new OSDElement("Battery Air", binding.itemBat));
@@ -89,7 +88,7 @@ public class OSDManager {
         listOSDItems.add(new OSDElement("RC Link", binding.itemRCLink));
         listOSDItems.add(new OSDElement("Recording Indicator", binding.itemRecIndicator));
         listOSDItems.add(new OSDElement("Roll", binding.itemRoll));
-        listOSDItems.add(new OSDElement("Satellites", binding.itemSats));
+        listOSDItems.add(new OSDElement("Satellites", binding.itemSat));
         listOSDItems.add(new OSDElement("Status", binding.itemStatus));
         listOSDItems.add(new OSDElement("Throttle", binding.itemThrottle));
         listOSDItems.add(new OSDElement("Timer", binding.itemTimer));
@@ -97,7 +96,6 @@ public class OSDManager {
         listOSDItems.add(new OSDElement("Video Decoding", binding.itemVideoStats));
         listOSDItems.add(new OSDElement("Video Link Txt", binding.itemLinkStatus));
         listOSDItems.add(new OSDElement("Video Link Graph", binding.itemLinkStatusChart));
-
         restoreOSDConfig();
     }
 
@@ -124,7 +122,9 @@ public class OSDManager {
         double a2 = sin(lat1) * cos(lat2) * cos(dlon);
         a2 = cos(lat1) * sin(lat2) - a2;
         a2 = atan2(a1, a2);
-        if (a2 < 0.0) a2 += 2.0 * 3.141592653589793;
+        if (a2 < 0.0) {
+            a2 += 2.0 * 3.141592653589793;
+        }
         return (float) (a2 * 180.0 / 3.141592653589793);
     }
 
@@ -134,44 +134,47 @@ public class OSDManager {
         int cellCount = (int) (floor(voltage / 4.3) + 1);
         float cellVolt = voltage / cellCount;
         binding.tvBatCell.setText(formatFloat(cellVolt, "V", ""));
-
-        binding.tvCurrent.setText(formatDouble(data.telemetryCurrent / 1000.0, "A", ""));
-
+        binding.tvCurrent.setText(formatDouble(data.telemetryCurrent / 100.0, "A", ""));
         binding.tvAlt.setText(formatDouble(data.telemetryAltitude / 100 - 1000, "m", ""));
-
         binding.tvThrottle.setText(String.format("%.0f", data.telemetryThrottle) + " %\t");
-
         binding.imgThrottle.setImageResource(data.telemetryArm == 1 ? R.drawable.disarmed : R.drawable.armed);
 
         if (data.gps_fix_type == 0) {
             binding.tvDis.setText("0 m");
             binding.tvGndSpeed.setText("0 km/h");
             binding.tvAirSpeed.setText("0 km/h");
-            binding.tvSats.setText("No GPS");
+            binding.tvSat.setText("No GPS");
             binding.tvLat.setText("---");
             binding.tvLon.setText("---");
             //Todo: Home navigation set to default?
         } else {
-            if (data.telemetryDistance / 100 > 1000)
+            if (data.telemetryDistance / 100 > 1000) {
                 binding.tvDis.setText(formatFloat((float) (data.telemetryDistance / 100000), " km", ""));
-            else
+            } else {
                 binding.tvDis.setText(formatDouble(data.telemetryDistance / 100, " m", ""));
+            }
 
-            binding.tvGndSpeed.setText(formatFloat((float) ((data.telemetryGspeed / 100.0f - 1000.0) * 3.6f), "Km/h", ""));
-            binding.tvAirSpeed.setText(formatFloat((float) (data.telemetryVspeed / 100.0f - 1000.0), "m/s", ""));
-            binding.tvSats.setText(formatFloat(data.telemetrySats, "", ""));
+            binding.tvGndSpeed.setText(formatFloat((float)
+                    ((data.telemetryGspeed / 100.0f - 1000.0) * 3.6f), "Km/h", ""));
+            binding.tvAirSpeed.setText(formatFloat((float)
+                    (data.telemetryVspeed / 100.0f - 1000.0), "m/s", ""));
+            binding.tvSat.setText(formatFloat(data.telemetrySats, "", ""));
             binding.tvLat.setText(String.format("%.7f", (float) (data.telemetryLat / 10000000.0f)));
             binding.tvLon.setText(String.format("%.7f", (float) (data.telemetryLon / 10000000.0f)));
 
             if (data.telemetryArm == 1) {
-                float heading_home = OSDToCourse(data.telemetryLat, data.telemetryLon, data.telemetryLatBase, data.telemetryLonBase);
+                float heading_home = OSDToCourse(data.telemetryLat, data.telemetryLon,
+                        data.telemetryLatBase, data.telemetryLonBase);
                 heading_home = heading_home - 180.0F;
 
                 float rel_heading = heading_home - data.heading;
-
                 rel_heading += 180F;
-                if (rel_heading < 0) rel_heading = rel_heading + 360.0F;
-                if (rel_heading >= 360) rel_heading = rel_heading - 360.0F;
+                if (rel_heading < 0) {
+                    rel_heading = rel_heading + 360.0F;
+                }
+                if (rel_heading >= 360) {
+                    rel_heading = rel_heading - 360.0F;
+                }
                 binding.tvHeadingHome.setText(formatFloat(heading_home, "", "Heading:"));
                 binding.tvRealHeading.setText(formatFloat(rel_heading, "", "Real:"));
                 binding.imgHomeNav.setRotation(rel_heading);
@@ -179,49 +182,35 @@ public class OSDManager {
         }
 
         binding.tvRCLink.setText(String.format("%.0f", (float) data.rssi));
-
         binding.tvRoll.setText(formatFloat(data.telemetryRoll, " degree", ""));
         binding.tvPitch.setText(formatFloat(data.telemetryPitch, " degree", ""));
 
-        String flightMode = "";
-        switch (data.flight_mode) {
-            case FLIGHT_MODE_MANUAL:
-                flightMode = "Manual";
-                break;
-            case FLIGHT_MODE_STAB:
-                flightMode = "Stab";
-                break;
-            case FLIGHT_MODE_LOITER:
-                flightMode = "Loiter";
-                break;
-            case FLIGHT_MODE_RTL:
-                flightMode = "RTL";
-                break;
-            case FLIGHT_MODE_AUTOTUNE:
-                flightMode = "Auto tune";
-                break;
-            case FLIGHT_MODE_ACRO:
-                flightMode = "Acro";
-                break;
-            case FLIGHT_MODE_FBWA:
-                flightMode = "Fbwa";
-                break;
-            case FLIGHT_MODE_FBWB:
-                flightMode = "Fbwb";
-                break;
-            case FLIGHT_MODE_CRUISE:
-                flightMode = "Cruise";
-                break;
-            case FLIGHT_MODE_TAKEOFF:
-                flightMode = "Takeoff";
-                break;
-            case FLIGHT_MODE_CIRCLE:
-                flightMode = "Circle";
-                break;
-            default:
-                flightMode = "Unknown";
-                break;
-        }
+        String flightMode = switch (data.flight_mode) {
+            case 0 -> "MANUAL";
+            case 1 -> "CIRCLE";
+            case 2 -> "STABILIZE";
+            case 3 -> "TRAINING";
+            case 4 -> "ACRO";
+            case 5 -> "FLY_BY_WIRE_A";
+            case 6 -> "FLY_BY_WIRE_B";
+            case 7 -> "CRUISE";
+            case 8 -> "AUTOTUNE";
+            case 10 -> "AUTO";
+            case 11 -> "RTL";
+            case 12 -> "LOITER";
+            case 13 -> "TAKEOFF";
+            case 14 -> "AVOID_ADSB";
+            case 15 -> "GUIDED";
+            case 16 -> "INITIALIZING";
+            case 17 -> "QSTABILIZE";
+            case 18 -> "QHOVER";
+            case 19 -> "QLOITER";
+            case 20 -> "QLAND";
+            case 21 -> "QRTL";
+            case 22 -> "QAUTOTUNE";
+            case 23 -> "ENUM_END";
+            default -> "Unknown";
+        };
         binding.tvFlightMode.setText(flightMode);
 
         if (!Objects.equals(currentFCStatus, data.status_text)) {
@@ -229,12 +218,9 @@ public class OSDManager {
             binding.tvStatus.setVisibility(View.VISIBLE);
             binding.tvStatus.setText(data.status_text);
             // Create a Runnable to hide the TextView after 5 second
-            Runnable hideTextViewRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    // Hide the TextView
-                    binding.tvStatus.setVisibility(View.GONE);
-                }
+            Runnable hideTextViewRunnable = () -> {
+                // Hide the TextView
+                binding.tvStatus.setVisibility(View.GONE);
             };
 
             // Schedule the Runnable to be executed after 1 second (5000 milliseconds)
@@ -251,16 +237,10 @@ public class OSDManager {
     }
 
     private String formatDouble(double v, String unit, String prefix) {
-        if (v == 0) {
-            return "";
-        }
-        return String.format("%s%.2f%s", prefix, v, unit);
+        return (v == 0) ? "" : String.format("%s%.2f%s", prefix, v, unit);
     }
 
     private String formatFloat(float v, String unit, String prefix) {
-        if (v == 0) {
-            return "";
-        }
-        return String.format("%s%.2f%s", prefix, v, unit);
+        return (v == 0) ? "" : String.format("%s%.2f%s", prefix, v, unit);
     }
 }

@@ -4,6 +4,7 @@
 #include <jni.h>
 #include <list>
 #include <map>
+#include "wfb-ng/src/fec.h"
 #include "wfb-ng/src/rx.hpp"
 #include "devourer/src/WiFiDriver.h"
 

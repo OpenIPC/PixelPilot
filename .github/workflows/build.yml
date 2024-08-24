@@ -1,0 +1,30 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build
+        run: |
+          sudo apt-get update
+          sudo apt-get install openjdk-17-jdk
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          keytool -genkeypair -dname CN=OpenIPC -keyalg RSA -validity 8000 -alias fpv -keystore fpv.jks -storepass release -noprompt
+          ./gradlew assembleRelease
+          mv app/build/outputs/apk/release/app-release.apk PixelPilot.apk
+
+      - name: Upload
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          files: PixelPilot.apk

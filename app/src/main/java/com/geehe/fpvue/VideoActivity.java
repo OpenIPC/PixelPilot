@@ -1,5 +1,6 @@
 package com.geehe.fpvue;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,17 +8,23 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.hardware.usb.UsbManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.ParcelFileDescriptor;
+import android.text.format.Formatter;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -54,14 +61,21 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import me.saket.cascade.CascadePopupMenuCheckable;
-
 // Most basic implementation of an activity that uses VideoNative to stream a video
 // Into an Android Surface View
-public class VideoActivity extends AppCompatActivity implements IVideoParamsChanged, WfbNGStatsChanged, MavlinkUpdate, SettingsChanged {
-    private static final int PICK_GSKEY_REQUEST_CODE = 1;
+public class VideoActivity extends AppCompatActivity implements IVideoParamsChanged,
+        WfbNGStatsChanged, MavlinkUpdate, SettingsChanged {
+    private static final int PICK_KEY_REQUEST_CODE = 1;
     private static final int PICK_DVR_REQUEST_CODE = 2;
     private static final String TAG = "VideoActivity";
+    private static WifiManager wifiManager;
+    final Handler handler = new Handler(Looper.getMainLooper());
+    final Runnable runnable = new Runnable() {
+        public void run() {
+            MavlinkNative.nativeCallBack(VideoActivity.this);
+            handler.postDelayed(this, 100);
+        }
+    };
     protected DecodingInfo mDecodingInfo;
     int lastVideoW = 0, lastVideoH = 0;
     WfbLinkManager wfbLinkManager;
@@ -71,17 +85,22 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private ActivityVideoBinding binding;
     private OSDManager osdManager;
     private String activeCodec;
-
     private ParcelFileDescriptor dvrFd = null;
-
     private Timer dvrIconTimer = null;
 
     public static String getCodec(Context context) {
-        return context.getSharedPreferences("general", Context.MODE_PRIVATE).getString("codec", "h265");
+        return context.getSharedPreferences("general",
+                Context.MODE_PRIVATE).getString("codec", "h265");
     }
 
     public static int getChannel(Context context) {
-        return context.getSharedPreferences("general", Context.MODE_PRIVATE).getInt("wifi-channel", 149);
+        return context.getSharedPreferences("general",
+                Context.MODE_PRIVATE).getInt("wifi-channel", 161);
+    }
+
+    public static String wirelessInfo() {
+        int address = wifiManager.getConnectionInfo().getIpAddress();
+        return (address == 0) ? null : Formatter.formatIpAddress(address);
     }
 
     static String paddedDigits(int val, int len) {
@@ -111,12 +130,13 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         super.onCreate(savedInstanceState);
         binding = ActivityVideoBinding.inflate(getLayoutInflater());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
 
         // Init wfb ng.
         setDefaultGsKey();
         copyGSKey();
-        WfbNgLink wfbLink = new WfbNgLink(VideoActivity.this);
-        wfbLink.SetWfbNGStatsChanged(VideoActivity.this);
+        WfbNgLink wfbLink = new WfbNgLink(this);
+        wfbLink.SetWfbNGStatsChanged(this);
         wfbLinkManager = new WfbLinkManager(this, binding, wfbLink);
 
         // Setup video players
@@ -149,16 +169,12 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         chart.setData(noData);
 
         binding.btnSettings.setOnClickListener(v -> {
-            CascadePopupMenuCheckable popup = new CascadePopupMenuCheckable(VideoActivity.this, v);
-
+            PopupMenu popup = new PopupMenu(this, v);
             SubMenu chnMenu = popup.getMenu().addSubMenu("Channel");
             int channelPref = getChannel(this);
             chnMenu.setHeaderTitle("Current: " + channelPref);
             String[] channels = getResources().getStringArray(R.array.channels);
             for (String chnStr : channels) {
-                if (channelPref == Integer.parseInt(chnStr)) {
-                    continue;
-                }
                 chnMenu.add(chnStr).setOnMenuItemClickListener(item -> {
                     onChannelSettingChanged(Integer.parseInt(chnStr));
                     return true;
@@ -183,11 +199,13 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
             // OSD
             SubMenu osd = popup.getMenu().addSubMenu("OSD");
-            String lockLabel = osdManager.isOSDLocked() ? "Unlock OSD" : "Lock OSD";
-            MenuItem lock = osd.add(lockLabel);
+            MenuItem lock = osd.add(osdManager.isOSDLocked() ? "Unlock OSD" : "Lock OSD");
             lock.setOnMenuItemClickListener(item -> {
                 osdManager.lockOSD(!osdManager.isOSDLocked());
-                return true;
+                lock.setTitle(osdManager.isOSDLocked() ? "Unlock OSD" : "Lock OSD");
+                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+                item.setActionView(new View(this));
+                return false;
             });
             for (OSDElement element : osdManager.listOSDItems) {
                 MenuItem itm = osd.add(element.name);
@@ -196,7 +214,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 itm.setOnMenuItemClickListener(item -> {
                     item.setChecked(!item.isChecked());
                     osdManager.onOSDItemCheckChanged(element, item.isChecked());
-                    return true;
+                    item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+                    item.setActionView(new View(this));
+                    return false;
                 });
             }
 
@@ -207,7 +227,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("*/*");
-                startActivityForResult(intent, PICK_GSKEY_REQUEST_CODE);
+                startActivityForResult(intent, PICK_KEY_REQUEST_CODE);
                 return true;
             });
 
@@ -229,14 +249,17 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 }
                 return true;
             });
+
             MenuItem fmp4 = recording.add("fMP4");
             fmp4.setCheckable(true);
-            fmp4.setChecked(getDvrfMP4());
+            fmp4.setChecked(getDvrMP4());
             fmp4.setOnMenuItemClickListener(item -> {
-                boolean enabled = getDvrfMP4();
+                boolean enabled = getDvrMP4();
                 item.setChecked(!enabled);
-                setDvrfMP4(!enabled);
-                return true;
+                setDvrMP4(!enabled);
+                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+                item.setActionView(new View(this));
+                return false;
             });
 
             popup.show();
@@ -244,13 +267,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         // Setup mavlink
         MavlinkNative.nativeStart(this);
-        Timer mavlinkTimer = new Timer();
-        mavlinkTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                MavlinkNative.nativeCallBack(VideoActivity.this);
-            }
-        }, 0, 200);
+        handler.post(runnable);
 
         batteryReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent batteryStatus) {
@@ -262,7 +279,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 float batteryPct = level * 100 / (float) scale;
                 binding.tvGSBattery.setText((int) batteryPct + "%");
 
-                int icon = 0;
+                int icon;
                 if (isCharging) {
                     icon = R.drawable.baseline_battery_charging_full_24;
                 } else {
@@ -290,7 +307,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     private Uri openDvrFile() {
-        String dvrFolder = getSharedPreferences("general", Context.MODE_PRIVATE).getString("dvr_folder_", "");
+        String dvrFolder = getSharedPreferences("general",
+                Context.MODE_PRIVATE).getString("dvr_folder_", "");
         if (dvrFolder.isEmpty()) {
             return null;
         }
@@ -301,10 +319,10 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmm");
             // Format the current date and time
             String formattedNow = now.format(formatter);
-            String filename = "fpvue_dvr_" + formattedNow + ".mp4";
+            String filename = "pixelpilot_" + formattedNow + ".mp4";
             DocumentFile newFile = pickedDir.createFile("video/mp4", filename);
             Toast.makeText(this, "Recording to " + filename, Toast.LENGTH_SHORT).show();
-            return newFile.getUri();
+            return newFile != null ? newFile.getUri() : null;
         }
         return null;
     }
@@ -315,7 +333,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         }
         try {
             dvrFd = getContentResolver().openFileDescriptor(dvrUri, "rw");
-            currentPlayer().startDvr(dvrFd.getFd(), getDvrfMP4());
+            currentPlayer().startDvr(dvrFd.getFd(), getDvrMP4());
         } catch (IOException e) {
             Log.e(TAG, "Failed to open dvr file ", e);
             dvrFd = null;
@@ -324,12 +342,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         dvrIconTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        binding.imgRecIndicator.setVisibility(binding.imgRecIndicator.getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE);
-                    }
-                });
+                runOnUiThread(() -> binding.imgRecIndicator.setVisibility(binding.imgRecIndicator
+                        .getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE));
             }
         }, 0, 1000);
     }
@@ -354,7 +368,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_GSKEY_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == PICK_KEY_REQUEST_CODE && resultCode == RESULT_OK) {
             if (data != null && data.getData() != null) {
                 Uri uri = data.getData();
                 Log.d(TAG, "Selected file " + uri);
@@ -371,11 +385,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         } else if (requestCode == PICK_DVR_REQUEST_CODE && resultCode == RESULT_OK) {
             // The result data contains a URI for the document or directory that
             // the user selected.
-            Uri uri = null;
+            Uri uri;
             if (data != null && data.getData() != null) {
                 uri = data.getData();
                 // Perform operations on the document using its URI.
-                SharedPreferences prefs = this.getSharedPreferences("general", Context.MODE_PRIVATE);
+                SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString("dvr_folder_", uri.toString());
                 editor.apply();
@@ -395,7 +409,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         try {
             Log.d(TAG, "Importing default gs.key...");
             InputStream inputStream = getAssets().open("gs.key");
-            ;
             setGsKey(inputStream);
             inputStream.close();
         } catch (IOException e) {
@@ -415,27 +428,28 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         while ((length = inputStream.read(buffer)) != -1) {
             result.write(buffer, 0, length);
         }
-        SharedPreferences prefs = this.getSharedPreferences("general", Context.MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("gs.key", Base64.encodeToString(result.toByteArray(), Base64.DEFAULT));
         editor.apply();
     }
 
-    public boolean getDvrfMP4() {
+    public boolean getDvrMP4() {
         return getSharedPreferences("general", Context.MODE_PRIVATE).getBoolean("dvr_fmp4", true);
     }
 
-    public void setDvrfMP4(boolean enabled) {
-        SharedPreferences prefs = this.getSharedPreferences("general", Context.MODE_PRIVATE);
+    public void setDvrMP4(boolean enabled) {
+        SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("dvr_fmp4", enabled);
         editor.apply();
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     public void registerReceivers() {
         IntentFilter usbFilter = new IntentFilter();
-        usbFilter.addAction(android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED);
-        usbFilter.addAction(android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED);
+        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         usbFilter.addAction(WfbLinkManager.ACTION_USB_PERMISSION);
         IntentFilter batFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
@@ -451,11 +465,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     public void unregisterReceivers() {
         try {
             unregisterReceiver(wfbLinkManager);
-        } catch (java.lang.IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException ignored) {
         }
         try {
             unregisterReceiver(batteryReceiver);
-        } catch (java.lang.IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException ignored) {
         }
     }
 
@@ -467,6 +481,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     @Override
     protected void onStop() {
         MavlinkNative.nativeStop(this);
+        handler.removeCallbacks(runnable);
         unregisterReceivers();
         wfbLinkManager.stopAdapters();
         stopVideoPlayer();
@@ -482,7 +497,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         wfbLinkManager.setChannel(getChannel(this));
         wfbLinkManager.refreshAdapters();
-
         osdManager.restoreOSDConfig();
 
         registerReceivers();
@@ -520,7 +534,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         if (currentChannel == channel) {
             return;
         }
-        SharedPreferences prefs = this.getSharedPreferences("general", Context.MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt("wifi-channel", channel);
         editor.apply();
@@ -533,7 +547,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         if (codec.equals(activeCodec)) {
             return;
         }
-        SharedPreferences prefs = this.getSharedPreferences("general", Context.MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("codec", codec);
         editor.apply();
@@ -550,84 +564,77 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     @Override
     public void onDecodingInfoChanged(final DecodingInfo decodingInfo) {
         mDecodingInfo = decodingInfo;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (decodingInfo.currentFPS > 0) {
-                    binding.tvMessage.setVisibility(View.INVISIBLE);
-                }
-                if (decodingInfo.currentKiloBitsPerSecond > 1000) {
-                    binding.tvVideoStats.setText(String.format("%dx%d@%.0f   %.1f Mbps   %.1f ms", lastVideoW, lastVideoH, decodingInfo.currentFPS, decodingInfo.currentKiloBitsPerSecond / 1000, decodingInfo.avgTotalDecodingTime_ms));
-                } else {
-                    binding.tvVideoStats.setText(String.format("%dx%d@%.0f   %.1f Kpbs   %.1f ms", lastVideoW, lastVideoH, decodingInfo.currentFPS, decodingInfo.currentKiloBitsPerSecond, decodingInfo.avgTotalDecodingTime_ms));
-                }
+        runOnUiThread(() -> {
+            if (decodingInfo.currentFPS > 0) {
+                binding.tvMessage.setVisibility(View.INVISIBLE);
+            }
+            if (decodingInfo.currentKiloBitsPerSecond > 1000) {
+                binding.tvVideoStats.setText(String.format("%dx%d@%.0f   %.1f Mbps   %.1f ms",
+                        lastVideoW, lastVideoH, decodingInfo.currentFPS,
+                        decodingInfo.currentKiloBitsPerSecond / 1000, decodingInfo.avgTotalDecodingTime_ms));
+            } else {
+                binding.tvVideoStats.setText(String.format("%dx%d@%.0f   %.1f Kpbs   %.1f ms",
+                        lastVideoW, lastVideoH, decodingInfo.currentFPS,
+                        decodingInfo.currentKiloBitsPerSecond, decodingInfo.avgTotalDecodingTime_ms));
             }
         });
     }
 
     @Override
     public void onWfbNgStatsChanged(WfbNGStats data) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (data.count_p_all > 0) {
-                    binding.tvMessage.setVisibility(View.INVISIBLE);
-                    binding.tvMessage.setText("");
-                    if (data.count_p_dec_err > 0) {
-                        binding.tvLinkStatus.setText("Waiting for session key.");
-                    } else {
-                        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-                        // the chart.
-                        ArrayList<PieEntry> entries = new ArrayList<>();
-                        entries.add(new PieEntry((float) data.count_p_dec_ok / data.count_p_all));
-                        entries.add(new PieEntry((float) data.count_p_fec_recovered / data.count_p_all));
-                        entries.add(new PieEntry((float) data.count_p_lost / data.count_p_all));
-                        PieDataSet dataSet = new PieDataSet(entries, "Link Status");
-                        dataSet.setDrawIcons(false);
-                        dataSet.setDrawValues(false);
-                        ArrayList<Integer> colors = new ArrayList<>();
-                        colors.add(getColor(R.color.colorGreen));
-                        colors.add(getColor(R.color.colorYellow));
-                        colors.add(getColor(R.color.colorRed));
-                        dataSet.setColors(colors);
-                        PieData pieData = new PieData(dataSet);
-                        pieData.setValueFormatter(new PercentFormatter());
-                        pieData.setValueTextSize(11f);
-                        pieData.setValueTextColor(Color.WHITE);
-
-                        binding.pcLinkStat.setData(pieData);
-                        binding.pcLinkStat.setCenterText("" + data.count_p_fec_recovered);
-                        binding.pcLinkStat.invalidate();
-
-                        int color = getColor(R.color.colorGreenBg);
-                        if ((float) data.count_p_fec_recovered / data.count_p_all > 0.2) {
-                            color = getColor(R.color.colorYellowBg);
-                        }
-                        if (data.count_p_lost > 0) {
-                            color = getColor(R.color.colorRedBg);
-                        }
-                        binding.imgLinkStatus.setImageTintList(ColorStateList.valueOf(color));
-                        binding.tvLinkStatus.setText(String.format("O%sD%sR%sL%s",
-                                paddedDigits(data.count_p_outgoing, 6),
-                                paddedDigits(data.count_p_dec_ok, 6),
-                                paddedDigits(data.count_p_fec_recovered, 6),
-                                paddedDigits(data.count_p_lost, 6)));
-                    }
+        runOnUiThread(() -> {
+            if (data.count_p_all > 0) {
+                binding.tvMessage.setVisibility(View.INVISIBLE);
+                binding.tvMessage.setText("");
+                if (data.count_p_dec_err > 0) {
+                    binding.tvLinkStatus.setText("Waiting for session key.");
                 } else {
-                    binding.tvLinkStatus.setText("No wfb-ng data.");
+                    // NOTE: The order of the entries when being added to the entries array
+                    // determines their position around the center of the chart.
+                    ArrayList<PieEntry> entries = new ArrayList<>();
+                    entries.add(new PieEntry((float) data.count_p_dec_ok / data.count_p_all));
+                    entries.add(new PieEntry((float) data.count_p_fec_recovered / data.count_p_all));
+                    entries.add(new PieEntry((float) data.count_p_lost / data.count_p_all));
+                    PieDataSet dataSet = new PieDataSet(entries, "Link Status");
+                    dataSet.setDrawIcons(false);
+                    dataSet.setDrawValues(false);
+                    ArrayList<Integer> colors = new ArrayList<>();
+                    colors.add(getColor(R.color.colorGreen));
+                    colors.add(getColor(R.color.colorYellow));
+                    colors.add(getColor(R.color.colorRed));
+                    dataSet.setColors(colors);
+                    PieData pieData = new PieData(dataSet);
+                    pieData.setValueFormatter(new PercentFormatter());
+                    pieData.setValueTextSize(11f);
+                    pieData.setValueTextColor(Color.WHITE);
+
+                    binding.pcLinkStat.setData(pieData);
+                    binding.pcLinkStat.setCenterText("" + data.count_p_fec_recovered);
+                    binding.pcLinkStat.invalidate();
+
+                    int color = getColor(R.color.colorGreenBg);
+                    if ((float) data.count_p_fec_recovered / data.count_p_all > 0.2) {
+                        color = getColor(R.color.colorYellowBg);
+                    }
+                    if (data.count_p_lost > 0) {
+                        color = getColor(R.color.colorRedBg);
+                    }
+                    binding.imgLinkStatus.setImageTintList(ColorStateList.valueOf(color));
+                    binding.tvLinkStatus.setText(String.format("O%sD%sR%sL%s",
+                            paddedDigits(data.count_p_outgoing, 6),
+                            paddedDigits(data.count_p_dec_ok, 6),
+                            paddedDigits(data.count_p_fec_recovered, 6),
+                            paddedDigits(data.count_p_lost, 6)));
                 }
+            } else {
+                binding.tvLinkStatus.setText("No wfb-ng data.");
             }
         });
     }
 
     @Override
     public void onNewMavlinkData(MavlinkData data) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                osdManager.render(data);
-            }
-        });
+        runOnUiThread(() -> osdManager.render(data));
     }
 
     private void copyGSKey() {

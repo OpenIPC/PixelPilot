@@ -61,11 +61,12 @@ public class WfbLinkManager extends BroadcastReceiver {
     }
 
     public Map<String, UsbDevice> getAttachedAdapters() {
-        android.hardware.usb.UsbManager manager = (android.hardware.usb.UsbManager) context.getSystemService(Context.USB_SERVICE);
+        android.hardware.usb.UsbManager manager =
+                (android.hardware.usb.UsbManager) context.getSystemService(Context.USB_SERVICE);
 
         List<UsbDeviceFilter> filters;
         try {
-            filters = DeviceFilterXmlParser.parseXml(context, R.xml.usb_device_filter);
+            filters = UsbDeviceFilter.parseXml(context, R.xml.usb_device_filter);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -75,7 +76,7 @@ public class WfbLinkManager extends BroadcastReceiver {
         for (UsbDevice dev : manager.getDeviceList().values()) {
             boolean allowed = false;
             for (UsbDeviceFilter filter : filters) {
-                if (filter.productId == dev.getProductId() && filter.venderId == dev.getVendorId()) {
+                if (filter.productId == dev.getProductId() && filter.vendorId == dev.getVendorId()) {
                     allowed = true;
                     break;
                 }
@@ -92,13 +93,14 @@ public class WfbLinkManager extends BroadcastReceiver {
         Map<String, UsbDevice> attachedAdapters = getAttachedAdapters();
 
         boolean missingPermissions = false;
-        android.hardware.usb.UsbManager usbManager = (android.hardware.usb.UsbManager) context.getSystemService(Context.USB_SERVICE);
+        android.hardware.usb.UsbManager usbManager =
+                (android.hardware.usb.UsbManager) context.getSystemService(Context.USB_SERVICE);
         for (Map.Entry<String, UsbDevice> entry : attachedAdapters.entrySet()) {
             if (!usbManager.hasPermission(entry.getValue())) {
                 binding.tvMessage.setVisibility(View.VISIBLE);
                 binding.tvMessage.setText("No permission for wifi adapter(s) " + entry.getValue().getDeviceName());
-                String k = entry.getValue().getDeviceName();
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, new Intent(WfbLinkManager.ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
+                        new Intent(WfbLinkManager.ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
                 usbManager.requestPermission(entry.getValue(), pendingIntent);
                 missingPermissions = true;
             }
@@ -129,8 +131,13 @@ public class WfbLinkManager extends BroadcastReceiver {
         }
 
         if (activeWifiAdapters.isEmpty()) {
+            String text = "No compatible wifi adapter found.";
+            String wifi = VideoActivity.wirelessInfo();
+            if (wifi != null) {
+                text += "\n(udp://" + wifi + ":5600)";
+            }
             binding.tvMessage.setVisibility(View.VISIBLE);
-            binding.tvMessage.setText("No compatible wifi adapter found.");
+            binding.tvMessage.setText(text);
         }
     }
 
@@ -159,14 +166,14 @@ public class WfbLinkManager extends BroadcastReceiver {
             if (!startAdapter(entry.getValue())) {
                 break;
             }
-            ;
         }
     }
 
     public synchronized boolean startAdapter(UsbDevice dev) {
         binding.tvMessage.setVisibility(View.VISIBLE);
-        String name = dev.getDeviceName().split("/dev/bus/")[1];
-        if (binding.tvMessage.getText().toString().startsWith("Starting") && !binding.tvMessage.getText().toString().endsWith(name)) {
+        String name = String.format("%04X", dev.getVendorId()) + ":" + String.format("%04X", dev.getProductId());
+        if (binding.tvMessage.getText().toString().startsWith("Starting")
+                && !binding.tvMessage.getText().toString().endsWith(name)) {
             binding.tvMessage.setText(binding.tvMessage.getText() + ", " + name);
         } else {
             binding.tvMessage.setText("Starting wfb-ng on channel " + wifiChannel + " with " + name);

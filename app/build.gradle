@@ -1,0 +1,51 @@
+plugins {
+    alias(libs.plugins.androidApplication)
+}
+
+android {
+    namespace = "com.geehe.fpvue"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.geehe.fpvue"
+        minSdk = 26
+        targetSdk = 34
+        versionCode = 1
+        versionName = "0.20"
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("../fpv.jks")
+            storePassword = "release"
+            keyAlias = "fpv"
+            keyPassword = "release"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = false
+            signingConfig = signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+}
+
+dependencies {
+    implementation(project(":app:mavlink"))
+    implementation(project(":app:videonative"))
+    implementation(project(":app:wfbngrtl8812"))
+
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    implementation(libs.philjay.mpandroidchart)
+}

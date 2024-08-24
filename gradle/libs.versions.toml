@@ -1,26 +1,18 @@
 [versions]
-agp = "8.3.1"
-junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-appcompat = "1.6.1"
-material = "1.11.0"
+agp = "8.5.2"
+coreKtx = "1.13.1"
+appcompat = "1.7.0"
+material = "1.12.0"
 constraintlayout = "2.1.4"
-meCascadeVersion = "2.3.0"
-mpandroidchart = "v3.1.0"
+mpandroidchartVersion = "3.1.0"
 
 [libraries]
-cascade-compose = { module = "me.saket.cascade:cascade-compose", version.ref = "meCascadeVersion" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-me-saket-cascade-cascade = { module = "me.saket.cascade:cascade", version.ref = "meCascadeVersion" }
-mpAndroidChart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
+philjay-mpandroidchart = { module = "com.github.Philjay:mpandroidchart", version.ref = "mpandroidchartVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-

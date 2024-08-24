@@ -25,8 +25,8 @@ public class WfbNgLink implements WfbNGStatsChanged {
     private final long nativeWfbngLink;
     private final Timer timer;
     private final Context context;
-    Map<UsbDevice, Thread> linkThreads = new HashMap<UsbDevice, Thread>();
-    Map<UsbDevice, UsbDeviceConnection> linkConns = new HashMap<UsbDevice, UsbDeviceConnection>();
+    Map<UsbDevice, Thread> linkThreads = new HashMap<>();
+    Map<UsbDevice, UsbDeviceConnection> linkConns = new HashMap<>();
     private WfbNGStatsChanged statsChanged;
 
     public WfbNgLink(final AppCompatActivity parent) {

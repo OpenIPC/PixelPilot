@@ -1,7 +1,7 @@
 [submodule "app/wfbngrtl8812/src/main/cpp/devourer"]
 	path = app/wfbngrtl8812/src/main/cpp/devourer
-	url = https://github.com/gehee/devourer.git
-	branch = android-compat
+	url = https://github.com/openipc/devourer.git
+	branch = master
 
 [submodule "app/wfbngrtl8812/src/main/cpp/wfb-ng"]
 	path = app/wfbngrtl8812/src/main/cpp/wfb-ng

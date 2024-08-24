@@ -35,3 +35,5 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         # List libraries link to the target library
         android
         log)
+
+target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -Wno-address-of-packed-member)
