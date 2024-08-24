@@ -61,24 +61,49 @@ import me.saket.cascade.CascadePopupMenuCheckable;
 public class VideoActivity extends AppCompatActivity implements IVideoParamsChanged, WfbNGStatsChanged, MavlinkUpdate, SettingsChanged {
     private static final int PICK_GSKEY_REQUEST_CODE = 1;
     private static final int PICK_DVR_REQUEST_CODE = 2;
-
-    private ActivityVideoBinding binding;
-    protected DecodingInfo mDecodingInfo;
-    int lastVideoW=0,lastVideoH=0;
-    private OSDManager osdManager;
-
     private static final String TAG = "VideoActivity";
-
+    protected DecodingInfo mDecodingInfo;
+    int lastVideoW = 0, lastVideoH = 0;
     WfbLinkManager wfbLinkManager;
     BroadcastReceiver batteryReceiver;
-
     VideoPlayer videoPlayerH264;
     VideoPlayer videoPlayerH265;
+    private ActivityVideoBinding binding;
+    private OSDManager osdManager;
     private String activeCodec;
 
     private ParcelFileDescriptor dvrFd = null;
 
-    private  Timer dvrIconTimer = null;
+    private Timer dvrIconTimer = null;
+
+    public static String getCodec(Context context) {
+        return context.getSharedPreferences("general", Context.MODE_PRIVATE).getString("codec", "h265");
+    }
+
+    public static int getChannel(Context context) {
+        return context.getSharedPreferences("general", Context.MODE_PRIVATE).getInt("wifi-channel", 149);
+    }
+
+    static String paddedDigits(int val, int len) {
+        StringBuilder sb = new StringBuilder(String.format("%d", val));
+        while (sb.length() < len) {
+            sb.append('\t');
+        }
+        return sb.toString();
+    }
+
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xFF & b);
+            if (hex.length() == 1) {
+                // Append a leading zero for single digit hex values
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +156,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             chnMenu.setHeaderTitle("Current: " + channelPref);
             String[] channels = getResources().getStringArray(R.array.channels);
             for (String chnStr : channels) {
-                if (channelPref==Integer.parseInt(chnStr)){
+                if (channelPref == Integer.parseInt(chnStr)) {
                     continue;
                 }
                 chnMenu.add(chnStr).setOnMenuItemClickListener(item -> {
@@ -147,7 +172,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
             String[] codecs = getResources().getStringArray(R.array.codecs);
             for (String codecStr : codecs) {
-                if (codecPref.equals(codecStr)){
+                if (codecPref.equals(codecStr)) {
                     continue;
                 }
                 codecMenu.add(codecStr).setOnMenuItemClickListener(item -> {
@@ -164,7 +189,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 osdManager.lockOSD(!osdManager.isOSDLocked());
                 return true;
             });
-            for (OSDElement element: osdManager.listOSDItems) {
+            for (OSDElement element : osdManager.listOSDItems) {
                 MenuItem itm = osd.add(element.name);
                 itm.setCheckable(true);
                 itm.setChecked(osdManager.isElementEnabled(element));
@@ -225,7 +250,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             public void run() {
                 MavlinkNative.nativeCallBack(VideoActivity.this);
             }
-        },0,200);
+        }, 0, 200);
 
         batteryReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent batteryStatus) {
@@ -234,26 +259,26 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                         status == BatteryManager.BATTERY_STATUS_FULL;
                 int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
                 int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-                float batteryPct = level * 100 / (float)scale;
-                binding.tvGSBattery.setText((int)batteryPct+"%");
+                float batteryPct = level * 100 / (float) scale;
+                binding.tvGSBattery.setText((int) batteryPct + "%");
 
                 int icon = 0;
                 if (isCharging) {
                     icon = R.drawable.baseline_battery_charging_full_24;
                 } else {
-                    if (batteryPct<=0) {
+                    if (batteryPct <= 0) {
                         icon = R.drawable.baseline_battery_0_bar_24;
-                    } else if (batteryPct<=1/7.0*100) {
+                    } else if (batteryPct <= 1 / 7.0 * 100) {
                         icon = R.drawable.baseline_battery_1_bar_24;
-                    } else if (batteryPct<=2/7.0*100) {
+                    } else if (batteryPct <= 2 / 7.0 * 100) {
                         icon = R.drawable.baseline_battery_2_bar_24;
-                    } else if (batteryPct<=3/7.0*100) {
+                    } else if (batteryPct <= 3 / 7.0 * 100) {
                         icon = R.drawable.baseline_battery_3_bar_24;
-                    } else if (batteryPct<=4/7.0*100) {
+                    } else if (batteryPct <= 4 / 7.0 * 100) {
                         icon = R.drawable.baseline_battery_4_bar_24;
-                    } else if (batteryPct<=5/7.0*100) {
+                    } else if (batteryPct <= 5 / 7.0 * 100) {
                         icon = R.drawable.baseline_battery_5_bar_24;
-                    } else if (batteryPct<=6/7.0*100) {
+                    } else if (batteryPct <= 6 / 7.0 * 100) {
                         icon = R.drawable.baseline_battery_6_bar_24;
                     } else {
                         icon = R.drawable.baseline_battery_full_24;
@@ -265,28 +290,28 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     private Uri openDvrFile() {
-            String dvrFolder = getSharedPreferences("general", Context.MODE_PRIVATE).getString("dvr_folder_", "");
-            if (dvrFolder.isEmpty()) {
-                return null;
-            }
-            Uri uri =  Uri.parse(dvrFolder);
-            DocumentFile pickedDir = DocumentFile.fromTreeUri(this, uri);
-            if (pickedDir != null && pickedDir.canWrite()) {
-                LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmm");
-                // Format the current date and time
-                String formattedNow = now.format(formatter);
-                String filename = "fpvue_dvr_" + formattedNow + ".mp4";
-                DocumentFile newFile = pickedDir.createFile("video/mp4", filename);
-                Toast.makeText(this, "Recording to " + filename, Toast.LENGTH_SHORT).show();
-                return newFile.getUri();
-            }
+        String dvrFolder = getSharedPreferences("general", Context.MODE_PRIVATE).getString("dvr_folder_", "");
+        if (dvrFolder.isEmpty()) {
             return null;
+        }
+        Uri uri = Uri.parse(dvrFolder);
+        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, uri);
+        if (pickedDir != null && pickedDir.canWrite()) {
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmm");
+            // Format the current date and time
+            String formattedNow = now.format(formatter);
+            String filename = "fpvue_dvr_" + formattedNow + ".mp4";
+            DocumentFile newFile = pickedDir.createFile("video/mp4", filename);
+            Toast.makeText(this, "Recording to " + filename, Toast.LENGTH_SHORT).show();
+            return newFile.getUri();
+        }
+        return null;
     }
 
     private void startDvr(Uri dvrUri) {
         if (dvrFd != null) {
-           stopDvr();
+            stopDvr();
         }
         try {
             dvrFd = getContentResolver().openFileDescriptor(dvrUri, "rw");
@@ -306,7 +331,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                     }
                 });
             }
-        },0,1000);
+        }, 0, 1000);
     }
 
     private void stopDvr() {
@@ -343,7 +368,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                     Log.e(TAG, "Failed to import gs.key from " + uri);
                 }
             }
-        } else if (requestCode == PICK_DVR_REQUEST_CODE  && resultCode == RESULT_OK) {
+        } else if (requestCode == PICK_DVR_REQUEST_CODE && resultCode == RESULT_OK) {
             // The result data contains a URI for the document or directory that
             // the user selected.
             Uri uri = null;
@@ -363,13 +388,14 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     public void setDefaultGsKey() {
-        if (getGsKey().length > 0 ){
-            Log.d(TAG,  "gs.key already saved in preferences.");
+        if (getGsKey().length > 0) {
+            Log.d(TAG, "gs.key already saved in preferences.");
             return;
         }
         try {
-            Log.d(TAG,  "Importing default gs.key...");
-            InputStream inputStream =  getAssets().open("gs.key");;
+            Log.d(TAG, "Importing default gs.key...");
+            InputStream inputStream = getAssets().open("gs.key");
+            ;
             setGsKey(inputStream);
             inputStream.close();
         } catch (IOException e) {
@@ -406,7 +432,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         editor.apply();
     }
 
-    public void registerReceivers(){
+    public void registerReceivers() {
         IntentFilter usbFilter = new IntentFilter();
         usbFilter.addAction(android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED);
         usbFilter.addAction(android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED);
@@ -425,10 +451,12 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     public void unregisterReceivers() {
         try {
             unregisterReceiver(wfbLinkManager);
-        } catch(java.lang.IllegalArgumentException ignored) {}
+        } catch (java.lang.IllegalArgumentException ignored) {
+        }
         try {
             unregisterReceiver(batteryReceiver);
-        } catch(java.lang.IllegalArgumentException ignored) {}
+        } catch (java.lang.IllegalArgumentException ignored) {
+        }
     }
 
     @Override
@@ -478,20 +506,12 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             binding.svH265.setVisibility(View.INVISIBLE);
             binding.svH264.setVisibility(View.VISIBLE);
         }
-        activeCodec=codec;
+        activeCodec = codec;
     }
 
     public synchronized void stopVideoPlayer() {
         videoPlayerH264.stop();
         videoPlayerH265.stop();
-    }
-
-    public static String getCodec(Context context) {
-        return context.getSharedPreferences("general", Context.MODE_PRIVATE).getString("codec", "h265");
-    }
-
-    public static int getChannel(Context context) {
-        return context.getSharedPreferences("general", Context.MODE_PRIVATE).getInt("wifi-channel", 149);
     }
 
     @Override
@@ -522,14 +542,14 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     @Override
-    public void onVideoRatioChanged(final int videoW,final int videoH) {
-        lastVideoW=videoW;
-        lastVideoH=videoH;
+    public void onVideoRatioChanged(final int videoW, final int videoH) {
+        lastVideoW = videoW;
+        lastVideoH = videoH;
     }
 
     @Override
     public void onDecodingInfoChanged(final DecodingInfo decodingInfo) {
-        mDecodingInfo=decodingInfo;
+        mDecodingInfo = decodingInfo;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -537,9 +557,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                     binding.tvMessage.setVisibility(View.INVISIBLE);
                 }
                 if (decodingInfo.currentKiloBitsPerSecond > 1000) {
-                    binding.tvVideoStats.setText(String.format("%dx%d@%.0f   %.1f Mbps   %.1f ms",lastVideoW, lastVideoH, decodingInfo.currentFPS, decodingInfo.currentKiloBitsPerSecond/1000, decodingInfo.avgTotalDecodingTime_ms));
+                    binding.tvVideoStats.setText(String.format("%dx%d@%.0f   %.1f Mbps   %.1f ms", lastVideoW, lastVideoH, decodingInfo.currentFPS, decodingInfo.currentKiloBitsPerSecond / 1000, decodingInfo.avgTotalDecodingTime_ms));
                 } else {
-                    binding.tvVideoStats.setText(String.format("%dx%d@%.0f   %.1f Kpbs   %.1f ms",lastVideoW, lastVideoH, decodingInfo.currentFPS, decodingInfo.currentKiloBitsPerSecond, decodingInfo.avgTotalDecodingTime_ms));
+                    binding.tvVideoStats.setText(String.format("%dx%d@%.0f   %.1f Kpbs   %.1f ms", lastVideoW, lastVideoH, decodingInfo.currentFPS, decodingInfo.currentKiloBitsPerSecond, decodingInfo.avgTotalDecodingTime_ms));
                 }
             }
         });
@@ -559,9 +579,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
                         // the chart.
                         ArrayList<PieEntry> entries = new ArrayList<>();
-                        entries.add(new PieEntry((float) data.count_p_dec_ok/data.count_p_all));
-                        entries.add(new PieEntry((float) data.count_p_fec_recovered/data.count_p_all));
-                        entries.add(new PieEntry((float) data.count_p_lost/data.count_p_all));
+                        entries.add(new PieEntry((float) data.count_p_dec_ok / data.count_p_all));
+                        entries.add(new PieEntry((float) data.count_p_fec_recovered / data.count_p_all));
+                        entries.add(new PieEntry((float) data.count_p_lost / data.count_p_all));
                         PieDataSet dataSet = new PieDataSet(entries, "Link Status");
                         dataSet.setDrawIcons(false);
                         dataSet.setDrawValues(false);
@@ -576,14 +596,14 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                         pieData.setValueTextColor(Color.WHITE);
 
                         binding.pcLinkStat.setData(pieData);
-                        binding.pcLinkStat.setCenterText(""+data.count_p_fec_recovered);
+                        binding.pcLinkStat.setCenterText("" + data.count_p_fec_recovered);
                         binding.pcLinkStat.invalidate();
 
                         int color = getColor(R.color.colorGreenBg);
-                        if ((float)data.count_p_fec_recovered/data.count_p_all>0.2) {
+                        if ((float) data.count_p_fec_recovered / data.count_p_all > 0.2) {
                             color = getColor(R.color.colorYellowBg);
                         }
-                        if (data.count_p_lost>0) {
+                        if (data.count_p_lost > 0) {
                             color = getColor(R.color.colorRedBg);
                         }
                         binding.imgLinkStatus.setImageTintList(ColorStateList.valueOf(color));
@@ -610,39 +630,17 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         });
     }
 
-    static String paddedDigits(int val, int len) {
-        StringBuilder sb = new StringBuilder(String.format("%d", val));
-        while (sb.length() < len) {
-            sb.append('\t');
-        }
-        return sb.toString();
-    }
-
-    public static String bytesToHex(byte[] bytes) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b: bytes) {
-            String hex = Integer.toHexString(0xFF & b);
-            if (hex.length() == 1) {
-                // Append a leading zero for single digit hex values
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-
     private void copyGSKey() {
         File file = new File(getApplicationContext().getFilesDir(), "gs.key");
         OutputStream out = null;
         try {
             byte[] keyBytes = getGsKey();
-            Log.d(TAG, "Using gs.key:"+bytesToHex(keyBytes)+"; Copying to" + file.getAbsolutePath());
+            Log.d(TAG, "Using gs.key:" + bytesToHex(keyBytes) + "; Copying to" + file.getAbsolutePath());
             out = new FileOutputStream(file);
             out.write(keyBytes, 0, keyBytes.length);
-        } catch(IOException e) {
+        } catch (IOException e) {
             Log.e("tag", "Failed to copy asset", e);
-        }
-        finally {
+        } finally {
             if (out != null) {
                 try {
                     out.close();

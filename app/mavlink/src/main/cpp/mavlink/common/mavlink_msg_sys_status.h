@@ -4,21 +4,21 @@
 #define MAVLINK_MSG_ID_SYS_STATUS 1
 
 MAVPACKED(
-typedef struct __mavlink_sys_status_t {
- uint32_t onboard_control_sensors_present; /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
- uint32_t onboard_control_sensors_enabled; /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
- uint32_t onboard_control_sensors_health; /*<  Bitmap showing which onboard controllers and sensors are operational or have an error:  Value of 0: not enabled. Value of 1: enabled.*/
- uint16_t load; /*< [d%] Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000*/
- uint16_t voltage_battery; /*< [mV] Battery voltage*/
- int16_t current_battery; /*< [cA] Battery current, -1: autopilot does not measure the current*/
- uint16_t drop_rate_comm; /*< [c%] Communication drop rate, (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
- uint16_t errors_comm; /*<  Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
- uint16_t errors_count1; /*<  Autopilot-specific errors*/
- uint16_t errors_count2; /*<  Autopilot-specific errors*/
- uint16_t errors_count3; /*<  Autopilot-specific errors*/
- uint16_t errors_count4; /*<  Autopilot-specific errors*/
- int8_t battery_remaining; /*< [%] Remaining battery energy, -1: autopilot estimate the remaining battery*/
-}) mavlink_sys_status_t;
+        typedef struct __mavlink_sys_status_t {
+            uint32_t onboard_control_sensors_present; /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
+            uint32_t onboard_control_sensors_enabled; /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
+            uint32_t onboard_control_sensors_health; /*<  Bitmap showing which onboard controllers and sensors are operational or have an error:  Value of 0: not enabled. Value of 1: enabled.*/
+            uint16_t load; /*< [d%] Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000*/
+            uint16_t voltage_battery; /*< [mV] Battery voltage*/
+            int16_t current_battery; /*< [cA] Battery current, -1: autopilot does not measure the current*/
+            uint16_t drop_rate_comm; /*< [c%] Communication drop rate, (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
+            uint16_t errors_comm; /*<  Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
+            uint16_t errors_count1; /*<  Autopilot-specific errors*/
+            uint16_t errors_count2; /*<  Autopilot-specific errors*/
+            uint16_t errors_count3; /*<  Autopilot-specific errors*/
+            uint16_t errors_count4; /*<  Autopilot-specific errors*/
+            int8_t battery_remaining; /*< [%] Remaining battery energy, -1: autopilot estimate the remaining battery*/
+        }) mavlink_sys_status_t;
 
 #define MAVLINK_MSG_ID_SYS_STATUS_LEN 31
 #define MAVLINK_MSG_ID_SYS_STATUS_MIN_LEN 31
@@ -27,7 +27,6 @@ typedef struct __mavlink_sys_status_t {
 
 #define MAVLINK_MSG_ID_SYS_STATUS_CRC 124
 #define MAVLINK_MSG_ID_1_CRC 124
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -92,9 +91,15 @@ typedef struct __mavlink_sys_status_t {
  * @param errors_count4  Autopilot-specific errors
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_sys_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint32_t onboard_control_sensors_present, uint32_t onboard_control_sensors_enabled, uint32_t onboard_control_sensors_health, uint16_t load, uint16_t voltage_battery, int16_t current_battery, int8_t battery_remaining, uint16_t drop_rate_comm, uint16_t errors_comm, uint16_t errors_count1, uint16_t errors_count2, uint16_t errors_count3, uint16_t errors_count4)
-{
+static inline uint16_t
+mavlink_msg_sys_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            uint32_t onboard_control_sensors_present,
+                            uint32_t onboard_control_sensors_enabled,
+                            uint32_t onboard_control_sensors_health, uint16_t load,
+                            uint16_t voltage_battery, int16_t current_battery,
+                            int8_t battery_remaining, uint16_t drop_rate_comm, uint16_t errors_comm,
+                            uint16_t errors_count1, uint16_t errors_count2, uint16_t errors_count3,
+                            uint16_t errors_count4) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SYS_STATUS_LEN];
     _mav_put_uint32_t(buf, 0, onboard_control_sensors_present);
@@ -128,11 +133,12 @@ static inline uint16_t mavlink_msg_sys_status_pack(uint8_t system_id, uint8_t co
     packet.errors_count4 = errors_count4;
     packet.battery_remaining = battery_remaining;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SYS_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SYS_STATUS_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SYS_STATUS;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SYS_STATUS_MIN_LEN, MAVLINK_MSG_ID_SYS_STATUS_LEN, MAVLINK_MSG_ID_SYS_STATUS_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SYS_STATUS_MIN_LEN,
+                                    MAVLINK_MSG_ID_SYS_STATUS_LEN, MAVLINK_MSG_ID_SYS_STATUS_CRC);
 }
 
 /**
@@ -156,10 +162,17 @@ static inline uint16_t mavlink_msg_sys_status_pack(uint8_t system_id, uint8_t co
  * @param errors_count4  Autopilot-specific errors
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_sys_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint32_t onboard_control_sensors_present,uint32_t onboard_control_sensors_enabled,uint32_t onboard_control_sensors_health,uint16_t load,uint16_t voltage_battery,int16_t current_battery,int8_t battery_remaining,uint16_t drop_rate_comm,uint16_t errors_comm,uint16_t errors_count1,uint16_t errors_count2,uint16_t errors_count3,uint16_t errors_count4)
-{
+static inline uint16_t
+mavlink_msg_sys_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg,
+                                 uint32_t onboard_control_sensors_present,
+                                 uint32_t onboard_control_sensors_enabled,
+                                 uint32_t onboard_control_sensors_health, uint16_t load,
+                                 uint16_t voltage_battery, int16_t current_battery,
+                                 int8_t battery_remaining, uint16_t drop_rate_comm,
+                                 uint16_t errors_comm, uint16_t errors_count1,
+                                 uint16_t errors_count2, uint16_t errors_count3,
+                                 uint16_t errors_count4) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SYS_STATUS_LEN];
     _mav_put_uint32_t(buf, 0, onboard_control_sensors_present);
@@ -193,11 +206,14 @@ static inline uint16_t mavlink_msg_sys_status_pack_chan(uint8_t system_id, uint8
     packet.errors_count4 = errors_count4;
     packet.battery_remaining = battery_remaining;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SYS_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SYS_STATUS_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SYS_STATUS;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SYS_STATUS_MIN_LEN, MAVLINK_MSG_ID_SYS_STATUS_LEN, MAVLINK_MSG_ID_SYS_STATUS_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SYS_STATUS_MIN_LEN,
+                                         MAVLINK_MSG_ID_SYS_STATUS_LEN,
+                                         MAVLINK_MSG_ID_SYS_STATUS_CRC);
 }
 
 /**
@@ -208,9 +224,18 @@ static inline uint16_t mavlink_msg_sys_status_pack_chan(uint8_t system_id, uint8
  * @param msg The MAVLink message to compress the data into
  * @param sys_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_sys_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_sys_status_t* sys_status)
-{
-    return mavlink_msg_sys_status_pack(system_id, component_id, msg, sys_status->onboard_control_sensors_present, sys_status->onboard_control_sensors_enabled, sys_status->onboard_control_sensors_health, sys_status->load, sys_status->voltage_battery, sys_status->current_battery, sys_status->battery_remaining, sys_status->drop_rate_comm, sys_status->errors_comm, sys_status->errors_count1, sys_status->errors_count2, sys_status->errors_count3, sys_status->errors_count4);
+static inline uint16_t
+mavlink_msg_sys_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                              const mavlink_sys_status_t *sys_status) {
+    return mavlink_msg_sys_status_pack(system_id, component_id, msg,
+                                       sys_status->onboard_control_sensors_present,
+                                       sys_status->onboard_control_sensors_enabled,
+                                       sys_status->onboard_control_sensors_health, sys_status->load,
+                                       sys_status->voltage_battery, sys_status->current_battery,
+                                       sys_status->battery_remaining, sys_status->drop_rate_comm,
+                                       sys_status->errors_comm, sys_status->errors_count1,
+                                       sys_status->errors_count2, sys_status->errors_count3,
+                                       sys_status->errors_count4);
 }
 
 /**
@@ -222,9 +247,19 @@ static inline uint16_t mavlink_msg_sys_status_encode(uint8_t system_id, uint8_t 
  * @param msg The MAVLink message to compress the data into
  * @param sys_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_sys_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_sys_status_t* sys_status)
-{
-    return mavlink_msg_sys_status_pack_chan(system_id, component_id, chan, msg, sys_status->onboard_control_sensors_present, sys_status->onboard_control_sensors_enabled, sys_status->onboard_control_sensors_health, sys_status->load, sys_status->voltage_battery, sys_status->current_battery, sys_status->battery_remaining, sys_status->drop_rate_comm, sys_status->errors_comm, sys_status->errors_count1, sys_status->errors_count2, sys_status->errors_count3, sys_status->errors_count4);
+static inline uint16_t
+mavlink_msg_sys_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                   mavlink_message_t *msg, const mavlink_sys_status_t *sys_status) {
+    return mavlink_msg_sys_status_pack_chan(system_id, component_id, chan, msg,
+                                            sys_status->onboard_control_sensors_present,
+                                            sys_status->onboard_control_sensors_enabled,
+                                            sys_status->onboard_control_sensors_health,
+                                            sys_status->load, sys_status->voltage_battery,
+                                            sys_status->current_battery,
+                                            sys_status->battery_remaining,
+                                            sys_status->drop_rate_comm, sys_status->errors_comm,
+                                            sys_status->errors_count1, sys_status->errors_count2,
+                                            sys_status->errors_count3, sys_status->errors_count4);
 }
 
 /**
@@ -358,9 +393,9 @@ static inline void mavlink_msg_sys_status_send_buf(mavlink_message_t *msgbuf, ma
  *
  * @return  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.
  */
-static inline uint32_t mavlink_msg_sys_status_get_onboard_control_sensors_present(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  0);
+static inline uint32_t
+mavlink_msg_sys_status_get_onboard_control_sensors_present(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 0);
 }
 
 /**
@@ -368,9 +403,9 @@ static inline uint32_t mavlink_msg_sys_status_get_onboard_control_sensors_presen
  *
  * @return  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.
  */
-static inline uint32_t mavlink_msg_sys_status_get_onboard_control_sensors_enabled(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  4);
+static inline uint32_t
+mavlink_msg_sys_status_get_onboard_control_sensors_enabled(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 4);
 }
 
 /**
@@ -378,9 +413,9 @@ static inline uint32_t mavlink_msg_sys_status_get_onboard_control_sensors_enable
  *
  * @return  Bitmap showing which onboard controllers and sensors are operational or have an error:  Value of 0: not enabled. Value of 1: enabled.
  */
-static inline uint32_t mavlink_msg_sys_status_get_onboard_control_sensors_health(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  8);
+static inline uint32_t
+mavlink_msg_sys_status_get_onboard_control_sensors_health(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 8);
 }
 
 /**
@@ -388,9 +423,8 @@ static inline uint32_t mavlink_msg_sys_status_get_onboard_control_sensors_health
  *
  * @return [d%] Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000
  */
-static inline uint16_t mavlink_msg_sys_status_get_load(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  12);
+static inline uint16_t mavlink_msg_sys_status_get_load(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 12);
 }
 
 /**
@@ -398,9 +432,8 @@ static inline uint16_t mavlink_msg_sys_status_get_load(const mavlink_message_t* 
  *
  * @return [mV] Battery voltage
  */
-static inline uint16_t mavlink_msg_sys_status_get_voltage_battery(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  14);
+static inline uint16_t mavlink_msg_sys_status_get_voltage_battery(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 14);
 }
 
 /**
@@ -408,9 +441,8 @@ static inline uint16_t mavlink_msg_sys_status_get_voltage_battery(const mavlink_
  *
  * @return [cA] Battery current, -1: autopilot does not measure the current
  */
-static inline int16_t mavlink_msg_sys_status_get_current_battery(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  16);
+static inline int16_t mavlink_msg_sys_status_get_current_battery(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 16);
 }
 
 /**
@@ -418,9 +450,8 @@ static inline int16_t mavlink_msg_sys_status_get_current_battery(const mavlink_m
  *
  * @return [%] Remaining battery energy, -1: autopilot estimate the remaining battery
  */
-static inline int8_t mavlink_msg_sys_status_get_battery_remaining(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int8_t(msg,  30);
+static inline int8_t mavlink_msg_sys_status_get_battery_remaining(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int8_t(msg, 30);
 }
 
 /**
@@ -428,9 +459,8 @@ static inline int8_t mavlink_msg_sys_status_get_battery_remaining(const mavlink_
  *
  * @return [c%] Communication drop rate, (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)
  */
-static inline uint16_t mavlink_msg_sys_status_get_drop_rate_comm(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  18);
+static inline uint16_t mavlink_msg_sys_status_get_drop_rate_comm(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 18);
 }
 
 /**
@@ -438,9 +468,8 @@ static inline uint16_t mavlink_msg_sys_status_get_drop_rate_comm(const mavlink_m
  *
  * @return  Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)
  */
-static inline uint16_t mavlink_msg_sys_status_get_errors_comm(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  20);
+static inline uint16_t mavlink_msg_sys_status_get_errors_comm(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 20);
 }
 
 /**
@@ -448,9 +477,8 @@ static inline uint16_t mavlink_msg_sys_status_get_errors_comm(const mavlink_mess
  *
  * @return  Autopilot-specific errors
  */
-static inline uint16_t mavlink_msg_sys_status_get_errors_count1(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  22);
+static inline uint16_t mavlink_msg_sys_status_get_errors_count1(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 22);
 }
 
 /**
@@ -458,9 +486,8 @@ static inline uint16_t mavlink_msg_sys_status_get_errors_count1(const mavlink_me
  *
  * @return  Autopilot-specific errors
  */
-static inline uint16_t mavlink_msg_sys_status_get_errors_count2(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  24);
+static inline uint16_t mavlink_msg_sys_status_get_errors_count2(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 24);
 }
 
 /**
@@ -468,9 +495,8 @@ static inline uint16_t mavlink_msg_sys_status_get_errors_count2(const mavlink_me
  *
  * @return  Autopilot-specific errors
  */
-static inline uint16_t mavlink_msg_sys_status_get_errors_count3(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  26);
+static inline uint16_t mavlink_msg_sys_status_get_errors_count3(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 26);
 }
 
 /**
@@ -478,9 +504,8 @@ static inline uint16_t mavlink_msg_sys_status_get_errors_count3(const mavlink_me
  *
  * @return  Autopilot-specific errors
  */
-static inline uint16_t mavlink_msg_sys_status_get_errors_count4(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  28);
+static inline uint16_t mavlink_msg_sys_status_get_errors_count4(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 28);
 }
 
 /**
@@ -489,8 +514,8 @@ static inline uint16_t mavlink_msg_sys_status_get_errors_count4(const mavlink_me
  * @param msg The message to decode
  * @param sys_status C-struct to decode the message contents into
  */
-static inline void mavlink_msg_sys_status_decode(const mavlink_message_t* msg, mavlink_sys_status_t* sys_status)
-{
+static inline void
+mavlink_msg_sys_status_decode(const mavlink_message_t *msg, mavlink_sys_status_t *sys_status) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     sys_status->onboard_control_sensors_present = mavlink_msg_sys_status_get_onboard_control_sensors_present(msg);
     sys_status->onboard_control_sensors_enabled = mavlink_msg_sys_status_get_onboard_control_sensors_enabled(msg);
@@ -506,8 +531,9 @@ static inline void mavlink_msg_sys_status_decode(const mavlink_message_t* msg, m
     sys_status->errors_count4 = mavlink_msg_sys_status_get_errors_count4(msg);
     sys_status->battery_remaining = mavlink_msg_sys_status_get_battery_remaining(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SYS_STATUS_LEN? msg->len : MAVLINK_MSG_ID_SYS_STATUS_LEN;
-        memset(sys_status, 0, MAVLINK_MSG_ID_SYS_STATUS_LEN);
+    uint8_t len =
+            msg->len < MAVLINK_MSG_ID_SYS_STATUS_LEN ? msg->len : MAVLINK_MSG_ID_SYS_STATUS_LEN;
+    memset(sys_status, 0, MAVLINK_MSG_ID_SYS_STATUS_LEN);
     memcpy(sys_status, _MAV_PAYLOAD(msg), len);
 #endif
 }

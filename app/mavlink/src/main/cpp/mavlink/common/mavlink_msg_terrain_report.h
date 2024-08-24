@@ -4,15 +4,15 @@
 #define MAVLINK_MSG_ID_TERRAIN_REPORT 136
 
 MAVPACKED(
-typedef struct __mavlink_terrain_report_t {
- int32_t lat; /*< [degE7] Latitude*/
- int32_t lon; /*< [degE7] Longitude*/
- float terrain_height; /*< [m] Terrain height MSL*/
- float current_height; /*< [m] Current vehicle height above lat/lon terrain height*/
- uint16_t spacing; /*<  grid spacing (zero if terrain at this location unavailable)*/
- uint16_t pending; /*<  Number of 4x4 terrain blocks waiting to be received or read from disk*/
- uint16_t loaded; /*<  Number of 4x4 terrain blocks in memory*/
-}) mavlink_terrain_report_t;
+        typedef struct __mavlink_terrain_report_t {
+            int32_t lat; /*< [degE7] Latitude*/
+            int32_t lon; /*< [degE7] Longitude*/
+            float terrain_height; /*< [m] Terrain height MSL*/
+            float current_height; /*< [m] Current vehicle height above lat/lon terrain height*/
+            uint16_t spacing; /*<  grid spacing (zero if terrain at this location unavailable)*/
+            uint16_t pending; /*<  Number of 4x4 terrain blocks waiting to be received or read from disk*/
+            uint16_t loaded; /*<  Number of 4x4 terrain blocks in memory*/
+        }) mavlink_terrain_report_t;
 
 #define MAVLINK_MSG_ID_TERRAIN_REPORT_LEN 22
 #define MAVLINK_MSG_ID_TERRAIN_REPORT_MIN_LEN 22
@@ -21,7 +21,6 @@ typedef struct __mavlink_terrain_report_t {
 
 #define MAVLINK_MSG_ID_TERRAIN_REPORT_CRC 1
 #define MAVLINK_MSG_ID_136_CRC 1
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -68,9 +67,10 @@ typedef struct __mavlink_terrain_report_t {
  * @param loaded  Number of 4x4 terrain blocks in memory
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_terrain_report_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               int32_t lat, int32_t lon, uint16_t spacing, float terrain_height, float current_height, uint16_t pending, uint16_t loaded)
-{
+static inline uint16_t
+mavlink_msg_terrain_report_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                int32_t lat, int32_t lon, uint16_t spacing, float terrain_height,
+                                float current_height, uint16_t pending, uint16_t loaded) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_TERRAIN_REPORT_LEN];
     _mav_put_int32_t(buf, 0, lat);
@@ -92,11 +92,14 @@ static inline uint16_t mavlink_msg_terrain_report_pack(uint8_t system_id, uint8_
     packet.pending = pending;
     packet.loaded = loaded;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_TERRAIN_REPORT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_TERRAIN_REPORT_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_TERRAIN_REPORT;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_TERRAIN_REPORT_MIN_LEN, MAVLINK_MSG_ID_TERRAIN_REPORT_LEN, MAVLINK_MSG_ID_TERRAIN_REPORT_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_TERRAIN_REPORT_MIN_LEN,
+                                    MAVLINK_MSG_ID_TERRAIN_REPORT_LEN,
+                                    MAVLINK_MSG_ID_TERRAIN_REPORT_CRC);
 }
 
 /**
@@ -114,10 +117,12 @@ static inline uint16_t mavlink_msg_terrain_report_pack(uint8_t system_id, uint8_
  * @param loaded  Number of 4x4 terrain blocks in memory
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_terrain_report_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   int32_t lat,int32_t lon,uint16_t spacing,float terrain_height,float current_height,uint16_t pending,uint16_t loaded)
-{
+static inline uint16_t
+mavlink_msg_terrain_report_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                     mavlink_message_t *msg,
+                                     int32_t lat, int32_t lon, uint16_t spacing,
+                                     float terrain_height, float current_height, uint16_t pending,
+                                     uint16_t loaded) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_TERRAIN_REPORT_LEN];
     _mav_put_int32_t(buf, 0, lat);
@@ -139,11 +144,14 @@ static inline uint16_t mavlink_msg_terrain_report_pack_chan(uint8_t system_id, u
     packet.pending = pending;
     packet.loaded = loaded;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_TERRAIN_REPORT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_TERRAIN_REPORT_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_TERRAIN_REPORT;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_TERRAIN_REPORT_MIN_LEN, MAVLINK_MSG_ID_TERRAIN_REPORT_LEN, MAVLINK_MSG_ID_TERRAIN_REPORT_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_TERRAIN_REPORT_MIN_LEN,
+                                         MAVLINK_MSG_ID_TERRAIN_REPORT_LEN,
+                                         MAVLINK_MSG_ID_TERRAIN_REPORT_CRC);
 }
 
 /**
@@ -154,9 +162,14 @@ static inline uint16_t mavlink_msg_terrain_report_pack_chan(uint8_t system_id, u
  * @param msg The MAVLink message to compress the data into
  * @param terrain_report C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_terrain_report_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_terrain_report_t* terrain_report)
-{
-    return mavlink_msg_terrain_report_pack(system_id, component_id, msg, terrain_report->lat, terrain_report->lon, terrain_report->spacing, terrain_report->terrain_height, terrain_report->current_height, terrain_report->pending, terrain_report->loaded);
+static inline uint16_t
+mavlink_msg_terrain_report_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                  const mavlink_terrain_report_t *terrain_report) {
+    return mavlink_msg_terrain_report_pack(system_id, component_id, msg, terrain_report->lat,
+                                           terrain_report->lon, terrain_report->spacing,
+                                           terrain_report->terrain_height,
+                                           terrain_report->current_height, terrain_report->pending,
+                                           terrain_report->loaded);
 }
 
 /**
@@ -168,9 +181,16 @@ static inline uint16_t mavlink_msg_terrain_report_encode(uint8_t system_id, uint
  * @param msg The MAVLink message to compress the data into
  * @param terrain_report C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_terrain_report_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_terrain_report_t* terrain_report)
-{
-    return mavlink_msg_terrain_report_pack_chan(system_id, component_id, chan, msg, terrain_report->lat, terrain_report->lon, terrain_report->spacing, terrain_report->terrain_height, terrain_report->current_height, terrain_report->pending, terrain_report->loaded);
+static inline uint16_t
+mavlink_msg_terrain_report_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                       mavlink_message_t *msg,
+                                       const mavlink_terrain_report_t *terrain_report) {
+    return mavlink_msg_terrain_report_pack_chan(system_id, component_id, chan, msg,
+                                                terrain_report->lat, terrain_report->lon,
+                                                terrain_report->spacing,
+                                                terrain_report->terrain_height,
+                                                terrain_report->current_height,
+                                                terrain_report->pending, terrain_report->loaded);
 }
 
 /**
@@ -274,9 +294,8 @@ static inline void mavlink_msg_terrain_report_send_buf(mavlink_message_t *msgbuf
  *
  * @return [degE7] Latitude
  */
-static inline int32_t mavlink_msg_terrain_report_get_lat(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  0);
+static inline int32_t mavlink_msg_terrain_report_get_lat(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 0);
 }
 
 /**
@@ -284,9 +303,8 @@ static inline int32_t mavlink_msg_terrain_report_get_lat(const mavlink_message_t
  *
  * @return [degE7] Longitude
  */
-static inline int32_t mavlink_msg_terrain_report_get_lon(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  4);
+static inline int32_t mavlink_msg_terrain_report_get_lon(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 4);
 }
 
 /**
@@ -294,9 +312,8 @@ static inline int32_t mavlink_msg_terrain_report_get_lon(const mavlink_message_t
  *
  * @return  grid spacing (zero if terrain at this location unavailable)
  */
-static inline uint16_t mavlink_msg_terrain_report_get_spacing(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  16);
+static inline uint16_t mavlink_msg_terrain_report_get_spacing(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 16);
 }
 
 /**
@@ -304,9 +321,8 @@ static inline uint16_t mavlink_msg_terrain_report_get_spacing(const mavlink_mess
  *
  * @return [m] Terrain height MSL
  */
-static inline float mavlink_msg_terrain_report_get_terrain_height(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_terrain_report_get_terrain_height(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -314,9 +330,8 @@ static inline float mavlink_msg_terrain_report_get_terrain_height(const mavlink_
  *
  * @return [m] Current vehicle height above lat/lon terrain height
  */
-static inline float mavlink_msg_terrain_report_get_current_height(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_terrain_report_get_current_height(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -324,9 +339,8 @@ static inline float mavlink_msg_terrain_report_get_current_height(const mavlink_
  *
  * @return  Number of 4x4 terrain blocks waiting to be received or read from disk
  */
-static inline uint16_t mavlink_msg_terrain_report_get_pending(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  18);
+static inline uint16_t mavlink_msg_terrain_report_get_pending(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 18);
 }
 
 /**
@@ -334,9 +348,8 @@ static inline uint16_t mavlink_msg_terrain_report_get_pending(const mavlink_mess
  *
  * @return  Number of 4x4 terrain blocks in memory
  */
-static inline uint16_t mavlink_msg_terrain_report_get_loaded(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  20);
+static inline uint16_t mavlink_msg_terrain_report_get_loaded(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 20);
 }
 
 /**
@@ -345,8 +358,8 @@ static inline uint16_t mavlink_msg_terrain_report_get_loaded(const mavlink_messa
  * @param msg The message to decode
  * @param terrain_report C-struct to decode the message contents into
  */
-static inline void mavlink_msg_terrain_report_decode(const mavlink_message_t* msg, mavlink_terrain_report_t* terrain_report)
-{
+static inline void mavlink_msg_terrain_report_decode(const mavlink_message_t *msg,
+                                                     mavlink_terrain_report_t *terrain_report) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     terrain_report->lat = mavlink_msg_terrain_report_get_lat(msg);
     terrain_report->lon = mavlink_msg_terrain_report_get_lon(msg);
@@ -356,8 +369,9 @@ static inline void mavlink_msg_terrain_report_decode(const mavlink_message_t* ms
     terrain_report->pending = mavlink_msg_terrain_report_get_pending(msg);
     terrain_report->loaded = mavlink_msg_terrain_report_get_loaded(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_TERRAIN_REPORT_LEN? msg->len : MAVLINK_MSG_ID_TERRAIN_REPORT_LEN;
-        memset(terrain_report, 0, MAVLINK_MSG_ID_TERRAIN_REPORT_LEN);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_TERRAIN_REPORT_LEN ? msg->len
+                                                               : MAVLINK_MSG_ID_TERRAIN_REPORT_LEN;
+    memset(terrain_report, 0, MAVLINK_MSG_ID_TERRAIN_REPORT_LEN);
     memcpy(terrain_report, _MAV_PAYLOAD(msg), len);
 #endif
 }

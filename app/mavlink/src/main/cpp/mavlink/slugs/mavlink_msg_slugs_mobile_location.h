@@ -4,11 +4,13 @@
 #define MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION 186
 
 MAVPACKED(
-typedef struct __mavlink_slugs_mobile_location_t {
- float latitude; /*< [deg] Mobile Latitude*/
- float longitude; /*< [deg] Mobile Longitude*/
- uint8_t target; /*<  The system reporting the action*/
-}) mavlink_slugs_mobile_location_t;
+        typedef struct __mavlink_slugs_mobile_location_t {
+            float latitude; /*< [deg] Mobile Latitude*/
+            float longitude; /*< [deg] Mobile Longitude*/
+            uint8_t target; /*<  The system reporting the action*/
+        })
+
+mavlink_slugs_mobile_location_t;
 
 #define MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN 9
 #define MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_MIN_LEN 9
@@ -17,7 +19,6 @@ typedef struct __mavlink_slugs_mobile_location_t {
 
 #define MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_CRC 101
 #define MAVLINK_MSG_ID_186_CRC 101
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -52,16 +53,17 @@ typedef struct __mavlink_slugs_mobile_location_t {
  * @param longitude [deg] Mobile Longitude
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_slugs_mobile_location_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target, float latitude, float longitude)
-{
+static inline uint16_t
+mavlink_msg_slugs_mobile_location_pack(uint8_t system_id, uint8_t component_id,
+                                       mavlink_message_t *msg,
+                                       uint8_t target, float latitude, float longitude) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN];
     _mav_put_float(buf, 0, latitude);
     _mav_put_float(buf, 4, longitude);
     _mav_put_uint8_t(buf, 8, target);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN);
 #else
     mavlink_slugs_mobile_location_t packet;
     packet.latitude = latitude;
@@ -72,7 +74,10 @@ static inline uint16_t mavlink_msg_slugs_mobile_location_pack(uint8_t system_id,
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_MIN_LEN, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_MIN_LEN,
+                                    MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN,
+                                    MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_CRC);
 }
 
 /**
@@ -86,17 +91,17 @@ static inline uint16_t mavlink_msg_slugs_mobile_location_pack(uint8_t system_id,
  * @param longitude [deg] Mobile Longitude
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_slugs_mobile_location_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target,float latitude,float longitude)
-{
+static inline uint16_t
+mavlink_msg_slugs_mobile_location_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                            mavlink_message_t *msg,
+                                            uint8_t target, float latitude, float longitude) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN];
     _mav_put_float(buf, 0, latitude);
     _mav_put_float(buf, 4, longitude);
     _mav_put_uint8_t(buf, 8, target);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN);
 #else
     mavlink_slugs_mobile_location_t packet;
     packet.latitude = latitude;
@@ -107,7 +112,10 @@ static inline uint16_t mavlink_msg_slugs_mobile_location_pack_chan(uint8_t syste
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_MIN_LEN, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_MIN_LEN,
+                                         MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN,
+                                         MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_CRC);
 }
 
 /**
@@ -118,9 +126,14 @@ static inline uint16_t mavlink_msg_slugs_mobile_location_pack_chan(uint8_t syste
  * @param msg The MAVLink message to compress the data into
  * @param slugs_mobile_location C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_slugs_mobile_location_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_slugs_mobile_location_t* slugs_mobile_location)
-{
-    return mavlink_msg_slugs_mobile_location_pack(system_id, component_id, msg, slugs_mobile_location->target, slugs_mobile_location->latitude, slugs_mobile_location->longitude);
+static inline uint16_t
+mavlink_msg_slugs_mobile_location_encode(uint8_t system_id, uint8_t component_id,
+                                         mavlink_message_t *msg,
+                                         const mavlink_slugs_mobile_location_t *slugs_mobile_location) {
+    return mavlink_msg_slugs_mobile_location_pack(system_id, component_id, msg,
+                                                  slugs_mobile_location->target,
+                                                  slugs_mobile_location->latitude,
+                                                  slugs_mobile_location->longitude);
 }
 
 /**
@@ -132,9 +145,14 @@ static inline uint16_t mavlink_msg_slugs_mobile_location_encode(uint8_t system_i
  * @param msg The MAVLink message to compress the data into
  * @param slugs_mobile_location C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_slugs_mobile_location_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_slugs_mobile_location_t* slugs_mobile_location)
-{
-    return mavlink_msg_slugs_mobile_location_pack_chan(system_id, component_id, chan, msg, slugs_mobile_location->target, slugs_mobile_location->latitude, slugs_mobile_location->longitude);
+static inline uint16_t
+mavlink_msg_slugs_mobile_location_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                              mavlink_message_t *msg,
+                                              const mavlink_slugs_mobile_location_t *slugs_mobile_location) {
+    return mavlink_msg_slugs_mobile_location_pack_chan(system_id, component_id, chan, msg,
+                                                       slugs_mobile_location->target,
+                                                       slugs_mobile_location->latitude,
+                                                       slugs_mobile_location->longitude);
 }
 
 /**
@@ -218,9 +236,8 @@ static inline void mavlink_msg_slugs_mobile_location_send_buf(mavlink_message_t 
  *
  * @return  The system reporting the action
  */
-static inline uint8_t mavlink_msg_slugs_mobile_location_get_target(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  8);
+static inline uint8_t mavlink_msg_slugs_mobile_location_get_target(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 8);
 }
 
 /**
@@ -228,9 +245,8 @@ static inline uint8_t mavlink_msg_slugs_mobile_location_get_target(const mavlink
  *
  * @return [deg] Mobile Latitude
  */
-static inline float mavlink_msg_slugs_mobile_location_get_latitude(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_slugs_mobile_location_get_latitude(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -238,9 +254,8 @@ static inline float mavlink_msg_slugs_mobile_location_get_latitude(const mavlink
  *
  * @return [deg] Mobile Longitude
  */
-static inline float mavlink_msg_slugs_mobile_location_get_longitude(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_slugs_mobile_location_get_longitude(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -249,15 +264,15 @@ static inline float mavlink_msg_slugs_mobile_location_get_longitude(const mavlin
  * @param msg The message to decode
  * @param slugs_mobile_location C-struct to decode the message contents into
  */
-static inline void mavlink_msg_slugs_mobile_location_decode(const mavlink_message_t* msg, mavlink_slugs_mobile_location_t* slugs_mobile_location)
-{
+static inline void mavlink_msg_slugs_mobile_location_decode(const mavlink_message_t *msg,
+                                                            mavlink_slugs_mobile_location_t *slugs_mobile_location) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     slugs_mobile_location->latitude = mavlink_msg_slugs_mobile_location_get_latitude(msg);
     slugs_mobile_location->longitude = mavlink_msg_slugs_mobile_location_get_longitude(msg);
     slugs_mobile_location->target = mavlink_msg_slugs_mobile_location_get_target(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN? msg->len : MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN;
-        memset(slugs_mobile_location, 0, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN);
-    memcpy(slugs_mobile_location, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN? msg->len : MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN;
+    memset(slugs_mobile_location, 0, MAVLINK_MSG_ID_SLUGS_MOBILE_LOCATION_LEN);
+memcpy(slugs_mobile_location, _MAV_PAYLOAD(msg), len);
 #endif
 }

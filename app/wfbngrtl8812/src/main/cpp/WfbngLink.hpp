@@ -7,12 +7,15 @@
 #include "wfb-ng/src/rx.hpp"
 #include "devourer/src/WiFiDriver.h"
 
-class WfbngLink{
+class WfbngLink {
 public:
-    WfbngLink(JNIEnv * env, jobject context);
-    int run(JNIEnv *env,jobject androidContext, jint wifiChannel, jint fd);
+    WfbngLink(JNIEnv *env, jobject context);
+
+    int run(JNIEnv *env, jobject androidContext, jint wifiChannel, jint fd);
+
     void initAgg();
-    void stop(JNIEnv *env,jobject androidContext, jint fd);
+
+    void stop(JNIEnv *env, jobject androidContext, jint fd);
 
     std::mutex agg_mutex;
     std::unique_ptr<Aggregator> video_aggregator;

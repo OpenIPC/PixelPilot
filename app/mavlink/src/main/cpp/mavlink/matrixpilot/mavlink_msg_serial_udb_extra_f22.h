@@ -4,14 +4,16 @@
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22 188
 
 MAVPACKED(
-typedef struct __mavlink_serial_udb_extra_f22_t {
- int16_t sue_accel_x_at_calibration; /*<  SUE X accelerometer at calibration time*/
- int16_t sue_accel_y_at_calibration; /*<  SUE Y accelerometer at calibration time*/
- int16_t sue_accel_z_at_calibration; /*<  SUE Z accelerometer at calibration time*/
- int16_t sue_gyro_x_at_calibration; /*<  SUE X gyro at calibration time*/
- int16_t sue_gyro_y_at_calibration; /*<  SUE Y gyro at calibration time*/
- int16_t sue_gyro_z_at_calibration; /*<  SUE Z gyro at calibration time*/
-}) mavlink_serial_udb_extra_f22_t;
+        typedef struct __mavlink_serial_udb_extra_f22_t {
+            int16_t sue_accel_x_at_calibration; /*<  SUE X accelerometer at calibration time*/
+            int16_t sue_accel_y_at_calibration; /*<  SUE Y accelerometer at calibration time*/
+            int16_t sue_accel_z_at_calibration; /*<  SUE Z accelerometer at calibration time*/
+            int16_t sue_gyro_x_at_calibration; /*<  SUE X gyro at calibration time*/
+            int16_t sue_gyro_y_at_calibration; /*<  SUE Y gyro at calibration time*/
+            int16_t sue_gyro_z_at_calibration; /*<  SUE Z gyro at calibration time*/
+        })
+
+mavlink_serial_udb_extra_f22_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN 12
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_MIN_LEN 12
@@ -20,7 +22,6 @@ typedef struct __mavlink_serial_udb_extra_f22_t {
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_CRC 91
 #define MAVLINK_MSG_ID_188_CRC 91
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -64,9 +65,15 @@ typedef struct __mavlink_serial_udb_extra_f22_t {
  * @param sue_gyro_z_at_calibration  SUE Z gyro at calibration time
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f22_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               int16_t sue_accel_x_at_calibration, int16_t sue_accel_y_at_calibration, int16_t sue_accel_z_at_calibration, int16_t sue_gyro_x_at_calibration, int16_t sue_gyro_y_at_calibration, int16_t sue_gyro_z_at_calibration)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f22_pack(uint8_t system_id, uint8_t component_id,
+                                      mavlink_message_t *msg,
+                                      int16_t sue_accel_x_at_calibration,
+                                      int16_t sue_accel_y_at_calibration,
+                                      int16_t sue_accel_z_at_calibration,
+                                      int16_t sue_gyro_x_at_calibration,
+                                      int16_t sue_gyro_y_at_calibration,
+                                      int16_t sue_gyro_z_at_calibration) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN];
     _mav_put_int16_t(buf, 0, sue_accel_x_at_calibration);
@@ -76,7 +83,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f22_pack(uint8_t system_id, 
     _mav_put_int16_t(buf, 8, sue_gyro_y_at_calibration);
     _mav_put_int16_t(buf, 10, sue_gyro_z_at_calibration);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN);
 #else
     mavlink_serial_udb_extra_f22_t packet;
     packet.sue_accel_x_at_calibration = sue_accel_x_at_calibration;
@@ -90,7 +97,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f22_pack(uint8_t system_id, 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_MIN_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_CRC);
 }
 
 /**
@@ -107,10 +117,15 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f22_pack(uint8_t system_id, 
  * @param sue_gyro_z_at_calibration  SUE Z gyro at calibration time
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f22_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   int16_t sue_accel_x_at_calibration,int16_t sue_accel_y_at_calibration,int16_t sue_accel_z_at_calibration,int16_t sue_gyro_x_at_calibration,int16_t sue_gyro_y_at_calibration,int16_t sue_gyro_z_at_calibration)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f22_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                           mavlink_message_t *msg,
+                                           int16_t sue_accel_x_at_calibration,
+                                           int16_t sue_accel_y_at_calibration,
+                                           int16_t sue_accel_z_at_calibration,
+                                           int16_t sue_gyro_x_at_calibration,
+                                           int16_t sue_gyro_y_at_calibration,
+                                           int16_t sue_gyro_z_at_calibration) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN];
     _mav_put_int16_t(buf, 0, sue_accel_x_at_calibration);
@@ -120,7 +135,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f22_pack_chan(uint8_t system
     _mav_put_int16_t(buf, 8, sue_gyro_y_at_calibration);
     _mav_put_int16_t(buf, 10, sue_gyro_z_at_calibration);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN);
 #else
     mavlink_serial_udb_extra_f22_t packet;
     packet.sue_accel_x_at_calibration = sue_accel_x_at_calibration;
@@ -134,7 +149,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f22_pack_chan(uint8_t system
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_MIN_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_CRC);
 }
 
 /**
@@ -145,9 +163,17 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f22_pack_chan(uint8_t system
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f22 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f22_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f22_t* serial_udb_extra_f22)
-{
-    return mavlink_msg_serial_udb_extra_f22_pack(system_id, component_id, msg, serial_udb_extra_f22->sue_accel_x_at_calibration, serial_udb_extra_f22->sue_accel_y_at_calibration, serial_udb_extra_f22->sue_accel_z_at_calibration, serial_udb_extra_f22->sue_gyro_x_at_calibration, serial_udb_extra_f22->sue_gyro_y_at_calibration, serial_udb_extra_f22->sue_gyro_z_at_calibration);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f22_encode(uint8_t system_id, uint8_t component_id,
+                                        mavlink_message_t *msg,
+                                        const mavlink_serial_udb_extra_f22_t *serial_udb_extra_f22) {
+    return mavlink_msg_serial_udb_extra_f22_pack(system_id, component_id, msg,
+                                                 serial_udb_extra_f22->sue_accel_x_at_calibration,
+                                                 serial_udb_extra_f22->sue_accel_y_at_calibration,
+                                                 serial_udb_extra_f22->sue_accel_z_at_calibration,
+                                                 serial_udb_extra_f22->sue_gyro_x_at_calibration,
+                                                 serial_udb_extra_f22->sue_gyro_y_at_calibration,
+                                                 serial_udb_extra_f22->sue_gyro_z_at_calibration);
 }
 
 /**
@@ -159,9 +185,17 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f22_encode(uint8_t system_id
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f22 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f22_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f22_t* serial_udb_extra_f22)
-{
-    return mavlink_msg_serial_udb_extra_f22_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f22->sue_accel_x_at_calibration, serial_udb_extra_f22->sue_accel_y_at_calibration, serial_udb_extra_f22->sue_accel_z_at_calibration, serial_udb_extra_f22->sue_gyro_x_at_calibration, serial_udb_extra_f22->sue_gyro_y_at_calibration, serial_udb_extra_f22->sue_gyro_z_at_calibration);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f22_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                             mavlink_message_t *msg,
+                                             const mavlink_serial_udb_extra_f22_t *serial_udb_extra_f22) {
+    return mavlink_msg_serial_udb_extra_f22_pack_chan(system_id, component_id, chan, msg,
+                                                      serial_udb_extra_f22->sue_accel_x_at_calibration,
+                                                      serial_udb_extra_f22->sue_accel_y_at_calibration,
+                                                      serial_udb_extra_f22->sue_accel_z_at_calibration,
+                                                      serial_udb_extra_f22->sue_gyro_x_at_calibration,
+                                                      serial_udb_extra_f22->sue_gyro_y_at_calibration,
+                                                      serial_udb_extra_f22->sue_gyro_z_at_calibration);
 }
 
 /**
@@ -260,9 +294,9 @@ static inline void mavlink_msg_serial_udb_extra_f22_send_buf(mavlink_message_t *
  *
  * @return  SUE X accelerometer at calibration time
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_accel_x_at_calibration(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  0);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f22_get_sue_accel_x_at_calibration(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 0);
 }
 
 /**
@@ -270,9 +304,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_accel_x_at_calibr
  *
  * @return  SUE Y accelerometer at calibration time
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_accel_y_at_calibration(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  2);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f22_get_sue_accel_y_at_calibration(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 2);
 }
 
 /**
@@ -280,9 +314,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_accel_y_at_calibr
  *
  * @return  SUE Z accelerometer at calibration time
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_accel_z_at_calibration(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  4);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f22_get_sue_accel_z_at_calibration(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 4);
 }
 
 /**
@@ -290,9 +324,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_accel_z_at_calibr
  *
  * @return  SUE X gyro at calibration time
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_gyro_x_at_calibration(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  6);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f22_get_sue_gyro_x_at_calibration(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 6);
 }
 
 /**
@@ -300,9 +334,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_gyro_x_at_calibra
  *
  * @return  SUE Y gyro at calibration time
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_gyro_y_at_calibration(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  8);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f22_get_sue_gyro_y_at_calibration(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 8);
 }
 
 /**
@@ -310,9 +344,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_gyro_y_at_calibra
  *
  * @return  SUE Z gyro at calibration time
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_gyro_z_at_calibration(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  10);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f22_get_sue_gyro_z_at_calibration(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 10);
 }
 
 /**
@@ -321,18 +355,24 @@ static inline int16_t mavlink_msg_serial_udb_extra_f22_get_sue_gyro_z_at_calibra
  * @param msg The message to decode
  * @param serial_udb_extra_f22 C-struct to decode the message contents into
  */
-static inline void mavlink_msg_serial_udb_extra_f22_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f22_t* serial_udb_extra_f22)
-{
+static inline void mavlink_msg_serial_udb_extra_f22_decode(const mavlink_message_t *msg,
+                                                           mavlink_serial_udb_extra_f22_t *serial_udb_extra_f22) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    serial_udb_extra_f22->sue_accel_x_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_accel_x_at_calibration(msg);
-    serial_udb_extra_f22->sue_accel_y_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_accel_y_at_calibration(msg);
-    serial_udb_extra_f22->sue_accel_z_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_accel_z_at_calibration(msg);
-    serial_udb_extra_f22->sue_gyro_x_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_gyro_x_at_calibration(msg);
-    serial_udb_extra_f22->sue_gyro_y_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_gyro_y_at_calibration(msg);
-    serial_udb_extra_f22->sue_gyro_z_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_gyro_z_at_calibration(msg);
+    serial_udb_extra_f22->sue_accel_x_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_accel_x_at_calibration(
+            msg);
+    serial_udb_extra_f22->sue_accel_y_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_accel_y_at_calibration(
+            msg);
+    serial_udb_extra_f22->sue_accel_z_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_accel_z_at_calibration(
+            msg);
+    serial_udb_extra_f22->sue_gyro_x_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_gyro_x_at_calibration(
+            msg);
+    serial_udb_extra_f22->sue_gyro_y_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_gyro_y_at_calibration(
+            msg);
+    serial_udb_extra_f22->sue_gyro_z_at_calibration = mavlink_msg_serial_udb_extra_f22_get_sue_gyro_z_at_calibration(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN;
-        memset(serial_udb_extra_f22, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN);
-    memcpy(serial_udb_extra_f22, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN;
+    memset(serial_udb_extra_f22, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F22_LEN);
+memcpy(serial_udb_extra_f22, _MAV_PAYLOAD(msg), len);
 #endif
 }

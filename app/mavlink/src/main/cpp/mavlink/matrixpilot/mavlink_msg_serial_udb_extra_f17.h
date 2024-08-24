@@ -4,11 +4,13 @@
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17 183
 
 MAVPACKED(
-typedef struct __mavlink_serial_udb_extra_f17_t {
- float sue_feed_forward; /*<  SUE Feed Forward Gain*/
- float sue_turn_rate_nav; /*<  SUE Max Turn Rate when Navigating*/
- float sue_turn_rate_fbw; /*<  SUE Max Turn Rate in Fly By Wire Mode*/
-}) mavlink_serial_udb_extra_f17_t;
+        typedef struct __mavlink_serial_udb_extra_f17_t {
+            float sue_feed_forward; /*<  SUE Feed Forward Gain*/
+            float sue_turn_rate_nav; /*<  SUE Max Turn Rate when Navigating*/
+            float sue_turn_rate_fbw; /*<  SUE Max Turn Rate in Fly By Wire Mode*/
+        })
+
+mavlink_serial_udb_extra_f17_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN 12
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_MIN_LEN 12
@@ -17,7 +19,6 @@ typedef struct __mavlink_serial_udb_extra_f17_t {
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_CRC 175
 #define MAVLINK_MSG_ID_183_CRC 175
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -52,16 +53,18 @@ typedef struct __mavlink_serial_udb_extra_f17_t {
  * @param sue_turn_rate_fbw  SUE Max Turn Rate in Fly By Wire Mode
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f17_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               float sue_feed_forward, float sue_turn_rate_nav, float sue_turn_rate_fbw)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f17_pack(uint8_t system_id, uint8_t component_id,
+                                      mavlink_message_t *msg,
+                                      float sue_feed_forward, float sue_turn_rate_nav,
+                                      float sue_turn_rate_fbw) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN];
     _mav_put_float(buf, 0, sue_feed_forward);
     _mav_put_float(buf, 4, sue_turn_rate_nav);
     _mav_put_float(buf, 8, sue_turn_rate_fbw);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN);
 #else
     mavlink_serial_udb_extra_f17_t packet;
     packet.sue_feed_forward = sue_feed_forward;
@@ -72,7 +75,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f17_pack(uint8_t system_id, 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_MIN_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_CRC);
 }
 
 /**
@@ -86,17 +92,18 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f17_pack(uint8_t system_id, 
  * @param sue_turn_rate_fbw  SUE Max Turn Rate in Fly By Wire Mode
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f17_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   float sue_feed_forward,float sue_turn_rate_nav,float sue_turn_rate_fbw)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f17_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                           mavlink_message_t *msg,
+                                           float sue_feed_forward, float sue_turn_rate_nav,
+                                           float sue_turn_rate_fbw) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN];
     _mav_put_float(buf, 0, sue_feed_forward);
     _mav_put_float(buf, 4, sue_turn_rate_nav);
     _mav_put_float(buf, 8, sue_turn_rate_fbw);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN);
 #else
     mavlink_serial_udb_extra_f17_t packet;
     packet.sue_feed_forward = sue_feed_forward;
@@ -107,7 +114,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f17_pack_chan(uint8_t system
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_MIN_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_CRC);
 }
 
 /**
@@ -118,9 +128,14 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f17_pack_chan(uint8_t system
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f17 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f17_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f17_t* serial_udb_extra_f17)
-{
-    return mavlink_msg_serial_udb_extra_f17_pack(system_id, component_id, msg, serial_udb_extra_f17->sue_feed_forward, serial_udb_extra_f17->sue_turn_rate_nav, serial_udb_extra_f17->sue_turn_rate_fbw);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f17_encode(uint8_t system_id, uint8_t component_id,
+                                        mavlink_message_t *msg,
+                                        const mavlink_serial_udb_extra_f17_t *serial_udb_extra_f17) {
+    return mavlink_msg_serial_udb_extra_f17_pack(system_id, component_id, msg,
+                                                 serial_udb_extra_f17->sue_feed_forward,
+                                                 serial_udb_extra_f17->sue_turn_rate_nav,
+                                                 serial_udb_extra_f17->sue_turn_rate_fbw);
 }
 
 /**
@@ -132,9 +147,14 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f17_encode(uint8_t system_id
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f17 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f17_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f17_t* serial_udb_extra_f17)
-{
-    return mavlink_msg_serial_udb_extra_f17_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f17->sue_feed_forward, serial_udb_extra_f17->sue_turn_rate_nav, serial_udb_extra_f17->sue_turn_rate_fbw);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f17_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                             mavlink_message_t *msg,
+                                             const mavlink_serial_udb_extra_f17_t *serial_udb_extra_f17) {
+    return mavlink_msg_serial_udb_extra_f17_pack_chan(system_id, component_id, chan, msg,
+                                                      serial_udb_extra_f17->sue_feed_forward,
+                                                      serial_udb_extra_f17->sue_turn_rate_nav,
+                                                      serial_udb_extra_f17->sue_turn_rate_fbw);
 }
 
 /**
@@ -218,9 +238,9 @@ static inline void mavlink_msg_serial_udb_extra_f17_send_buf(mavlink_message_t *
  *
  * @return  SUE Feed Forward Gain
  */
-static inline float mavlink_msg_serial_udb_extra_f17_get_sue_feed_forward(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float
+mavlink_msg_serial_udb_extra_f17_get_sue_feed_forward(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -228,9 +248,9 @@ static inline float mavlink_msg_serial_udb_extra_f17_get_sue_feed_forward(const 
  *
  * @return  SUE Max Turn Rate when Navigating
  */
-static inline float mavlink_msg_serial_udb_extra_f17_get_sue_turn_rate_nav(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float
+mavlink_msg_serial_udb_extra_f17_get_sue_turn_rate_nav(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -238,9 +258,9 @@ static inline float mavlink_msg_serial_udb_extra_f17_get_sue_turn_rate_nav(const
  *
  * @return  SUE Max Turn Rate in Fly By Wire Mode
  */
-static inline float mavlink_msg_serial_udb_extra_f17_get_sue_turn_rate_fbw(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float
+mavlink_msg_serial_udb_extra_f17_get_sue_turn_rate_fbw(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -249,15 +269,18 @@ static inline float mavlink_msg_serial_udb_extra_f17_get_sue_turn_rate_fbw(const
  * @param msg The message to decode
  * @param serial_udb_extra_f17 C-struct to decode the message contents into
  */
-static inline void mavlink_msg_serial_udb_extra_f17_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f17_t* serial_udb_extra_f17)
-{
+static inline void mavlink_msg_serial_udb_extra_f17_decode(const mavlink_message_t *msg,
+                                                           mavlink_serial_udb_extra_f17_t *serial_udb_extra_f17) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    serial_udb_extra_f17->sue_feed_forward = mavlink_msg_serial_udb_extra_f17_get_sue_feed_forward(msg);
-    serial_udb_extra_f17->sue_turn_rate_nav = mavlink_msg_serial_udb_extra_f17_get_sue_turn_rate_nav(msg);
-    serial_udb_extra_f17->sue_turn_rate_fbw = mavlink_msg_serial_udb_extra_f17_get_sue_turn_rate_fbw(msg);
+    serial_udb_extra_f17->sue_feed_forward = mavlink_msg_serial_udb_extra_f17_get_sue_feed_forward(
+            msg);
+    serial_udb_extra_f17->sue_turn_rate_nav = mavlink_msg_serial_udb_extra_f17_get_sue_turn_rate_nav(
+            msg);
+    serial_udb_extra_f17->sue_turn_rate_fbw = mavlink_msg_serial_udb_extra_f17_get_sue_turn_rate_fbw(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN;
-        memset(serial_udb_extra_f17, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN);
-    memcpy(serial_udb_extra_f17, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN;
+    memset(serial_udb_extra_f17, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F17_LEN);
+memcpy(serial_udb_extra_f17, _MAV_PAYLOAD(msg), len);
 #endif
 }

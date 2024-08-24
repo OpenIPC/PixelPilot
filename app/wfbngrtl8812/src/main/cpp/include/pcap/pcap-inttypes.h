@@ -41,58 +41,59 @@
  * sufficient C99 support there.
  */
 #if defined(_MSC_VER)
+/*
+ * Compiler is MSVC.
+ */
+#if _MSC_VER >= 1800
   /*
-   * Compiler is MSVC.
+   * VS 2013 or newer; we have <inttypes.h>.
    */
-  #if _MSC_VER >= 1800
-    /*
-     * VS 2013 or newer; we have <inttypes.h>.
-     */
-    #include <inttypes.h>
-  #else
-    /*
-     * Earlier VS; we have to define this stuff ourselves.
-     * We don't support building libpcap with earlier versions of VS,
-     * but SDKs for Npcap have to support building applications using
-     * earlier versions of VS, so we work around this by defining
-     * those types ourselves, as some files use them.
-     */
-    typedef unsigned char uint8_t;
-    typedef signed char int8_t;
-    typedef unsigned short uint16_t;
-    typedef signed short int16_t;
-    typedef unsigned int uint32_t;
-    typedef signed int int32_t;
-    #ifdef _MSC_EXTENSIONS
-      typedef unsigned _int64 uint64_t;
-      typedef _int64 int64_t;
-    #else /* _MSC_EXTENSIONS */
-      typedef unsigned long long uint64_t;
-      typedef long long int64_t;
-    #endif
-  #endif
+#include <inttypes.h>
+#else
+  /*
+   * Earlier VS; we have to define this stuff ourselves.
+   * We don't support building libpcap with earlier versions of VS,
+   * but SDKs for Npcap have to support building applications using
+   * earlier versions of VS, so we work around this by defining
+   * those types ourselves, as some files use them.
+   */
+  typedef unsigned char uint8_t;
+  typedef signed char int8_t;
+  typedef unsigned short uint16_t;
+  typedef signed short int16_t;
+  typedef unsigned int uint32_t;
+  typedef signed int int32_t;
+#ifdef _MSC_EXTENSIONS
+    typedef unsigned _int64 uint64_t;
+    typedef _int64 int64_t;
+#else /* _MSC_EXTENSIONS */
+    typedef unsigned long long uint64_t;
+    typedef long long int64_t;
+#endif
+#endif
 #else /* defined(_MSC_VER) */
-  /*
-   * Not Visual Studio.
-   * Include <inttypes.h> to get the integer types and PRI[doux]64 values
-   * defined.
-   *
-   * If the compiler is MinGW, we assume we have <inttypes.h> - and
-   * support for %zu in the formatted printing functions.
-   *
-   * If the target is UN*X, we assume we have a C99-or-later development
-   * environment, and thus have <inttypes.h> - and support for %zu in
-   * the formatted printing functions.
-   *
-   * I.e., assume we have <inttypes.h> and that it suffices.
-   */
+/*
+ * Not Visual Studio.
+ * Include <inttypes.h> to get the integer types and PRI[doux]64 values
+ * defined.
+ *
+ * If the compiler is MinGW, we assume we have <inttypes.h> - and
+ * support for %zu in the formatted printing functions.
+ *
+ * If the target is UN*X, we assume we have a C99-or-later development
+ * environment, and thus have <inttypes.h> - and support for %zu in
+ * the formatted printing functions.
+ *
+ * I.e., assume we have <inttypes.h> and that it suffices.
+ */
 
-  /*
-   * XXX - somehow make sure we have enough C99 support with other
-   * compilers and support libraries?
-   */
+/*
+ * XXX - somehow make sure we have enough C99 support with other
+ * compilers and support libraries?
+ */
 
-  #include <inttypes.h>
+#include <inttypes.h>
+
 #endif /* defined(_MSC_VER) */
 
 #endif /* pcap/pcap-inttypes.h */

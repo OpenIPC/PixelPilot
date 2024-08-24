@@ -33,18 +33,18 @@ size_t crypto_kdf_keybytes(void);
 #define crypto_kdf_PRIMITIVE "blake2b"
 SODIUM_EXPORT
 const char *crypto_kdf_primitive(void)
-            __attribute__ ((warn_unused_result));
+__attribute__ ((warn_unused_result));
 
 SODIUM_EXPORT
 int crypto_kdf_derive_from_key(unsigned char *subkey, size_t subkey_len,
                                uint64_t subkey_id,
                                const char ctx[crypto_kdf_CONTEXTBYTES],
                                const unsigned char key[crypto_kdf_KEYBYTES])
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 SODIUM_EXPORT
 void crypto_kdf_keygen(unsigned char k[crypto_kdf_KEYBYTES])
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 #ifdef __cplusplus
 }

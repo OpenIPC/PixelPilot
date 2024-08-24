@@ -4,11 +4,13 @@
 #define MAVLINK_MSG_ID_GOPRO_GET_REQUEST 216
 
 MAVPACKED(
-typedef struct __mavlink_gopro_get_request_t {
- uint8_t target_system; /*<  System ID.*/
- uint8_t target_component; /*<  Component ID.*/
- uint8_t cmd_id; /*<  Command ID.*/
-}) mavlink_gopro_get_request_t;
+        typedef struct __mavlink_gopro_get_request_t {
+            uint8_t target_system; /*<  System ID.*/
+            uint8_t target_component; /*<  Component ID.*/
+            uint8_t cmd_id; /*<  Command ID.*/
+        })
+
+mavlink_gopro_get_request_t;
 
 #define MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN 3
 #define MAVLINK_MSG_ID_GOPRO_GET_REQUEST_MIN_LEN 3
@@ -17,7 +19,6 @@ typedef struct __mavlink_gopro_get_request_t {
 
 #define MAVLINK_MSG_ID_GOPRO_GET_REQUEST_CRC 50
 #define MAVLINK_MSG_ID_216_CRC 50
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -52,16 +53,17 @@ typedef struct __mavlink_gopro_get_request_t {
  * @param cmd_id  Command ID.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_gopro_get_request_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, uint8_t cmd_id)
-{
+static inline uint16_t
+mavlink_msg_gopro_get_request_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                   uint8_t target_system, uint8_t target_component,
+                                   uint8_t cmd_id) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN];
     _mav_put_uint8_t(buf, 0, target_system);
     _mav_put_uint8_t(buf, 1, target_component);
     _mav_put_uint8_t(buf, 2, cmd_id);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN);
 #else
     mavlink_gopro_get_request_t packet;
     packet.target_system = target_system;
@@ -72,7 +74,10 @@ static inline uint16_t mavlink_msg_gopro_get_request_pack(uint8_t system_id, uin
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_GOPRO_GET_REQUEST;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_MIN_LEN, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_GOPRO_GET_REQUEST_MIN_LEN,
+                                    MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN,
+                                    MAVLINK_MSG_ID_GOPRO_GET_REQUEST_CRC);
 }
 
 /**
@@ -86,17 +91,18 @@ static inline uint16_t mavlink_msg_gopro_get_request_pack(uint8_t system_id, uin
  * @param cmd_id  Command ID.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_gopro_get_request_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,uint8_t cmd_id)
-{
+static inline uint16_t
+mavlink_msg_gopro_get_request_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                        mavlink_message_t *msg,
+                                        uint8_t target_system, uint8_t target_component,
+                                        uint8_t cmd_id) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN];
     _mav_put_uint8_t(buf, 0, target_system);
     _mav_put_uint8_t(buf, 1, target_component);
     _mav_put_uint8_t(buf, 2, cmd_id);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN);
 #else
     mavlink_gopro_get_request_t packet;
     packet.target_system = target_system;
@@ -107,7 +113,10 @@ static inline uint16_t mavlink_msg_gopro_get_request_pack_chan(uint8_t system_id
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_GOPRO_GET_REQUEST;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_MIN_LEN, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_GOPRO_GET_REQUEST_MIN_LEN,
+                                         MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN,
+                                         MAVLINK_MSG_ID_GOPRO_GET_REQUEST_CRC);
 }
 
 /**
@@ -118,9 +127,13 @@ static inline uint16_t mavlink_msg_gopro_get_request_pack_chan(uint8_t system_id
  * @param msg The MAVLink message to compress the data into
  * @param gopro_get_request C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_gopro_get_request_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_gopro_get_request_t* gopro_get_request)
-{
-    return mavlink_msg_gopro_get_request_pack(system_id, component_id, msg, gopro_get_request->target_system, gopro_get_request->target_component, gopro_get_request->cmd_id);
+static inline uint16_t mavlink_msg_gopro_get_request_encode(uint8_t system_id, uint8_t component_id,
+                                                            mavlink_message_t *msg,
+                                                            const mavlink_gopro_get_request_t *gopro_get_request) {
+    return mavlink_msg_gopro_get_request_pack(system_id, component_id, msg,
+                                              gopro_get_request->target_system,
+                                              gopro_get_request->target_component,
+                                              gopro_get_request->cmd_id);
 }
 
 /**
@@ -132,9 +145,14 @@ static inline uint16_t mavlink_msg_gopro_get_request_encode(uint8_t system_id, u
  * @param msg The MAVLink message to compress the data into
  * @param gopro_get_request C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_gopro_get_request_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_gopro_get_request_t* gopro_get_request)
-{
-    return mavlink_msg_gopro_get_request_pack_chan(system_id, component_id, chan, msg, gopro_get_request->target_system, gopro_get_request->target_component, gopro_get_request->cmd_id);
+static inline uint16_t
+mavlink_msg_gopro_get_request_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                          mavlink_message_t *msg,
+                                          const mavlink_gopro_get_request_t *gopro_get_request) {
+    return mavlink_msg_gopro_get_request_pack_chan(system_id, component_id, chan, msg,
+                                                   gopro_get_request->target_system,
+                                                   gopro_get_request->target_component,
+                                                   gopro_get_request->cmd_id);
 }
 
 /**
@@ -218,9 +236,9 @@ static inline void mavlink_msg_gopro_get_request_send_buf(mavlink_message_t *msg
  *
  * @return  System ID.
  */
-static inline uint8_t mavlink_msg_gopro_get_request_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  0);
+static inline uint8_t
+mavlink_msg_gopro_get_request_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 0);
 }
 
 /**
@@ -228,9 +246,9 @@ static inline uint8_t mavlink_msg_gopro_get_request_get_target_system(const mavl
  *
  * @return  Component ID.
  */
-static inline uint8_t mavlink_msg_gopro_get_request_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  1);
+static inline uint8_t
+mavlink_msg_gopro_get_request_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 1);
 }
 
 /**
@@ -238,9 +256,8 @@ static inline uint8_t mavlink_msg_gopro_get_request_get_target_component(const m
  *
  * @return  Command ID.
  */
-static inline uint8_t mavlink_msg_gopro_get_request_get_cmd_id(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  2);
+static inline uint8_t mavlink_msg_gopro_get_request_get_cmd_id(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 2);
 }
 
 /**
@@ -249,15 +266,15 @@ static inline uint8_t mavlink_msg_gopro_get_request_get_cmd_id(const mavlink_mes
  * @param msg The message to decode
  * @param gopro_get_request C-struct to decode the message contents into
  */
-static inline void mavlink_msg_gopro_get_request_decode(const mavlink_message_t* msg, mavlink_gopro_get_request_t* gopro_get_request)
-{
+static inline void mavlink_msg_gopro_get_request_decode(const mavlink_message_t *msg,
+                                                        mavlink_gopro_get_request_t *gopro_get_request) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     gopro_get_request->target_system = mavlink_msg_gopro_get_request_get_target_system(msg);
     gopro_get_request->target_component = mavlink_msg_gopro_get_request_get_target_component(msg);
     gopro_get_request->cmd_id = mavlink_msg_gopro_get_request_get_cmd_id(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN? msg->len : MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN;
-        memset(gopro_get_request, 0, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN);
-    memcpy(gopro_get_request, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN? msg->len : MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN;
+    memset(gopro_get_request, 0, MAVLINK_MSG_ID_GOPRO_GET_REQUEST_LEN);
+memcpy(gopro_get_request, _MAV_PAYLOAD(msg), len);
 #endif
 }

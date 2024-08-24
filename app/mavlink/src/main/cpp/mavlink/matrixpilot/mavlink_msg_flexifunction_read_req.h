@@ -4,12 +4,14 @@
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ 151
 
 MAVPACKED(
-typedef struct __mavlink_flexifunction_read_req_t {
- int16_t read_req_type; /*<  Type of flexifunction data requested*/
- int16_t data_index; /*<  index into data where needed*/
- uint8_t target_system; /*<  System ID*/
- uint8_t target_component; /*<  Component ID*/
-}) mavlink_flexifunction_read_req_t;
+        typedef struct __mavlink_flexifunction_read_req_t {
+            int16_t read_req_type; /*<  Type of flexifunction data requested*/
+            int16_t data_index; /*<  index into data where needed*/
+            uint8_t target_system; /*<  System ID*/
+            uint8_t target_component; /*<  Component ID*/
+        })
+
+mavlink_flexifunction_read_req_t;
 
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN 6
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_MIN_LEN 6
@@ -18,7 +20,6 @@ typedef struct __mavlink_flexifunction_read_req_t {
 
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_CRC 26
 #define MAVLINK_MSG_ID_151_CRC 26
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -56,9 +57,11 @@ typedef struct __mavlink_flexifunction_read_req_t {
  * @param data_index  index into data where needed
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_flexifunction_read_req_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, int16_t read_req_type, int16_t data_index)
-{
+static inline uint16_t
+mavlink_msg_flexifunction_read_req_pack(uint8_t system_id, uint8_t component_id,
+                                        mavlink_message_t *msg,
+                                        uint8_t target_system, uint8_t target_component,
+                                        int16_t read_req_type, int16_t data_index) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN];
     _mav_put_int16_t(buf, 0, read_req_type);
@@ -66,7 +69,7 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_pack(uint8_t system_id
     _mav_put_uint8_t(buf, 4, target_system);
     _mav_put_uint8_t(buf, 5, target_component);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN);
 #else
     mavlink_flexifunction_read_req_t packet;
     packet.read_req_type = read_req_type;
@@ -78,7 +81,10 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_pack(uint8_t system_id
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_MIN_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_MIN_LEN,
+                                    MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN,
+                                    MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_CRC);
 }
 
 /**
@@ -93,10 +99,11 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_pack(uint8_t system_id
  * @param data_index  index into data where needed
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_flexifunction_read_req_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,int16_t read_req_type,int16_t data_index)
-{
+static inline uint16_t
+mavlink_msg_flexifunction_read_req_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                             mavlink_message_t *msg,
+                                             uint8_t target_system, uint8_t target_component,
+                                             int16_t read_req_type, int16_t data_index) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN];
     _mav_put_int16_t(buf, 0, read_req_type);
@@ -104,7 +111,7 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_pack_chan(uint8_t syst
     _mav_put_uint8_t(buf, 4, target_system);
     _mav_put_uint8_t(buf, 5, target_component);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN);
 #else
     mavlink_flexifunction_read_req_t packet;
     packet.read_req_type = read_req_type;
@@ -116,7 +123,10 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_pack_chan(uint8_t syst
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_MIN_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_MIN_LEN,
+                                         MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN,
+                                         MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_CRC);
 }
 
 /**
@@ -127,9 +137,15 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_pack_chan(uint8_t syst
  * @param msg The MAVLink message to compress the data into
  * @param flexifunction_read_req C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_flexifunction_read_req_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_flexifunction_read_req_t* flexifunction_read_req)
-{
-    return mavlink_msg_flexifunction_read_req_pack(system_id, component_id, msg, flexifunction_read_req->target_system, flexifunction_read_req->target_component, flexifunction_read_req->read_req_type, flexifunction_read_req->data_index);
+static inline uint16_t
+mavlink_msg_flexifunction_read_req_encode(uint8_t system_id, uint8_t component_id,
+                                          mavlink_message_t *msg,
+                                          const mavlink_flexifunction_read_req_t *flexifunction_read_req) {
+    return mavlink_msg_flexifunction_read_req_pack(system_id, component_id, msg,
+                                                   flexifunction_read_req->target_system,
+                                                   flexifunction_read_req->target_component,
+                                                   flexifunction_read_req->read_req_type,
+                                                   flexifunction_read_req->data_index);
 }
 
 /**
@@ -141,9 +157,15 @@ static inline uint16_t mavlink_msg_flexifunction_read_req_encode(uint8_t system_
  * @param msg The MAVLink message to compress the data into
  * @param flexifunction_read_req C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_flexifunction_read_req_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_flexifunction_read_req_t* flexifunction_read_req)
-{
-    return mavlink_msg_flexifunction_read_req_pack_chan(system_id, component_id, chan, msg, flexifunction_read_req->target_system, flexifunction_read_req->target_component, flexifunction_read_req->read_req_type, flexifunction_read_req->data_index);
+static inline uint16_t
+mavlink_msg_flexifunction_read_req_encode_chan(uint8_t system_id, uint8_t component_id,
+                                               uint8_t chan, mavlink_message_t *msg,
+                                               const mavlink_flexifunction_read_req_t *flexifunction_read_req) {
+    return mavlink_msg_flexifunction_read_req_pack_chan(system_id, component_id, chan, msg,
+                                                        flexifunction_read_req->target_system,
+                                                        flexifunction_read_req->target_component,
+                                                        flexifunction_read_req->read_req_type,
+                                                        flexifunction_read_req->data_index);
 }
 
 /**
@@ -232,9 +254,9 @@ static inline void mavlink_msg_flexifunction_read_req_send_buf(mavlink_message_t
  *
  * @return  System ID
  */
-static inline uint8_t mavlink_msg_flexifunction_read_req_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  4);
+static inline uint8_t
+mavlink_msg_flexifunction_read_req_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 4);
 }
 
 /**
@@ -242,9 +264,9 @@ static inline uint8_t mavlink_msg_flexifunction_read_req_get_target_system(const
  *
  * @return  Component ID
  */
-static inline uint8_t mavlink_msg_flexifunction_read_req_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  5);
+static inline uint8_t
+mavlink_msg_flexifunction_read_req_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 5);
 }
 
 /**
@@ -252,9 +274,9 @@ static inline uint8_t mavlink_msg_flexifunction_read_req_get_target_component(co
  *
  * @return  Type of flexifunction data requested
  */
-static inline int16_t mavlink_msg_flexifunction_read_req_get_read_req_type(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  0);
+static inline int16_t
+mavlink_msg_flexifunction_read_req_get_read_req_type(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 0);
 }
 
 /**
@@ -262,9 +284,9 @@ static inline int16_t mavlink_msg_flexifunction_read_req_get_read_req_type(const
  *
  * @return  index into data where needed
  */
-static inline int16_t mavlink_msg_flexifunction_read_req_get_data_index(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  2);
+static inline int16_t
+mavlink_msg_flexifunction_read_req_get_data_index(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 2);
 }
 
 /**
@@ -273,16 +295,19 @@ static inline int16_t mavlink_msg_flexifunction_read_req_get_data_index(const ma
  * @param msg The message to decode
  * @param flexifunction_read_req C-struct to decode the message contents into
  */
-static inline void mavlink_msg_flexifunction_read_req_decode(const mavlink_message_t* msg, mavlink_flexifunction_read_req_t* flexifunction_read_req)
-{
+static inline void mavlink_msg_flexifunction_read_req_decode(const mavlink_message_t *msg,
+                                                             mavlink_flexifunction_read_req_t *flexifunction_read_req) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    flexifunction_read_req->read_req_type = mavlink_msg_flexifunction_read_req_get_read_req_type(msg);
+    flexifunction_read_req->read_req_type = mavlink_msg_flexifunction_read_req_get_read_req_type(
+            msg);
     flexifunction_read_req->data_index = mavlink_msg_flexifunction_read_req_get_data_index(msg);
-    flexifunction_read_req->target_system = mavlink_msg_flexifunction_read_req_get_target_system(msg);
-    flexifunction_read_req->target_component = mavlink_msg_flexifunction_read_req_get_target_component(msg);
+    flexifunction_read_req->target_system = mavlink_msg_flexifunction_read_req_get_target_system(
+            msg);
+    flexifunction_read_req->target_component = mavlink_msg_flexifunction_read_req_get_target_component(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN? msg->len : MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN;
-        memset(flexifunction_read_req, 0, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN);
-    memcpy(flexifunction_read_req, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN? msg->len : MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN;
+    memset(flexifunction_read_req, 0, MAVLINK_MSG_ID_FLEXIFUNCTION_READ_REQ_LEN);
+memcpy(flexifunction_read_req, _MAV_PAYLOAD(msg), len);
 #endif
 }

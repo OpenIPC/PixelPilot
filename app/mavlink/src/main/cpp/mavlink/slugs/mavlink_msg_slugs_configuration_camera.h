@@ -4,11 +4,13 @@
 #define MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA 188
 
 MAVPACKED(
-typedef struct __mavlink_slugs_configuration_camera_t {
- uint8_t target; /*<  The system setting the commands*/
- uint8_t idOrder; /*<  ID 0: brightness 1: aperture 2: iris 3: ICR 4: backlight*/
- uint8_t order; /*<   1: up/on 2: down/off 3: auto/reset/no action*/
-}) mavlink_slugs_configuration_camera_t;
+        typedef struct __mavlink_slugs_configuration_camera_t {
+            uint8_t target; /*<  The system setting the commands*/
+            uint8_t idOrder; /*<  ID 0: brightness 1: aperture 2: iris 3: ICR 4: backlight*/
+            uint8_t order; /*<   1: up/on 2: down/off 3: auto/reset/no action*/
+        })
+
+mavlink_slugs_configuration_camera_t;
 
 #define MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN 3
 #define MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_MIN_LEN 3
@@ -17,7 +19,6 @@ typedef struct __mavlink_slugs_configuration_camera_t {
 
 #define MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_CRC 5
 #define MAVLINK_MSG_ID_188_CRC 5
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -52,16 +53,17 @@ typedef struct __mavlink_slugs_configuration_camera_t {
  * @param order   1: up/on 2: down/off 3: auto/reset/no action
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_slugs_configuration_camera_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target, uint8_t idOrder, uint8_t order)
-{
+static inline uint16_t
+mavlink_msg_slugs_configuration_camera_pack(uint8_t system_id, uint8_t component_id,
+                                            mavlink_message_t *msg,
+                                            uint8_t target, uint8_t idOrder, uint8_t order) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN];
     _mav_put_uint8_t(buf, 0, target);
     _mav_put_uint8_t(buf, 1, idOrder);
     _mav_put_uint8_t(buf, 2, order);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN);
 #else
     mavlink_slugs_configuration_camera_t packet;
     packet.target = target;
@@ -72,7 +74,10 @@ static inline uint16_t mavlink_msg_slugs_configuration_camera_pack(uint8_t syste
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_MIN_LEN, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_MIN_LEN,
+                                    MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN,
+                                    MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_CRC);
 }
 
 /**
@@ -86,17 +91,18 @@ static inline uint16_t mavlink_msg_slugs_configuration_camera_pack(uint8_t syste
  * @param order   1: up/on 2: down/off 3: auto/reset/no action
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_slugs_configuration_camera_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target,uint8_t idOrder,uint8_t order)
-{
+static inline uint16_t
+mavlink_msg_slugs_configuration_camera_pack_chan(uint8_t system_id, uint8_t component_id,
+                                                 uint8_t chan,
+                                                 mavlink_message_t *msg,
+                                                 uint8_t target, uint8_t idOrder, uint8_t order) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN];
     _mav_put_uint8_t(buf, 0, target);
     _mav_put_uint8_t(buf, 1, idOrder);
     _mav_put_uint8_t(buf, 2, order);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN);
 #else
     mavlink_slugs_configuration_camera_t packet;
     packet.target = target;
@@ -107,7 +113,10 @@ static inline uint16_t mavlink_msg_slugs_configuration_camera_pack_chan(uint8_t 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_MIN_LEN, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_MIN_LEN,
+                                         MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN,
+                                         MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_CRC);
 }
 
 /**
@@ -118,9 +127,14 @@ static inline uint16_t mavlink_msg_slugs_configuration_camera_pack_chan(uint8_t 
  * @param msg The MAVLink message to compress the data into
  * @param slugs_configuration_camera C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_slugs_configuration_camera_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_slugs_configuration_camera_t* slugs_configuration_camera)
-{
-    return mavlink_msg_slugs_configuration_camera_pack(system_id, component_id, msg, slugs_configuration_camera->target, slugs_configuration_camera->idOrder, slugs_configuration_camera->order);
+static inline uint16_t
+mavlink_msg_slugs_configuration_camera_encode(uint8_t system_id, uint8_t component_id,
+                                              mavlink_message_t *msg,
+                                              const mavlink_slugs_configuration_camera_t *slugs_configuration_camera) {
+    return mavlink_msg_slugs_configuration_camera_pack(system_id, component_id, msg,
+                                                       slugs_configuration_camera->target,
+                                                       slugs_configuration_camera->idOrder,
+                                                       slugs_configuration_camera->order);
 }
 
 /**
@@ -132,9 +146,14 @@ static inline uint16_t mavlink_msg_slugs_configuration_camera_encode(uint8_t sys
  * @param msg The MAVLink message to compress the data into
  * @param slugs_configuration_camera C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_slugs_configuration_camera_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_slugs_configuration_camera_t* slugs_configuration_camera)
-{
-    return mavlink_msg_slugs_configuration_camera_pack_chan(system_id, component_id, chan, msg, slugs_configuration_camera->target, slugs_configuration_camera->idOrder, slugs_configuration_camera->order);
+static inline uint16_t
+mavlink_msg_slugs_configuration_camera_encode_chan(uint8_t system_id, uint8_t component_id,
+                                                   uint8_t chan, mavlink_message_t *msg,
+                                                   const mavlink_slugs_configuration_camera_t *slugs_configuration_camera) {
+    return mavlink_msg_slugs_configuration_camera_pack_chan(system_id, component_id, chan, msg,
+                                                            slugs_configuration_camera->target,
+                                                            slugs_configuration_camera->idOrder,
+                                                            slugs_configuration_camera->order);
 }
 
 /**
@@ -218,9 +237,9 @@ static inline void mavlink_msg_slugs_configuration_camera_send_buf(mavlink_messa
  *
  * @return  The system setting the commands
  */
-static inline uint8_t mavlink_msg_slugs_configuration_camera_get_target(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  0);
+static inline uint8_t
+mavlink_msg_slugs_configuration_camera_get_target(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 0);
 }
 
 /**
@@ -228,9 +247,9 @@ static inline uint8_t mavlink_msg_slugs_configuration_camera_get_target(const ma
  *
  * @return  ID 0: brightness 1: aperture 2: iris 3: ICR 4: backlight
  */
-static inline uint8_t mavlink_msg_slugs_configuration_camera_get_idOrder(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  1);
+static inline uint8_t
+mavlink_msg_slugs_configuration_camera_get_idOrder(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 1);
 }
 
 /**
@@ -238,9 +257,9 @@ static inline uint8_t mavlink_msg_slugs_configuration_camera_get_idOrder(const m
  *
  * @return   1: up/on 2: down/off 3: auto/reset/no action
  */
-static inline uint8_t mavlink_msg_slugs_configuration_camera_get_order(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  2);
+static inline uint8_t
+mavlink_msg_slugs_configuration_camera_get_order(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 2);
 }
 
 /**
@@ -249,15 +268,15 @@ static inline uint8_t mavlink_msg_slugs_configuration_camera_get_order(const mav
  * @param msg The message to decode
  * @param slugs_configuration_camera C-struct to decode the message contents into
  */
-static inline void mavlink_msg_slugs_configuration_camera_decode(const mavlink_message_t* msg, mavlink_slugs_configuration_camera_t* slugs_configuration_camera)
-{
+static inline void mavlink_msg_slugs_configuration_camera_decode(const mavlink_message_t *msg,
+                                                                 mavlink_slugs_configuration_camera_t *slugs_configuration_camera) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     slugs_configuration_camera->target = mavlink_msg_slugs_configuration_camera_get_target(msg);
     slugs_configuration_camera->idOrder = mavlink_msg_slugs_configuration_camera_get_idOrder(msg);
     slugs_configuration_camera->order = mavlink_msg_slugs_configuration_camera_get_order(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN? msg->len : MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN;
-        memset(slugs_configuration_camera, 0, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN);
-    memcpy(slugs_configuration_camera, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN? msg->len : MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN;
+    memset(slugs_configuration_camera, 0, MAVLINK_MSG_ID_SLUGS_CONFIGURATION_CAMERA_LEN);
+memcpy(slugs_configuration_camera, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -4,12 +4,14 @@
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5 173
 
 MAVPACKED(
-typedef struct __mavlink_serial_udb_extra_f5_t {
- float sue_YAWKP_AILERON; /*<  Serial UDB YAWKP_AILERON Gain for Proporional control of navigation*/
- float sue_YAWKD_AILERON; /*<  Serial UDB YAWKD_AILERON Gain for Rate control of navigation*/
- float sue_ROLLKP; /*<  Serial UDB Extra ROLLKP Gain for Proportional control of roll stabilization*/
- float sue_ROLLKD; /*<  Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization*/
-}) mavlink_serial_udb_extra_f5_t;
+        typedef struct __mavlink_serial_udb_extra_f5_t {
+            float sue_YAWKP_AILERON; /*<  Serial UDB YAWKP_AILERON Gain for Proporional control of navigation*/
+            float sue_YAWKD_AILERON; /*<  Serial UDB YAWKD_AILERON Gain for Rate control of navigation*/
+            float sue_ROLLKP; /*<  Serial UDB Extra ROLLKP Gain for Proportional control of roll stabilization*/
+            float sue_ROLLKD; /*<  Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization*/
+        })
+
+mavlink_serial_udb_extra_f5_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN 16
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_MIN_LEN 16
@@ -18,7 +20,6 @@ typedef struct __mavlink_serial_udb_extra_f5_t {
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_CRC 54
 #define MAVLINK_MSG_ID_173_CRC 54
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -56,9 +57,11 @@ typedef struct __mavlink_serial_udb_extra_f5_t {
  * @param sue_ROLLKD  Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               float sue_YAWKP_AILERON, float sue_YAWKD_AILERON, float sue_ROLLKP, float sue_ROLLKD)
-{
+static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack(uint8_t system_id, uint8_t component_id,
+                                                            mavlink_message_t *msg,
+                                                            float sue_YAWKP_AILERON,
+                                                            float sue_YAWKD_AILERON,
+                                                            float sue_ROLLKP, float sue_ROLLKD) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN];
     _mav_put_float(buf, 0, sue_YAWKP_AILERON);
@@ -66,7 +69,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack(uint8_t system_id, u
     _mav_put_float(buf, 8, sue_ROLLKP);
     _mav_put_float(buf, 12, sue_ROLLKD);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN);
 #else
     mavlink_serial_udb_extra_f5_t packet;
     packet.sue_YAWKP_AILERON = sue_YAWKP_AILERON;
@@ -78,7 +81,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack(uint8_t system_id, u
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_MIN_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_CRC);
 }
 
 /**
@@ -93,10 +99,11 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack(uint8_t system_id, u
  * @param sue_ROLLKD  Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   float sue_YAWKP_AILERON,float sue_YAWKD_AILERON,float sue_ROLLKP,float sue_ROLLKD)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f5_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                          mavlink_message_t *msg,
+                                          float sue_YAWKP_AILERON, float sue_YAWKD_AILERON,
+                                          float sue_ROLLKP, float sue_ROLLKD) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN];
     _mav_put_float(buf, 0, sue_YAWKP_AILERON);
@@ -104,7 +111,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack_chan(uint8_t system_
     _mav_put_float(buf, 8, sue_ROLLKP);
     _mav_put_float(buf, 12, sue_ROLLKD);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN);
 #else
     mavlink_serial_udb_extra_f5_t packet;
     packet.sue_YAWKP_AILERON = sue_YAWKP_AILERON;
@@ -116,7 +123,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack_chan(uint8_t system_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_MIN_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_CRC);
 }
 
 /**
@@ -127,9 +137,15 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_pack_chan(uint8_t system_
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f5 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f5_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f5_t* serial_udb_extra_f5)
-{
-    return mavlink_msg_serial_udb_extra_f5_pack(system_id, component_id, msg, serial_udb_extra_f5->sue_YAWKP_AILERON, serial_udb_extra_f5->sue_YAWKD_AILERON, serial_udb_extra_f5->sue_ROLLKP, serial_udb_extra_f5->sue_ROLLKD);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f5_encode(uint8_t system_id, uint8_t component_id,
+                                       mavlink_message_t *msg,
+                                       const mavlink_serial_udb_extra_f5_t *serial_udb_extra_f5) {
+    return mavlink_msg_serial_udb_extra_f5_pack(system_id, component_id, msg,
+                                                serial_udb_extra_f5->sue_YAWKP_AILERON,
+                                                serial_udb_extra_f5->sue_YAWKD_AILERON,
+                                                serial_udb_extra_f5->sue_ROLLKP,
+                                                serial_udb_extra_f5->sue_ROLLKD);
 }
 
 /**
@@ -141,9 +157,15 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f5_encode(uint8_t system_id,
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f5 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f5_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f5_t* serial_udb_extra_f5)
-{
-    return mavlink_msg_serial_udb_extra_f5_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f5->sue_YAWKP_AILERON, serial_udb_extra_f5->sue_YAWKD_AILERON, serial_udb_extra_f5->sue_ROLLKP, serial_udb_extra_f5->sue_ROLLKD);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f5_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                            mavlink_message_t *msg,
+                                            const mavlink_serial_udb_extra_f5_t *serial_udb_extra_f5) {
+    return mavlink_msg_serial_udb_extra_f5_pack_chan(system_id, component_id, chan, msg,
+                                                     serial_udb_extra_f5->sue_YAWKP_AILERON,
+                                                     serial_udb_extra_f5->sue_YAWKD_AILERON,
+                                                     serial_udb_extra_f5->sue_ROLLKP,
+                                                     serial_udb_extra_f5->sue_ROLLKD);
 }
 
 /**
@@ -232,9 +254,9 @@ static inline void mavlink_msg_serial_udb_extra_f5_send_buf(mavlink_message_t *m
  *
  * @return  Serial UDB YAWKP_AILERON Gain for Proporional control of navigation
  */
-static inline float mavlink_msg_serial_udb_extra_f5_get_sue_YAWKP_AILERON(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float
+mavlink_msg_serial_udb_extra_f5_get_sue_YAWKP_AILERON(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -242,9 +264,9 @@ static inline float mavlink_msg_serial_udb_extra_f5_get_sue_YAWKP_AILERON(const 
  *
  * @return  Serial UDB YAWKD_AILERON Gain for Rate control of navigation
  */
-static inline float mavlink_msg_serial_udb_extra_f5_get_sue_YAWKD_AILERON(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float
+mavlink_msg_serial_udb_extra_f5_get_sue_YAWKD_AILERON(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -252,9 +274,8 @@ static inline float mavlink_msg_serial_udb_extra_f5_get_sue_YAWKD_AILERON(const 
  *
  * @return  Serial UDB Extra ROLLKP Gain for Proportional control of roll stabilization
  */
-static inline float mavlink_msg_serial_udb_extra_f5_get_sue_ROLLKP(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_serial_udb_extra_f5_get_sue_ROLLKP(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -262,9 +283,8 @@ static inline float mavlink_msg_serial_udb_extra_f5_get_sue_ROLLKP(const mavlink
  *
  * @return  Serial UDB Extra ROLLKD Gain for Rate control of roll stabilization
  */
-static inline float mavlink_msg_serial_udb_extra_f5_get_sue_ROLLKD(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_serial_udb_extra_f5_get_sue_ROLLKD(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -273,16 +293,18 @@ static inline float mavlink_msg_serial_udb_extra_f5_get_sue_ROLLKD(const mavlink
  * @param msg The message to decode
  * @param serial_udb_extra_f5 C-struct to decode the message contents into
  */
-static inline void mavlink_msg_serial_udb_extra_f5_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f5_t* serial_udb_extra_f5)
-{
+static inline void mavlink_msg_serial_udb_extra_f5_decode(const mavlink_message_t *msg,
+                                                          mavlink_serial_udb_extra_f5_t *serial_udb_extra_f5) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    serial_udb_extra_f5->sue_YAWKP_AILERON = mavlink_msg_serial_udb_extra_f5_get_sue_YAWKP_AILERON(msg);
-    serial_udb_extra_f5->sue_YAWKD_AILERON = mavlink_msg_serial_udb_extra_f5_get_sue_YAWKD_AILERON(msg);
+    serial_udb_extra_f5->sue_YAWKP_AILERON = mavlink_msg_serial_udb_extra_f5_get_sue_YAWKP_AILERON(
+            msg);
+    serial_udb_extra_f5->sue_YAWKD_AILERON = mavlink_msg_serial_udb_extra_f5_get_sue_YAWKD_AILERON(
+            msg);
     serial_udb_extra_f5->sue_ROLLKP = mavlink_msg_serial_udb_extra_f5_get_sue_ROLLKP(msg);
     serial_udb_extra_f5->sue_ROLLKD = mavlink_msg_serial_udb_extra_f5_get_sue_ROLLKD(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN;
-        memset(serial_udb_extra_f5, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN);
-    memcpy(serial_udb_extra_f5, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN;
+    memset(serial_udb_extra_f5, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F5_LEN);
+memcpy(serial_udb_extra_f5, _MAV_PAYLOAD(msg), len);
 #endif
 }

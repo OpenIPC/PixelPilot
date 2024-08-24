@@ -4,15 +4,17 @@
 #define MAVLINK_MSG_ID_ISR_LOCATION 189
 
 MAVPACKED(
-typedef struct __mavlink_isr_location_t {
- float latitude; /*< [deg] ISR Latitude*/
- float longitude; /*< [deg] ISR Longitude*/
- float height; /*<  ISR Height*/
- uint8_t target; /*<  The system reporting the action*/
- uint8_t option1; /*<  Option 1*/
- uint8_t option2; /*<  Option 2*/
- uint8_t option3; /*<  Option 3*/
-}) mavlink_isr_location_t;
+        typedef struct __mavlink_isr_location_t {
+            float latitude; /*< [deg] ISR Latitude*/
+            float longitude; /*< [deg] ISR Longitude*/
+            float height; /*<  ISR Height*/
+            uint8_t target; /*<  The system reporting the action*/
+            uint8_t option1; /*<  Option 1*/
+            uint8_t option2; /*<  Option 2*/
+            uint8_t option3; /*<  Option 3*/
+        })
+
+mavlink_isr_location_t;
 
 #define MAVLINK_MSG_ID_ISR_LOCATION_LEN 16
 #define MAVLINK_MSG_ID_ISR_LOCATION_MIN_LEN 16
@@ -21,7 +23,6 @@ typedef struct __mavlink_isr_location_t {
 
 #define MAVLINK_MSG_ID_ISR_LOCATION_CRC 246
 #define MAVLINK_MSG_ID_189_CRC 246
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -68,9 +69,10 @@ typedef struct __mavlink_isr_location_t {
  * @param option3  Option 3
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_isr_location_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target, float latitude, float longitude, float height, uint8_t option1, uint8_t option2, uint8_t option3)
-{
+static inline uint16_t
+mavlink_msg_isr_location_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                              uint8_t target, float latitude, float longitude, float height,
+                              uint8_t option1, uint8_t option2, uint8_t option3) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_ISR_LOCATION_LEN];
     _mav_put_float(buf, 0, latitude);
@@ -81,7 +83,7 @@ static inline uint16_t mavlink_msg_isr_location_pack(uint8_t system_id, uint8_t 
     _mav_put_uint8_t(buf, 14, option2);
     _mav_put_uint8_t(buf, 15, option3);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ISR_LOCATION_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ISR_LOCATION_LEN);
 #else
     mavlink_isr_location_t packet;
     packet.latitude = latitude;
@@ -96,7 +98,10 @@ static inline uint16_t mavlink_msg_isr_location_pack(uint8_t system_id, uint8_t 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_ISR_LOCATION;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ISR_LOCATION_MIN_LEN, MAVLINK_MSG_ID_ISR_LOCATION_LEN, MAVLINK_MSG_ID_ISR_LOCATION_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_ISR_LOCATION_MIN_LEN,
+                                    MAVLINK_MSG_ID_ISR_LOCATION_LEN,
+                                    MAVLINK_MSG_ID_ISR_LOCATION_CRC);
 }
 
 /**
@@ -114,10 +119,11 @@ static inline uint16_t mavlink_msg_isr_location_pack(uint8_t system_id, uint8_t 
  * @param option3  Option 3
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_isr_location_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target,float latitude,float longitude,float height,uint8_t option1,uint8_t option2,uint8_t option3)
-{
+static inline uint16_t
+mavlink_msg_isr_location_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                   mavlink_message_t *msg,
+                                   uint8_t target, float latitude, float longitude, float height,
+                                   uint8_t option1, uint8_t option2, uint8_t option3) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_ISR_LOCATION_LEN];
     _mav_put_float(buf, 0, latitude);
@@ -128,7 +134,7 @@ static inline uint16_t mavlink_msg_isr_location_pack_chan(uint8_t system_id, uin
     _mav_put_uint8_t(buf, 14, option2);
     _mav_put_uint8_t(buf, 15, option3);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ISR_LOCATION_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ISR_LOCATION_LEN);
 #else
     mavlink_isr_location_t packet;
     packet.latitude = latitude;
@@ -143,7 +149,10 @@ static inline uint16_t mavlink_msg_isr_location_pack_chan(uint8_t system_id, uin
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_ISR_LOCATION;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ISR_LOCATION_MIN_LEN, MAVLINK_MSG_ID_ISR_LOCATION_LEN, MAVLINK_MSG_ID_ISR_LOCATION_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_ISR_LOCATION_MIN_LEN,
+                                         MAVLINK_MSG_ID_ISR_LOCATION_LEN,
+                                         MAVLINK_MSG_ID_ISR_LOCATION_CRC);
 }
 
 /**
@@ -154,9 +163,13 @@ static inline uint16_t mavlink_msg_isr_location_pack_chan(uint8_t system_id, uin
  * @param msg The MAVLink message to compress the data into
  * @param isr_location C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_isr_location_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_isr_location_t* isr_location)
-{
-    return mavlink_msg_isr_location_pack(system_id, component_id, msg, isr_location->target, isr_location->latitude, isr_location->longitude, isr_location->height, isr_location->option1, isr_location->option2, isr_location->option3);
+static inline uint16_t
+mavlink_msg_isr_location_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                const mavlink_isr_location_t *isr_location) {
+    return mavlink_msg_isr_location_pack(system_id, component_id, msg, isr_location->target,
+                                         isr_location->latitude, isr_location->longitude,
+                                         isr_location->height, isr_location->option1,
+                                         isr_location->option2, isr_location->option3);
 }
 
 /**
@@ -168,9 +181,15 @@ static inline uint16_t mavlink_msg_isr_location_encode(uint8_t system_id, uint8_
  * @param msg The MAVLink message to compress the data into
  * @param isr_location C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_isr_location_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_isr_location_t* isr_location)
-{
-    return mavlink_msg_isr_location_pack_chan(system_id, component_id, chan, msg, isr_location->target, isr_location->latitude, isr_location->longitude, isr_location->height, isr_location->option1, isr_location->option2, isr_location->option3);
+static inline uint16_t
+mavlink_msg_isr_location_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                     mavlink_message_t *msg,
+                                     const mavlink_isr_location_t *isr_location) {
+    return mavlink_msg_isr_location_pack_chan(system_id, component_id, chan, msg,
+                                              isr_location->target, isr_location->latitude,
+                                              isr_location->longitude, isr_location->height,
+                                              isr_location->option1, isr_location->option2,
+                                              isr_location->option3);
 }
 
 /**
@@ -274,9 +293,8 @@ static inline void mavlink_msg_isr_location_send_buf(mavlink_message_t *msgbuf, 
  *
  * @return  The system reporting the action
  */
-static inline uint8_t mavlink_msg_isr_location_get_target(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  12);
+static inline uint8_t mavlink_msg_isr_location_get_target(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 12);
 }
 
 /**
@@ -284,9 +302,8 @@ static inline uint8_t mavlink_msg_isr_location_get_target(const mavlink_message_
  *
  * @return [deg] ISR Latitude
  */
-static inline float mavlink_msg_isr_location_get_latitude(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_isr_location_get_latitude(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -294,9 +311,8 @@ static inline float mavlink_msg_isr_location_get_latitude(const mavlink_message_
  *
  * @return [deg] ISR Longitude
  */
-static inline float mavlink_msg_isr_location_get_longitude(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_isr_location_get_longitude(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -304,9 +320,8 @@ static inline float mavlink_msg_isr_location_get_longitude(const mavlink_message
  *
  * @return  ISR Height
  */
-static inline float mavlink_msg_isr_location_get_height(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_isr_location_get_height(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -314,9 +329,8 @@ static inline float mavlink_msg_isr_location_get_height(const mavlink_message_t*
  *
  * @return  Option 1
  */
-static inline uint8_t mavlink_msg_isr_location_get_option1(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  13);
+static inline uint8_t mavlink_msg_isr_location_get_option1(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 13);
 }
 
 /**
@@ -324,9 +338,8 @@ static inline uint8_t mavlink_msg_isr_location_get_option1(const mavlink_message
  *
  * @return  Option 2
  */
-static inline uint8_t mavlink_msg_isr_location_get_option2(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  14);
+static inline uint8_t mavlink_msg_isr_location_get_option2(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 14);
 }
 
 /**
@@ -334,9 +347,8 @@ static inline uint8_t mavlink_msg_isr_location_get_option2(const mavlink_message
  *
  * @return  Option 3
  */
-static inline uint8_t mavlink_msg_isr_location_get_option3(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  15);
+static inline uint8_t mavlink_msg_isr_location_get_option3(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 15);
 }
 
 /**
@@ -345,8 +357,8 @@ static inline uint8_t mavlink_msg_isr_location_get_option3(const mavlink_message
  * @param msg The message to decode
  * @param isr_location C-struct to decode the message contents into
  */
-static inline void mavlink_msg_isr_location_decode(const mavlink_message_t* msg, mavlink_isr_location_t* isr_location)
-{
+static inline void mavlink_msg_isr_location_decode(const mavlink_message_t *msg,
+                                                   mavlink_isr_location_t *isr_location) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     isr_location->latitude = mavlink_msg_isr_location_get_latitude(msg);
     isr_location->longitude = mavlink_msg_isr_location_get_longitude(msg);
@@ -356,8 +368,8 @@ static inline void mavlink_msg_isr_location_decode(const mavlink_message_t* msg,
     isr_location->option2 = mavlink_msg_isr_location_get_option2(msg);
     isr_location->option3 = mavlink_msg_isr_location_get_option3(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_ISR_LOCATION_LEN? msg->len : MAVLINK_MSG_ID_ISR_LOCATION_LEN;
-        memset(isr_location, 0, MAVLINK_MSG_ID_ISR_LOCATION_LEN);
-    memcpy(isr_location, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_ISR_LOCATION_LEN? msg->len : MAVLINK_MSG_ID_ISR_LOCATION_LEN;
+    memset(isr_location, 0, MAVLINK_MSG_ID_ISR_LOCATION_LEN);
+memcpy(isr_location, _MAV_PAYLOAD(msg), len);
 #endif
 }

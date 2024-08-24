@@ -5,14 +5,14 @@
 
 
 typedef struct __mavlink_gimbal_manager_set_attitude_t {
- uint32_t flags; /*<  High level gimbal manager flags to use.*/
- float q[4]; /*<  Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation, the frame is depends on whether the flag GIMBAL_MANAGER_FLAGS_YAW_LOCK is set)*/
- float angular_velocity_x; /*< [rad/s] X component of angular velocity, positive is rolling to the right, NaN to be ignored.*/
- float angular_velocity_y; /*< [rad/s] Y component of angular velocity, positive is pitching up, NaN to be ignored.*/
- float angular_velocity_z; /*< [rad/s] Z component of angular velocity, positive is yawing to the right, NaN to be ignored.*/
- uint8_t target_system; /*<  System ID*/
- uint8_t target_component; /*<  Component ID*/
- uint8_t gimbal_device_id; /*<  Component ID of gimbal device to address (or 1-6 for non-MAVLink gimbal), 0 for all gimbal device components. Send command multiple times for more than one gimbal (but not all gimbals).*/
+    uint32_t flags; /*<  High level gimbal manager flags to use.*/
+    float q[4]; /*<  Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation, the frame is depends on whether the flag GIMBAL_MANAGER_FLAGS_YAW_LOCK is set)*/
+    float angular_velocity_x; /*< [rad/s] X component of angular velocity, positive is rolling to the right, NaN to be ignored.*/
+    float angular_velocity_y; /*< [rad/s] Y component of angular velocity, positive is pitching up, NaN to be ignored.*/
+    float angular_velocity_z; /*< [rad/s] Z component of angular velocity, positive is yawing to the right, NaN to be ignored.*/
+    uint8_t target_system; /*<  System ID*/
+    uint8_t target_component; /*<  Component ID*/
+    uint8_t gimbal_device_id; /*<  Component ID of gimbal device to address (or 1-6 for non-MAVLink gimbal), 0 for all gimbal device components. Send command multiple times for more than one gimbal (but not all gimbals).*/
 } mavlink_gimbal_manager_set_attitude_t;
 
 #define MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN 35
@@ -72,9 +72,13 @@ typedef struct __mavlink_gimbal_manager_set_attitude_t {
  * @param angular_velocity_z [rad/s] Z component of angular velocity, positive is yawing to the right, NaN to be ignored.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, uint32_t flags, uint8_t gimbal_device_id, const float *q, float angular_velocity_x, float angular_velocity_y, float angular_velocity_z)
-{
+static inline uint16_t
+mavlink_msg_gimbal_manager_set_attitude_pack(uint8_t system_id, uint8_t component_id,
+                                             mavlink_message_t *msg,
+                                             uint8_t target_system, uint8_t target_component,
+                                             uint32_t flags, uint8_t gimbal_device_id,
+                                             const float *q, float angular_velocity_x,
+                                             float angular_velocity_y, float angular_velocity_z) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN];
     _mav_put_uint32_t(buf, 0, flags);
@@ -85,7 +89,7 @@ static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_pack(uint8_t syst
     _mav_put_uint8_t(buf, 33, target_component);
     _mav_put_uint8_t(buf, 34, gimbal_device_id);
     _mav_put_float_array(buf, 4, q, 4);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN);
 #else
     mavlink_gimbal_manager_set_attitude_t packet;
     packet.flags = flags;
@@ -100,7 +104,10 @@ static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_pack(uint8_t syst
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_MIN_LEN, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_MIN_LEN,
+                                    MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN,
+                                    MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_CRC);
 }
 
 /**
@@ -119,10 +126,15 @@ static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_pack(uint8_t syst
  * @param angular_velocity_z [rad/s] Z component of angular velocity, positive is yawing to the right, NaN to be ignored.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,uint32_t flags,uint8_t gimbal_device_id,const float *q,float angular_velocity_x,float angular_velocity_y,float angular_velocity_z)
-{
+static inline uint16_t
+mavlink_msg_gimbal_manager_set_attitude_pack_chan(uint8_t system_id, uint8_t component_id,
+                                                  uint8_t chan,
+                                                  mavlink_message_t *msg,
+                                                  uint8_t target_system, uint8_t target_component,
+                                                  uint32_t flags, uint8_t gimbal_device_id,
+                                                  const float *q, float angular_velocity_x,
+                                                  float angular_velocity_y,
+                                                  float angular_velocity_z) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN];
     _mav_put_uint32_t(buf, 0, flags);
@@ -133,7 +145,7 @@ static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_pack_chan(uint8_t
     _mav_put_uint8_t(buf, 33, target_component);
     _mav_put_uint8_t(buf, 34, gimbal_device_id);
     _mav_put_float_array(buf, 4, q, 4);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN);
 #else
     mavlink_gimbal_manager_set_attitude_t packet;
     packet.flags = flags;
@@ -148,7 +160,10 @@ static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_pack_chan(uint8_t
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_MIN_LEN, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_MIN_LEN,
+                                         MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN,
+                                         MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_CRC);
 }
 
 /**
@@ -159,9 +174,19 @@ static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_pack_chan(uint8_t
  * @param msg The MAVLink message to compress the data into
  * @param gimbal_manager_set_attitude C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_gimbal_manager_set_attitude_t* gimbal_manager_set_attitude)
-{
-    return mavlink_msg_gimbal_manager_set_attitude_pack(system_id, component_id, msg, gimbal_manager_set_attitude->target_system, gimbal_manager_set_attitude->target_component, gimbal_manager_set_attitude->flags, gimbal_manager_set_attitude->gimbal_device_id, gimbal_manager_set_attitude->q, gimbal_manager_set_attitude->angular_velocity_x, gimbal_manager_set_attitude->angular_velocity_y, gimbal_manager_set_attitude->angular_velocity_z);
+static inline uint16_t
+mavlink_msg_gimbal_manager_set_attitude_encode(uint8_t system_id, uint8_t component_id,
+                                               mavlink_message_t *msg,
+                                               const mavlink_gimbal_manager_set_attitude_t *gimbal_manager_set_attitude) {
+    return mavlink_msg_gimbal_manager_set_attitude_pack(system_id, component_id, msg,
+                                                        gimbal_manager_set_attitude->target_system,
+                                                        gimbal_manager_set_attitude->target_component,
+                                                        gimbal_manager_set_attitude->flags,
+                                                        gimbal_manager_set_attitude->gimbal_device_id,
+                                                        gimbal_manager_set_attitude->q,
+                                                        gimbal_manager_set_attitude->angular_velocity_x,
+                                                        gimbal_manager_set_attitude->angular_velocity_y,
+                                                        gimbal_manager_set_attitude->angular_velocity_z);
 }
 
 /**
@@ -173,9 +198,19 @@ static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_encode(uint8_t sy
  * @param msg The MAVLink message to compress the data into
  * @param gimbal_manager_set_attitude C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_gimbal_manager_set_attitude_t* gimbal_manager_set_attitude)
-{
-    return mavlink_msg_gimbal_manager_set_attitude_pack_chan(system_id, component_id, chan, msg, gimbal_manager_set_attitude->target_system, gimbal_manager_set_attitude->target_component, gimbal_manager_set_attitude->flags, gimbal_manager_set_attitude->gimbal_device_id, gimbal_manager_set_attitude->q, gimbal_manager_set_attitude->angular_velocity_x, gimbal_manager_set_attitude->angular_velocity_y, gimbal_manager_set_attitude->angular_velocity_z);
+static inline uint16_t
+mavlink_msg_gimbal_manager_set_attitude_encode_chan(uint8_t system_id, uint8_t component_id,
+                                                    uint8_t chan, mavlink_message_t *msg,
+                                                    const mavlink_gimbal_manager_set_attitude_t *gimbal_manager_set_attitude) {
+    return mavlink_msg_gimbal_manager_set_attitude_pack_chan(system_id, component_id, chan, msg,
+                                                             gimbal_manager_set_attitude->target_system,
+                                                             gimbal_manager_set_attitude->target_component,
+                                                             gimbal_manager_set_attitude->flags,
+                                                             gimbal_manager_set_attitude->gimbal_device_id,
+                                                             gimbal_manager_set_attitude->q,
+                                                             gimbal_manager_set_attitude->angular_velocity_x,
+                                                             gimbal_manager_set_attitude->angular_velocity_y,
+                                                             gimbal_manager_set_attitude->angular_velocity_z);
 }
 
 /**
@@ -280,9 +315,9 @@ static inline void mavlink_msg_gimbal_manager_set_attitude_send_buf(mavlink_mess
  *
  * @return  System ID
  */
-static inline uint8_t mavlink_msg_gimbal_manager_set_attitude_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  32);
+static inline uint8_t
+mavlink_msg_gimbal_manager_set_attitude_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 32);
 }
 
 /**
@@ -290,9 +325,9 @@ static inline uint8_t mavlink_msg_gimbal_manager_set_attitude_get_target_system(
  *
  * @return  Component ID
  */
-static inline uint8_t mavlink_msg_gimbal_manager_set_attitude_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  33);
+static inline uint8_t
+mavlink_msg_gimbal_manager_set_attitude_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 33);
 }
 
 /**
@@ -300,9 +335,9 @@ static inline uint8_t mavlink_msg_gimbal_manager_set_attitude_get_target_compone
  *
  * @return  High level gimbal manager flags to use.
  */
-static inline uint32_t mavlink_msg_gimbal_manager_set_attitude_get_flags(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  0);
+static inline uint32_t
+mavlink_msg_gimbal_manager_set_attitude_get_flags(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 0);
 }
 
 /**
@@ -310,9 +345,9 @@ static inline uint32_t mavlink_msg_gimbal_manager_set_attitude_get_flags(const m
  *
  * @return  Component ID of gimbal device to address (or 1-6 for non-MAVLink gimbal), 0 for all gimbal device components. Send command multiple times for more than one gimbal (but not all gimbals).
  */
-static inline uint8_t mavlink_msg_gimbal_manager_set_attitude_get_gimbal_device_id(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  34);
+static inline uint8_t
+mavlink_msg_gimbal_manager_set_attitude_get_gimbal_device_id(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 34);
 }
 
 /**
@@ -320,9 +355,9 @@ static inline uint8_t mavlink_msg_gimbal_manager_set_attitude_get_gimbal_device_
  *
  * @return  Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation, the frame is depends on whether the flag GIMBAL_MANAGER_FLAGS_YAW_LOCK is set)
  */
-static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_get_q(const mavlink_message_t* msg, float *q)
-{
-    return _MAV_RETURN_float_array(msg, q, 4,  4);
+static inline uint16_t
+mavlink_msg_gimbal_manager_set_attitude_get_q(const mavlink_message_t *msg, float *q) {
+    return _MAV_RETURN_float_array(msg, q, 4, 4);
 }
 
 /**
@@ -330,9 +365,9 @@ static inline uint16_t mavlink_msg_gimbal_manager_set_attitude_get_q(const mavli
  *
  * @return [rad/s] X component of angular velocity, positive is rolling to the right, NaN to be ignored.
  */
-static inline float mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_x(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  20);
+static inline float
+mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_x(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 20);
 }
 
 /**
@@ -340,9 +375,9 @@ static inline float mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity
  *
  * @return [rad/s] Y component of angular velocity, positive is pitching up, NaN to be ignored.
  */
-static inline float mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_y(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float
+mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_y(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -350,9 +385,9 @@ static inline float mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity
  *
  * @return [rad/s] Z component of angular velocity, positive is yawing to the right, NaN to be ignored.
  */
-static inline float mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_z(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float
+mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_z(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -361,20 +396,26 @@ static inline float mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity
  * @param msg The message to decode
  * @param gimbal_manager_set_attitude C-struct to decode the message contents into
  */
-static inline void mavlink_msg_gimbal_manager_set_attitude_decode(const mavlink_message_t* msg, mavlink_gimbal_manager_set_attitude_t* gimbal_manager_set_attitude)
-{
+static inline void mavlink_msg_gimbal_manager_set_attitude_decode(const mavlink_message_t *msg,
+                                                                  mavlink_gimbal_manager_set_attitude_t *gimbal_manager_set_attitude) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     gimbal_manager_set_attitude->flags = mavlink_msg_gimbal_manager_set_attitude_get_flags(msg);
     mavlink_msg_gimbal_manager_set_attitude_get_q(msg, gimbal_manager_set_attitude->q);
-    gimbal_manager_set_attitude->angular_velocity_x = mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_x(msg);
-    gimbal_manager_set_attitude->angular_velocity_y = mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_y(msg);
-    gimbal_manager_set_attitude->angular_velocity_z = mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_z(msg);
-    gimbal_manager_set_attitude->target_system = mavlink_msg_gimbal_manager_set_attitude_get_target_system(msg);
-    gimbal_manager_set_attitude->target_component = mavlink_msg_gimbal_manager_set_attitude_get_target_component(msg);
-    gimbal_manager_set_attitude->gimbal_device_id = mavlink_msg_gimbal_manager_set_attitude_get_gimbal_device_id(msg);
+    gimbal_manager_set_attitude->angular_velocity_x = mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_x(
+            msg);
+    gimbal_manager_set_attitude->angular_velocity_y = mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_y(
+            msg);
+    gimbal_manager_set_attitude->angular_velocity_z = mavlink_msg_gimbal_manager_set_attitude_get_angular_velocity_z(
+            msg);
+    gimbal_manager_set_attitude->target_system = mavlink_msg_gimbal_manager_set_attitude_get_target_system(
+            msg);
+    gimbal_manager_set_attitude->target_component = mavlink_msg_gimbal_manager_set_attitude_get_target_component(
+            msg);
+    gimbal_manager_set_attitude->gimbal_device_id = mavlink_msg_gimbal_manager_set_attitude_get_gimbal_device_id(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN? msg->len : MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN;
-        memset(gimbal_manager_set_attitude, 0, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN);
-    memcpy(gimbal_manager_set_attitude, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN? msg->len : MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN;
+    memset(gimbal_manager_set_attitude, 0, MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE_LEN);
+memcpy(gimbal_manager_set_attitude, _MAV_PAYLOAD(msg), len);
 #endif
 }

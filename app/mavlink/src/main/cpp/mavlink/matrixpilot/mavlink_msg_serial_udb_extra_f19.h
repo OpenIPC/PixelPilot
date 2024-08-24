@@ -4,16 +4,18 @@
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19 185
 
 MAVPACKED(
-typedef struct __mavlink_serial_udb_extra_f19_t {
- uint8_t sue_aileron_output_channel; /*<  SUE aileron output channel*/
- uint8_t sue_aileron_reversed; /*<  SUE aileron reversed*/
- uint8_t sue_elevator_output_channel; /*<  SUE elevator output channel*/
- uint8_t sue_elevator_reversed; /*<  SUE elevator reversed*/
- uint8_t sue_throttle_output_channel; /*<  SUE throttle output channel*/
- uint8_t sue_throttle_reversed; /*<  SUE throttle reversed*/
- uint8_t sue_rudder_output_channel; /*<  SUE rudder output channel*/
- uint8_t sue_rudder_reversed; /*<  SUE rudder reversed*/
-}) mavlink_serial_udb_extra_f19_t;
+        typedef struct __mavlink_serial_udb_extra_f19_t {
+            uint8_t sue_aileron_output_channel; /*<  SUE aileron output channel*/
+            uint8_t sue_aileron_reversed; /*<  SUE aileron reversed*/
+            uint8_t sue_elevator_output_channel; /*<  SUE elevator output channel*/
+            uint8_t sue_elevator_reversed; /*<  SUE elevator reversed*/
+            uint8_t sue_throttle_output_channel; /*<  SUE throttle output channel*/
+            uint8_t sue_throttle_reversed; /*<  SUE throttle reversed*/
+            uint8_t sue_rudder_output_channel; /*<  SUE rudder output channel*/
+            uint8_t sue_rudder_reversed; /*<  SUE rudder reversed*/
+        })
+
+mavlink_serial_udb_extra_f19_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN 8
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_MIN_LEN 8
@@ -22,7 +24,6 @@ typedef struct __mavlink_serial_udb_extra_f19_t {
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_CRC 87
 #define MAVLINK_MSG_ID_185_CRC 87
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -72,9 +73,17 @@ typedef struct __mavlink_serial_udb_extra_f19_t {
  * @param sue_rudder_reversed  SUE rudder reversed
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f19_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t sue_aileron_output_channel, uint8_t sue_aileron_reversed, uint8_t sue_elevator_output_channel, uint8_t sue_elevator_reversed, uint8_t sue_throttle_output_channel, uint8_t sue_throttle_reversed, uint8_t sue_rudder_output_channel, uint8_t sue_rudder_reversed)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f19_pack(uint8_t system_id, uint8_t component_id,
+                                      mavlink_message_t *msg,
+                                      uint8_t sue_aileron_output_channel,
+                                      uint8_t sue_aileron_reversed,
+                                      uint8_t sue_elevator_output_channel,
+                                      uint8_t sue_elevator_reversed,
+                                      uint8_t sue_throttle_output_channel,
+                                      uint8_t sue_throttle_reversed,
+                                      uint8_t sue_rudder_output_channel,
+                                      uint8_t sue_rudder_reversed) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN];
     _mav_put_uint8_t(buf, 0, sue_aileron_output_channel);
@@ -86,7 +95,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f19_pack(uint8_t system_id, 
     _mav_put_uint8_t(buf, 6, sue_rudder_output_channel);
     _mav_put_uint8_t(buf, 7, sue_rudder_reversed);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN);
 #else
     mavlink_serial_udb_extra_f19_t packet;
     packet.sue_aileron_output_channel = sue_aileron_output_channel;
@@ -102,7 +111,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f19_pack(uint8_t system_id, 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_MIN_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_CRC);
 }
 
 /**
@@ -121,10 +133,17 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f19_pack(uint8_t system_id, 
  * @param sue_rudder_reversed  SUE rudder reversed
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f19_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t sue_aileron_output_channel,uint8_t sue_aileron_reversed,uint8_t sue_elevator_output_channel,uint8_t sue_elevator_reversed,uint8_t sue_throttle_output_channel,uint8_t sue_throttle_reversed,uint8_t sue_rudder_output_channel,uint8_t sue_rudder_reversed)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f19_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                           mavlink_message_t *msg,
+                                           uint8_t sue_aileron_output_channel,
+                                           uint8_t sue_aileron_reversed,
+                                           uint8_t sue_elevator_output_channel,
+                                           uint8_t sue_elevator_reversed,
+                                           uint8_t sue_throttle_output_channel,
+                                           uint8_t sue_throttle_reversed,
+                                           uint8_t sue_rudder_output_channel,
+                                           uint8_t sue_rudder_reversed) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN];
     _mav_put_uint8_t(buf, 0, sue_aileron_output_channel);
@@ -136,7 +155,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f19_pack_chan(uint8_t system
     _mav_put_uint8_t(buf, 6, sue_rudder_output_channel);
     _mav_put_uint8_t(buf, 7, sue_rudder_reversed);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN);
 #else
     mavlink_serial_udb_extra_f19_t packet;
     packet.sue_aileron_output_channel = sue_aileron_output_channel;
@@ -152,7 +171,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f19_pack_chan(uint8_t system
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_MIN_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_CRC);
 }
 
 /**
@@ -163,9 +185,19 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f19_pack_chan(uint8_t system
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f19 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f19_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f19_t* serial_udb_extra_f19)
-{
-    return mavlink_msg_serial_udb_extra_f19_pack(system_id, component_id, msg, serial_udb_extra_f19->sue_aileron_output_channel, serial_udb_extra_f19->sue_aileron_reversed, serial_udb_extra_f19->sue_elevator_output_channel, serial_udb_extra_f19->sue_elevator_reversed, serial_udb_extra_f19->sue_throttle_output_channel, serial_udb_extra_f19->sue_throttle_reversed, serial_udb_extra_f19->sue_rudder_output_channel, serial_udb_extra_f19->sue_rudder_reversed);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f19_encode(uint8_t system_id, uint8_t component_id,
+                                        mavlink_message_t *msg,
+                                        const mavlink_serial_udb_extra_f19_t *serial_udb_extra_f19) {
+    return mavlink_msg_serial_udb_extra_f19_pack(system_id, component_id, msg,
+                                                 serial_udb_extra_f19->sue_aileron_output_channel,
+                                                 serial_udb_extra_f19->sue_aileron_reversed,
+                                                 serial_udb_extra_f19->sue_elevator_output_channel,
+                                                 serial_udb_extra_f19->sue_elevator_reversed,
+                                                 serial_udb_extra_f19->sue_throttle_output_channel,
+                                                 serial_udb_extra_f19->sue_throttle_reversed,
+                                                 serial_udb_extra_f19->sue_rudder_output_channel,
+                                                 serial_udb_extra_f19->sue_rudder_reversed);
 }
 
 /**
@@ -177,9 +209,19 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f19_encode(uint8_t system_id
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f19 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f19_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f19_t* serial_udb_extra_f19)
-{
-    return mavlink_msg_serial_udb_extra_f19_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f19->sue_aileron_output_channel, serial_udb_extra_f19->sue_aileron_reversed, serial_udb_extra_f19->sue_elevator_output_channel, serial_udb_extra_f19->sue_elevator_reversed, serial_udb_extra_f19->sue_throttle_output_channel, serial_udb_extra_f19->sue_throttle_reversed, serial_udb_extra_f19->sue_rudder_output_channel, serial_udb_extra_f19->sue_rudder_reversed);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f19_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                             mavlink_message_t *msg,
+                                             const mavlink_serial_udb_extra_f19_t *serial_udb_extra_f19) {
+    return mavlink_msg_serial_udb_extra_f19_pack_chan(system_id, component_id, chan, msg,
+                                                      serial_udb_extra_f19->sue_aileron_output_channel,
+                                                      serial_udb_extra_f19->sue_aileron_reversed,
+                                                      serial_udb_extra_f19->sue_elevator_output_channel,
+                                                      serial_udb_extra_f19->sue_elevator_reversed,
+                                                      serial_udb_extra_f19->sue_throttle_output_channel,
+                                                      serial_udb_extra_f19->sue_throttle_reversed,
+                                                      serial_udb_extra_f19->sue_rudder_output_channel,
+                                                      serial_udb_extra_f19->sue_rudder_reversed);
 }
 
 /**
@@ -288,9 +330,9 @@ static inline void mavlink_msg_serial_udb_extra_f19_send_buf(mavlink_message_t *
  *
  * @return  SUE aileron output channel
  */
-static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_aileron_output_channel(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  0);
+static inline uint8_t
+mavlink_msg_serial_udb_extra_f19_get_sue_aileron_output_channel(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 0);
 }
 
 /**
@@ -298,9 +340,9 @@ static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_aileron_output_ch
  *
  * @return  SUE aileron reversed
  */
-static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_aileron_reversed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  1);
+static inline uint8_t
+mavlink_msg_serial_udb_extra_f19_get_sue_aileron_reversed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 1);
 }
 
 /**
@@ -308,9 +350,9 @@ static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_aileron_reversed(
  *
  * @return  SUE elevator output channel
  */
-static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_elevator_output_channel(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  2);
+static inline uint8_t
+mavlink_msg_serial_udb_extra_f19_get_sue_elevator_output_channel(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 2);
 }
 
 /**
@@ -318,9 +360,9 @@ static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_elevator_output_c
  *
  * @return  SUE elevator reversed
  */
-static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_elevator_reversed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  3);
+static inline uint8_t
+mavlink_msg_serial_udb_extra_f19_get_sue_elevator_reversed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 3);
 }
 
 /**
@@ -328,9 +370,9 @@ static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_elevator_reversed
  *
  * @return  SUE throttle output channel
  */
-static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_throttle_output_channel(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  4);
+static inline uint8_t
+mavlink_msg_serial_udb_extra_f19_get_sue_throttle_output_channel(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 4);
 }
 
 /**
@@ -338,9 +380,9 @@ static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_throttle_output_c
  *
  * @return  SUE throttle reversed
  */
-static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_throttle_reversed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  5);
+static inline uint8_t
+mavlink_msg_serial_udb_extra_f19_get_sue_throttle_reversed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 5);
 }
 
 /**
@@ -348,9 +390,9 @@ static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_throttle_reversed
  *
  * @return  SUE rudder output channel
  */
-static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_rudder_output_channel(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  6);
+static inline uint8_t
+mavlink_msg_serial_udb_extra_f19_get_sue_rudder_output_channel(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 6);
 }
 
 /**
@@ -358,9 +400,9 @@ static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_rudder_output_cha
  *
  * @return  SUE rudder reversed
  */
-static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_rudder_reversed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  7);
+static inline uint8_t
+mavlink_msg_serial_udb_extra_f19_get_sue_rudder_reversed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 7);
 }
 
 /**
@@ -369,20 +411,28 @@ static inline uint8_t mavlink_msg_serial_udb_extra_f19_get_sue_rudder_reversed(c
  * @param msg The message to decode
  * @param serial_udb_extra_f19 C-struct to decode the message contents into
  */
-static inline void mavlink_msg_serial_udb_extra_f19_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f19_t* serial_udb_extra_f19)
-{
+static inline void mavlink_msg_serial_udb_extra_f19_decode(const mavlink_message_t *msg,
+                                                           mavlink_serial_udb_extra_f19_t *serial_udb_extra_f19) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    serial_udb_extra_f19->sue_aileron_output_channel = mavlink_msg_serial_udb_extra_f19_get_sue_aileron_output_channel(msg);
-    serial_udb_extra_f19->sue_aileron_reversed = mavlink_msg_serial_udb_extra_f19_get_sue_aileron_reversed(msg);
-    serial_udb_extra_f19->sue_elevator_output_channel = mavlink_msg_serial_udb_extra_f19_get_sue_elevator_output_channel(msg);
-    serial_udb_extra_f19->sue_elevator_reversed = mavlink_msg_serial_udb_extra_f19_get_sue_elevator_reversed(msg);
-    serial_udb_extra_f19->sue_throttle_output_channel = mavlink_msg_serial_udb_extra_f19_get_sue_throttle_output_channel(msg);
-    serial_udb_extra_f19->sue_throttle_reversed = mavlink_msg_serial_udb_extra_f19_get_sue_throttle_reversed(msg);
-    serial_udb_extra_f19->sue_rudder_output_channel = mavlink_msg_serial_udb_extra_f19_get_sue_rudder_output_channel(msg);
-    serial_udb_extra_f19->sue_rudder_reversed = mavlink_msg_serial_udb_extra_f19_get_sue_rudder_reversed(msg);
+    serial_udb_extra_f19->sue_aileron_output_channel = mavlink_msg_serial_udb_extra_f19_get_sue_aileron_output_channel(
+            msg);
+    serial_udb_extra_f19->sue_aileron_reversed = mavlink_msg_serial_udb_extra_f19_get_sue_aileron_reversed(
+            msg);
+    serial_udb_extra_f19->sue_elevator_output_channel = mavlink_msg_serial_udb_extra_f19_get_sue_elevator_output_channel(
+            msg);
+    serial_udb_extra_f19->sue_elevator_reversed = mavlink_msg_serial_udb_extra_f19_get_sue_elevator_reversed(
+            msg);
+    serial_udb_extra_f19->sue_throttle_output_channel = mavlink_msg_serial_udb_extra_f19_get_sue_throttle_output_channel(
+            msg);
+    serial_udb_extra_f19->sue_throttle_reversed = mavlink_msg_serial_udb_extra_f19_get_sue_throttle_reversed(
+            msg);
+    serial_udb_extra_f19->sue_rudder_output_channel = mavlink_msg_serial_udb_extra_f19_get_sue_rudder_output_channel(
+            msg);
+    serial_udb_extra_f19->sue_rudder_reversed = mavlink_msg_serial_udb_extra_f19_get_sue_rudder_reversed(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN;
-        memset(serial_udb_extra_f19, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN);
-    memcpy(serial_udb_extra_f19, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN;
+    memset(serial_udb_extra_f19, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F19_LEN);
+memcpy(serial_udb_extra_f19, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -4,21 +4,23 @@
 #define MAVLINK_MSG_ID_SENS_MPPT 202
 
 MAVPACKED(
-typedef struct __mavlink_sens_mppt_t {
- uint64_t mppt_timestamp; /*< [us]  MPPT last timestamp */
- float mppt1_volt; /*< [V]  MPPT1 voltage */
- float mppt1_amp; /*< [A]  MPPT1 current */
- float mppt2_volt; /*< [V]  MPPT2 voltage */
- float mppt2_amp; /*< [A]  MPPT2 current */
- float mppt3_volt; /*< [V] MPPT3 voltage */
- float mppt3_amp; /*< [A]  MPPT3 current */
- uint16_t mppt1_pwm; /*< [us]  MPPT1 pwm */
- uint16_t mppt2_pwm; /*< [us]  MPPT2 pwm */
- uint16_t mppt3_pwm; /*< [us]  MPPT3 pwm */
- uint8_t mppt1_status; /*<   MPPT1 status */
- uint8_t mppt2_status; /*<   MPPT2 status */
- uint8_t mppt3_status; /*<   MPPT3 status */
-}) mavlink_sens_mppt_t;
+        typedef struct __mavlink_sens_mppt_t {
+            uint64_t mppt_timestamp; /*< [us]  MPPT last timestamp */
+            float mppt1_volt; /*< [V]  MPPT1 voltage */
+            float mppt1_amp; /*< [A]  MPPT1 current */
+            float mppt2_volt; /*< [V]  MPPT2 voltage */
+            float mppt2_amp; /*< [A]  MPPT2 current */
+            float mppt3_volt; /*< [V] MPPT3 voltage */
+            float mppt3_amp; /*< [A]  MPPT3 current */
+            uint16_t mppt1_pwm; /*< [us]  MPPT1 pwm */
+            uint16_t mppt2_pwm; /*< [us]  MPPT2 pwm */
+            uint16_t mppt3_pwm; /*< [us]  MPPT3 pwm */
+            uint8_t mppt1_status; /*<   MPPT1 status */
+            uint8_t mppt2_status; /*<   MPPT2 status */
+            uint8_t mppt3_status; /*<   MPPT3 status */
+        })
+
+mavlink_sens_mppt_t;
 
 #define MAVLINK_MSG_ID_SENS_MPPT_LEN 41
 #define MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN 41
@@ -27,7 +29,6 @@ typedef struct __mavlink_sens_mppt_t {
 
 #define MAVLINK_MSG_ID_SENS_MPPT_CRC 231
 #define MAVLINK_MSG_ID_202_CRC 231
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -92,9 +93,13 @@ typedef struct __mavlink_sens_mppt_t {
  * @param mppt3_status   MPPT3 status 
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_sens_mppt_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint64_t mppt_timestamp, float mppt1_volt, float mppt1_amp, uint16_t mppt1_pwm, uint8_t mppt1_status, float mppt2_volt, float mppt2_amp, uint16_t mppt2_pwm, uint8_t mppt2_status, float mppt3_volt, float mppt3_amp, uint16_t mppt3_pwm, uint8_t mppt3_status)
-{
+static inline uint16_t
+mavlink_msg_sens_mppt_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                           uint64_t mppt_timestamp, float mppt1_volt, float mppt1_amp,
+                           uint16_t mppt1_pwm, uint8_t mppt1_status, float mppt2_volt,
+                           float mppt2_amp, uint16_t mppt2_pwm, uint8_t mppt2_status,
+                           float mppt3_volt, float mppt3_amp, uint16_t mppt3_pwm,
+                           uint8_t mppt3_status) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SENS_MPPT_LEN];
     _mav_put_uint64_t(buf, 0, mppt_timestamp);
@@ -111,7 +116,7 @@ static inline uint16_t mavlink_msg_sens_mppt_pack(uint8_t system_id, uint8_t com
     _mav_put_uint8_t(buf, 39, mppt2_status);
     _mav_put_uint8_t(buf, 40, mppt3_status);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_MPPT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_MPPT_LEN);
 #else
     mavlink_sens_mppt_t packet;
     packet.mppt_timestamp = mppt_timestamp;
@@ -132,7 +137,8 @@ static inline uint16_t mavlink_msg_sens_mppt_pack(uint8_t system_id, uint8_t com
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SENS_MPPT;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN,
+                                    MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
 }
 
 /**
@@ -156,10 +162,14 @@ static inline uint16_t mavlink_msg_sens_mppt_pack(uint8_t system_id, uint8_t com
  * @param mppt3_status   MPPT3 status 
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_sens_mppt_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint64_t mppt_timestamp,float mppt1_volt,float mppt1_amp,uint16_t mppt1_pwm,uint8_t mppt1_status,float mppt2_volt,float mppt2_amp,uint16_t mppt2_pwm,uint8_t mppt2_status,float mppt3_volt,float mppt3_amp,uint16_t mppt3_pwm,uint8_t mppt3_status)
-{
+static inline uint16_t
+mavlink_msg_sens_mppt_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                mavlink_message_t *msg,
+                                uint64_t mppt_timestamp, float mppt1_volt, float mppt1_amp,
+                                uint16_t mppt1_pwm, uint8_t mppt1_status, float mppt2_volt,
+                                float mppt2_amp, uint16_t mppt2_pwm, uint8_t mppt2_status,
+                                float mppt3_volt, float mppt3_amp, uint16_t mppt3_pwm,
+                                uint8_t mppt3_status) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SENS_MPPT_LEN];
     _mav_put_uint64_t(buf, 0, mppt_timestamp);
@@ -176,7 +186,7 @@ static inline uint16_t mavlink_msg_sens_mppt_pack_chan(uint8_t system_id, uint8_
     _mav_put_uint8_t(buf, 39, mppt2_status);
     _mav_put_uint8_t(buf, 40, mppt3_status);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_MPPT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_MPPT_LEN);
 #else
     mavlink_sens_mppt_t packet;
     packet.mppt_timestamp = mppt_timestamp;
@@ -197,7 +207,10 @@ static inline uint16_t mavlink_msg_sens_mppt_pack_chan(uint8_t system_id, uint8_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SENS_MPPT;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN,
+                                         MAVLINK_MSG_ID_SENS_MPPT_LEN,
+                                         MAVLINK_MSG_ID_SENS_MPPT_CRC);
 }
 
 /**
@@ -208,9 +221,16 @@ static inline uint16_t mavlink_msg_sens_mppt_pack_chan(uint8_t system_id, uint8_
  * @param msg The MAVLink message to compress the data into
  * @param sens_mppt C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_sens_mppt_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_sens_mppt_t* sens_mppt)
-{
-    return mavlink_msg_sens_mppt_pack(system_id, component_id, msg, sens_mppt->mppt_timestamp, sens_mppt->mppt1_volt, sens_mppt->mppt1_amp, sens_mppt->mppt1_pwm, sens_mppt->mppt1_status, sens_mppt->mppt2_volt, sens_mppt->mppt2_amp, sens_mppt->mppt2_pwm, sens_mppt->mppt2_status, sens_mppt->mppt3_volt, sens_mppt->mppt3_amp, sens_mppt->mppt3_pwm, sens_mppt->mppt3_status);
+static inline uint16_t
+mavlink_msg_sens_mppt_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                             const mavlink_sens_mppt_t *sens_mppt) {
+    return mavlink_msg_sens_mppt_pack(system_id, component_id, msg, sens_mppt->mppt_timestamp,
+                                      sens_mppt->mppt1_volt, sens_mppt->mppt1_amp,
+                                      sens_mppt->mppt1_pwm, sens_mppt->mppt1_status,
+                                      sens_mppt->mppt2_volt, sens_mppt->mppt2_amp,
+                                      sens_mppt->mppt2_pwm, sens_mppt->mppt2_status,
+                                      sens_mppt->mppt3_volt, sens_mppt->mppt3_amp,
+                                      sens_mppt->mppt3_pwm, sens_mppt->mppt3_status);
 }
 
 /**
@@ -222,9 +242,17 @@ static inline uint16_t mavlink_msg_sens_mppt_encode(uint8_t system_id, uint8_t c
  * @param msg The MAVLink message to compress the data into
  * @param sens_mppt C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_sens_mppt_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_sens_mppt_t* sens_mppt)
-{
-    return mavlink_msg_sens_mppt_pack_chan(system_id, component_id, chan, msg, sens_mppt->mppt_timestamp, sens_mppt->mppt1_volt, sens_mppt->mppt1_amp, sens_mppt->mppt1_pwm, sens_mppt->mppt1_status, sens_mppt->mppt2_volt, sens_mppt->mppt2_amp, sens_mppt->mppt2_pwm, sens_mppt->mppt2_status, sens_mppt->mppt3_volt, sens_mppt->mppt3_amp, sens_mppt->mppt3_pwm, sens_mppt->mppt3_status);
+static inline uint16_t
+mavlink_msg_sens_mppt_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                  mavlink_message_t *msg, const mavlink_sens_mppt_t *sens_mppt) {
+    return mavlink_msg_sens_mppt_pack_chan(system_id, component_id, chan, msg,
+                                           sens_mppt->mppt_timestamp, sens_mppt->mppt1_volt,
+                                           sens_mppt->mppt1_amp, sens_mppt->mppt1_pwm,
+                                           sens_mppt->mppt1_status, sens_mppt->mppt2_volt,
+                                           sens_mppt->mppt2_amp, sens_mppt->mppt2_pwm,
+                                           sens_mppt->mppt2_status, sens_mppt->mppt3_volt,
+                                           sens_mppt->mppt3_amp, sens_mppt->mppt3_pwm,
+                                           sens_mppt->mppt3_status);
 }
 
 /**
@@ -358,9 +386,8 @@ static inline void mavlink_msg_sens_mppt_send_buf(mavlink_message_t *msgbuf, mav
  *
  * @return [us]  MPPT last timestamp 
  */
-static inline uint64_t mavlink_msg_sens_mppt_get_mppt_timestamp(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint64_t(msg,  0);
+static inline uint64_t mavlink_msg_sens_mppt_get_mppt_timestamp(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint64_t(msg, 0);
 }
 
 /**
@@ -368,9 +395,8 @@ static inline uint64_t mavlink_msg_sens_mppt_get_mppt_timestamp(const mavlink_me
  *
  * @return [V]  MPPT1 voltage 
  */
-static inline float mavlink_msg_sens_mppt_get_mppt1_volt(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_sens_mppt_get_mppt1_volt(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -378,9 +404,8 @@ static inline float mavlink_msg_sens_mppt_get_mppt1_volt(const mavlink_message_t
  *
  * @return [A]  MPPT1 current 
  */
-static inline float mavlink_msg_sens_mppt_get_mppt1_amp(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_sens_mppt_get_mppt1_amp(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -388,9 +413,8 @@ static inline float mavlink_msg_sens_mppt_get_mppt1_amp(const mavlink_message_t*
  *
  * @return [us]  MPPT1 pwm 
  */
-static inline uint16_t mavlink_msg_sens_mppt_get_mppt1_pwm(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  32);
+static inline uint16_t mavlink_msg_sens_mppt_get_mppt1_pwm(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 32);
 }
 
 /**
@@ -398,9 +422,8 @@ static inline uint16_t mavlink_msg_sens_mppt_get_mppt1_pwm(const mavlink_message
  *
  * @return   MPPT1 status 
  */
-static inline uint8_t mavlink_msg_sens_mppt_get_mppt1_status(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  38);
+static inline uint8_t mavlink_msg_sens_mppt_get_mppt1_status(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 38);
 }
 
 /**
@@ -408,9 +431,8 @@ static inline uint8_t mavlink_msg_sens_mppt_get_mppt1_status(const mavlink_messa
  *
  * @return [V]  MPPT2 voltage 
  */
-static inline float mavlink_msg_sens_mppt_get_mppt2_volt(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float mavlink_msg_sens_mppt_get_mppt2_volt(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -418,9 +440,8 @@ static inline float mavlink_msg_sens_mppt_get_mppt2_volt(const mavlink_message_t
  *
  * @return [A]  MPPT2 current 
  */
-static inline float mavlink_msg_sens_mppt_get_mppt2_amp(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  20);
+static inline float mavlink_msg_sens_mppt_get_mppt2_amp(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 20);
 }
 
 /**
@@ -428,9 +449,8 @@ static inline float mavlink_msg_sens_mppt_get_mppt2_amp(const mavlink_message_t*
  *
  * @return [us]  MPPT2 pwm 
  */
-static inline uint16_t mavlink_msg_sens_mppt_get_mppt2_pwm(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  34);
+static inline uint16_t mavlink_msg_sens_mppt_get_mppt2_pwm(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 34);
 }
 
 /**
@@ -438,9 +458,8 @@ static inline uint16_t mavlink_msg_sens_mppt_get_mppt2_pwm(const mavlink_message
  *
  * @return   MPPT2 status 
  */
-static inline uint8_t mavlink_msg_sens_mppt_get_mppt2_status(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  39);
+static inline uint8_t mavlink_msg_sens_mppt_get_mppt2_status(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 39);
 }
 
 /**
@@ -448,9 +467,8 @@ static inline uint8_t mavlink_msg_sens_mppt_get_mppt2_status(const mavlink_messa
  *
  * @return [V] MPPT3 voltage 
  */
-static inline float mavlink_msg_sens_mppt_get_mppt3_volt(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float mavlink_msg_sens_mppt_get_mppt3_volt(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -458,9 +476,8 @@ static inline float mavlink_msg_sens_mppt_get_mppt3_volt(const mavlink_message_t
  *
  * @return [A]  MPPT3 current 
  */
-static inline float mavlink_msg_sens_mppt_get_mppt3_amp(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float mavlink_msg_sens_mppt_get_mppt3_amp(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -468,9 +485,8 @@ static inline float mavlink_msg_sens_mppt_get_mppt3_amp(const mavlink_message_t*
  *
  * @return [us]  MPPT3 pwm 
  */
-static inline uint16_t mavlink_msg_sens_mppt_get_mppt3_pwm(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  36);
+static inline uint16_t mavlink_msg_sens_mppt_get_mppt3_pwm(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 36);
 }
 
 /**
@@ -478,9 +494,8 @@ static inline uint16_t mavlink_msg_sens_mppt_get_mppt3_pwm(const mavlink_message
  *
  * @return   MPPT3 status 
  */
-static inline uint8_t mavlink_msg_sens_mppt_get_mppt3_status(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  40);
+static inline uint8_t mavlink_msg_sens_mppt_get_mppt3_status(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 40);
 }
 
 /**
@@ -489,8 +504,8 @@ static inline uint8_t mavlink_msg_sens_mppt_get_mppt3_status(const mavlink_messa
  * @param msg The message to decode
  * @param sens_mppt C-struct to decode the message contents into
  */
-static inline void mavlink_msg_sens_mppt_decode(const mavlink_message_t* msg, mavlink_sens_mppt_t* sens_mppt)
-{
+static inline void
+mavlink_msg_sens_mppt_decode(const mavlink_message_t *msg, mavlink_sens_mppt_t *sens_mppt) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     sens_mppt->mppt_timestamp = mavlink_msg_sens_mppt_get_mppt_timestamp(msg);
     sens_mppt->mppt1_volt = mavlink_msg_sens_mppt_get_mppt1_volt(msg);
@@ -506,8 +521,8 @@ static inline void mavlink_msg_sens_mppt_decode(const mavlink_message_t* msg, ma
     sens_mppt->mppt2_status = mavlink_msg_sens_mppt_get_mppt2_status(msg);
     sens_mppt->mppt3_status = mavlink_msg_sens_mppt_get_mppt3_status(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SENS_MPPT_LEN? msg->len : MAVLINK_MSG_ID_SENS_MPPT_LEN;
-        memset(sens_mppt, 0, MAVLINK_MSG_ID_SENS_MPPT_LEN);
-    memcpy(sens_mppt, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SENS_MPPT_LEN? msg->len : MAVLINK_MSG_ID_SENS_MPPT_LEN;
+    memset(sens_mppt, 0, MAVLINK_MSG_ID_SENS_MPPT_LEN);
+memcpy(sens_mppt, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -5,11 +5,11 @@
 
 
 typedef struct __mavlink_esc_status_t {
- uint64_t time_usec; /*< [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.*/
- int32_t rpm[4]; /*< [rpm] Reported motor RPM from each ESC (negative for reverse rotation).*/
- float voltage[4]; /*< [V] Voltage measured from each ESC.*/
- float current[4]; /*< [A] Current measured from each ESC.*/
- uint8_t index; /*<  Index of the first ESC in this message. minValue = 0, maxValue = 60, increment = 4.*/
+    uint64_t time_usec; /*< [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.*/
+    int32_t rpm[4]; /*< [rpm] Reported motor RPM from each ESC (negative for reverse rotation).*/
+    float voltage[4]; /*< [V] Voltage measured from each ESC.*/
+    float current[4]; /*< [A] Current measured from each ESC.*/
+    uint8_t index; /*<  Index of the first ESC in this message. minValue = 0, maxValue = 60, increment = 4.*/
 } mavlink_esc_status_t;
 
 #define MAVLINK_MSG_ID_ESC_STATUS_LEN 57
@@ -62,9 +62,10 @@ typedef struct __mavlink_esc_status_t {
  * @param current [A] Current measured from each ESC.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_esc_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t index, uint64_t time_usec, const int32_t *rpm, const float *voltage, const float *current)
-{
+static inline uint16_t
+mavlink_msg_esc_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            uint8_t index, uint64_t time_usec, const int32_t *rpm,
+                            const float *voltage, const float *current) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_ESC_STATUS_LEN];
     _mav_put_uint64_t(buf, 0, time_usec);
@@ -72,7 +73,7 @@ static inline uint16_t mavlink_msg_esc_status_pack(uint8_t system_id, uint8_t co
     _mav_put_int32_t_array(buf, 8, rpm, 4);
     _mav_put_float_array(buf, 24, voltage, 4);
     _mav_put_float_array(buf, 40, current, 4);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ESC_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ESC_STATUS_LEN);
 #else
     mavlink_esc_status_t packet;
     packet.time_usec = time_usec;
@@ -84,7 +85,8 @@ static inline uint16_t mavlink_msg_esc_status_pack(uint8_t system_id, uint8_t co
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_ESC_STATUS;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ESC_STATUS_MIN_LEN, MAVLINK_MSG_ID_ESC_STATUS_LEN, MAVLINK_MSG_ID_ESC_STATUS_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ESC_STATUS_MIN_LEN,
+                                    MAVLINK_MSG_ID_ESC_STATUS_LEN, MAVLINK_MSG_ID_ESC_STATUS_CRC);
 }
 
 /**
@@ -100,10 +102,11 @@ static inline uint16_t mavlink_msg_esc_status_pack(uint8_t system_id, uint8_t co
  * @param current [A] Current measured from each ESC.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_esc_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t index,uint64_t time_usec,const int32_t *rpm,const float *voltage,const float *current)
-{
+static inline uint16_t
+mavlink_msg_esc_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg,
+                                 uint8_t index, uint64_t time_usec, const int32_t *rpm,
+                                 const float *voltage, const float *current) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_ESC_STATUS_LEN];
     _mav_put_uint64_t(buf, 0, time_usec);
@@ -111,7 +114,7 @@ static inline uint16_t mavlink_msg_esc_status_pack_chan(uint8_t system_id, uint8
     _mav_put_int32_t_array(buf, 8, rpm, 4);
     _mav_put_float_array(buf, 24, voltage, 4);
     _mav_put_float_array(buf, 40, current, 4);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ESC_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ESC_STATUS_LEN);
 #else
     mavlink_esc_status_t packet;
     packet.time_usec = time_usec;
@@ -123,7 +126,10 @@ static inline uint16_t mavlink_msg_esc_status_pack_chan(uint8_t system_id, uint8
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_ESC_STATUS;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ESC_STATUS_MIN_LEN, MAVLINK_MSG_ID_ESC_STATUS_LEN, MAVLINK_MSG_ID_ESC_STATUS_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_ESC_STATUS_MIN_LEN,
+                                         MAVLINK_MSG_ID_ESC_STATUS_LEN,
+                                         MAVLINK_MSG_ID_ESC_STATUS_CRC);
 }
 
 /**
@@ -134,9 +140,12 @@ static inline uint16_t mavlink_msg_esc_status_pack_chan(uint8_t system_id, uint8
  * @param msg The MAVLink message to compress the data into
  * @param esc_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_esc_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_esc_status_t* esc_status)
-{
-    return mavlink_msg_esc_status_pack(system_id, component_id, msg, esc_status->index, esc_status->time_usec, esc_status->rpm, esc_status->voltage, esc_status->current);
+static inline uint16_t
+mavlink_msg_esc_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                              const mavlink_esc_status_t *esc_status) {
+    return mavlink_msg_esc_status_pack(system_id, component_id, msg, esc_status->index,
+                                       esc_status->time_usec, esc_status->rpm, esc_status->voltage,
+                                       esc_status->current);
 }
 
 /**
@@ -148,9 +157,12 @@ static inline uint16_t mavlink_msg_esc_status_encode(uint8_t system_id, uint8_t 
  * @param msg The MAVLink message to compress the data into
  * @param esc_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_esc_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_esc_status_t* esc_status)
-{
-    return mavlink_msg_esc_status_pack_chan(system_id, component_id, chan, msg, esc_status->index, esc_status->time_usec, esc_status->rpm, esc_status->voltage, esc_status->current);
+static inline uint16_t
+mavlink_msg_esc_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                   mavlink_message_t *msg, const mavlink_esc_status_t *esc_status) {
+    return mavlink_msg_esc_status_pack_chan(system_id, component_id, chan, msg, esc_status->index,
+                                            esc_status->time_usec, esc_status->rpm,
+                                            esc_status->voltage, esc_status->current);
 }
 
 /**
@@ -240,9 +252,8 @@ static inline void mavlink_msg_esc_status_send_buf(mavlink_message_t *msgbuf, ma
  *
  * @return  Index of the first ESC in this message. minValue = 0, maxValue = 60, increment = 4.
  */
-static inline uint8_t mavlink_msg_esc_status_get_index(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  56);
+static inline uint8_t mavlink_msg_esc_status_get_index(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 56);
 }
 
 /**
@@ -250,9 +261,8 @@ static inline uint8_t mavlink_msg_esc_status_get_index(const mavlink_message_t* 
  *
  * @return [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
  */
-static inline uint64_t mavlink_msg_esc_status_get_time_usec(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint64_t(msg,  0);
+static inline uint64_t mavlink_msg_esc_status_get_time_usec(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint64_t(msg, 0);
 }
 
 /**
@@ -260,9 +270,8 @@ static inline uint64_t mavlink_msg_esc_status_get_time_usec(const mavlink_messag
  *
  * @return [rpm] Reported motor RPM from each ESC (negative for reverse rotation).
  */
-static inline uint16_t mavlink_msg_esc_status_get_rpm(const mavlink_message_t* msg, int32_t *rpm)
-{
-    return _MAV_RETURN_int32_t_array(msg, rpm, 4,  8);
+static inline uint16_t mavlink_msg_esc_status_get_rpm(const mavlink_message_t *msg, int32_t *rpm) {
+    return _MAV_RETURN_int32_t_array(msg, rpm, 4, 8);
 }
 
 /**
@@ -270,9 +279,9 @@ static inline uint16_t mavlink_msg_esc_status_get_rpm(const mavlink_message_t* m
  *
  * @return [V] Voltage measured from each ESC.
  */
-static inline uint16_t mavlink_msg_esc_status_get_voltage(const mavlink_message_t* msg, float *voltage)
-{
-    return _MAV_RETURN_float_array(msg, voltage, 4,  24);
+static inline uint16_t
+mavlink_msg_esc_status_get_voltage(const mavlink_message_t *msg, float *voltage) {
+    return _MAV_RETURN_float_array(msg, voltage, 4, 24);
 }
 
 /**
@@ -280,9 +289,9 @@ static inline uint16_t mavlink_msg_esc_status_get_voltage(const mavlink_message_
  *
  * @return [A] Current measured from each ESC.
  */
-static inline uint16_t mavlink_msg_esc_status_get_current(const mavlink_message_t* msg, float *current)
-{
-    return _MAV_RETURN_float_array(msg, current, 4,  40);
+static inline uint16_t
+mavlink_msg_esc_status_get_current(const mavlink_message_t *msg, float *current) {
+    return _MAV_RETURN_float_array(msg, current, 4, 40);
 }
 
 /**
@@ -291,8 +300,8 @@ static inline uint16_t mavlink_msg_esc_status_get_current(const mavlink_message_
  * @param msg The message to decode
  * @param esc_status C-struct to decode the message contents into
  */
-static inline void mavlink_msg_esc_status_decode(const mavlink_message_t* msg, mavlink_esc_status_t* esc_status)
-{
+static inline void
+mavlink_msg_esc_status_decode(const mavlink_message_t *msg, mavlink_esc_status_t *esc_status) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     esc_status->time_usec = mavlink_msg_esc_status_get_time_usec(msg);
     mavlink_msg_esc_status_get_rpm(msg, esc_status->rpm);
@@ -300,8 +309,8 @@ static inline void mavlink_msg_esc_status_decode(const mavlink_message_t* msg, m
     mavlink_msg_esc_status_get_current(msg, esc_status->current);
     esc_status->index = mavlink_msg_esc_status_get_index(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_ESC_STATUS_LEN? msg->len : MAVLINK_MSG_ID_ESC_STATUS_LEN;
-        memset(esc_status, 0, MAVLINK_MSG_ID_ESC_STATUS_LEN);
-    memcpy(esc_status, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_ESC_STATUS_LEN? msg->len : MAVLINK_MSG_ID_ESC_STATUS_LEN;
+    memset(esc_status, 0, MAVLINK_MSG_ID_ESC_STATUS_LEN);
+memcpy(esc_status, _MAV_PAYLOAD(msg), len);
 #endif
 }

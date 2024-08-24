@@ -4,15 +4,17 @@
 #define MAVLINK_MSG_ID_AIRSPEEDS 182
 
 MAVPACKED(
-typedef struct __mavlink_airspeeds_t {
- uint32_t time_boot_ms; /*<  Timestamp (milliseconds since system boot)*/
- int16_t airspeed_imu; /*<  Airspeed estimate from IMU, cm/s*/
- int16_t airspeed_pitot; /*<  Pitot measured forward airpseed, cm/s*/
- int16_t airspeed_hot_wire; /*<  Hot wire anenometer measured airspeed, cm/s*/
- int16_t airspeed_ultrasonic; /*<  Ultrasonic measured airspeed, cm/s*/
- int16_t aoa; /*<  Angle of attack sensor, degrees * 10*/
- int16_t aoy; /*<  Yaw angle sensor, degrees * 10*/
-}) mavlink_airspeeds_t;
+        typedef struct __mavlink_airspeeds_t {
+            uint32_t time_boot_ms; /*<  Timestamp (milliseconds since system boot)*/
+            int16_t airspeed_imu; /*<  Airspeed estimate from IMU, cm/s*/
+            int16_t airspeed_pitot; /*<  Pitot measured forward airpseed, cm/s*/
+            int16_t airspeed_hot_wire; /*<  Hot wire anenometer measured airspeed, cm/s*/
+            int16_t airspeed_ultrasonic; /*<  Ultrasonic measured airspeed, cm/s*/
+            int16_t aoa; /*<  Angle of attack sensor, degrees * 10*/
+            int16_t aoy; /*<  Yaw angle sensor, degrees * 10*/
+        })
+
+mavlink_airspeeds_t;
 
 #define MAVLINK_MSG_ID_AIRSPEEDS_LEN 16
 #define MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN 16
@@ -21,7 +23,6 @@ typedef struct __mavlink_airspeeds_t {
 
 #define MAVLINK_MSG_ID_AIRSPEEDS_CRC 154
 #define MAVLINK_MSG_ID_182_CRC 154
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -68,9 +69,11 @@ typedef struct __mavlink_airspeeds_t {
  * @param aoy  Yaw angle sensor, degrees * 10
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_airspeeds_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint32_t time_boot_ms, int16_t airspeed_imu, int16_t airspeed_pitot, int16_t airspeed_hot_wire, int16_t airspeed_ultrasonic, int16_t aoa, int16_t aoy)
-{
+static inline uint16_t
+mavlink_msg_airspeeds_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                           uint32_t time_boot_ms, int16_t airspeed_imu, int16_t airspeed_pitot,
+                           int16_t airspeed_hot_wire, int16_t airspeed_ultrasonic, int16_t aoa,
+                           int16_t aoy) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AIRSPEEDS_LEN];
     _mav_put_uint32_t(buf, 0, time_boot_ms);
@@ -81,7 +84,7 @@ static inline uint16_t mavlink_msg_airspeeds_pack(uint8_t system_id, uint8_t com
     _mav_put_int16_t(buf, 12, aoa);
     _mav_put_int16_t(buf, 14, aoy);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
 #else
     mavlink_airspeeds_t packet;
     packet.time_boot_ms = time_boot_ms;
@@ -96,7 +99,8 @@ static inline uint16_t mavlink_msg_airspeeds_pack(uint8_t system_id, uint8_t com
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AIRSPEEDS;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN,
+                                    MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
 }
 
 /**
@@ -114,10 +118,12 @@ static inline uint16_t mavlink_msg_airspeeds_pack(uint8_t system_id, uint8_t com
  * @param aoy  Yaw angle sensor, degrees * 10
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_airspeeds_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint32_t time_boot_ms,int16_t airspeed_imu,int16_t airspeed_pitot,int16_t airspeed_hot_wire,int16_t airspeed_ultrasonic,int16_t aoa,int16_t aoy)
-{
+static inline uint16_t
+mavlink_msg_airspeeds_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                mavlink_message_t *msg,
+                                uint32_t time_boot_ms, int16_t airspeed_imu, int16_t airspeed_pitot,
+                                int16_t airspeed_hot_wire, int16_t airspeed_ultrasonic, int16_t aoa,
+                                int16_t aoy) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AIRSPEEDS_LEN];
     _mav_put_uint32_t(buf, 0, time_boot_ms);
@@ -128,7 +134,7 @@ static inline uint16_t mavlink_msg_airspeeds_pack_chan(uint8_t system_id, uint8_
     _mav_put_int16_t(buf, 12, aoa);
     _mav_put_int16_t(buf, 14, aoy);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
 #else
     mavlink_airspeeds_t packet;
     packet.time_boot_ms = time_boot_ms;
@@ -143,7 +149,10 @@ static inline uint16_t mavlink_msg_airspeeds_pack_chan(uint8_t system_id, uint8_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AIRSPEEDS;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN,
+                                         MAVLINK_MSG_ID_AIRSPEEDS_LEN,
+                                         MAVLINK_MSG_ID_AIRSPEEDS_CRC);
 }
 
 /**
@@ -154,9 +163,13 @@ static inline uint16_t mavlink_msg_airspeeds_pack_chan(uint8_t system_id, uint8_
  * @param msg The MAVLink message to compress the data into
  * @param airspeeds C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_airspeeds_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_airspeeds_t* airspeeds)
-{
-    return mavlink_msg_airspeeds_pack(system_id, component_id, msg, airspeeds->time_boot_ms, airspeeds->airspeed_imu, airspeeds->airspeed_pitot, airspeeds->airspeed_hot_wire, airspeeds->airspeed_ultrasonic, airspeeds->aoa, airspeeds->aoy);
+static inline uint16_t
+mavlink_msg_airspeeds_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                             const mavlink_airspeeds_t *airspeeds) {
+    return mavlink_msg_airspeeds_pack(system_id, component_id, msg, airspeeds->time_boot_ms,
+                                      airspeeds->airspeed_imu, airspeeds->airspeed_pitot,
+                                      airspeeds->airspeed_hot_wire, airspeeds->airspeed_ultrasonic,
+                                      airspeeds->aoa, airspeeds->aoy);
 }
 
 /**
@@ -168,9 +181,14 @@ static inline uint16_t mavlink_msg_airspeeds_encode(uint8_t system_id, uint8_t c
  * @param msg The MAVLink message to compress the data into
  * @param airspeeds C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_airspeeds_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_airspeeds_t* airspeeds)
-{
-    return mavlink_msg_airspeeds_pack_chan(system_id, component_id, chan, msg, airspeeds->time_boot_ms, airspeeds->airspeed_imu, airspeeds->airspeed_pitot, airspeeds->airspeed_hot_wire, airspeeds->airspeed_ultrasonic, airspeeds->aoa, airspeeds->aoy);
+static inline uint16_t
+mavlink_msg_airspeeds_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                  mavlink_message_t *msg, const mavlink_airspeeds_t *airspeeds) {
+    return mavlink_msg_airspeeds_pack_chan(system_id, component_id, chan, msg,
+                                           airspeeds->time_boot_ms, airspeeds->airspeed_imu,
+                                           airspeeds->airspeed_pitot, airspeeds->airspeed_hot_wire,
+                                           airspeeds->airspeed_ultrasonic, airspeeds->aoa,
+                                           airspeeds->aoy);
 }
 
 /**
@@ -274,9 +292,8 @@ static inline void mavlink_msg_airspeeds_send_buf(mavlink_message_t *msgbuf, mav
  *
  * @return  Timestamp (milliseconds since system boot)
  */
-static inline uint32_t mavlink_msg_airspeeds_get_time_boot_ms(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  0);
+static inline uint32_t mavlink_msg_airspeeds_get_time_boot_ms(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 0);
 }
 
 /**
@@ -284,9 +301,8 @@ static inline uint32_t mavlink_msg_airspeeds_get_time_boot_ms(const mavlink_mess
  *
  * @return  Airspeed estimate from IMU, cm/s
  */
-static inline int16_t mavlink_msg_airspeeds_get_airspeed_imu(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  4);
+static inline int16_t mavlink_msg_airspeeds_get_airspeed_imu(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 4);
 }
 
 /**
@@ -294,9 +310,8 @@ static inline int16_t mavlink_msg_airspeeds_get_airspeed_imu(const mavlink_messa
  *
  * @return  Pitot measured forward airpseed, cm/s
  */
-static inline int16_t mavlink_msg_airspeeds_get_airspeed_pitot(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  6);
+static inline int16_t mavlink_msg_airspeeds_get_airspeed_pitot(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 6);
 }
 
 /**
@@ -304,9 +319,8 @@ static inline int16_t mavlink_msg_airspeeds_get_airspeed_pitot(const mavlink_mes
  *
  * @return  Hot wire anenometer measured airspeed, cm/s
  */
-static inline int16_t mavlink_msg_airspeeds_get_airspeed_hot_wire(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  8);
+static inline int16_t mavlink_msg_airspeeds_get_airspeed_hot_wire(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 8);
 }
 
 /**
@@ -314,9 +328,8 @@ static inline int16_t mavlink_msg_airspeeds_get_airspeed_hot_wire(const mavlink_
  *
  * @return  Ultrasonic measured airspeed, cm/s
  */
-static inline int16_t mavlink_msg_airspeeds_get_airspeed_ultrasonic(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  10);
+static inline int16_t mavlink_msg_airspeeds_get_airspeed_ultrasonic(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 10);
 }
 
 /**
@@ -324,9 +337,8 @@ static inline int16_t mavlink_msg_airspeeds_get_airspeed_ultrasonic(const mavlin
  *
  * @return  Angle of attack sensor, degrees * 10
  */
-static inline int16_t mavlink_msg_airspeeds_get_aoa(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  12);
+static inline int16_t mavlink_msg_airspeeds_get_aoa(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 12);
 }
 
 /**
@@ -334,9 +346,8 @@ static inline int16_t mavlink_msg_airspeeds_get_aoa(const mavlink_message_t* msg
  *
  * @return  Yaw angle sensor, degrees * 10
  */
-static inline int16_t mavlink_msg_airspeeds_get_aoy(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  14);
+static inline int16_t mavlink_msg_airspeeds_get_aoy(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 14);
 }
 
 /**
@@ -345,8 +356,8 @@ static inline int16_t mavlink_msg_airspeeds_get_aoy(const mavlink_message_t* msg
  * @param msg The message to decode
  * @param airspeeds C-struct to decode the message contents into
  */
-static inline void mavlink_msg_airspeeds_decode(const mavlink_message_t* msg, mavlink_airspeeds_t* airspeeds)
-{
+static inline void
+mavlink_msg_airspeeds_decode(const mavlink_message_t *msg, mavlink_airspeeds_t *airspeeds) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     airspeeds->time_boot_ms = mavlink_msg_airspeeds_get_time_boot_ms(msg);
     airspeeds->airspeed_imu = mavlink_msg_airspeeds_get_airspeed_imu(msg);
@@ -356,8 +367,8 @@ static inline void mavlink_msg_airspeeds_decode(const mavlink_message_t* msg, ma
     airspeeds->aoa = mavlink_msg_airspeeds_get_aoa(msg);
     airspeeds->aoy = mavlink_msg_airspeeds_get_aoy(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_AIRSPEEDS_LEN? msg->len : MAVLINK_MSG_ID_AIRSPEEDS_LEN;
-        memset(airspeeds, 0, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
-    memcpy(airspeeds, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_AIRSPEEDS_LEN? msg->len : MAVLINK_MSG_ID_AIRSPEEDS_LEN;
+    memset(airspeeds, 0, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
+memcpy(airspeeds, _MAV_PAYLOAD(msg), len);
 #endif
 }

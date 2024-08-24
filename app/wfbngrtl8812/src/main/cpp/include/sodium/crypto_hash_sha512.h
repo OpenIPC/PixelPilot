@@ -24,7 +24,7 @@ extern "C" {
 typedef struct crypto_hash_sha512_state {
     uint64_t state[8];
     uint64_t count[2];
-    uint8_t  buf[128];
+    uint8_t buf[128];
 } crypto_hash_sha512_state;
 
 SODIUM_EXPORT
@@ -40,18 +40,18 @@ int crypto_hash_sha512(unsigned char *out, const unsigned char *in,
 
 SODIUM_EXPORT
 int crypto_hash_sha512_init(crypto_hash_sha512_state *state)
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 SODIUM_EXPORT
 int crypto_hash_sha512_update(crypto_hash_sha512_state *state,
                               const unsigned char *in,
                               unsigned long long inlen)
-            __attribute__ ((nonnull(1)));
+__attribute__ ((nonnull(1)));
 
 SODIUM_EXPORT
 int crypto_hash_sha512_final(crypto_hash_sha512_state *state,
                              unsigned char *out)
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 #ifdef __cplusplus
 }

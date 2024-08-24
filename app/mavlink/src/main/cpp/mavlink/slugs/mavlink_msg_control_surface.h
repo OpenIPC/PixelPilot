@@ -4,12 +4,14 @@
 #define MAVLINK_MSG_ID_CONTROL_SURFACE 185
 
 MAVPACKED(
-typedef struct __mavlink_control_surface_t {
- float mControl; /*<  Pending*/
- float bControl; /*<  Order to origin*/
- uint8_t target; /*<  The system setting the commands*/
- uint8_t idSurface; /*<  ID control surface send 0: throttle 1: aileron 2: elevator 3: rudder*/
-}) mavlink_control_surface_t;
+        typedef struct __mavlink_control_surface_t {
+            float mControl; /*<  Pending*/
+            float bControl; /*<  Order to origin*/
+            uint8_t target; /*<  The system setting the commands*/
+            uint8_t idSurface; /*<  ID control surface send 0: throttle 1: aileron 2: elevator 3: rudder*/
+        })
+
+mavlink_control_surface_t;
 
 #define MAVLINK_MSG_ID_CONTROL_SURFACE_LEN 10
 #define MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN 10
@@ -18,7 +20,6 @@ typedef struct __mavlink_control_surface_t {
 
 #define MAVLINK_MSG_ID_CONTROL_SURFACE_CRC 113
 #define MAVLINK_MSG_ID_185_CRC 113
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -56,9 +57,10 @@ typedef struct __mavlink_control_surface_t {
  * @param bControl  Order to origin
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_control_surface_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target, uint8_t idSurface, float mControl, float bControl)
-{
+static inline uint16_t
+mavlink_msg_control_surface_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                 uint8_t target, uint8_t idSurface, float mControl,
+                                 float bControl) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_CONTROL_SURFACE_LEN];
     _mav_put_float(buf, 0, mControl);
@@ -66,7 +68,7 @@ static inline uint16_t mavlink_msg_control_surface_pack(uint8_t system_id, uint8
     _mav_put_uint8_t(buf, 8, target);
     _mav_put_uint8_t(buf, 9, idSurface);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
 #else
     mavlink_control_surface_t packet;
     packet.mControl = mControl;
@@ -78,7 +80,10 @@ static inline uint16_t mavlink_msg_control_surface_pack(uint8_t system_id, uint8
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_CONTROL_SURFACE;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN,
+                                    MAVLINK_MSG_ID_CONTROL_SURFACE_LEN,
+                                    MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
 }
 
 /**
@@ -93,10 +98,11 @@ static inline uint16_t mavlink_msg_control_surface_pack(uint8_t system_id, uint8
  * @param bControl  Order to origin
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_control_surface_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target,uint8_t idSurface,float mControl,float bControl)
-{
+static inline uint16_t
+mavlink_msg_control_surface_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                      mavlink_message_t *msg,
+                                      uint8_t target, uint8_t idSurface, float mControl,
+                                      float bControl) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_CONTROL_SURFACE_LEN];
     _mav_put_float(buf, 0, mControl);
@@ -104,7 +110,7 @@ static inline uint16_t mavlink_msg_control_surface_pack_chan(uint8_t system_id, 
     _mav_put_uint8_t(buf, 8, target);
     _mav_put_uint8_t(buf, 9, idSurface);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
 #else
     mavlink_control_surface_t packet;
     packet.mControl = mControl;
@@ -116,7 +122,10 @@ static inline uint16_t mavlink_msg_control_surface_pack_chan(uint8_t system_id, 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_CONTROL_SURFACE;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN,
+                                         MAVLINK_MSG_ID_CONTROL_SURFACE_LEN,
+                                         MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
 }
 
 /**
@@ -127,9 +136,12 @@ static inline uint16_t mavlink_msg_control_surface_pack_chan(uint8_t system_id, 
  * @param msg The MAVLink message to compress the data into
  * @param control_surface C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_control_surface_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_control_surface_t* control_surface)
-{
-    return mavlink_msg_control_surface_pack(system_id, component_id, msg, control_surface->target, control_surface->idSurface, control_surface->mControl, control_surface->bControl);
+static inline uint16_t
+mavlink_msg_control_surface_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                   const mavlink_control_surface_t *control_surface) {
+    return mavlink_msg_control_surface_pack(system_id, component_id, msg, control_surface->target,
+                                            control_surface->idSurface, control_surface->mControl,
+                                            control_surface->bControl);
 }
 
 /**
@@ -141,9 +153,15 @@ static inline uint16_t mavlink_msg_control_surface_encode(uint8_t system_id, uin
  * @param msg The MAVLink message to compress the data into
  * @param control_surface C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_control_surface_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_control_surface_t* control_surface)
-{
-    return mavlink_msg_control_surface_pack_chan(system_id, component_id, chan, msg, control_surface->target, control_surface->idSurface, control_surface->mControl, control_surface->bControl);
+static inline uint16_t
+mavlink_msg_control_surface_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                        mavlink_message_t *msg,
+                                        const mavlink_control_surface_t *control_surface) {
+    return mavlink_msg_control_surface_pack_chan(system_id, component_id, chan, msg,
+                                                 control_surface->target,
+                                                 control_surface->idSurface,
+                                                 control_surface->mControl,
+                                                 control_surface->bControl);
 }
 
 /**
@@ -232,9 +250,8 @@ static inline void mavlink_msg_control_surface_send_buf(mavlink_message_t *msgbu
  *
  * @return  The system setting the commands
  */
-static inline uint8_t mavlink_msg_control_surface_get_target(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  8);
+static inline uint8_t mavlink_msg_control_surface_get_target(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 8);
 }
 
 /**
@@ -242,9 +259,8 @@ static inline uint8_t mavlink_msg_control_surface_get_target(const mavlink_messa
  *
  * @return  ID control surface send 0: throttle 1: aileron 2: elevator 3: rudder
  */
-static inline uint8_t mavlink_msg_control_surface_get_idSurface(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  9);
+static inline uint8_t mavlink_msg_control_surface_get_idSurface(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 9);
 }
 
 /**
@@ -252,9 +268,8 @@ static inline uint8_t mavlink_msg_control_surface_get_idSurface(const mavlink_me
  *
  * @return  Pending
  */
-static inline float mavlink_msg_control_surface_get_mControl(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_control_surface_get_mControl(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -262,9 +277,8 @@ static inline float mavlink_msg_control_surface_get_mControl(const mavlink_messa
  *
  * @return  Order to origin
  */
-static inline float mavlink_msg_control_surface_get_bControl(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_control_surface_get_bControl(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -273,16 +287,16 @@ static inline float mavlink_msg_control_surface_get_bControl(const mavlink_messa
  * @param msg The message to decode
  * @param control_surface C-struct to decode the message contents into
  */
-static inline void mavlink_msg_control_surface_decode(const mavlink_message_t* msg, mavlink_control_surface_t* control_surface)
-{
+static inline void mavlink_msg_control_surface_decode(const mavlink_message_t *msg,
+                                                      mavlink_control_surface_t *control_surface) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     control_surface->mControl = mavlink_msg_control_surface_get_mControl(msg);
     control_surface->bControl = mavlink_msg_control_surface_get_bControl(msg);
     control_surface->target = mavlink_msg_control_surface_get_target(msg);
     control_surface->idSurface = mavlink_msg_control_surface_get_idSurface(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_CONTROL_SURFACE_LEN? msg->len : MAVLINK_MSG_ID_CONTROL_SURFACE_LEN;
-        memset(control_surface, 0, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
-    memcpy(control_surface, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_CONTROL_SURFACE_LEN? msg->len : MAVLINK_MSG_ID_CONTROL_SURFACE_LEN;
+    memset(control_surface, 0, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
+memcpy(control_surface, _MAV_PAYLOAD(msg), len);
 #endif
 }

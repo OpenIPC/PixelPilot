@@ -16,31 +16,41 @@
 #include <queue>
 #include "time_util.h"
 
-class VideoPlayer{
+class VideoPlayer {
 
 public:
-    VideoPlayer(JNIEnv * env, jobject context);
-    enum VIDEO_DATA_TYPE{RTP_H264,RAW_H264,RTP_H265,RAW_H265};
-    void onNewVideoData(const uint8_t* data,const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType);
+    VideoPlayer(JNIEnv *env, jobject context);
+
+    enum VIDEO_DATA_TYPE {
+        RTP_H264, RAW_H264, RTP_H265, RAW_H265
+    };
+
+    void onNewVideoData(const uint8_t *data, const std::size_t data_length,
+                        const VIDEO_DATA_TYPE videoDataType);
+
     /*
      * Set the surface the decoder can be configured with. When @param surface==nullptr
      * It is guaranteed that the surface is not used by the decoder anymore when this call returns
      */
-    void setVideoSurface(JNIEnv* env, jobject surface);
+    void setVideoSurface(JNIEnv *env, jobject surface);
+
     /*
      * Start the receiver and ground recorder if enabled
      */
-    void start(JNIEnv *env,jobject androidContext, jstring codec);
+    void start(JNIEnv *env, jobject androidContext, jstring codec);
+
     /**
      * Stop the receiver and ground recorder if enabled
      */
-    void stop(JNIEnv *env,jobject androidContext);
+    void stop(JNIEnv *env, jobject androidContext);
+
     /*
      * Returns a string with the current configuration for debugging
      */
-    std::string getInfoString()const;
+    std::string getInfoString() const;
 
-    void startDvr(JNIEnv *env,jint fd, jint fmp4_enabled);
+    void startDvr(JNIEnv *env, jint fd, jint fmp4_enabled);
+
     void stopDvr();
 
     bool isRecording() {
@@ -48,14 +58,17 @@ public:
     }
 
 private:
-    void onNewNALU(const NALU& nalu);
+    void onNewNALU(const NALU &nalu);
+
     //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 100ms
     //5 MB should be plenty !
-    static constexpr const size_t WANTED_UDP_RCVBUF_SIZE=1024*1024*5;
+    static constexpr const size_t WANTED_UDP_RCVBUF_SIZE = 1024 * 1024 * 5;
     // Retrieve settings from shared preferences
-    enum SOURCE_TYPE_OPTIONS{UDP,FILE,ASSETS,VIA_FFMPEG_URL,EXTERNAL};
+    enum SOURCE_TYPE_OPTIONS {
+        UDP, FILE, ASSETS, VIA_FFMPEG_URL, EXTERNAL
+    };
     const std::string GROUND_RECORDING_DIRECTORY;
-    JavaVM* javaVm=nullptr;
+    JavaVM *javaVm = nullptr;
     H26XParser mParser;
 
     // DVR attributes
@@ -68,7 +81,7 @@ private:
     int dvr_mp4_fragmentation = 0;
     uint64_t last_dvr_write = 0;
 
-    void enqueueNALU(const NALU& nalu) {
+    void enqueueNALU(const NALU &nalu) {
         {
             std::lock_guard<std::mutex> lock(mtx);
             naluQueue.push(nalu);
@@ -97,15 +110,15 @@ private:
 public:
     VideoDecoder videoDecoder;
     std::unique_ptr<UDPReceiver> mUDPReceiver;
-    long nNALUsAtLastCall=0;
+    long nNALUsAtLastCall = 0;
 
 public:
     DecodingInfo latestDecodingInfo{};
-    std::atomic<bool> latestDecodingInfoChanged=false;
+    std::atomic<bool> latestDecodingInfoChanged = false;
     VideoRatio latestVideoRatio{};
-    std::atomic<bool> latestVideoRatioChanged=false;
+    std::atomic<bool> latestVideoRatioChanged = false;
 
-    bool lastFrameWasAUD=false;
+    bool lastFrameWasAUD = false;
 };
 
 #endif //FPV_VR_VIDEOPLAYERN_H

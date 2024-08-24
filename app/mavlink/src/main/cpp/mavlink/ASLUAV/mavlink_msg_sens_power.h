@@ -4,12 +4,14 @@
 #define MAVLINK_MSG_ID_SENS_POWER 201
 
 MAVPACKED(
-typedef struct __mavlink_sens_power_t {
- float adc121_vspb_volt; /*< [V]  Power board voltage sensor reading*/
- float adc121_cspb_amp; /*< [A]  Power board current sensor reading*/
- float adc121_cs1_amp; /*< [A]  Board current sensor 1 reading*/
- float adc121_cs2_amp; /*< [A]  Board current sensor 2 reading*/
-}) mavlink_sens_power_t;
+        typedef struct __mavlink_sens_power_t {
+            float adc121_vspb_volt; /*< [V]  Power board voltage sensor reading*/
+            float adc121_cspb_amp; /*< [A]  Power board current sensor reading*/
+            float adc121_cs1_amp; /*< [A]  Board current sensor 1 reading*/
+            float adc121_cs2_amp; /*< [A]  Board current sensor 2 reading*/
+        })
+
+mavlink_sens_power_t;
 
 #define MAVLINK_MSG_ID_SENS_POWER_LEN 16
 #define MAVLINK_MSG_ID_SENS_POWER_MIN_LEN 16
@@ -18,7 +20,6 @@ typedef struct __mavlink_sens_power_t {
 
 #define MAVLINK_MSG_ID_SENS_POWER_CRC 218
 #define MAVLINK_MSG_ID_201_CRC 218
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -56,9 +57,10 @@ typedef struct __mavlink_sens_power_t {
  * @param adc121_cs2_amp [A]  Board current sensor 2 reading
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_sens_power_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               float adc121_vspb_volt, float adc121_cspb_amp, float adc121_cs1_amp, float adc121_cs2_amp)
-{
+static inline uint16_t
+mavlink_msg_sens_power_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            float adc121_vspb_volt, float adc121_cspb_amp, float adc121_cs1_amp,
+                            float adc121_cs2_amp) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SENS_POWER_LEN];
     _mav_put_float(buf, 0, adc121_vspb_volt);
@@ -66,7 +68,7 @@ static inline uint16_t mavlink_msg_sens_power_pack(uint8_t system_id, uint8_t co
     _mav_put_float(buf, 8, adc121_cs1_amp);
     _mav_put_float(buf, 12, adc121_cs2_amp);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_POWER_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_POWER_LEN);
 #else
     mavlink_sens_power_t packet;
     packet.adc121_vspb_volt = adc121_vspb_volt;
@@ -78,7 +80,8 @@ static inline uint16_t mavlink_msg_sens_power_pack(uint8_t system_id, uint8_t co
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SENS_POWER;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SENS_POWER_MIN_LEN, MAVLINK_MSG_ID_SENS_POWER_LEN, MAVLINK_MSG_ID_SENS_POWER_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SENS_POWER_MIN_LEN,
+                                    MAVLINK_MSG_ID_SENS_POWER_LEN, MAVLINK_MSG_ID_SENS_POWER_CRC);
 }
 
 /**
@@ -93,10 +96,11 @@ static inline uint16_t mavlink_msg_sens_power_pack(uint8_t system_id, uint8_t co
  * @param adc121_cs2_amp [A]  Board current sensor 2 reading
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_sens_power_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   float adc121_vspb_volt,float adc121_cspb_amp,float adc121_cs1_amp,float adc121_cs2_amp)
-{
+static inline uint16_t
+mavlink_msg_sens_power_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg,
+                                 float adc121_vspb_volt, float adc121_cspb_amp,
+                                 float adc121_cs1_amp, float adc121_cs2_amp) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SENS_POWER_LEN];
     _mav_put_float(buf, 0, adc121_vspb_volt);
@@ -104,7 +108,7 @@ static inline uint16_t mavlink_msg_sens_power_pack_chan(uint8_t system_id, uint8
     _mav_put_float(buf, 8, adc121_cs1_amp);
     _mav_put_float(buf, 12, adc121_cs2_amp);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_POWER_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_POWER_LEN);
 #else
     mavlink_sens_power_t packet;
     packet.adc121_vspb_volt = adc121_vspb_volt;
@@ -116,7 +120,10 @@ static inline uint16_t mavlink_msg_sens_power_pack_chan(uint8_t system_id, uint8
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SENS_POWER;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SENS_POWER_MIN_LEN, MAVLINK_MSG_ID_SENS_POWER_LEN, MAVLINK_MSG_ID_SENS_POWER_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SENS_POWER_MIN_LEN,
+                                         MAVLINK_MSG_ID_SENS_POWER_LEN,
+                                         MAVLINK_MSG_ID_SENS_POWER_CRC);
 }
 
 /**
@@ -127,9 +134,12 @@ static inline uint16_t mavlink_msg_sens_power_pack_chan(uint8_t system_id, uint8
  * @param msg The MAVLink message to compress the data into
  * @param sens_power C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_sens_power_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_sens_power_t* sens_power)
-{
-    return mavlink_msg_sens_power_pack(system_id, component_id, msg, sens_power->adc121_vspb_volt, sens_power->adc121_cspb_amp, sens_power->adc121_cs1_amp, sens_power->adc121_cs2_amp);
+static inline uint16_t
+mavlink_msg_sens_power_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                              const mavlink_sens_power_t *sens_power) {
+    return mavlink_msg_sens_power_pack(system_id, component_id, msg, sens_power->adc121_vspb_volt,
+                                       sens_power->adc121_cspb_amp, sens_power->adc121_cs1_amp,
+                                       sens_power->adc121_cs2_amp);
 }
 
 /**
@@ -141,9 +151,13 @@ static inline uint16_t mavlink_msg_sens_power_encode(uint8_t system_id, uint8_t 
  * @param msg The MAVLink message to compress the data into
  * @param sens_power C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_sens_power_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_sens_power_t* sens_power)
-{
-    return mavlink_msg_sens_power_pack_chan(system_id, component_id, chan, msg, sens_power->adc121_vspb_volt, sens_power->adc121_cspb_amp, sens_power->adc121_cs1_amp, sens_power->adc121_cs2_amp);
+static inline uint16_t
+mavlink_msg_sens_power_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                   mavlink_message_t *msg, const mavlink_sens_power_t *sens_power) {
+    return mavlink_msg_sens_power_pack_chan(system_id, component_id, chan, msg,
+                                            sens_power->adc121_vspb_volt,
+                                            sens_power->adc121_cspb_amp, sens_power->adc121_cs1_amp,
+                                            sens_power->adc121_cs2_amp);
 }
 
 /**
@@ -232,9 +246,8 @@ static inline void mavlink_msg_sens_power_send_buf(mavlink_message_t *msgbuf, ma
  *
  * @return [V]  Power board voltage sensor reading
  */
-static inline float mavlink_msg_sens_power_get_adc121_vspb_volt(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_sens_power_get_adc121_vspb_volt(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -242,9 +255,8 @@ static inline float mavlink_msg_sens_power_get_adc121_vspb_volt(const mavlink_me
  *
  * @return [A]  Power board current sensor reading
  */
-static inline float mavlink_msg_sens_power_get_adc121_cspb_amp(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_sens_power_get_adc121_cspb_amp(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -252,9 +264,8 @@ static inline float mavlink_msg_sens_power_get_adc121_cspb_amp(const mavlink_mes
  *
  * @return [A]  Board current sensor 1 reading
  */
-static inline float mavlink_msg_sens_power_get_adc121_cs1_amp(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_sens_power_get_adc121_cs1_amp(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -262,9 +273,8 @@ static inline float mavlink_msg_sens_power_get_adc121_cs1_amp(const mavlink_mess
  *
  * @return [A]  Board current sensor 2 reading
  */
-static inline float mavlink_msg_sens_power_get_adc121_cs2_amp(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_sens_power_get_adc121_cs2_amp(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -273,16 +283,16 @@ static inline float mavlink_msg_sens_power_get_adc121_cs2_amp(const mavlink_mess
  * @param msg The message to decode
  * @param sens_power C-struct to decode the message contents into
  */
-static inline void mavlink_msg_sens_power_decode(const mavlink_message_t* msg, mavlink_sens_power_t* sens_power)
-{
+static inline void
+mavlink_msg_sens_power_decode(const mavlink_message_t *msg, mavlink_sens_power_t *sens_power) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     sens_power->adc121_vspb_volt = mavlink_msg_sens_power_get_adc121_vspb_volt(msg);
     sens_power->adc121_cspb_amp = mavlink_msg_sens_power_get_adc121_cspb_amp(msg);
     sens_power->adc121_cs1_amp = mavlink_msg_sens_power_get_adc121_cs1_amp(msg);
     sens_power->adc121_cs2_amp = mavlink_msg_sens_power_get_adc121_cs2_amp(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SENS_POWER_LEN? msg->len : MAVLINK_MSG_ID_SENS_POWER_LEN;
-        memset(sens_power, 0, MAVLINK_MSG_ID_SENS_POWER_LEN);
-    memcpy(sens_power, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SENS_POWER_LEN? msg->len : MAVLINK_MSG_ID_SENS_POWER_LEN;
+    memset(sens_power, 0, MAVLINK_MSG_ID_SENS_POWER_LEN);
+memcpy(sens_power, _MAV_PAYLOAD(msg), len);
 #endif
 }

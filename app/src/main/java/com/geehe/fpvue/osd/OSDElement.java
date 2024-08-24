@@ -1,8 +1,6 @@
 package com.geehe.fpvue.osd;
 
-import android.content.Context;
-
-public class OSDElement{
+public class OSDElement {
     public String name;
     public MovableLayout layout;
 
@@ -12,6 +10,6 @@ public class OSDElement{
     }
 
     public String prefName() {
-        return String.format("%d",name.hashCode());
+        return String.format("%d", name.hashCode());
     }
 }

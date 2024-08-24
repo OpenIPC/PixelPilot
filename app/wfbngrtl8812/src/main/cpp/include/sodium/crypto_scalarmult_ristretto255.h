@@ -29,12 +29,12 @@ size_t crypto_scalarmult_ristretto255_scalarbytes(void);
 SODIUM_EXPORT
 int crypto_scalarmult_ristretto255(unsigned char *q, const unsigned char *n,
                                    const unsigned char *p)
-            __attribute__ ((warn_unused_result)) __attribute__ ((nonnull));
+__attribute__ ((warn_unused_result)) __attribute__ ((nonnull));
 
 SODIUM_EXPORT
 int crypto_scalarmult_ristretto255_base(unsigned char *q,
                                         const unsigned char *n)
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 #ifdef __cplusplus
 }

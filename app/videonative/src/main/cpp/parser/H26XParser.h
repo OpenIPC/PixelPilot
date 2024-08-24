@@ -29,27 +29,38 @@
 class H26XParser {
 public:
     H26XParser(NALU_DATA_CALLBACK onNewNALU);
-    void parse_raw_h264_stream(const uint8_t* data,const size_t data_length);
-    void parse_raw_h265_stream(const uint8_t* data,const size_t data_length);
-    void parse_rtp_h264_stream(const uint8_t* rtp_data,const size_t data_len);
-    void parse_rtp_h265_stream(const uint8_t* rtp_data,const size_t data_len);
+
+    void parse_raw_h264_stream(const uint8_t *data, const size_t data_length);
+
+    void parse_raw_h265_stream(const uint8_t *data, const size_t data_length);
+
+    void parse_rtp_h264_stream(const uint8_t *rtp_data, const size_t data_len);
+
+    void parse_rtp_h265_stream(const uint8_t *rtp_data, const size_t data_len);
+
     void reset();
+
 public:
-    long nParsedNALUs=0;
-    long nParsedKonfigurationFrames=0;
+    long nParsedNALUs = 0;
+    long nParsedKonfigurationFrames = 0;
+
     //For live video set to -1 (no fps limitation), else additional latency will be generated
     void setLimitFPS(int maxFPS);
+
 private:
-    void newNaluExtracted(const NALU& nalu);
-    void onNewNaluDataExtracted(const std::chrono::steady_clock::time_point creation_time,const uint8_t* nalu_data,const int nalu_data_size);
+    void newNaluExtracted(const NALU &nalu);
+
+    void onNewNaluDataExtracted(const std::chrono::steady_clock::time_point creation_time,
+                                const uint8_t *nalu_data, const int nalu_data_size);
+
     const NALU_DATA_CALLBACK onNewNALU;
-    std::chrono::steady_clock::time_point lastFrameLimitFPS=std::chrono::steady_clock::now();
-    std::chrono::steady_clock::time_point lastTimeOnNewNALUCalled=std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point lastFrameLimitFPS = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point lastTimeOnNewNALUCalled = std::chrono::steady_clock::now();
 
     RTPDecoder mDecodeRTP;
 
-    int maxFPS=0;
-    bool IS_H265=false;
+    int maxFPS = 0;
+    bool IS_H265 = false;
     //First time a NALU was succesfully decoded
     //std::chrono::steady_clock::time_point timeFirstNALUArrived=std::chrono::steady_clock::time_point(0);
 };

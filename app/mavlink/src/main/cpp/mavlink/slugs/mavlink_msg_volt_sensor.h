@@ -4,11 +4,13 @@
 #define MAVLINK_MSG_ID_VOLT_SENSOR 191
 
 MAVPACKED(
-typedef struct __mavlink_volt_sensor_t {
- uint16_t voltage; /*<  Voltage in uS of PWM. 0 uS = 0V, 20 uS = 21.5V */
- uint16_t reading2; /*<  Depends on the value of r2Type (0) Current consumption in uS of PWM, 20 uS = 90Amp (1) Distance in cm (2) Distance in cm (3) Absolute value*/
- uint8_t r2Type; /*<  It is the value of reading 2: 0 - Current, 1 - Foreward Sonar, 2 - Back Sonar, 3 - RPM*/
-}) mavlink_volt_sensor_t;
+        typedef struct __mavlink_volt_sensor_t {
+            uint16_t voltage; /*<  Voltage in uS of PWM. 0 uS = 0V, 20 uS = 21.5V */
+            uint16_t reading2; /*<  Depends on the value of r2Type (0) Current consumption in uS of PWM, 20 uS = 90Amp (1) Distance in cm (2) Distance in cm (3) Absolute value*/
+            uint8_t r2Type; /*<  It is the value of reading 2: 0 - Current, 1 - Foreward Sonar, 2 - Back Sonar, 3 - RPM*/
+        })
+
+mavlink_volt_sensor_t;
 
 #define MAVLINK_MSG_ID_VOLT_SENSOR_LEN 5
 #define MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN 5
@@ -17,7 +19,6 @@ typedef struct __mavlink_volt_sensor_t {
 
 #define MAVLINK_MSG_ID_VOLT_SENSOR_CRC 17
 #define MAVLINK_MSG_ID_191_CRC 17
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -52,16 +53,16 @@ typedef struct __mavlink_volt_sensor_t {
  * @param reading2  Depends on the value of r2Type (0) Current consumption in uS of PWM, 20 uS = 90Amp (1) Distance in cm (2) Distance in cm (3) Absolute value
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_volt_sensor_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t r2Type, uint16_t voltage, uint16_t reading2)
-{
+static inline uint16_t
+mavlink_msg_volt_sensor_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                             uint8_t r2Type, uint16_t voltage, uint16_t reading2) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_VOLT_SENSOR_LEN];
     _mav_put_uint16_t(buf, 0, voltage);
     _mav_put_uint16_t(buf, 2, reading2);
     _mav_put_uint8_t(buf, 4, r2Type);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
 #else
     mavlink_volt_sensor_t packet;
     packet.voltage = voltage;
@@ -72,7 +73,9 @@ static inline uint16_t mavlink_msg_volt_sensor_pack(uint8_t system_id, uint8_t c
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_VOLT_SENSOR;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN,
+                                    MAVLINK_MSG_ID_VOLT_SENSOR_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_CRC);
 }
 
 /**
@@ -86,17 +89,17 @@ static inline uint16_t mavlink_msg_volt_sensor_pack(uint8_t system_id, uint8_t c
  * @param reading2  Depends on the value of r2Type (0) Current consumption in uS of PWM, 20 uS = 90Amp (1) Distance in cm (2) Distance in cm (3) Absolute value
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_volt_sensor_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t r2Type,uint16_t voltage,uint16_t reading2)
-{
+static inline uint16_t
+mavlink_msg_volt_sensor_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                  mavlink_message_t *msg,
+                                  uint8_t r2Type, uint16_t voltage, uint16_t reading2) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_VOLT_SENSOR_LEN];
     _mav_put_uint16_t(buf, 0, voltage);
     _mav_put_uint16_t(buf, 2, reading2);
     _mav_put_uint8_t(buf, 4, r2Type);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
 #else
     mavlink_volt_sensor_t packet;
     packet.voltage = voltage;
@@ -107,7 +110,10 @@ static inline uint16_t mavlink_msg_volt_sensor_pack_chan(uint8_t system_id, uint
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_VOLT_SENSOR;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN,
+                                         MAVLINK_MSG_ID_VOLT_SENSOR_LEN,
+                                         MAVLINK_MSG_ID_VOLT_SENSOR_CRC);
 }
 
 /**
@@ -118,9 +124,11 @@ static inline uint16_t mavlink_msg_volt_sensor_pack_chan(uint8_t system_id, uint
  * @param msg The MAVLink message to compress the data into
  * @param volt_sensor C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_volt_sensor_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_volt_sensor_t* volt_sensor)
-{
-    return mavlink_msg_volt_sensor_pack(system_id, component_id, msg, volt_sensor->r2Type, volt_sensor->voltage, volt_sensor->reading2);
+static inline uint16_t
+mavlink_msg_volt_sensor_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                               const mavlink_volt_sensor_t *volt_sensor) {
+    return mavlink_msg_volt_sensor_pack(system_id, component_id, msg, volt_sensor->r2Type,
+                                        volt_sensor->voltage, volt_sensor->reading2);
 }
 
 /**
@@ -132,9 +140,13 @@ static inline uint16_t mavlink_msg_volt_sensor_encode(uint8_t system_id, uint8_t
  * @param msg The MAVLink message to compress the data into
  * @param volt_sensor C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_volt_sensor_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_volt_sensor_t* volt_sensor)
-{
-    return mavlink_msg_volt_sensor_pack_chan(system_id, component_id, chan, msg, volt_sensor->r2Type, volt_sensor->voltage, volt_sensor->reading2);
+static inline uint16_t
+mavlink_msg_volt_sensor_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                    mavlink_message_t *msg,
+                                    const mavlink_volt_sensor_t *volt_sensor) {
+    return mavlink_msg_volt_sensor_pack_chan(system_id, component_id, chan, msg,
+                                             volt_sensor->r2Type, volt_sensor->voltage,
+                                             volt_sensor->reading2);
 }
 
 /**
@@ -218,9 +230,8 @@ static inline void mavlink_msg_volt_sensor_send_buf(mavlink_message_t *msgbuf, m
  *
  * @return  It is the value of reading 2: 0 - Current, 1 - Foreward Sonar, 2 - Back Sonar, 3 - RPM
  */
-static inline uint8_t mavlink_msg_volt_sensor_get_r2Type(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  4);
+static inline uint8_t mavlink_msg_volt_sensor_get_r2Type(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 4);
 }
 
 /**
@@ -228,9 +239,8 @@ static inline uint8_t mavlink_msg_volt_sensor_get_r2Type(const mavlink_message_t
  *
  * @return  Voltage in uS of PWM. 0 uS = 0V, 20 uS = 21.5V 
  */
-static inline uint16_t mavlink_msg_volt_sensor_get_voltage(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  0);
+static inline uint16_t mavlink_msg_volt_sensor_get_voltage(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 0);
 }
 
 /**
@@ -238,9 +248,8 @@ static inline uint16_t mavlink_msg_volt_sensor_get_voltage(const mavlink_message
  *
  * @return  Depends on the value of r2Type (0) Current consumption in uS of PWM, 20 uS = 90Amp (1) Distance in cm (2) Distance in cm (3) Absolute value
  */
-static inline uint16_t mavlink_msg_volt_sensor_get_reading2(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  2);
+static inline uint16_t mavlink_msg_volt_sensor_get_reading2(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 2);
 }
 
 /**
@@ -249,15 +258,15 @@ static inline uint16_t mavlink_msg_volt_sensor_get_reading2(const mavlink_messag
  * @param msg The message to decode
  * @param volt_sensor C-struct to decode the message contents into
  */
-static inline void mavlink_msg_volt_sensor_decode(const mavlink_message_t* msg, mavlink_volt_sensor_t* volt_sensor)
-{
+static inline void
+mavlink_msg_volt_sensor_decode(const mavlink_message_t *msg, mavlink_volt_sensor_t *volt_sensor) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     volt_sensor->voltage = mavlink_msg_volt_sensor_get_voltage(msg);
     volt_sensor->reading2 = mavlink_msg_volt_sensor_get_reading2(msg);
     volt_sensor->r2Type = mavlink_msg_volt_sensor_get_r2Type(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_VOLT_SENSOR_LEN? msg->len : MAVLINK_MSG_ID_VOLT_SENSOR_LEN;
-        memset(volt_sensor, 0, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
-    memcpy(volt_sensor, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_VOLT_SENSOR_LEN? msg->len : MAVLINK_MSG_ID_VOLT_SENSOR_LEN;
+    memset(volt_sensor, 0, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
+memcpy(volt_sensor, _MAV_PAYLOAD(msg), len);
 #endif
 }

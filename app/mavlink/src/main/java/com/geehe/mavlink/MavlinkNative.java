@@ -10,6 +10,7 @@ public class MavlinkNative {
     }
 
     public static native void nativeStart(Context context);
+
     public static native void nativeStop(Context context);
 
     // TODO: Use message queue from cpp for performance#

@@ -4,14 +4,16 @@
 #define MAVLINK_MSG_ID_MOUNT_CONTROL 157
 
 MAVPACKED(
-typedef struct __mavlink_mount_control_t {
- int32_t input_a; /*<  Pitch (centi-degrees) or lat (degE7), depending on mount mode.*/
- int32_t input_b; /*<  Roll (centi-degrees) or lon (degE7) depending on mount mode.*/
- int32_t input_c; /*<  Yaw (centi-degrees) or alt (cm) depending on mount mode.*/
- uint8_t target_system; /*<  System ID.*/
- uint8_t target_component; /*<  Component ID.*/
- uint8_t save_position; /*<  If "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING).*/
-}) mavlink_mount_control_t;
+        typedef struct __mavlink_mount_control_t {
+            int32_t input_a; /*<  Pitch (centi-degrees) or lat (degE7), depending on mount mode.*/
+            int32_t input_b; /*<  Roll (centi-degrees) or lon (degE7) depending on mount mode.*/
+            int32_t input_c; /*<  Yaw (centi-degrees) or alt (cm) depending on mount mode.*/
+            uint8_t target_system; /*<  System ID.*/
+            uint8_t target_component; /*<  Component ID.*/
+            uint8_t save_position; /*<  If "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING).*/
+        })
+
+mavlink_mount_control_t;
 
 #define MAVLINK_MSG_ID_MOUNT_CONTROL_LEN 15
 #define MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN 15
@@ -20,7 +22,6 @@ typedef struct __mavlink_mount_control_t {
 
 #define MAVLINK_MSG_ID_MOUNT_CONTROL_CRC 21
 #define MAVLINK_MSG_ID_157_CRC 21
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -64,9 +65,10 @@ typedef struct __mavlink_mount_control_t {
  * @param save_position  If "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING).
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_mount_control_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, int32_t input_a, int32_t input_b, int32_t input_c, uint8_t save_position)
-{
+static inline uint16_t
+mavlink_msg_mount_control_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                               uint8_t target_system, uint8_t target_component, int32_t input_a,
+                               int32_t input_b, int32_t input_c, uint8_t save_position) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_MOUNT_CONTROL_LEN];
     _mav_put_int32_t(buf, 0, input_a);
@@ -76,7 +78,7 @@ static inline uint16_t mavlink_msg_mount_control_pack(uint8_t system_id, uint8_t
     _mav_put_uint8_t(buf, 13, target_component);
     _mav_put_uint8_t(buf, 14, save_position);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
 #else
     mavlink_mount_control_t packet;
     packet.input_a = input_a;
@@ -90,7 +92,10 @@ static inline uint16_t mavlink_msg_mount_control_pack(uint8_t system_id, uint8_t
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_MOUNT_CONTROL;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN,
+                                    MAVLINK_MSG_ID_MOUNT_CONTROL_LEN,
+                                    MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
 }
 
 /**
@@ -107,10 +112,12 @@ static inline uint16_t mavlink_msg_mount_control_pack(uint8_t system_id, uint8_t
  * @param save_position  If "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING).
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_mount_control_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,int32_t input_a,int32_t input_b,int32_t input_c,uint8_t save_position)
-{
+static inline uint16_t
+mavlink_msg_mount_control_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                    mavlink_message_t *msg,
+                                    uint8_t target_system, uint8_t target_component,
+                                    int32_t input_a, int32_t input_b, int32_t input_c,
+                                    uint8_t save_position) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_MOUNT_CONTROL_LEN];
     _mav_put_int32_t(buf, 0, input_a);
@@ -120,7 +127,7 @@ static inline uint16_t mavlink_msg_mount_control_pack_chan(uint8_t system_id, ui
     _mav_put_uint8_t(buf, 13, target_component);
     _mav_put_uint8_t(buf, 14, save_position);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
 #else
     mavlink_mount_control_t packet;
     packet.input_a = input_a;
@@ -134,7 +141,10 @@ static inline uint16_t mavlink_msg_mount_control_pack_chan(uint8_t system_id, ui
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_MOUNT_CONTROL;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN,
+                                         MAVLINK_MSG_ID_MOUNT_CONTROL_LEN,
+                                         MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
 }
 
 /**
@@ -145,9 +155,14 @@ static inline uint16_t mavlink_msg_mount_control_pack_chan(uint8_t system_id, ui
  * @param msg The MAVLink message to compress the data into
  * @param mount_control C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_mount_control_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_mount_control_t* mount_control)
-{
-    return mavlink_msg_mount_control_pack(system_id, component_id, msg, mount_control->target_system, mount_control->target_component, mount_control->input_a, mount_control->input_b, mount_control->input_c, mount_control->save_position);
+static inline uint16_t
+mavlink_msg_mount_control_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                 const mavlink_mount_control_t *mount_control) {
+    return mavlink_msg_mount_control_pack(system_id, component_id, msg,
+                                          mount_control->target_system,
+                                          mount_control->target_component, mount_control->input_a,
+                                          mount_control->input_b, mount_control->input_c,
+                                          mount_control->save_position);
 }
 
 /**
@@ -159,9 +174,16 @@ static inline uint16_t mavlink_msg_mount_control_encode(uint8_t system_id, uint8
  * @param msg The MAVLink message to compress the data into
  * @param mount_control C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_mount_control_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_mount_control_t* mount_control)
-{
-    return mavlink_msg_mount_control_pack_chan(system_id, component_id, chan, msg, mount_control->target_system, mount_control->target_component, mount_control->input_a, mount_control->input_b, mount_control->input_c, mount_control->save_position);
+static inline uint16_t
+mavlink_msg_mount_control_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                      mavlink_message_t *msg,
+                                      const mavlink_mount_control_t *mount_control) {
+    return mavlink_msg_mount_control_pack_chan(system_id, component_id, chan, msg,
+                                               mount_control->target_system,
+                                               mount_control->target_component,
+                                               mount_control->input_a, mount_control->input_b,
+                                               mount_control->input_c,
+                                               mount_control->save_position);
 }
 
 /**
@@ -260,9 +282,8 @@ static inline void mavlink_msg_mount_control_send_buf(mavlink_message_t *msgbuf,
  *
  * @return  System ID.
  */
-static inline uint8_t mavlink_msg_mount_control_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  12);
+static inline uint8_t mavlink_msg_mount_control_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 12);
 }
 
 /**
@@ -270,9 +291,8 @@ static inline uint8_t mavlink_msg_mount_control_get_target_system(const mavlink_
  *
  * @return  Component ID.
  */
-static inline uint8_t mavlink_msg_mount_control_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  13);
+static inline uint8_t mavlink_msg_mount_control_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 13);
 }
 
 /**
@@ -280,9 +300,8 @@ static inline uint8_t mavlink_msg_mount_control_get_target_component(const mavli
  *
  * @return  Pitch (centi-degrees) or lat (degE7), depending on mount mode.
  */
-static inline int32_t mavlink_msg_mount_control_get_input_a(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  0);
+static inline int32_t mavlink_msg_mount_control_get_input_a(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 0);
 }
 
 /**
@@ -290,9 +309,8 @@ static inline int32_t mavlink_msg_mount_control_get_input_a(const mavlink_messag
  *
  * @return  Roll (centi-degrees) or lon (degE7) depending on mount mode.
  */
-static inline int32_t mavlink_msg_mount_control_get_input_b(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  4);
+static inline int32_t mavlink_msg_mount_control_get_input_b(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 4);
 }
 
 /**
@@ -300,9 +318,8 @@ static inline int32_t mavlink_msg_mount_control_get_input_b(const mavlink_messag
  *
  * @return  Yaw (centi-degrees) or alt (cm) depending on mount mode.
  */
-static inline int32_t mavlink_msg_mount_control_get_input_c(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  8);
+static inline int32_t mavlink_msg_mount_control_get_input_c(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 8);
 }
 
 /**
@@ -310,9 +327,8 @@ static inline int32_t mavlink_msg_mount_control_get_input_c(const mavlink_messag
  *
  * @return  If "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING).
  */
-static inline uint8_t mavlink_msg_mount_control_get_save_position(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  14);
+static inline uint8_t mavlink_msg_mount_control_get_save_position(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 14);
 }
 
 /**
@@ -321,8 +337,8 @@ static inline uint8_t mavlink_msg_mount_control_get_save_position(const mavlink_
  * @param msg The message to decode
  * @param mount_control C-struct to decode the message contents into
  */
-static inline void mavlink_msg_mount_control_decode(const mavlink_message_t* msg, mavlink_mount_control_t* mount_control)
-{
+static inline void mavlink_msg_mount_control_decode(const mavlink_message_t *msg,
+                                                    mavlink_mount_control_t *mount_control) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     mount_control->input_a = mavlink_msg_mount_control_get_input_a(msg);
     mount_control->input_b = mavlink_msg_mount_control_get_input_b(msg);
@@ -331,8 +347,8 @@ static inline void mavlink_msg_mount_control_decode(const mavlink_message_t* msg
     mount_control->target_component = mavlink_msg_mount_control_get_target_component(msg);
     mount_control->save_position = mavlink_msg_mount_control_get_save_position(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_MOUNT_CONTROL_LEN? msg->len : MAVLINK_MSG_ID_MOUNT_CONTROL_LEN;
-        memset(mount_control, 0, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
-    memcpy(mount_control, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_MOUNT_CONTROL_LEN? msg->len : MAVLINK_MSG_ID_MOUNT_CONTROL_LEN;
+    memset(mount_control, 0, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
+memcpy(mount_control, _MAV_PAYLOAD(msg), len);
 #endif
 }

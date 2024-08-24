@@ -4,13 +4,13 @@
 #define MAVLINK_MSG_ID_REQUEST_DATA_STREAM 66
 
 MAVPACKED(
-typedef struct __mavlink_request_data_stream_t {
- uint16_t req_message_rate; /*< [Hz] The requested message rate*/
- uint8_t target_system; /*<  The target requested to send the message stream.*/
- uint8_t target_component; /*<  The target requested to send the message stream.*/
- uint8_t req_stream_id; /*<  The ID of the requested data stream*/
- uint8_t start_stop; /*<  1 to start sending, 0 to stop sending.*/
-}) mavlink_request_data_stream_t;
+        typedef struct __mavlink_request_data_stream_t {
+            uint16_t req_message_rate; /*< [Hz] The requested message rate*/
+            uint8_t target_system; /*<  The target requested to send the message stream.*/
+            uint8_t target_component; /*<  The target requested to send the message stream.*/
+            uint8_t req_stream_id; /*<  The ID of the requested data stream*/
+            uint8_t start_stop; /*<  1 to start sending, 0 to stop sending.*/
+        }) mavlink_request_data_stream_t;
 
 #define MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN 6
 #define MAVLINK_MSG_ID_REQUEST_DATA_STREAM_MIN_LEN 6
@@ -19,7 +19,6 @@ typedef struct __mavlink_request_data_stream_t {
 
 #define MAVLINK_MSG_ID_REQUEST_DATA_STREAM_CRC 148
 #define MAVLINK_MSG_ID_66_CRC 148
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -60,9 +59,13 @@ typedef struct __mavlink_request_data_stream_t {
  * @param start_stop  1 to start sending, 0 to stop sending.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_request_data_stream_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, uint8_t req_stream_id, uint16_t req_message_rate, uint8_t start_stop)
-{
+static inline uint16_t mavlink_msg_request_data_stream_pack(uint8_t system_id, uint8_t component_id,
+                                                            mavlink_message_t *msg,
+                                                            uint8_t target_system,
+                                                            uint8_t target_component,
+                                                            uint8_t req_stream_id,
+                                                            uint16_t req_message_rate,
+                                                            uint8_t start_stop) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN];
     _mav_put_uint16_t(buf, 0, req_message_rate);
@@ -80,11 +83,14 @@ static inline uint16_t mavlink_msg_request_data_stream_pack(uint8_t system_id, u
     packet.req_stream_id = req_stream_id;
     packet.start_stop = start_stop;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_REQUEST_DATA_STREAM;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_MIN_LEN, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_REQUEST_DATA_STREAM_MIN_LEN,
+                                    MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN,
+                                    MAVLINK_MSG_ID_REQUEST_DATA_STREAM_CRC);
 }
 
 /**
@@ -100,10 +106,12 @@ static inline uint16_t mavlink_msg_request_data_stream_pack(uint8_t system_id, u
  * @param start_stop  1 to start sending, 0 to stop sending.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_request_data_stream_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,uint8_t req_stream_id,uint16_t req_message_rate,uint8_t start_stop)
-{
+static inline uint16_t
+mavlink_msg_request_data_stream_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                          mavlink_message_t *msg,
+                                          uint8_t target_system, uint8_t target_component,
+                                          uint8_t req_stream_id, uint16_t req_message_rate,
+                                          uint8_t start_stop) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN];
     _mav_put_uint16_t(buf, 0, req_message_rate);
@@ -121,11 +129,14 @@ static inline uint16_t mavlink_msg_request_data_stream_pack_chan(uint8_t system_
     packet.req_stream_id = req_stream_id;
     packet.start_stop = start_stop;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_REQUEST_DATA_STREAM;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_MIN_LEN, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_REQUEST_DATA_STREAM_MIN_LEN,
+                                         MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN,
+                                         MAVLINK_MSG_ID_REQUEST_DATA_STREAM_CRC);
 }
 
 /**
@@ -136,9 +147,16 @@ static inline uint16_t mavlink_msg_request_data_stream_pack_chan(uint8_t system_
  * @param msg The MAVLink message to compress the data into
  * @param request_data_stream C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_request_data_stream_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_request_data_stream_t* request_data_stream)
-{
-    return mavlink_msg_request_data_stream_pack(system_id, component_id, msg, request_data_stream->target_system, request_data_stream->target_component, request_data_stream->req_stream_id, request_data_stream->req_message_rate, request_data_stream->start_stop);
+static inline uint16_t
+mavlink_msg_request_data_stream_encode(uint8_t system_id, uint8_t component_id,
+                                       mavlink_message_t *msg,
+                                       const mavlink_request_data_stream_t *request_data_stream) {
+    return mavlink_msg_request_data_stream_pack(system_id, component_id, msg,
+                                                request_data_stream->target_system,
+                                                request_data_stream->target_component,
+                                                request_data_stream->req_stream_id,
+                                                request_data_stream->req_message_rate,
+                                                request_data_stream->start_stop);
 }
 
 /**
@@ -150,9 +168,16 @@ static inline uint16_t mavlink_msg_request_data_stream_encode(uint8_t system_id,
  * @param msg The MAVLink message to compress the data into
  * @param request_data_stream C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_request_data_stream_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_request_data_stream_t* request_data_stream)
-{
-    return mavlink_msg_request_data_stream_pack_chan(system_id, component_id, chan, msg, request_data_stream->target_system, request_data_stream->target_component, request_data_stream->req_stream_id, request_data_stream->req_message_rate, request_data_stream->start_stop);
+static inline uint16_t
+mavlink_msg_request_data_stream_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                            mavlink_message_t *msg,
+                                            const mavlink_request_data_stream_t *request_data_stream) {
+    return mavlink_msg_request_data_stream_pack_chan(system_id, component_id, chan, msg,
+                                                     request_data_stream->target_system,
+                                                     request_data_stream->target_component,
+                                                     request_data_stream->req_stream_id,
+                                                     request_data_stream->req_message_rate,
+                                                     request_data_stream->start_stop);
 }
 
 /**
@@ -246,9 +271,9 @@ static inline void mavlink_msg_request_data_stream_send_buf(mavlink_message_t *m
  *
  * @return  The target requested to send the message stream.
  */
-static inline uint8_t mavlink_msg_request_data_stream_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  2);
+static inline uint8_t
+mavlink_msg_request_data_stream_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 2);
 }
 
 /**
@@ -256,9 +281,9 @@ static inline uint8_t mavlink_msg_request_data_stream_get_target_system(const ma
  *
  * @return  The target requested to send the message stream.
  */
-static inline uint8_t mavlink_msg_request_data_stream_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  3);
+static inline uint8_t
+mavlink_msg_request_data_stream_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 3);
 }
 
 /**
@@ -266,9 +291,9 @@ static inline uint8_t mavlink_msg_request_data_stream_get_target_component(const
  *
  * @return  The ID of the requested data stream
  */
-static inline uint8_t mavlink_msg_request_data_stream_get_req_stream_id(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  4);
+static inline uint8_t
+mavlink_msg_request_data_stream_get_req_stream_id(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 4);
 }
 
 /**
@@ -276,9 +301,9 @@ static inline uint8_t mavlink_msg_request_data_stream_get_req_stream_id(const ma
  *
  * @return [Hz] The requested message rate
  */
-static inline uint16_t mavlink_msg_request_data_stream_get_req_message_rate(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  0);
+static inline uint16_t
+mavlink_msg_request_data_stream_get_req_message_rate(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 0);
 }
 
 /**
@@ -286,9 +311,8 @@ static inline uint16_t mavlink_msg_request_data_stream_get_req_message_rate(cons
  *
  * @return  1 to start sending, 0 to stop sending.
  */
-static inline uint8_t mavlink_msg_request_data_stream_get_start_stop(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  5);
+static inline uint8_t mavlink_msg_request_data_stream_get_start_stop(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 5);
 }
 
 /**
@@ -297,8 +321,8 @@ static inline uint8_t mavlink_msg_request_data_stream_get_start_stop(const mavli
  * @param msg The message to decode
  * @param request_data_stream C-struct to decode the message contents into
  */
-static inline void mavlink_msg_request_data_stream_decode(const mavlink_message_t* msg, mavlink_request_data_stream_t* request_data_stream)
-{
+static inline void mavlink_msg_request_data_stream_decode(const mavlink_message_t *msg,
+                                                          mavlink_request_data_stream_t *request_data_stream) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     request_data_stream->req_message_rate = mavlink_msg_request_data_stream_get_req_message_rate(msg);
     request_data_stream->target_system = mavlink_msg_request_data_stream_get_target_system(msg);
@@ -306,8 +330,9 @@ static inline void mavlink_msg_request_data_stream_decode(const mavlink_message_
     request_data_stream->req_stream_id = mavlink_msg_request_data_stream_get_req_stream_id(msg);
     request_data_stream->start_stop = mavlink_msg_request_data_stream_get_start_stop(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN? msg->len : MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN;
-        memset(request_data_stream, 0, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN ? msg->len
+                                                                    : MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN;
+    memset(request_data_stream, 0, MAVLINK_MSG_ID_REQUEST_DATA_STREAM_LEN);
     memcpy(request_data_stream, _MAV_PAYLOAD(msg), len);
 #endif
 }

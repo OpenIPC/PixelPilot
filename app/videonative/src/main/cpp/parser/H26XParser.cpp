@@ -8,15 +8,16 @@
 #include <chrono>
 #include <thread>
 
-H26XParser::H26XParser(NALU_DATA_CALLBACK onNewNALU):
+H26XParser::H26XParser(NALU_DATA_CALLBACK onNewNALU) :
         onNewNALU(std::move(onNewNALU)),
-        mDecodeRTP(std::bind(&H26XParser::onNewNaluDataExtracted, this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3)){
+        mDecodeRTP(std::bind(&H26XParser::onNewNaluDataExtracted, this, std::placeholders::_1,
+                             std::placeholders::_2, std::placeholders::_3)) {
 }
 
-void H26XParser::reset(){
+void H26XParser::reset() {
     mDecodeRTP.reset();
-    nParsedNALUs=0;
-    nParsedKonfigurationFrames=0;
+    nParsedNALUs = 0;
+    nParsedKonfigurationFrames = 0;
 }
 
 void H26XParser::parse_raw_h264_stream(const uint8_t *data, const size_t data_length) {
@@ -32,7 +33,7 @@ void H26XParser::parse_rtp_h264_stream(const uint8_t *rtp_data, const size_t dat
 }
 
 void H26XParser::parse_rtp_h265_stream(const uint8_t *rtp_data, const size_t data_length) {
-    IS_H265=true;
+    IS_H265 = true;
     mDecodeRTP.parseRTPH265toNALU(rtp_data, data_length);
 }
 
@@ -42,13 +43,13 @@ void H26XParser::onNewNaluDataExtracted(const std::chrono::steady_clock::time_po
     newNaluExtracted(nalu);
 }
 
-void H26XParser::newNaluExtracted(const NALU& nalu) {
-    if(onNewNALU!= nullptr){
+void H26XParser::newNaluExtracted(const NALU &nalu) {
+    if (onNewNALU != nullptr) {
         onNewNALU(nalu);
     }
     nParsedNALUs++;
-    const bool sps_or_pps=nalu.isSPS() || nalu.isPPS();
-    if(sps_or_pps){
+    const bool sps_or_pps = nalu.isSPS() || nalu.isPPS();
+    if (sps_or_pps) {
         nParsedKonfigurationFrames++;
     }
 }

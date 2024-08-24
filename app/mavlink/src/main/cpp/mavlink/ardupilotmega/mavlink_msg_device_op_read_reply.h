@@ -4,13 +4,15 @@
 #define MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY 11001
 
 MAVPACKED(
-typedef struct __mavlink_device_op_read_reply_t {
- uint32_t request_id; /*<  Request ID - copied from request.*/
- uint8_t result; /*<  0 for success, anything else is failure code.*/
- uint8_t regstart; /*<  Starting register.*/
- uint8_t count; /*<  Count of bytes read.*/
- uint8_t data[128]; /*<  Reply data.*/
-}) mavlink_device_op_read_reply_t;
+        typedef struct __mavlink_device_op_read_reply_t {
+            uint32_t request_id; /*<  Request ID - copied from request.*/
+            uint8_t result; /*<  0 for success, anything else is failure code.*/
+            uint8_t regstart; /*<  Starting register.*/
+            uint8_t count; /*<  Count of bytes read.*/
+            uint8_t data[128]; /*<  Reply data.*/
+        })
+
+mavlink_device_op_read_reply_t;
 
 #define MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN 135
 #define MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_MIN_LEN 135
@@ -60,9 +62,11 @@ typedef struct __mavlink_device_op_read_reply_t {
  * @param data  Reply data.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_device_op_read_reply_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint32_t request_id, uint8_t result, uint8_t regstart, uint8_t count, const uint8_t *data)
-{
+static inline uint16_t
+mavlink_msg_device_op_read_reply_pack(uint8_t system_id, uint8_t component_id,
+                                      mavlink_message_t *msg,
+                                      uint32_t request_id, uint8_t result, uint8_t regstart,
+                                      uint8_t count, const uint8_t *data) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN];
     _mav_put_uint32_t(buf, 0, request_id);
@@ -70,7 +74,7 @@ static inline uint16_t mavlink_msg_device_op_read_reply_pack(uint8_t system_id, 
     _mav_put_uint8_t(buf, 5, regstart);
     _mav_put_uint8_t(buf, 6, count);
     _mav_put_uint8_t_array(buf, 7, data, 128);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN);
 #else
     mavlink_device_op_read_reply_t packet;
     packet.request_id = request_id;
@@ -82,7 +86,10 @@ static inline uint16_t mavlink_msg_device_op_read_reply_pack(uint8_t system_id, 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_MIN_LEN, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_MIN_LEN,
+                                    MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN,
+                                    MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_CRC);
 }
 
 /**
@@ -98,10 +105,11 @@ static inline uint16_t mavlink_msg_device_op_read_reply_pack(uint8_t system_id, 
  * @param data  Reply data.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_device_op_read_reply_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint32_t request_id,uint8_t result,uint8_t regstart,uint8_t count,const uint8_t *data)
-{
+static inline uint16_t
+mavlink_msg_device_op_read_reply_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                           mavlink_message_t *msg,
+                                           uint32_t request_id, uint8_t result, uint8_t regstart,
+                                           uint8_t count, const uint8_t *data) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN];
     _mav_put_uint32_t(buf, 0, request_id);
@@ -109,7 +117,7 @@ static inline uint16_t mavlink_msg_device_op_read_reply_pack_chan(uint8_t system
     _mav_put_uint8_t(buf, 5, regstart);
     _mav_put_uint8_t(buf, 6, count);
     _mav_put_uint8_t_array(buf, 7, data, 128);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN);
 #else
     mavlink_device_op_read_reply_t packet;
     packet.request_id = request_id;
@@ -121,7 +129,10 @@ static inline uint16_t mavlink_msg_device_op_read_reply_pack_chan(uint8_t system
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_MIN_LEN, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_MIN_LEN,
+                                         MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN,
+                                         MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_CRC);
 }
 
 /**
@@ -132,9 +143,16 @@ static inline uint16_t mavlink_msg_device_op_read_reply_pack_chan(uint8_t system
  * @param msg The MAVLink message to compress the data into
  * @param device_op_read_reply C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_device_op_read_reply_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_device_op_read_reply_t* device_op_read_reply)
-{
-    return mavlink_msg_device_op_read_reply_pack(system_id, component_id, msg, device_op_read_reply->request_id, device_op_read_reply->result, device_op_read_reply->regstart, device_op_read_reply->count, device_op_read_reply->data);
+static inline uint16_t
+mavlink_msg_device_op_read_reply_encode(uint8_t system_id, uint8_t component_id,
+                                        mavlink_message_t *msg,
+                                        const mavlink_device_op_read_reply_t *device_op_read_reply) {
+    return mavlink_msg_device_op_read_reply_pack(system_id, component_id, msg,
+                                                 device_op_read_reply->request_id,
+                                                 device_op_read_reply->result,
+                                                 device_op_read_reply->regstart,
+                                                 device_op_read_reply->count,
+                                                 device_op_read_reply->data);
 }
 
 /**
@@ -146,9 +164,16 @@ static inline uint16_t mavlink_msg_device_op_read_reply_encode(uint8_t system_id
  * @param msg The MAVLink message to compress the data into
  * @param device_op_read_reply C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_device_op_read_reply_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_device_op_read_reply_t* device_op_read_reply)
-{
-    return mavlink_msg_device_op_read_reply_pack_chan(system_id, component_id, chan, msg, device_op_read_reply->request_id, device_op_read_reply->result, device_op_read_reply->regstart, device_op_read_reply->count, device_op_read_reply->data);
+static inline uint16_t
+mavlink_msg_device_op_read_reply_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                             mavlink_message_t *msg,
+                                             const mavlink_device_op_read_reply_t *device_op_read_reply) {
+    return mavlink_msg_device_op_read_reply_pack_chan(system_id, component_id, chan, msg,
+                                                      device_op_read_reply->request_id,
+                                                      device_op_read_reply->result,
+                                                      device_op_read_reply->regstart,
+                                                      device_op_read_reply->count,
+                                                      device_op_read_reply->data);
 }
 
 /**
@@ -238,9 +263,9 @@ static inline void mavlink_msg_device_op_read_reply_send_buf(mavlink_message_t *
  *
  * @return  Request ID - copied from request.
  */
-static inline uint32_t mavlink_msg_device_op_read_reply_get_request_id(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  0);
+static inline uint32_t
+mavlink_msg_device_op_read_reply_get_request_id(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 0);
 }
 
 /**
@@ -248,9 +273,8 @@ static inline uint32_t mavlink_msg_device_op_read_reply_get_request_id(const mav
  *
  * @return  0 for success, anything else is failure code.
  */
-static inline uint8_t mavlink_msg_device_op_read_reply_get_result(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  4);
+static inline uint8_t mavlink_msg_device_op_read_reply_get_result(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 4);
 }
 
 /**
@@ -258,9 +282,8 @@ static inline uint8_t mavlink_msg_device_op_read_reply_get_result(const mavlink_
  *
  * @return  Starting register.
  */
-static inline uint8_t mavlink_msg_device_op_read_reply_get_regstart(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  5);
+static inline uint8_t mavlink_msg_device_op_read_reply_get_regstart(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 5);
 }
 
 /**
@@ -268,9 +291,8 @@ static inline uint8_t mavlink_msg_device_op_read_reply_get_regstart(const mavlin
  *
  * @return  Count of bytes read.
  */
-static inline uint8_t mavlink_msg_device_op_read_reply_get_count(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  6);
+static inline uint8_t mavlink_msg_device_op_read_reply_get_count(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 6);
 }
 
 /**
@@ -278,9 +300,9 @@ static inline uint8_t mavlink_msg_device_op_read_reply_get_count(const mavlink_m
  *
  * @return  Reply data.
  */
-static inline uint16_t mavlink_msg_device_op_read_reply_get_data(const mavlink_message_t* msg, uint8_t *data)
-{
-    return _MAV_RETURN_uint8_t_array(msg, data, 128,  7);
+static inline uint16_t
+mavlink_msg_device_op_read_reply_get_data(const mavlink_message_t *msg, uint8_t *data) {
+    return _MAV_RETURN_uint8_t_array(msg, data, 128, 7);
 }
 
 /**
@@ -289,8 +311,8 @@ static inline uint16_t mavlink_msg_device_op_read_reply_get_data(const mavlink_m
  * @param msg The message to decode
  * @param device_op_read_reply C-struct to decode the message contents into
  */
-static inline void mavlink_msg_device_op_read_reply_decode(const mavlink_message_t* msg, mavlink_device_op_read_reply_t* device_op_read_reply)
-{
+static inline void mavlink_msg_device_op_read_reply_decode(const mavlink_message_t *msg,
+                                                           mavlink_device_op_read_reply_t *device_op_read_reply) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     device_op_read_reply->request_id = mavlink_msg_device_op_read_reply_get_request_id(msg);
     device_op_read_reply->result = mavlink_msg_device_op_read_reply_get_result(msg);
@@ -298,8 +320,8 @@ static inline void mavlink_msg_device_op_read_reply_decode(const mavlink_message
     device_op_read_reply->count = mavlink_msg_device_op_read_reply_get_count(msg);
     mavlink_msg_device_op_read_reply_get_data(msg, device_op_read_reply->data);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN? msg->len : MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN;
-        memset(device_op_read_reply, 0, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN);
-    memcpy(device_op_read_reply, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN? msg->len : MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN;
+    memset(device_op_read_reply, 0, MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY_LEN);
+memcpy(device_op_read_reply, _MAV_PAYLOAD(msg), len);
 #endif
 }

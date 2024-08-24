@@ -18,13 +18,13 @@ SODIUM_EXPORT
 const char *sodium_version_string(void);
 
 SODIUM_EXPORT
-int         sodium_library_version_major(void);
+int sodium_library_version_major(void);
 
 SODIUM_EXPORT
-int         sodium_library_version_minor(void);
+int sodium_library_version_minor(void);
 
 SODIUM_EXPORT
-int         sodium_library_minimal(void);
+int sodium_library_minimal(void);
 
 #ifdef __cplusplus
 }

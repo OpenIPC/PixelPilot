@@ -4,21 +4,23 @@
 #define MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE 286
 
 MAVPACKED(
-typedef struct __mavlink_autopilot_state_for_gimbal_device_t {
- uint64_t time_boot_us; /*< [us] Timestamp (time since system boot).*/
- float q[4]; /*<  Quaternion components of autopilot attitude: w, x, y, z (1 0 0 0 is the null-rotation, Hamilton convention).*/
- uint32_t q_estimated_delay_us; /*< [us] Estimated delay of the attitude data. 0 if unknown.*/
- float vx; /*< [m/s] X Speed in NED (North, East, Down). NAN if unknown.*/
- float vy; /*< [m/s] Y Speed in NED (North, East, Down). NAN if unknown.*/
- float vz; /*< [m/s] Z Speed in NED (North, East, Down). NAN if unknown.*/
- uint32_t v_estimated_delay_us; /*< [us] Estimated delay of the speed data. 0 if unknown.*/
- float feed_forward_angular_velocity_z; /*< [rad/s] Feed forward Z component of angular velocity (positive: yawing to the right). NaN to be ignored. This is to indicate if the autopilot is actively yawing.*/
- uint16_t estimator_status; /*<  Bitmap indicating which estimator outputs are valid.*/
- uint8_t target_system; /*<  System ID*/
- uint8_t target_component; /*<  Component ID*/
- uint8_t landed_state; /*<  The landed state. Is set to MAV_LANDED_STATE_UNDEFINED if landed state is unknown.*/
- float angular_velocity_z; /*< [rad/s] Z component of angular velocity in NED (North, East, Down). NaN if unknown.*/
-}) mavlink_autopilot_state_for_gimbal_device_t;
+        typedef struct __mavlink_autopilot_state_for_gimbal_device_t {
+            uint64_t time_boot_us; /*< [us] Timestamp (time since system boot).*/
+            float q[4]; /*<  Quaternion components of autopilot attitude: w, x, y, z (1 0 0 0 is the null-rotation, Hamilton convention).*/
+            uint32_t q_estimated_delay_us; /*< [us] Estimated delay of the attitude data. 0 if unknown.*/
+            float vx; /*< [m/s] X Speed in NED (North, East, Down). NAN if unknown.*/
+            float vy; /*< [m/s] Y Speed in NED (North, East, Down). NAN if unknown.*/
+            float vz; /*< [m/s] Z Speed in NED (North, East, Down). NAN if unknown.*/
+            uint32_t v_estimated_delay_us; /*< [us] Estimated delay of the speed data. 0 if unknown.*/
+            float feed_forward_angular_velocity_z; /*< [rad/s] Feed forward Z component of angular velocity (positive: yawing to the right). NaN to be ignored. This is to indicate if the autopilot is actively yawing.*/
+            uint16_t estimator_status; /*<  Bitmap indicating which estimator outputs are valid.*/
+            uint8_t target_system; /*<  System ID*/
+            uint8_t target_component; /*<  Component ID*/
+            uint8_t landed_state; /*<  The landed state. Is set to MAV_LANDED_STATE_UNDEFINED if landed state is unknown.*/
+            float angular_velocity_z; /*< [rad/s] Z component of angular velocity in NED (North, East, Down). NaN if unknown.*/
+        })
+
+mavlink_autopilot_state_for_gimbal_device_t;
 
 #define MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN 57
 #define MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_MIN_LEN 53
@@ -92,9 +94,17 @@ typedef struct __mavlink_autopilot_state_for_gimbal_device_t {
  * @param angular_velocity_z [rad/s] Z component of angular velocity in NED (North, East, Down). NaN if unknown.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, uint64_t time_boot_us, const float *q, uint32_t q_estimated_delay_us, float vx, float vy, float vz, uint32_t v_estimated_delay_us, float feed_forward_angular_velocity_z, uint16_t estimator_status, uint8_t landed_state, float angular_velocity_z)
-{
+static inline uint16_t
+mavlink_msg_autopilot_state_for_gimbal_device_pack(uint8_t system_id, uint8_t component_id,
+                                                   mavlink_message_t *msg,
+                                                   uint8_t target_system, uint8_t target_component,
+                                                   uint64_t time_boot_us, const float *q,
+                                                   uint32_t q_estimated_delay_us, float vx,
+                                                   float vy, float vz,
+                                                   uint32_t v_estimated_delay_us,
+                                                   float feed_forward_angular_velocity_z,
+                                                   uint16_t estimator_status, uint8_t landed_state,
+                                                   float angular_velocity_z) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN];
     _mav_put_uint64_t(buf, 0, time_boot_us);
@@ -110,7 +120,7 @@ static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_pack(uint8_
     _mav_put_uint8_t(buf, 52, landed_state);
     _mav_put_float(buf, 53, angular_velocity_z);
     _mav_put_float_array(buf, 8, q, 4);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN);
 #else
     mavlink_autopilot_state_for_gimbal_device_t packet;
     packet.time_boot_us = time_boot_us;
@@ -130,7 +140,10 @@ static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_pack(uint8_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_MIN_LEN, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_MIN_LEN,
+                                    MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN,
+                                    MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_CRC);
 }
 
 /**
@@ -154,10 +167,20 @@ static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_pack(uint8_
  * @param angular_velocity_z [rad/s] Z component of angular velocity in NED (North, East, Down). NaN if unknown.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,uint64_t time_boot_us,const float *q,uint32_t q_estimated_delay_us,float vx,float vy,float vz,uint32_t v_estimated_delay_us,float feed_forward_angular_velocity_z,uint16_t estimator_status,uint8_t landed_state,float angular_velocity_z)
-{
+static inline uint16_t
+mavlink_msg_autopilot_state_for_gimbal_device_pack_chan(uint8_t system_id, uint8_t component_id,
+                                                        uint8_t chan,
+                                                        mavlink_message_t *msg,
+                                                        uint8_t target_system,
+                                                        uint8_t target_component,
+                                                        uint64_t time_boot_us, const float *q,
+                                                        uint32_t q_estimated_delay_us, float vx,
+                                                        float vy, float vz,
+                                                        uint32_t v_estimated_delay_us,
+                                                        float feed_forward_angular_velocity_z,
+                                                        uint16_t estimator_status,
+                                                        uint8_t landed_state,
+                                                        float angular_velocity_z) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN];
     _mav_put_uint64_t(buf, 0, time_boot_us);
@@ -173,7 +196,7 @@ static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_pack_chan(u
     _mav_put_uint8_t(buf, 52, landed_state);
     _mav_put_float(buf, 53, angular_velocity_z);
     _mav_put_float_array(buf, 8, q, 4);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN);
 #else
     mavlink_autopilot_state_for_gimbal_device_t packet;
     packet.time_boot_us = time_boot_us;
@@ -193,7 +216,10 @@ static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_pack_chan(u
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_MIN_LEN, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_MIN_LEN,
+                                         MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN,
+                                         MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_CRC);
 }
 
 /**
@@ -204,9 +230,24 @@ static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_pack_chan(u
  * @param msg The MAVLink message to compress the data into
  * @param autopilot_state_for_gimbal_device C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_autopilot_state_for_gimbal_device_t* autopilot_state_for_gimbal_device)
-{
-    return mavlink_msg_autopilot_state_for_gimbal_device_pack(system_id, component_id, msg, autopilot_state_for_gimbal_device->target_system, autopilot_state_for_gimbal_device->target_component, autopilot_state_for_gimbal_device->time_boot_us, autopilot_state_for_gimbal_device->q, autopilot_state_for_gimbal_device->q_estimated_delay_us, autopilot_state_for_gimbal_device->vx, autopilot_state_for_gimbal_device->vy, autopilot_state_for_gimbal_device->vz, autopilot_state_for_gimbal_device->v_estimated_delay_us, autopilot_state_for_gimbal_device->feed_forward_angular_velocity_z, autopilot_state_for_gimbal_device->estimator_status, autopilot_state_for_gimbal_device->landed_state, autopilot_state_for_gimbal_device->angular_velocity_z);
+static inline uint16_t
+mavlink_msg_autopilot_state_for_gimbal_device_encode(uint8_t system_id, uint8_t component_id,
+                                                     mavlink_message_t *msg,
+                                                     const mavlink_autopilot_state_for_gimbal_device_t *autopilot_state_for_gimbal_device) {
+    return mavlink_msg_autopilot_state_for_gimbal_device_pack(system_id, component_id, msg,
+                                                              autopilot_state_for_gimbal_device->target_system,
+                                                              autopilot_state_for_gimbal_device->target_component,
+                                                              autopilot_state_for_gimbal_device->time_boot_us,
+                                                              autopilot_state_for_gimbal_device->q,
+                                                              autopilot_state_for_gimbal_device->q_estimated_delay_us,
+                                                              autopilot_state_for_gimbal_device->vx,
+                                                              autopilot_state_for_gimbal_device->vy,
+                                                              autopilot_state_for_gimbal_device->vz,
+                                                              autopilot_state_for_gimbal_device->v_estimated_delay_us,
+                                                              autopilot_state_for_gimbal_device->feed_forward_angular_velocity_z,
+                                                              autopilot_state_for_gimbal_device->estimator_status,
+                                                              autopilot_state_for_gimbal_device->landed_state,
+                                                              autopilot_state_for_gimbal_device->angular_velocity_z);
 }
 
 /**
@@ -218,9 +259,25 @@ static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_encode(uint
  * @param msg The MAVLink message to compress the data into
  * @param autopilot_state_for_gimbal_device C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_autopilot_state_for_gimbal_device_t* autopilot_state_for_gimbal_device)
-{
-    return mavlink_msg_autopilot_state_for_gimbal_device_pack_chan(system_id, component_id, chan, msg, autopilot_state_for_gimbal_device->target_system, autopilot_state_for_gimbal_device->target_component, autopilot_state_for_gimbal_device->time_boot_us, autopilot_state_for_gimbal_device->q, autopilot_state_for_gimbal_device->q_estimated_delay_us, autopilot_state_for_gimbal_device->vx, autopilot_state_for_gimbal_device->vy, autopilot_state_for_gimbal_device->vz, autopilot_state_for_gimbal_device->v_estimated_delay_us, autopilot_state_for_gimbal_device->feed_forward_angular_velocity_z, autopilot_state_for_gimbal_device->estimator_status, autopilot_state_for_gimbal_device->landed_state, autopilot_state_for_gimbal_device->angular_velocity_z);
+static inline uint16_t
+mavlink_msg_autopilot_state_for_gimbal_device_encode_chan(uint8_t system_id, uint8_t component_id,
+                                                          uint8_t chan, mavlink_message_t *msg,
+                                                          const mavlink_autopilot_state_for_gimbal_device_t *autopilot_state_for_gimbal_device) {
+    return mavlink_msg_autopilot_state_for_gimbal_device_pack_chan(system_id, component_id, chan,
+                                                                   msg,
+                                                                   autopilot_state_for_gimbal_device->target_system,
+                                                                   autopilot_state_for_gimbal_device->target_component,
+                                                                   autopilot_state_for_gimbal_device->time_boot_us,
+                                                                   autopilot_state_for_gimbal_device->q,
+                                                                   autopilot_state_for_gimbal_device->q_estimated_delay_us,
+                                                                   autopilot_state_for_gimbal_device->vx,
+                                                                   autopilot_state_for_gimbal_device->vy,
+                                                                   autopilot_state_for_gimbal_device->vz,
+                                                                   autopilot_state_for_gimbal_device->v_estimated_delay_us,
+                                                                   autopilot_state_for_gimbal_device->feed_forward_angular_velocity_z,
+                                                                   autopilot_state_for_gimbal_device->estimator_status,
+                                                                   autopilot_state_for_gimbal_device->landed_state,
+                                                                   autopilot_state_for_gimbal_device->angular_velocity_z);
 }
 
 /**
@@ -350,9 +407,9 @@ static inline void mavlink_msg_autopilot_state_for_gimbal_device_send_buf(mavlin
  *
  * @return  System ID
  */
-static inline uint8_t mavlink_msg_autopilot_state_for_gimbal_device_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  50);
+static inline uint8_t
+mavlink_msg_autopilot_state_for_gimbal_device_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 50);
 }
 
 /**
@@ -360,9 +417,9 @@ static inline uint8_t mavlink_msg_autopilot_state_for_gimbal_device_get_target_s
  *
  * @return  Component ID
  */
-static inline uint8_t mavlink_msg_autopilot_state_for_gimbal_device_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  51);
+static inline uint8_t
+mavlink_msg_autopilot_state_for_gimbal_device_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 51);
 }
 
 /**
@@ -370,9 +427,9 @@ static inline uint8_t mavlink_msg_autopilot_state_for_gimbal_device_get_target_c
  *
  * @return [us] Timestamp (time since system boot).
  */
-static inline uint64_t mavlink_msg_autopilot_state_for_gimbal_device_get_time_boot_us(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint64_t(msg,  0);
+static inline uint64_t
+mavlink_msg_autopilot_state_for_gimbal_device_get_time_boot_us(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint64_t(msg, 0);
 }
 
 /**
@@ -380,9 +437,9 @@ static inline uint64_t mavlink_msg_autopilot_state_for_gimbal_device_get_time_bo
  *
  * @return  Quaternion components of autopilot attitude: w, x, y, z (1 0 0 0 is the null-rotation, Hamilton convention).
  */
-static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_get_q(const mavlink_message_t* msg, float *q)
-{
-    return _MAV_RETURN_float_array(msg, q, 4,  8);
+static inline uint16_t
+mavlink_msg_autopilot_state_for_gimbal_device_get_q(const mavlink_message_t *msg, float *q) {
+    return _MAV_RETURN_float_array(msg, q, 4, 8);
 }
 
 /**
@@ -390,9 +447,9 @@ static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_get_q(const
  *
  * @return [us] Estimated delay of the attitude data. 0 if unknown.
  */
-static inline uint32_t mavlink_msg_autopilot_state_for_gimbal_device_get_q_estimated_delay_us(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  24);
+static inline uint32_t mavlink_msg_autopilot_state_for_gimbal_device_get_q_estimated_delay_us(
+        const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 24);
 }
 
 /**
@@ -400,9 +457,9 @@ static inline uint32_t mavlink_msg_autopilot_state_for_gimbal_device_get_q_estim
  *
  * @return [m/s] X Speed in NED (North, East, Down). NAN if unknown.
  */
-static inline float mavlink_msg_autopilot_state_for_gimbal_device_get_vx(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float
+mavlink_msg_autopilot_state_for_gimbal_device_get_vx(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -410,9 +467,9 @@ static inline float mavlink_msg_autopilot_state_for_gimbal_device_get_vx(const m
  *
  * @return [m/s] Y Speed in NED (North, East, Down). NAN if unknown.
  */
-static inline float mavlink_msg_autopilot_state_for_gimbal_device_get_vy(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  32);
+static inline float
+mavlink_msg_autopilot_state_for_gimbal_device_get_vy(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 32);
 }
 
 /**
@@ -420,9 +477,9 @@ static inline float mavlink_msg_autopilot_state_for_gimbal_device_get_vy(const m
  *
  * @return [m/s] Z Speed in NED (North, East, Down). NAN if unknown.
  */
-static inline float mavlink_msg_autopilot_state_for_gimbal_device_get_vz(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  36);
+static inline float
+mavlink_msg_autopilot_state_for_gimbal_device_get_vz(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 36);
 }
 
 /**
@@ -430,9 +487,9 @@ static inline float mavlink_msg_autopilot_state_for_gimbal_device_get_vz(const m
  *
  * @return [us] Estimated delay of the speed data. 0 if unknown.
  */
-static inline uint32_t mavlink_msg_autopilot_state_for_gimbal_device_get_v_estimated_delay_us(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  40);
+static inline uint32_t mavlink_msg_autopilot_state_for_gimbal_device_get_v_estimated_delay_us(
+        const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 40);
 }
 
 /**
@@ -440,9 +497,10 @@ static inline uint32_t mavlink_msg_autopilot_state_for_gimbal_device_get_v_estim
  *
  * @return [rad/s] Feed forward Z component of angular velocity (positive: yawing to the right). NaN to be ignored. This is to indicate if the autopilot is actively yawing.
  */
-static inline float mavlink_msg_autopilot_state_for_gimbal_device_get_feed_forward_angular_velocity_z(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  44);
+static inline float
+mavlink_msg_autopilot_state_for_gimbal_device_get_feed_forward_angular_velocity_z(
+        const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 44);
 }
 
 /**
@@ -450,9 +508,9 @@ static inline float mavlink_msg_autopilot_state_for_gimbal_device_get_feed_forwa
  *
  * @return  Bitmap indicating which estimator outputs are valid.
  */
-static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_get_estimator_status(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  48);
+static inline uint16_t
+mavlink_msg_autopilot_state_for_gimbal_device_get_estimator_status(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 48);
 }
 
 /**
@@ -460,9 +518,9 @@ static inline uint16_t mavlink_msg_autopilot_state_for_gimbal_device_get_estimat
  *
  * @return  The landed state. Is set to MAV_LANDED_STATE_UNDEFINED if landed state is unknown.
  */
-static inline uint8_t mavlink_msg_autopilot_state_for_gimbal_device_get_landed_state(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  52);
+static inline uint8_t
+mavlink_msg_autopilot_state_for_gimbal_device_get_landed_state(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 52);
 }
 
 /**
@@ -470,9 +528,9 @@ static inline uint8_t mavlink_msg_autopilot_state_for_gimbal_device_get_landed_s
  *
  * @return [rad/s] Z component of angular velocity in NED (North, East, Down). NaN if unknown.
  */
-static inline float mavlink_msg_autopilot_state_for_gimbal_device_get_angular_velocity_z(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  53);
+static inline float
+mavlink_msg_autopilot_state_for_gimbal_device_get_angular_velocity_z(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 53);
 }
 
 /**
@@ -481,25 +539,38 @@ static inline float mavlink_msg_autopilot_state_for_gimbal_device_get_angular_ve
  * @param msg The message to decode
  * @param autopilot_state_for_gimbal_device C-struct to decode the message contents into
  */
-static inline void mavlink_msg_autopilot_state_for_gimbal_device_decode(const mavlink_message_t* msg, mavlink_autopilot_state_for_gimbal_device_t* autopilot_state_for_gimbal_device)
-{
+static inline void
+mavlink_msg_autopilot_state_for_gimbal_device_decode(const mavlink_message_t *msg,
+                                                     mavlink_autopilot_state_for_gimbal_device_t *autopilot_state_for_gimbal_device) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    autopilot_state_for_gimbal_device->time_boot_us = mavlink_msg_autopilot_state_for_gimbal_device_get_time_boot_us(msg);
+    autopilot_state_for_gimbal_device->time_boot_us = mavlink_msg_autopilot_state_for_gimbal_device_get_time_boot_us(
+            msg);
     mavlink_msg_autopilot_state_for_gimbal_device_get_q(msg, autopilot_state_for_gimbal_device->q);
-    autopilot_state_for_gimbal_device->q_estimated_delay_us = mavlink_msg_autopilot_state_for_gimbal_device_get_q_estimated_delay_us(msg);
-    autopilot_state_for_gimbal_device->vx = mavlink_msg_autopilot_state_for_gimbal_device_get_vx(msg);
-    autopilot_state_for_gimbal_device->vy = mavlink_msg_autopilot_state_for_gimbal_device_get_vy(msg);
-    autopilot_state_for_gimbal_device->vz = mavlink_msg_autopilot_state_for_gimbal_device_get_vz(msg);
-    autopilot_state_for_gimbal_device->v_estimated_delay_us = mavlink_msg_autopilot_state_for_gimbal_device_get_v_estimated_delay_us(msg);
-    autopilot_state_for_gimbal_device->feed_forward_angular_velocity_z = mavlink_msg_autopilot_state_for_gimbal_device_get_feed_forward_angular_velocity_z(msg);
-    autopilot_state_for_gimbal_device->estimator_status = mavlink_msg_autopilot_state_for_gimbal_device_get_estimator_status(msg);
-    autopilot_state_for_gimbal_device->target_system = mavlink_msg_autopilot_state_for_gimbal_device_get_target_system(msg);
-    autopilot_state_for_gimbal_device->target_component = mavlink_msg_autopilot_state_for_gimbal_device_get_target_component(msg);
-    autopilot_state_for_gimbal_device->landed_state = mavlink_msg_autopilot_state_for_gimbal_device_get_landed_state(msg);
-    autopilot_state_for_gimbal_device->angular_velocity_z = mavlink_msg_autopilot_state_for_gimbal_device_get_angular_velocity_z(msg);
+    autopilot_state_for_gimbal_device->q_estimated_delay_us = mavlink_msg_autopilot_state_for_gimbal_device_get_q_estimated_delay_us(
+            msg);
+    autopilot_state_for_gimbal_device->vx = mavlink_msg_autopilot_state_for_gimbal_device_get_vx(
+            msg);
+    autopilot_state_for_gimbal_device->vy = mavlink_msg_autopilot_state_for_gimbal_device_get_vy(
+            msg);
+    autopilot_state_for_gimbal_device->vz = mavlink_msg_autopilot_state_for_gimbal_device_get_vz(
+            msg);
+    autopilot_state_for_gimbal_device->v_estimated_delay_us = mavlink_msg_autopilot_state_for_gimbal_device_get_v_estimated_delay_us(
+            msg);
+    autopilot_state_for_gimbal_device->feed_forward_angular_velocity_z = mavlink_msg_autopilot_state_for_gimbal_device_get_feed_forward_angular_velocity_z(
+            msg);
+    autopilot_state_for_gimbal_device->estimator_status = mavlink_msg_autopilot_state_for_gimbal_device_get_estimator_status(
+            msg);
+    autopilot_state_for_gimbal_device->target_system = mavlink_msg_autopilot_state_for_gimbal_device_get_target_system(
+            msg);
+    autopilot_state_for_gimbal_device->target_component = mavlink_msg_autopilot_state_for_gimbal_device_get_target_component(
+            msg);
+    autopilot_state_for_gimbal_device->landed_state = mavlink_msg_autopilot_state_for_gimbal_device_get_landed_state(
+            msg);
+    autopilot_state_for_gimbal_device->angular_velocity_z = mavlink_msg_autopilot_state_for_gimbal_device_get_angular_velocity_z(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN? msg->len : MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN;
-        memset(autopilot_state_for_gimbal_device, 0, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN);
-    memcpy(autopilot_state_for_gimbal_device, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN? msg->len : MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN;
+    memset(autopilot_state_for_gimbal_device, 0, MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE_LEN);
+memcpy(autopilot_state_for_gimbal_device, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -12,11 +12,11 @@ extern "C" {
 
 #define crypto_scalarmult_BYTES crypto_scalarmult_curve25519_BYTES
 SODIUM_EXPORT
-size_t  crypto_scalarmult_bytes(void);
+size_t crypto_scalarmult_bytes(void);
 
 #define crypto_scalarmult_SCALARBYTES crypto_scalarmult_curve25519_SCALARBYTES
 SODIUM_EXPORT
-size_t  crypto_scalarmult_scalarbytes(void);
+size_t crypto_scalarmult_scalarbytes(void);
 
 #define crypto_scalarmult_PRIMITIVE "curve25519"
 SODIUM_EXPORT
@@ -24,7 +24,7 @@ const char *crypto_scalarmult_primitive(void);
 
 SODIUM_EXPORT
 int crypto_scalarmult_base(unsigned char *q, const unsigned char *n)
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 /*
  * NOTE: Do not use the result of this function directly for key exchange.
@@ -37,7 +37,7 @@ int crypto_scalarmult_base(unsigned char *q, const unsigned char *n)
 SODIUM_EXPORT
 int crypto_scalarmult(unsigned char *q, const unsigned char *n,
                       const unsigned char *p)
-            __attribute__ ((warn_unused_result)) __attribute__ ((nonnull));
+__attribute__ ((warn_unused_result)) __attribute__ ((nonnull));
 
 #ifdef __cplusplus
 }

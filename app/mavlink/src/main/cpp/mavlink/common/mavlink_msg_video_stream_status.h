@@ -4,16 +4,16 @@
 #define MAVLINK_MSG_ID_VIDEO_STREAM_STATUS 270
 
 MAVPACKED(
-typedef struct __mavlink_video_stream_status_t {
- float framerate; /*< [Hz] Frame rate*/
- uint32_t bitrate; /*< [bits/s] Bit rate*/
- uint16_t flags; /*<  Bitmap of stream status flags*/
- uint16_t resolution_h; /*< [pix] Horizontal resolution*/
- uint16_t resolution_v; /*< [pix] Vertical resolution*/
- uint16_t rotation; /*< [deg] Video image rotation clockwise*/
- uint16_t hfov; /*< [deg] Horizontal Field of view*/
- uint8_t stream_id; /*<  Video Stream ID (1 for first, 2 for second, etc.)*/
-}) mavlink_video_stream_status_t;
+        typedef struct __mavlink_video_stream_status_t {
+            float framerate; /*< [Hz] Frame rate*/
+            uint32_t bitrate; /*< [bits/s] Bit rate*/
+            uint16_t flags; /*<  Bitmap of stream status flags*/
+            uint16_t resolution_h; /*< [pix] Horizontal resolution*/
+            uint16_t resolution_v; /*< [pix] Vertical resolution*/
+            uint16_t rotation; /*< [deg] Video image rotation clockwise*/
+            uint16_t hfov; /*< [deg] Horizontal Field of view*/
+            uint8_t stream_id; /*<  Video Stream ID (1 for first, 2 for second, etc.)*/
+        }) mavlink_video_stream_status_t;
 
 #define MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN 19
 #define MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_MIN_LEN 19
@@ -22,7 +22,6 @@ typedef struct __mavlink_video_stream_status_t {
 
 #define MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_CRC 59
 #define MAVLINK_MSG_ID_270_CRC 59
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -72,9 +71,12 @@ typedef struct __mavlink_video_stream_status_t {
  * @param hfov [deg] Horizontal Field of view
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_video_stream_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t stream_id, uint16_t flags, float framerate, uint16_t resolution_h, uint16_t resolution_v, uint32_t bitrate, uint16_t rotation, uint16_t hfov)
-{
+static inline uint16_t mavlink_msg_video_stream_status_pack(uint8_t system_id, uint8_t component_id,
+                                                            mavlink_message_t *msg,
+                                                            uint8_t stream_id, uint16_t flags,
+                                                            float framerate, uint16_t resolution_h,
+                                                            uint16_t resolution_v, uint32_t bitrate,
+                                                            uint16_t rotation, uint16_t hfov) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN];
     _mav_put_float(buf, 0, framerate);
@@ -98,11 +100,14 @@ static inline uint16_t mavlink_msg_video_stream_status_pack(uint8_t system_id, u
     packet.hfov = hfov;
     packet.stream_id = stream_id;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_VIDEO_STREAM_STATUS;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_MIN_LEN, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_MIN_LEN,
+                                    MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN,
+                                    MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_CRC);
 }
 
 /**
@@ -121,10 +126,12 @@ static inline uint16_t mavlink_msg_video_stream_status_pack(uint8_t system_id, u
  * @param hfov [deg] Horizontal Field of view
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_video_stream_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t stream_id,uint16_t flags,float framerate,uint16_t resolution_h,uint16_t resolution_v,uint32_t bitrate,uint16_t rotation,uint16_t hfov)
-{
+static inline uint16_t
+mavlink_msg_video_stream_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                          mavlink_message_t *msg,
+                                          uint8_t stream_id, uint16_t flags, float framerate,
+                                          uint16_t resolution_h, uint16_t resolution_v,
+                                          uint32_t bitrate, uint16_t rotation, uint16_t hfov) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN];
     _mav_put_float(buf, 0, framerate);
@@ -148,11 +155,14 @@ static inline uint16_t mavlink_msg_video_stream_status_pack_chan(uint8_t system_
     packet.hfov = hfov;
     packet.stream_id = stream_id;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_VIDEO_STREAM_STATUS;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_MIN_LEN, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_MIN_LEN,
+                                         MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN,
+                                         MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_CRC);
 }
 
 /**
@@ -163,9 +173,19 @@ static inline uint16_t mavlink_msg_video_stream_status_pack_chan(uint8_t system_
  * @param msg The MAVLink message to compress the data into
  * @param video_stream_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_video_stream_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_video_stream_status_t* video_stream_status)
-{
-    return mavlink_msg_video_stream_status_pack(system_id, component_id, msg, video_stream_status->stream_id, video_stream_status->flags, video_stream_status->framerate, video_stream_status->resolution_h, video_stream_status->resolution_v, video_stream_status->bitrate, video_stream_status->rotation, video_stream_status->hfov);
+static inline uint16_t
+mavlink_msg_video_stream_status_encode(uint8_t system_id, uint8_t component_id,
+                                       mavlink_message_t *msg,
+                                       const mavlink_video_stream_status_t *video_stream_status) {
+    return mavlink_msg_video_stream_status_pack(system_id, component_id, msg,
+                                                video_stream_status->stream_id,
+                                                video_stream_status->flags,
+                                                video_stream_status->framerate,
+                                                video_stream_status->resolution_h,
+                                                video_stream_status->resolution_v,
+                                                video_stream_status->bitrate,
+                                                video_stream_status->rotation,
+                                                video_stream_status->hfov);
 }
 
 /**
@@ -177,9 +197,19 @@ static inline uint16_t mavlink_msg_video_stream_status_encode(uint8_t system_id,
  * @param msg The MAVLink message to compress the data into
  * @param video_stream_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_video_stream_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_video_stream_status_t* video_stream_status)
-{
-    return mavlink_msg_video_stream_status_pack_chan(system_id, component_id, chan, msg, video_stream_status->stream_id, video_stream_status->flags, video_stream_status->framerate, video_stream_status->resolution_h, video_stream_status->resolution_v, video_stream_status->bitrate, video_stream_status->rotation, video_stream_status->hfov);
+static inline uint16_t
+mavlink_msg_video_stream_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                            mavlink_message_t *msg,
+                                            const mavlink_video_stream_status_t *video_stream_status) {
+    return mavlink_msg_video_stream_status_pack_chan(system_id, component_id, chan, msg,
+                                                     video_stream_status->stream_id,
+                                                     video_stream_status->flags,
+                                                     video_stream_status->framerate,
+                                                     video_stream_status->resolution_h,
+                                                     video_stream_status->resolution_v,
+                                                     video_stream_status->bitrate,
+                                                     video_stream_status->rotation,
+                                                     video_stream_status->hfov);
 }
 
 /**
@@ -288,9 +318,8 @@ static inline void mavlink_msg_video_stream_status_send_buf(mavlink_message_t *m
  *
  * @return  Video Stream ID (1 for first, 2 for second, etc.)
  */
-static inline uint8_t mavlink_msg_video_stream_status_get_stream_id(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  18);
+static inline uint8_t mavlink_msg_video_stream_status_get_stream_id(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 18);
 }
 
 /**
@@ -298,9 +327,8 @@ static inline uint8_t mavlink_msg_video_stream_status_get_stream_id(const mavlin
  *
  * @return  Bitmap of stream status flags
  */
-static inline uint16_t mavlink_msg_video_stream_status_get_flags(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  8);
+static inline uint16_t mavlink_msg_video_stream_status_get_flags(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 8);
 }
 
 /**
@@ -308,9 +336,8 @@ static inline uint16_t mavlink_msg_video_stream_status_get_flags(const mavlink_m
  *
  * @return [Hz] Frame rate
  */
-static inline float mavlink_msg_video_stream_status_get_framerate(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_video_stream_status_get_framerate(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -318,9 +345,9 @@ static inline float mavlink_msg_video_stream_status_get_framerate(const mavlink_
  *
  * @return [pix] Horizontal resolution
  */
-static inline uint16_t mavlink_msg_video_stream_status_get_resolution_h(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  10);
+static inline uint16_t
+mavlink_msg_video_stream_status_get_resolution_h(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 10);
 }
 
 /**
@@ -328,9 +355,9 @@ static inline uint16_t mavlink_msg_video_stream_status_get_resolution_h(const ma
  *
  * @return [pix] Vertical resolution
  */
-static inline uint16_t mavlink_msg_video_stream_status_get_resolution_v(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  12);
+static inline uint16_t
+mavlink_msg_video_stream_status_get_resolution_v(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 12);
 }
 
 /**
@@ -338,9 +365,8 @@ static inline uint16_t mavlink_msg_video_stream_status_get_resolution_v(const ma
  *
  * @return [bits/s] Bit rate
  */
-static inline uint32_t mavlink_msg_video_stream_status_get_bitrate(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  4);
+static inline uint32_t mavlink_msg_video_stream_status_get_bitrate(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 4);
 }
 
 /**
@@ -348,9 +374,8 @@ static inline uint32_t mavlink_msg_video_stream_status_get_bitrate(const mavlink
  *
  * @return [deg] Video image rotation clockwise
  */
-static inline uint16_t mavlink_msg_video_stream_status_get_rotation(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  14);
+static inline uint16_t mavlink_msg_video_stream_status_get_rotation(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 14);
 }
 
 /**
@@ -358,9 +383,8 @@ static inline uint16_t mavlink_msg_video_stream_status_get_rotation(const mavlin
  *
  * @return [deg] Horizontal Field of view
  */
-static inline uint16_t mavlink_msg_video_stream_status_get_hfov(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  16);
+static inline uint16_t mavlink_msg_video_stream_status_get_hfov(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 16);
 }
 
 /**
@@ -369,8 +393,8 @@ static inline uint16_t mavlink_msg_video_stream_status_get_hfov(const mavlink_me
  * @param msg The message to decode
  * @param video_stream_status C-struct to decode the message contents into
  */
-static inline void mavlink_msg_video_stream_status_decode(const mavlink_message_t* msg, mavlink_video_stream_status_t* video_stream_status)
-{
+static inline void mavlink_msg_video_stream_status_decode(const mavlink_message_t *msg,
+                                                          mavlink_video_stream_status_t *video_stream_status) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     video_stream_status->framerate = mavlink_msg_video_stream_status_get_framerate(msg);
     video_stream_status->bitrate = mavlink_msg_video_stream_status_get_bitrate(msg);
@@ -381,8 +405,9 @@ static inline void mavlink_msg_video_stream_status_decode(const mavlink_message_
     video_stream_status->hfov = mavlink_msg_video_stream_status_get_hfov(msg);
     video_stream_status->stream_id = mavlink_msg_video_stream_status_get_stream_id(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN? msg->len : MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN;
-        memset(video_stream_status, 0, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN ? msg->len
+                                                                    : MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN;
+    memset(video_stream_status, 0, MAVLINK_MSG_ID_VIDEO_STREAM_STATUS_LEN);
     memcpy(video_stream_status, _MAV_PAYLOAD(msg), len);
 #endif
 }

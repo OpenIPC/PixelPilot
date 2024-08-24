@@ -4,19 +4,19 @@
 #define MAVLINK_MSG_ID_DISTANCE_SENSOR 132
 
 MAVPACKED(
-typedef struct __mavlink_distance_sensor_t {
- uint32_t time_boot_ms; /*< [ms] Timestamp (time since system boot).*/
- uint16_t min_distance; /*< [cm] Minimum distance the sensor can measure*/
- uint16_t max_distance; /*< [cm] Maximum distance the sensor can measure*/
- uint16_t current_distance; /*< [cm] Current distance reading*/
- uint8_t type; /*<  Type of distance sensor.*/
- uint8_t id; /*<  Onboard ID of the sensor*/
- uint8_t orientation; /*<  Direction the sensor faces. downward-facing: ROTATION_PITCH_270, upward-facing: ROTATION_PITCH_90, backward-facing: ROTATION_PITCH_180, forward-facing: ROTATION_NONE, left-facing: ROTATION_YAW_90, right-facing: ROTATION_YAW_270*/
- uint8_t covariance; /*< [cm] Measurement covariance, 0 for unknown / invalid readings*/
- float horizontal_fov; /*< [rad] Horizontal Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
- float vertical_fov; /*< [rad] Vertical Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
- float quaternion[4]; /*<  Quaternion of the sensor orientation in vehicle body frame (w, x, y, z order, zero-rotation is 1, 0, 0, 0). Zero-rotation is along the vehicle body x-axis. This field is required if the orientation is set to MAV_SENSOR_ROTATION_CUSTOM. Set it to 0 if invalid."*/
-}) mavlink_distance_sensor_t;
+        typedef struct __mavlink_distance_sensor_t {
+            uint32_t time_boot_ms; /*< [ms] Timestamp (time since system boot).*/
+            uint16_t min_distance; /*< [cm] Minimum distance the sensor can measure*/
+            uint16_t max_distance; /*< [cm] Maximum distance the sensor can measure*/
+            uint16_t current_distance; /*< [cm] Current distance reading*/
+            uint8_t type; /*<  Type of distance sensor.*/
+            uint8_t id; /*<  Onboard ID of the sensor*/
+            uint8_t orientation; /*<  Direction the sensor faces. downward-facing: ROTATION_PITCH_270, upward-facing: ROTATION_PITCH_90, backward-facing: ROTATION_PITCH_180, forward-facing: ROTATION_NONE, left-facing: ROTATION_YAW_90, right-facing: ROTATION_YAW_270*/
+            uint8_t covariance; /*< [cm] Measurement covariance, 0 for unknown / invalid readings*/
+            float horizontal_fov; /*< [rad] Horizontal Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
+            float vertical_fov; /*< [rad] Vertical Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
+            float quaternion[4]; /*<  Quaternion of the sensor orientation in vehicle body frame (w, x, y, z order, zero-rotation is 1, 0, 0, 0). Zero-rotation is along the vehicle body x-axis. This field is required if the orientation is set to MAV_SENSOR_ROTATION_CUSTOM. Set it to 0 if invalid."*/
+        }) mavlink_distance_sensor_t;
 
 #define MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN 38
 #define MAVLINK_MSG_ID_DISTANCE_SENSOR_MIN_LEN 14
@@ -84,9 +84,13 @@ typedef struct __mavlink_distance_sensor_t {
  * @param quaternion  Quaternion of the sensor orientation in vehicle body frame (w, x, y, z order, zero-rotation is 1, 0, 0, 0). Zero-rotation is along the vehicle body x-axis. This field is required if the orientation is set to MAV_SENSOR_ROTATION_CUSTOM. Set it to 0 if invalid."
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_distance_sensor_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint32_t time_boot_ms, uint16_t min_distance, uint16_t max_distance, uint16_t current_distance, uint8_t type, uint8_t id, uint8_t orientation, uint8_t covariance, float horizontal_fov, float vertical_fov, const float *quaternion)
-{
+static inline uint16_t
+mavlink_msg_distance_sensor_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                 uint32_t time_boot_ms, uint16_t min_distance,
+                                 uint16_t max_distance, uint16_t current_distance, uint8_t type,
+                                 uint8_t id, uint8_t orientation, uint8_t covariance,
+                                 float horizontal_fov, float vertical_fov,
+                                 const float *quaternion) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN];
     _mav_put_uint32_t(buf, 0, time_boot_ms);
@@ -113,12 +117,15 @@ static inline uint16_t mavlink_msg_distance_sensor_pack(uint8_t system_id, uint8
     packet.covariance = covariance;
     packet.horizontal_fov = horizontal_fov;
     packet.vertical_fov = vertical_fov;
-    mav_array_memcpy(packet.quaternion, quaternion, sizeof(float)*4);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN);
+    mav_array_memcpy(packet.quaternion, quaternion, sizeof(float) * 4);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_DISTANCE_SENSOR;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_DISTANCE_SENSOR_MIN_LEN, MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN, MAVLINK_MSG_ID_DISTANCE_SENSOR_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_DISTANCE_SENSOR_MIN_LEN,
+                                    MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN,
+                                    MAVLINK_MSG_ID_DISTANCE_SENSOR_CRC);
 }
 
 /**
@@ -140,10 +147,14 @@ static inline uint16_t mavlink_msg_distance_sensor_pack(uint8_t system_id, uint8
  * @param quaternion  Quaternion of the sensor orientation in vehicle body frame (w, x, y, z order, zero-rotation is 1, 0, 0, 0). Zero-rotation is along the vehicle body x-axis. This field is required if the orientation is set to MAV_SENSOR_ROTATION_CUSTOM. Set it to 0 if invalid."
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_distance_sensor_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint32_t time_boot_ms,uint16_t min_distance,uint16_t max_distance,uint16_t current_distance,uint8_t type,uint8_t id,uint8_t orientation,uint8_t covariance,float horizontal_fov,float vertical_fov,const float *quaternion)
-{
+static inline uint16_t
+mavlink_msg_distance_sensor_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                      mavlink_message_t *msg,
+                                      uint32_t time_boot_ms, uint16_t min_distance,
+                                      uint16_t max_distance, uint16_t current_distance,
+                                      uint8_t type, uint8_t id, uint8_t orientation,
+                                      uint8_t covariance, float horizontal_fov, float vertical_fov,
+                                      const float *quaternion) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN];
     _mav_put_uint32_t(buf, 0, time_boot_ms);
@@ -170,12 +181,15 @@ static inline uint16_t mavlink_msg_distance_sensor_pack_chan(uint8_t system_id, 
     packet.covariance = covariance;
     packet.horizontal_fov = horizontal_fov;
     packet.vertical_fov = vertical_fov;
-    mav_array_memcpy(packet.quaternion, quaternion, sizeof(float)*4);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN);
+    mav_array_memcpy(packet.quaternion, quaternion, sizeof(float) * 4);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_DISTANCE_SENSOR;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_DISTANCE_SENSOR_MIN_LEN, MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN, MAVLINK_MSG_ID_DISTANCE_SENSOR_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_DISTANCE_SENSOR_MIN_LEN,
+                                         MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN,
+                                         MAVLINK_MSG_ID_DISTANCE_SENSOR_CRC);
 }
 
 /**
@@ -186,9 +200,20 @@ static inline uint16_t mavlink_msg_distance_sensor_pack_chan(uint8_t system_id, 
  * @param msg The MAVLink message to compress the data into
  * @param distance_sensor C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_distance_sensor_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_distance_sensor_t* distance_sensor)
-{
-    return mavlink_msg_distance_sensor_pack(system_id, component_id, msg, distance_sensor->time_boot_ms, distance_sensor->min_distance, distance_sensor->max_distance, distance_sensor->current_distance, distance_sensor->type, distance_sensor->id, distance_sensor->orientation, distance_sensor->covariance, distance_sensor->horizontal_fov, distance_sensor->vertical_fov, distance_sensor->quaternion);
+static inline uint16_t
+mavlink_msg_distance_sensor_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                   const mavlink_distance_sensor_t *distance_sensor) {
+    return mavlink_msg_distance_sensor_pack(system_id, component_id, msg,
+                                            distance_sensor->time_boot_ms,
+                                            distance_sensor->min_distance,
+                                            distance_sensor->max_distance,
+                                            distance_sensor->current_distance,
+                                            distance_sensor->type, distance_sensor->id,
+                                            distance_sensor->orientation,
+                                            distance_sensor->covariance,
+                                            distance_sensor->horizontal_fov,
+                                            distance_sensor->vertical_fov,
+                                            distance_sensor->quaternion);
 }
 
 /**
@@ -200,9 +225,21 @@ static inline uint16_t mavlink_msg_distance_sensor_encode(uint8_t system_id, uin
  * @param msg The MAVLink message to compress the data into
  * @param distance_sensor C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_distance_sensor_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_distance_sensor_t* distance_sensor)
-{
-    return mavlink_msg_distance_sensor_pack_chan(system_id, component_id, chan, msg, distance_sensor->time_boot_ms, distance_sensor->min_distance, distance_sensor->max_distance, distance_sensor->current_distance, distance_sensor->type, distance_sensor->id, distance_sensor->orientation, distance_sensor->covariance, distance_sensor->horizontal_fov, distance_sensor->vertical_fov, distance_sensor->quaternion);
+static inline uint16_t
+mavlink_msg_distance_sensor_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                        mavlink_message_t *msg,
+                                        const mavlink_distance_sensor_t *distance_sensor) {
+    return mavlink_msg_distance_sensor_pack_chan(system_id, component_id, chan, msg,
+                                                 distance_sensor->time_boot_ms,
+                                                 distance_sensor->min_distance,
+                                                 distance_sensor->max_distance,
+                                                 distance_sensor->current_distance,
+                                                 distance_sensor->type, distance_sensor->id,
+                                                 distance_sensor->orientation,
+                                                 distance_sensor->covariance,
+                                                 distance_sensor->horizontal_fov,
+                                                 distance_sensor->vertical_fov,
+                                                 distance_sensor->quaternion);
 }
 
 /**
@@ -322,9 +359,8 @@ static inline void mavlink_msg_distance_sensor_send_buf(mavlink_message_t *msgbu
  *
  * @return [ms] Timestamp (time since system boot).
  */
-static inline uint32_t mavlink_msg_distance_sensor_get_time_boot_ms(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  0);
+static inline uint32_t mavlink_msg_distance_sensor_get_time_boot_ms(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 0);
 }
 
 /**
@@ -332,9 +368,8 @@ static inline uint32_t mavlink_msg_distance_sensor_get_time_boot_ms(const mavlin
  *
  * @return [cm] Minimum distance the sensor can measure
  */
-static inline uint16_t mavlink_msg_distance_sensor_get_min_distance(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  4);
+static inline uint16_t mavlink_msg_distance_sensor_get_min_distance(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 4);
 }
 
 /**
@@ -342,9 +377,8 @@ static inline uint16_t mavlink_msg_distance_sensor_get_min_distance(const mavlin
  *
  * @return [cm] Maximum distance the sensor can measure
  */
-static inline uint16_t mavlink_msg_distance_sensor_get_max_distance(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  6);
+static inline uint16_t mavlink_msg_distance_sensor_get_max_distance(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 6);
 }
 
 /**
@@ -352,9 +386,9 @@ static inline uint16_t mavlink_msg_distance_sensor_get_max_distance(const mavlin
  *
  * @return [cm] Current distance reading
  */
-static inline uint16_t mavlink_msg_distance_sensor_get_current_distance(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  8);
+static inline uint16_t
+mavlink_msg_distance_sensor_get_current_distance(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 8);
 }
 
 /**
@@ -362,9 +396,8 @@ static inline uint16_t mavlink_msg_distance_sensor_get_current_distance(const ma
  *
  * @return  Type of distance sensor.
  */
-static inline uint8_t mavlink_msg_distance_sensor_get_type(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  10);
+static inline uint8_t mavlink_msg_distance_sensor_get_type(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 10);
 }
 
 /**
@@ -372,9 +405,8 @@ static inline uint8_t mavlink_msg_distance_sensor_get_type(const mavlink_message
  *
  * @return  Onboard ID of the sensor
  */
-static inline uint8_t mavlink_msg_distance_sensor_get_id(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  11);
+static inline uint8_t mavlink_msg_distance_sensor_get_id(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 11);
 }
 
 /**
@@ -382,9 +414,8 @@ static inline uint8_t mavlink_msg_distance_sensor_get_id(const mavlink_message_t
  *
  * @return  Direction the sensor faces. downward-facing: ROTATION_PITCH_270, upward-facing: ROTATION_PITCH_90, backward-facing: ROTATION_PITCH_180, forward-facing: ROTATION_NONE, left-facing: ROTATION_YAW_90, right-facing: ROTATION_YAW_270
  */
-static inline uint8_t mavlink_msg_distance_sensor_get_orientation(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  12);
+static inline uint8_t mavlink_msg_distance_sensor_get_orientation(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 12);
 }
 
 /**
@@ -392,9 +423,8 @@ static inline uint8_t mavlink_msg_distance_sensor_get_orientation(const mavlink_
  *
  * @return [cm] Measurement covariance, 0 for unknown / invalid readings
  */
-static inline uint8_t mavlink_msg_distance_sensor_get_covariance(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  13);
+static inline uint8_t mavlink_msg_distance_sensor_get_covariance(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 13);
 }
 
 /**
@@ -402,9 +432,8 @@ static inline uint8_t mavlink_msg_distance_sensor_get_covariance(const mavlink_m
  *
  * @return [rad] Horizontal Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.
  */
-static inline float mavlink_msg_distance_sensor_get_horizontal_fov(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  14);
+static inline float mavlink_msg_distance_sensor_get_horizontal_fov(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 14);
 }
 
 /**
@@ -412,9 +441,8 @@ static inline float mavlink_msg_distance_sensor_get_horizontal_fov(const mavlink
  *
  * @return [rad] Vertical Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.
  */
-static inline float mavlink_msg_distance_sensor_get_vertical_fov(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  18);
+static inline float mavlink_msg_distance_sensor_get_vertical_fov(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 18);
 }
 
 /**
@@ -422,9 +450,9 @@ static inline float mavlink_msg_distance_sensor_get_vertical_fov(const mavlink_m
  *
  * @return  Quaternion of the sensor orientation in vehicle body frame (w, x, y, z order, zero-rotation is 1, 0, 0, 0). Zero-rotation is along the vehicle body x-axis. This field is required if the orientation is set to MAV_SENSOR_ROTATION_CUSTOM. Set it to 0 if invalid."
  */
-static inline uint16_t mavlink_msg_distance_sensor_get_quaternion(const mavlink_message_t* msg, float *quaternion)
-{
-    return _MAV_RETURN_float_array(msg, quaternion, 4,  22);
+static inline uint16_t
+mavlink_msg_distance_sensor_get_quaternion(const mavlink_message_t *msg, float *quaternion) {
+    return _MAV_RETURN_float_array(msg, quaternion, 4, 22);
 }
 
 /**
@@ -433,8 +461,8 @@ static inline uint16_t mavlink_msg_distance_sensor_get_quaternion(const mavlink_
  * @param msg The message to decode
  * @param distance_sensor C-struct to decode the message contents into
  */
-static inline void mavlink_msg_distance_sensor_decode(const mavlink_message_t* msg, mavlink_distance_sensor_t* distance_sensor)
-{
+static inline void mavlink_msg_distance_sensor_decode(const mavlink_message_t *msg,
+                                                      mavlink_distance_sensor_t *distance_sensor) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     distance_sensor->time_boot_ms = mavlink_msg_distance_sensor_get_time_boot_ms(msg);
     distance_sensor->min_distance = mavlink_msg_distance_sensor_get_min_distance(msg);
@@ -448,8 +476,9 @@ static inline void mavlink_msg_distance_sensor_decode(const mavlink_message_t* m
     distance_sensor->vertical_fov = mavlink_msg_distance_sensor_get_vertical_fov(msg);
     mavlink_msg_distance_sensor_get_quaternion(msg, distance_sensor->quaternion);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN? msg->len : MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN;
-        memset(distance_sensor, 0, MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN ? msg->len
+                                                                : MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN;
+    memset(distance_sensor, 0, MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN);
     memcpy(distance_sensor, _MAV_PAYLOAD(msg), len);
 #endif
 }

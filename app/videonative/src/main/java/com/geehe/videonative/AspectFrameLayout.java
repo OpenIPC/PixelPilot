@@ -21,13 +21,18 @@ public class AspectFrameLayout extends FrameLayout {
         super(context, attrs);
     }
 
+    @SuppressWarnings({"EmptyMethod", "unused"})
+    private static void Debug(final String s) {
+        //Log.d(TAG,s);
+    }
+
     /**
      * Sets the desired aspect ratio.  The value is <code>width / height</code>.
      */
     public void setAspectRatio(double aspectRatio) {
         if (aspectRatio < 0) {
             //throw new IllegalArgumentException();
-            aspectRatio=1.0f;
+            aspectRatio = 1.0f;
         }
         Debug("Setting aspect ratio to " + aspectRatio + " (was " + mTargetAspect + ")");
         if (mTargetAspect != aspectRatio) {
@@ -38,7 +43,7 @@ public class AspectFrameLayout extends FrameLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Debug( "onMeasure target=" + mTargetAspect +
+        Debug("onMeasure target=" + mTargetAspect +
                 " width=[" + MeasureSpec.toString(widthMeasureSpec) +
                 "] height=[" + MeasureSpec.toString(heightMeasureSpec) + "]");
 
@@ -61,7 +66,7 @@ public class AspectFrameLayout extends FrameLayout {
                 // We're very close already.  We don't want to risk switching from e.g. non-scaled
                 // 1280x720 to scaled 1280x719 because of some floating-point round-off error,
                 // so if we're really close just leave it alone.
-                Debug( "aspect ratio is good (target=" + mTargetAspect +
+                Debug("aspect ratio is good (target=" + mTargetAspect +
                         ", view=" + initialWidth + "x" + initialHeight + ")");
             } else {
                 if (aspectDiff > 0) {
@@ -71,7 +76,7 @@ public class AspectFrameLayout extends FrameLayout {
                     // limited by short height; restrict width
                     initialWidth = (int) (initialHeight * mTargetAspect);
                 }
-                Debug( "new size=" + initialWidth + "x" + initialHeight + " + padding " +
+                Debug("new size=" + initialWidth + "x" + initialHeight + " + padding " +
                         horizPadding + "x" + vertPadding);
                 initialWidth += horizPadding;
                 initialHeight += vertPadding;
@@ -83,11 +88,5 @@ public class AspectFrameLayout extends FrameLayout {
         Debug("set width=[" + MeasureSpec.toString(widthMeasureSpec) +
                 "] height=[" + MeasureSpec.toString(heightMeasureSpec) + "]");
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    }
-
-
-    @SuppressWarnings({"EmptyMethod", "unused"})
-    private static void Debug(final String s){
-        //Log.d(TAG,s);
     }
 }

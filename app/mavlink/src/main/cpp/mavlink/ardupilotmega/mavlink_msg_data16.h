@@ -4,11 +4,13 @@
 #define MAVLINK_MSG_ID_DATA16 169
 
 MAVPACKED(
-typedef struct __mavlink_data16_t {
- uint8_t type; /*<  Data type.*/
- uint8_t len; /*< [bytes] Data length.*/
- uint8_t data[16]; /*<  Raw data.*/
-}) mavlink_data16_t;
+        typedef struct __mavlink_data16_t {
+            uint8_t type; /*<  Data type.*/
+            uint8_t len; /*< [bytes] Data length.*/
+            uint8_t data[16]; /*<  Raw data.*/
+        })
+
+mavlink_data16_t;
 
 #define MAVLINK_MSG_ID_DATA16_LEN 18
 #define MAVLINK_MSG_ID_DATA16_MIN_LEN 18
@@ -52,15 +54,15 @@ typedef struct __mavlink_data16_t {
  * @param data  Raw data.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_data16_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t type, uint8_t len, const uint8_t *data)
-{
+static inline uint16_t
+mavlink_msg_data16_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                        uint8_t type, uint8_t len, const uint8_t *data) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_DATA16_LEN];
     _mav_put_uint8_t(buf, 0, type);
     _mav_put_uint8_t(buf, 1, len);
     _mav_put_uint8_t_array(buf, 2, data, 16);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DATA16_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DATA16_LEN);
 #else
     mavlink_data16_t packet;
     packet.type = type;
@@ -70,7 +72,8 @@ static inline uint16_t mavlink_msg_data16_pack(uint8_t system_id, uint8_t compon
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_DATA16;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_DATA16_MIN_LEN, MAVLINK_MSG_ID_DATA16_LEN, MAVLINK_MSG_ID_DATA16_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_DATA16_MIN_LEN,
+                                    MAVLINK_MSG_ID_DATA16_LEN, MAVLINK_MSG_ID_DATA16_CRC);
 }
 
 /**
@@ -84,16 +87,16 @@ static inline uint16_t mavlink_msg_data16_pack(uint8_t system_id, uint8_t compon
  * @param data  Raw data.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_data16_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t type,uint8_t len,const uint8_t *data)
-{
+static inline uint16_t
+mavlink_msg_data16_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                             mavlink_message_t *msg,
+                             uint8_t type, uint8_t len, const uint8_t *data) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_DATA16_LEN];
     _mav_put_uint8_t(buf, 0, type);
     _mav_put_uint8_t(buf, 1, len);
     _mav_put_uint8_t_array(buf, 2, data, 16);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DATA16_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DATA16_LEN);
 #else
     mavlink_data16_t packet;
     packet.type = type;
@@ -103,7 +106,9 @@ static inline uint16_t mavlink_msg_data16_pack_chan(uint8_t system_id, uint8_t c
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_DATA16;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_DATA16_MIN_LEN, MAVLINK_MSG_ID_DATA16_LEN, MAVLINK_MSG_ID_DATA16_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_DATA16_MIN_LEN, MAVLINK_MSG_ID_DATA16_LEN,
+                                         MAVLINK_MSG_ID_DATA16_CRC);
 }
 
 /**
@@ -114,9 +119,11 @@ static inline uint16_t mavlink_msg_data16_pack_chan(uint8_t system_id, uint8_t c
  * @param msg The MAVLink message to compress the data into
  * @param data16 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_data16_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_data16_t* data16)
-{
-    return mavlink_msg_data16_pack(system_id, component_id, msg, data16->type, data16->len, data16->data);
+static inline uint16_t
+mavlink_msg_data16_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                          const mavlink_data16_t *data16) {
+    return mavlink_msg_data16_pack(system_id, component_id, msg, data16->type, data16->len,
+                                   data16->data);
 }
 
 /**
@@ -128,9 +135,11 @@ static inline uint16_t mavlink_msg_data16_encode(uint8_t system_id, uint8_t comp
  * @param msg The MAVLink message to compress the data into
  * @param data16 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_data16_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_data16_t* data16)
-{
-    return mavlink_msg_data16_pack_chan(system_id, component_id, chan, msg, data16->type, data16->len, data16->data);
+static inline uint16_t
+mavlink_msg_data16_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                               mavlink_message_t *msg, const mavlink_data16_t *data16) {
+    return mavlink_msg_data16_pack_chan(system_id, component_id, chan, msg, data16->type,
+                                        data16->len, data16->data);
 }
 
 /**
@@ -210,9 +219,8 @@ static inline void mavlink_msg_data16_send_buf(mavlink_message_t *msgbuf, mavlin
  *
  * @return  Data type.
  */
-static inline uint8_t mavlink_msg_data16_get_type(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  0);
+static inline uint8_t mavlink_msg_data16_get_type(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 0);
 }
 
 /**
@@ -220,9 +228,8 @@ static inline uint8_t mavlink_msg_data16_get_type(const mavlink_message_t* msg)
  *
  * @return [bytes] Data length.
  */
-static inline uint8_t mavlink_msg_data16_get_len(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  1);
+static inline uint8_t mavlink_msg_data16_get_len(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 1);
 }
 
 /**
@@ -230,9 +237,8 @@ static inline uint8_t mavlink_msg_data16_get_len(const mavlink_message_t* msg)
  *
  * @return  Raw data.
  */
-static inline uint16_t mavlink_msg_data16_get_data(const mavlink_message_t* msg, uint8_t *data)
-{
-    return _MAV_RETURN_uint8_t_array(msg, data, 16,  2);
+static inline uint16_t mavlink_msg_data16_get_data(const mavlink_message_t *msg, uint8_t *data) {
+    return _MAV_RETURN_uint8_t_array(msg, data, 16, 2);
 }
 
 /**
@@ -241,15 +247,15 @@ static inline uint16_t mavlink_msg_data16_get_data(const mavlink_message_t* msg,
  * @param msg The message to decode
  * @param data16 C-struct to decode the message contents into
  */
-static inline void mavlink_msg_data16_decode(const mavlink_message_t* msg, mavlink_data16_t* data16)
-{
+static inline void
+mavlink_msg_data16_decode(const mavlink_message_t *msg, mavlink_data16_t *data16) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     data16->type = mavlink_msg_data16_get_type(msg);
     data16->len = mavlink_msg_data16_get_len(msg);
     mavlink_msg_data16_get_data(msg, data16->data);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_DATA16_LEN? msg->len : MAVLINK_MSG_ID_DATA16_LEN;
-        memset(data16, 0, MAVLINK_MSG_ID_DATA16_LEN);
-    memcpy(data16, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_DATA16_LEN? msg->len : MAVLINK_MSG_ID_DATA16_LEN;
+    memset(data16, 0, MAVLINK_MSG_ID_DATA16_LEN);
+memcpy(data16, _MAV_PAYLOAD(msg), len);
 #endif
 }

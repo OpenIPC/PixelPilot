@@ -4,17 +4,19 @@
 #define MAVLINK_MSG_ID_LIMITS_STATUS 167
 
 MAVPACKED(
-typedef struct __mavlink_limits_status_t {
- uint32_t last_trigger; /*< [ms] Time (since boot) of last breach.*/
- uint32_t last_action; /*< [ms] Time (since boot) of last recovery action.*/
- uint32_t last_recovery; /*< [ms] Time (since boot) of last successful recovery.*/
- uint32_t last_clear; /*< [ms] Time (since boot) of last all-clear.*/
- uint16_t breach_count; /*<  Number of fence breaches.*/
- uint8_t limits_state; /*<  State of AP_Limits.*/
- uint8_t mods_enabled; /*<  AP_Limit_Module bitfield of enabled modules.*/
- uint8_t mods_required; /*<  AP_Limit_Module bitfield of required modules.*/
- uint8_t mods_triggered; /*<  AP_Limit_Module bitfield of triggered modules.*/
-}) mavlink_limits_status_t;
+        typedef struct __mavlink_limits_status_t {
+            uint32_t last_trigger; /*< [ms] Time (since boot) of last breach.*/
+            uint32_t last_action; /*< [ms] Time (since boot) of last recovery action.*/
+            uint32_t last_recovery; /*< [ms] Time (since boot) of last successful recovery.*/
+            uint32_t last_clear; /*< [ms] Time (since boot) of last all-clear.*/
+            uint16_t breach_count; /*<  Number of fence breaches.*/
+            uint8_t limits_state; /*<  State of AP_Limits.*/
+            uint8_t mods_enabled; /*<  AP_Limit_Module bitfield of enabled modules.*/
+            uint8_t mods_required; /*<  AP_Limit_Module bitfield of required modules.*/
+            uint8_t mods_triggered; /*<  AP_Limit_Module bitfield of triggered modules.*/
+        })
+
+mavlink_limits_status_t;
 
 #define MAVLINK_MSG_ID_LIMITS_STATUS_LEN 22
 #define MAVLINK_MSG_ID_LIMITS_STATUS_MIN_LEN 22
@@ -23,7 +25,6 @@ typedef struct __mavlink_limits_status_t {
 
 #define MAVLINK_MSG_ID_LIMITS_STATUS_CRC 144
 #define MAVLINK_MSG_ID_167_CRC 144
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -76,9 +77,12 @@ typedef struct __mavlink_limits_status_t {
  * @param mods_triggered  AP_Limit_Module bitfield of triggered modules.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_limits_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t limits_state, uint32_t last_trigger, uint32_t last_action, uint32_t last_recovery, uint32_t last_clear, uint16_t breach_count, uint8_t mods_enabled, uint8_t mods_required, uint8_t mods_triggered)
-{
+static inline uint16_t
+mavlink_msg_limits_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                               uint8_t limits_state, uint32_t last_trigger, uint32_t last_action,
+                               uint32_t last_recovery, uint32_t last_clear, uint16_t breach_count,
+                               uint8_t mods_enabled, uint8_t mods_required,
+                               uint8_t mods_triggered) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_LIMITS_STATUS_LEN];
     _mav_put_uint32_t(buf, 0, last_trigger);
@@ -91,7 +95,7 @@ static inline uint16_t mavlink_msg_limits_status_pack(uint8_t system_id, uint8_t
     _mav_put_uint8_t(buf, 20, mods_required);
     _mav_put_uint8_t(buf, 21, mods_triggered);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_LIMITS_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_LIMITS_STATUS_LEN);
 #else
     mavlink_limits_status_t packet;
     packet.last_trigger = last_trigger;
@@ -108,7 +112,10 @@ static inline uint16_t mavlink_msg_limits_status_pack(uint8_t system_id, uint8_t
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_LIMITS_STATUS;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_LIMITS_STATUS_MIN_LEN, MAVLINK_MSG_ID_LIMITS_STATUS_LEN, MAVLINK_MSG_ID_LIMITS_STATUS_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_LIMITS_STATUS_MIN_LEN,
+                                    MAVLINK_MSG_ID_LIMITS_STATUS_LEN,
+                                    MAVLINK_MSG_ID_LIMITS_STATUS_CRC);
 }
 
 /**
@@ -128,10 +135,14 @@ static inline uint16_t mavlink_msg_limits_status_pack(uint8_t system_id, uint8_t
  * @param mods_triggered  AP_Limit_Module bitfield of triggered modules.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_limits_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t limits_state,uint32_t last_trigger,uint32_t last_action,uint32_t last_recovery,uint32_t last_clear,uint16_t breach_count,uint8_t mods_enabled,uint8_t mods_required,uint8_t mods_triggered)
-{
+static inline uint16_t
+mavlink_msg_limits_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                    mavlink_message_t *msg,
+                                    uint8_t limits_state, uint32_t last_trigger,
+                                    uint32_t last_action, uint32_t last_recovery,
+                                    uint32_t last_clear, uint16_t breach_count,
+                                    uint8_t mods_enabled, uint8_t mods_required,
+                                    uint8_t mods_triggered) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_LIMITS_STATUS_LEN];
     _mav_put_uint32_t(buf, 0, last_trigger);
@@ -144,7 +155,7 @@ static inline uint16_t mavlink_msg_limits_status_pack_chan(uint8_t system_id, ui
     _mav_put_uint8_t(buf, 20, mods_required);
     _mav_put_uint8_t(buf, 21, mods_triggered);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_LIMITS_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_LIMITS_STATUS_LEN);
 #else
     mavlink_limits_status_t packet;
     packet.last_trigger = last_trigger;
@@ -161,7 +172,10 @@ static inline uint16_t mavlink_msg_limits_status_pack_chan(uint8_t system_id, ui
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_LIMITS_STATUS;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_LIMITS_STATUS_MIN_LEN, MAVLINK_MSG_ID_LIMITS_STATUS_LEN, MAVLINK_MSG_ID_LIMITS_STATUS_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_LIMITS_STATUS_MIN_LEN,
+                                         MAVLINK_MSG_ID_LIMITS_STATUS_LEN,
+                                         MAVLINK_MSG_ID_LIMITS_STATUS_CRC);
 }
 
 /**
@@ -172,9 +186,15 @@ static inline uint16_t mavlink_msg_limits_status_pack_chan(uint8_t system_id, ui
  * @param msg The MAVLink message to compress the data into
  * @param limits_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_limits_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_limits_status_t* limits_status)
-{
-    return mavlink_msg_limits_status_pack(system_id, component_id, msg, limits_status->limits_state, limits_status->last_trigger, limits_status->last_action, limits_status->last_recovery, limits_status->last_clear, limits_status->breach_count, limits_status->mods_enabled, limits_status->mods_required, limits_status->mods_triggered);
+static inline uint16_t
+mavlink_msg_limits_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                 const mavlink_limits_status_t *limits_status) {
+    return mavlink_msg_limits_status_pack(system_id, component_id, msg, limits_status->limits_state,
+                                          limits_status->last_trigger, limits_status->last_action,
+                                          limits_status->last_recovery, limits_status->last_clear,
+                                          limits_status->breach_count, limits_status->mods_enabled,
+                                          limits_status->mods_required,
+                                          limits_status->mods_triggered);
 }
 
 /**
@@ -186,9 +206,20 @@ static inline uint16_t mavlink_msg_limits_status_encode(uint8_t system_id, uint8
  * @param msg The MAVLink message to compress the data into
  * @param limits_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_limits_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_limits_status_t* limits_status)
-{
-    return mavlink_msg_limits_status_pack_chan(system_id, component_id, chan, msg, limits_status->limits_state, limits_status->last_trigger, limits_status->last_action, limits_status->last_recovery, limits_status->last_clear, limits_status->breach_count, limits_status->mods_enabled, limits_status->mods_required, limits_status->mods_triggered);
+static inline uint16_t
+mavlink_msg_limits_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                      mavlink_message_t *msg,
+                                      const mavlink_limits_status_t *limits_status) {
+    return mavlink_msg_limits_status_pack_chan(system_id, component_id, chan, msg,
+                                               limits_status->limits_state,
+                                               limits_status->last_trigger,
+                                               limits_status->last_action,
+                                               limits_status->last_recovery,
+                                               limits_status->last_clear,
+                                               limits_status->breach_count,
+                                               limits_status->mods_enabled,
+                                               limits_status->mods_required,
+                                               limits_status->mods_triggered);
 }
 
 /**
@@ -302,9 +333,8 @@ static inline void mavlink_msg_limits_status_send_buf(mavlink_message_t *msgbuf,
  *
  * @return  State of AP_Limits.
  */
-static inline uint8_t mavlink_msg_limits_status_get_limits_state(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  18);
+static inline uint8_t mavlink_msg_limits_status_get_limits_state(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 18);
 }
 
 /**
@@ -312,9 +342,8 @@ static inline uint8_t mavlink_msg_limits_status_get_limits_state(const mavlink_m
  *
  * @return [ms] Time (since boot) of last breach.
  */
-static inline uint32_t mavlink_msg_limits_status_get_last_trigger(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  0);
+static inline uint32_t mavlink_msg_limits_status_get_last_trigger(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 0);
 }
 
 /**
@@ -322,9 +351,8 @@ static inline uint32_t mavlink_msg_limits_status_get_last_trigger(const mavlink_
  *
  * @return [ms] Time (since boot) of last recovery action.
  */
-static inline uint32_t mavlink_msg_limits_status_get_last_action(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  4);
+static inline uint32_t mavlink_msg_limits_status_get_last_action(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 4);
 }
 
 /**
@@ -332,9 +360,8 @@ static inline uint32_t mavlink_msg_limits_status_get_last_action(const mavlink_m
  *
  * @return [ms] Time (since boot) of last successful recovery.
  */
-static inline uint32_t mavlink_msg_limits_status_get_last_recovery(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  8);
+static inline uint32_t mavlink_msg_limits_status_get_last_recovery(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 8);
 }
 
 /**
@@ -342,9 +369,8 @@ static inline uint32_t mavlink_msg_limits_status_get_last_recovery(const mavlink
  *
  * @return [ms] Time (since boot) of last all-clear.
  */
-static inline uint32_t mavlink_msg_limits_status_get_last_clear(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  12);
+static inline uint32_t mavlink_msg_limits_status_get_last_clear(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 12);
 }
 
 /**
@@ -352,9 +378,8 @@ static inline uint32_t mavlink_msg_limits_status_get_last_clear(const mavlink_me
  *
  * @return  Number of fence breaches.
  */
-static inline uint16_t mavlink_msg_limits_status_get_breach_count(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  16);
+static inline uint16_t mavlink_msg_limits_status_get_breach_count(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 16);
 }
 
 /**
@@ -362,9 +387,8 @@ static inline uint16_t mavlink_msg_limits_status_get_breach_count(const mavlink_
  *
  * @return  AP_Limit_Module bitfield of enabled modules.
  */
-static inline uint8_t mavlink_msg_limits_status_get_mods_enabled(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  19);
+static inline uint8_t mavlink_msg_limits_status_get_mods_enabled(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 19);
 }
 
 /**
@@ -372,9 +396,8 @@ static inline uint8_t mavlink_msg_limits_status_get_mods_enabled(const mavlink_m
  *
  * @return  AP_Limit_Module bitfield of required modules.
  */
-static inline uint8_t mavlink_msg_limits_status_get_mods_required(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  20);
+static inline uint8_t mavlink_msg_limits_status_get_mods_required(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 20);
 }
 
 /**
@@ -382,9 +405,8 @@ static inline uint8_t mavlink_msg_limits_status_get_mods_required(const mavlink_
  *
  * @return  AP_Limit_Module bitfield of triggered modules.
  */
-static inline uint8_t mavlink_msg_limits_status_get_mods_triggered(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  21);
+static inline uint8_t mavlink_msg_limits_status_get_mods_triggered(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 21);
 }
 
 /**
@@ -393,8 +415,8 @@ static inline uint8_t mavlink_msg_limits_status_get_mods_triggered(const mavlink
  * @param msg The message to decode
  * @param limits_status C-struct to decode the message contents into
  */
-static inline void mavlink_msg_limits_status_decode(const mavlink_message_t* msg, mavlink_limits_status_t* limits_status)
-{
+static inline void mavlink_msg_limits_status_decode(const mavlink_message_t *msg,
+                                                    mavlink_limits_status_t *limits_status) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     limits_status->last_trigger = mavlink_msg_limits_status_get_last_trigger(msg);
     limits_status->last_action = mavlink_msg_limits_status_get_last_action(msg);
@@ -406,8 +428,8 @@ static inline void mavlink_msg_limits_status_decode(const mavlink_message_t* msg
     limits_status->mods_required = mavlink_msg_limits_status_get_mods_required(msg);
     limits_status->mods_triggered = mavlink_msg_limits_status_get_mods_triggered(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_LIMITS_STATUS_LEN? msg->len : MAVLINK_MSG_ID_LIMITS_STATUS_LEN;
-        memset(limits_status, 0, MAVLINK_MSG_ID_LIMITS_STATUS_LEN);
-    memcpy(limits_status, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_LIMITS_STATUS_LEN? msg->len : MAVLINK_MSG_ID_LIMITS_STATUS_LEN;
+    memset(limits_status, 0, MAVLINK_MSG_ID_LIMITS_STATUS_LEN);
+memcpy(limits_status, _MAV_PAYLOAD(msg), len);
 #endif
 }

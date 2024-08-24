@@ -4,13 +4,15 @@
 #define MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER 184
 
 MAVPACKED(
-typedef struct __mavlink_slugs_camera_order_t {
- uint8_t target; /*<  The system reporting the action*/
- int8_t pan; /*<  Order the mount to pan: -1 left, 0 No pan motion, +1 right*/
- int8_t tilt; /*<  Order the mount to tilt: -1 down, 0 No tilt motion, +1 up*/
- int8_t zoom; /*<  Order the zoom values 0 to 10*/
- int8_t moveHome; /*<  Orders the camera mount to move home. The other fields are ignored when this field is set. 1: move home, 0 ignored*/
-}) mavlink_slugs_camera_order_t;
+        typedef struct __mavlink_slugs_camera_order_t {
+            uint8_t target; /*<  The system reporting the action*/
+            int8_t pan; /*<  Order the mount to pan: -1 left, 0 No pan motion, +1 right*/
+            int8_t tilt; /*<  Order the mount to tilt: -1 down, 0 No tilt motion, +1 up*/
+            int8_t zoom; /*<  Order the zoom values 0 to 10*/
+            int8_t moveHome; /*<  Orders the camera mount to move home. The other fields are ignored when this field is set. 1: move home, 0 ignored*/
+        })
+
+mavlink_slugs_camera_order_t;
 
 #define MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN 5
 #define MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN 5
@@ -19,7 +21,6 @@ typedef struct __mavlink_slugs_camera_order_t {
 
 #define MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC 45
 #define MAVLINK_MSG_ID_184_CRC 45
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -60,9 +61,10 @@ typedef struct __mavlink_slugs_camera_order_t {
  * @param moveHome  Orders the camera mount to move home. The other fields are ignored when this field is set. 1: move home, 0 ignored
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_slugs_camera_order_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target, int8_t pan, int8_t tilt, int8_t zoom, int8_t moveHome)
-{
+static inline uint16_t
+mavlink_msg_slugs_camera_order_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                    uint8_t target, int8_t pan, int8_t tilt, int8_t zoom,
+                                    int8_t moveHome) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN];
     _mav_put_uint8_t(buf, 0, target);
@@ -71,7 +73,7 @@ static inline uint16_t mavlink_msg_slugs_camera_order_pack(uint8_t system_id, ui
     _mav_put_int8_t(buf, 3, zoom);
     _mav_put_int8_t(buf, 4, moveHome);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
 #else
     mavlink_slugs_camera_order_t packet;
     packet.target = target;
@@ -84,7 +86,10 @@ static inline uint16_t mavlink_msg_slugs_camera_order_pack(uint8_t system_id, ui
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN,
+                                    MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN,
+                                    MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC);
 }
 
 /**
@@ -100,10 +105,11 @@ static inline uint16_t mavlink_msg_slugs_camera_order_pack(uint8_t system_id, ui
  * @param moveHome  Orders the camera mount to move home. The other fields are ignored when this field is set. 1: move home, 0 ignored
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_slugs_camera_order_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target,int8_t pan,int8_t tilt,int8_t zoom,int8_t moveHome)
-{
+static inline uint16_t
+mavlink_msg_slugs_camera_order_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                         mavlink_message_t *msg,
+                                         uint8_t target, int8_t pan, int8_t tilt, int8_t zoom,
+                                         int8_t moveHome) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN];
     _mav_put_uint8_t(buf, 0, target);
@@ -112,7 +118,7 @@ static inline uint16_t mavlink_msg_slugs_camera_order_pack_chan(uint8_t system_i
     _mav_put_int8_t(buf, 3, zoom);
     _mav_put_int8_t(buf, 4, moveHome);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
 #else
     mavlink_slugs_camera_order_t packet;
     packet.target = target;
@@ -125,7 +131,10 @@ static inline uint16_t mavlink_msg_slugs_camera_order_pack_chan(uint8_t system_i
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN,
+                                         MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN,
+                                         MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC);
 }
 
 /**
@@ -136,9 +145,14 @@ static inline uint16_t mavlink_msg_slugs_camera_order_pack_chan(uint8_t system_i
  * @param msg The MAVLink message to compress the data into
  * @param slugs_camera_order C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_slugs_camera_order_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_slugs_camera_order_t* slugs_camera_order)
-{
-    return mavlink_msg_slugs_camera_order_pack(system_id, component_id, msg, slugs_camera_order->target, slugs_camera_order->pan, slugs_camera_order->tilt, slugs_camera_order->zoom, slugs_camera_order->moveHome);
+static inline uint16_t
+mavlink_msg_slugs_camera_order_encode(uint8_t system_id, uint8_t component_id,
+                                      mavlink_message_t *msg,
+                                      const mavlink_slugs_camera_order_t *slugs_camera_order) {
+    return mavlink_msg_slugs_camera_order_pack(system_id, component_id, msg,
+                                               slugs_camera_order->target, slugs_camera_order->pan,
+                                               slugs_camera_order->tilt, slugs_camera_order->zoom,
+                                               slugs_camera_order->moveHome);
 }
 
 /**
@@ -150,9 +164,16 @@ static inline uint16_t mavlink_msg_slugs_camera_order_encode(uint8_t system_id, 
  * @param msg The MAVLink message to compress the data into
  * @param slugs_camera_order C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_slugs_camera_order_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_slugs_camera_order_t* slugs_camera_order)
-{
-    return mavlink_msg_slugs_camera_order_pack_chan(system_id, component_id, chan, msg, slugs_camera_order->target, slugs_camera_order->pan, slugs_camera_order->tilt, slugs_camera_order->zoom, slugs_camera_order->moveHome);
+static inline uint16_t
+mavlink_msg_slugs_camera_order_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                           mavlink_message_t *msg,
+                                           const mavlink_slugs_camera_order_t *slugs_camera_order) {
+    return mavlink_msg_slugs_camera_order_pack_chan(system_id, component_id, chan, msg,
+                                                    slugs_camera_order->target,
+                                                    slugs_camera_order->pan,
+                                                    slugs_camera_order->tilt,
+                                                    slugs_camera_order->zoom,
+                                                    slugs_camera_order->moveHome);
 }
 
 /**
@@ -246,9 +267,8 @@ static inline void mavlink_msg_slugs_camera_order_send_buf(mavlink_message_t *ms
  *
  * @return  The system reporting the action
  */
-static inline uint8_t mavlink_msg_slugs_camera_order_get_target(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  0);
+static inline uint8_t mavlink_msg_slugs_camera_order_get_target(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 0);
 }
 
 /**
@@ -256,9 +276,8 @@ static inline uint8_t mavlink_msg_slugs_camera_order_get_target(const mavlink_me
  *
  * @return  Order the mount to pan: -1 left, 0 No pan motion, +1 right
  */
-static inline int8_t mavlink_msg_slugs_camera_order_get_pan(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int8_t(msg,  1);
+static inline int8_t mavlink_msg_slugs_camera_order_get_pan(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int8_t(msg, 1);
 }
 
 /**
@@ -266,9 +285,8 @@ static inline int8_t mavlink_msg_slugs_camera_order_get_pan(const mavlink_messag
  *
  * @return  Order the mount to tilt: -1 down, 0 No tilt motion, +1 up
  */
-static inline int8_t mavlink_msg_slugs_camera_order_get_tilt(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int8_t(msg,  2);
+static inline int8_t mavlink_msg_slugs_camera_order_get_tilt(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int8_t(msg, 2);
 }
 
 /**
@@ -276,9 +294,8 @@ static inline int8_t mavlink_msg_slugs_camera_order_get_tilt(const mavlink_messa
  *
  * @return  Order the zoom values 0 to 10
  */
-static inline int8_t mavlink_msg_slugs_camera_order_get_zoom(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int8_t(msg,  3);
+static inline int8_t mavlink_msg_slugs_camera_order_get_zoom(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int8_t(msg, 3);
 }
 
 /**
@@ -286,9 +303,8 @@ static inline int8_t mavlink_msg_slugs_camera_order_get_zoom(const mavlink_messa
  *
  * @return  Orders the camera mount to move home. The other fields are ignored when this field is set. 1: move home, 0 ignored
  */
-static inline int8_t mavlink_msg_slugs_camera_order_get_moveHome(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int8_t(msg,  4);
+static inline int8_t mavlink_msg_slugs_camera_order_get_moveHome(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int8_t(msg, 4);
 }
 
 /**
@@ -297,8 +313,8 @@ static inline int8_t mavlink_msg_slugs_camera_order_get_moveHome(const mavlink_m
  * @param msg The message to decode
  * @param slugs_camera_order C-struct to decode the message contents into
  */
-static inline void mavlink_msg_slugs_camera_order_decode(const mavlink_message_t* msg, mavlink_slugs_camera_order_t* slugs_camera_order)
-{
+static inline void mavlink_msg_slugs_camera_order_decode(const mavlink_message_t *msg,
+                                                         mavlink_slugs_camera_order_t *slugs_camera_order) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     slugs_camera_order->target = mavlink_msg_slugs_camera_order_get_target(msg);
     slugs_camera_order->pan = mavlink_msg_slugs_camera_order_get_pan(msg);
@@ -306,8 +322,8 @@ static inline void mavlink_msg_slugs_camera_order_decode(const mavlink_message_t
     slugs_camera_order->zoom = mavlink_msg_slugs_camera_order_get_zoom(msg);
     slugs_camera_order->moveHome = mavlink_msg_slugs_camera_order_get_moveHome(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN? msg->len : MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN;
-        memset(slugs_camera_order, 0, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
-    memcpy(slugs_camera_order, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN? msg->len : MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN;
+    memset(slugs_camera_order, 0, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
+memcpy(slugs_camera_order, _MAV_PAYLOAD(msg), len);
 #endif
 }

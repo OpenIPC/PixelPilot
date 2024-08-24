@@ -4,13 +4,15 @@
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18 184
 
 MAVPACKED(
-typedef struct __mavlink_serial_udb_extra_f18_t {
- float angle_of_attack_normal; /*<  SUE Angle of Attack Normal*/
- float angle_of_attack_inverted; /*<  SUE Angle of Attack Inverted*/
- float elevator_trim_normal; /*<  SUE Elevator Trim Normal*/
- float elevator_trim_inverted; /*<  SUE Elevator Trim Inverted*/
- float reference_speed; /*<  SUE reference_speed*/
-}) mavlink_serial_udb_extra_f18_t;
+        typedef struct __mavlink_serial_udb_extra_f18_t {
+            float angle_of_attack_normal; /*<  SUE Angle of Attack Normal*/
+            float angle_of_attack_inverted; /*<  SUE Angle of Attack Inverted*/
+            float elevator_trim_normal; /*<  SUE Elevator Trim Normal*/
+            float elevator_trim_inverted; /*<  SUE Elevator Trim Inverted*/
+            float reference_speed; /*<  SUE reference_speed*/
+        })
+
+mavlink_serial_udb_extra_f18_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN 20
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_MIN_LEN 20
@@ -19,7 +21,6 @@ typedef struct __mavlink_serial_udb_extra_f18_t {
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_CRC 41
 #define MAVLINK_MSG_ID_184_CRC 41
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -60,9 +61,12 @@ typedef struct __mavlink_serial_udb_extra_f18_t {
  * @param reference_speed  SUE reference_speed
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f18_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               float angle_of_attack_normal, float angle_of_attack_inverted, float elevator_trim_normal, float elevator_trim_inverted, float reference_speed)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f18_pack(uint8_t system_id, uint8_t component_id,
+                                      mavlink_message_t *msg,
+                                      float angle_of_attack_normal, float angle_of_attack_inverted,
+                                      float elevator_trim_normal, float elevator_trim_inverted,
+                                      float reference_speed) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN];
     _mav_put_float(buf, 0, angle_of_attack_normal);
@@ -71,7 +75,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f18_pack(uint8_t system_id, 
     _mav_put_float(buf, 12, elevator_trim_inverted);
     _mav_put_float(buf, 16, reference_speed);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN);
 #else
     mavlink_serial_udb_extra_f18_t packet;
     packet.angle_of_attack_normal = angle_of_attack_normal;
@@ -84,7 +88,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f18_pack(uint8_t system_id, 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_MIN_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_CRC);
 }
 
 /**
@@ -100,10 +107,13 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f18_pack(uint8_t system_id, 
  * @param reference_speed  SUE reference_speed
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f18_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   float angle_of_attack_normal,float angle_of_attack_inverted,float elevator_trim_normal,float elevator_trim_inverted,float reference_speed)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f18_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                           mavlink_message_t *msg,
+                                           float angle_of_attack_normal,
+                                           float angle_of_attack_inverted,
+                                           float elevator_trim_normal, float elevator_trim_inverted,
+                                           float reference_speed) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN];
     _mav_put_float(buf, 0, angle_of_attack_normal);
@@ -112,7 +122,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f18_pack_chan(uint8_t system
     _mav_put_float(buf, 12, elevator_trim_inverted);
     _mav_put_float(buf, 16, reference_speed);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN);
 #else
     mavlink_serial_udb_extra_f18_t packet;
     packet.angle_of_attack_normal = angle_of_attack_normal;
@@ -125,7 +135,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f18_pack_chan(uint8_t system
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_MIN_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_CRC);
 }
 
 /**
@@ -136,9 +149,16 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f18_pack_chan(uint8_t system
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f18 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f18_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f18_t* serial_udb_extra_f18)
-{
-    return mavlink_msg_serial_udb_extra_f18_pack(system_id, component_id, msg, serial_udb_extra_f18->angle_of_attack_normal, serial_udb_extra_f18->angle_of_attack_inverted, serial_udb_extra_f18->elevator_trim_normal, serial_udb_extra_f18->elevator_trim_inverted, serial_udb_extra_f18->reference_speed);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f18_encode(uint8_t system_id, uint8_t component_id,
+                                        mavlink_message_t *msg,
+                                        const mavlink_serial_udb_extra_f18_t *serial_udb_extra_f18) {
+    return mavlink_msg_serial_udb_extra_f18_pack(system_id, component_id, msg,
+                                                 serial_udb_extra_f18->angle_of_attack_normal,
+                                                 serial_udb_extra_f18->angle_of_attack_inverted,
+                                                 serial_udb_extra_f18->elevator_trim_normal,
+                                                 serial_udb_extra_f18->elevator_trim_inverted,
+                                                 serial_udb_extra_f18->reference_speed);
 }
 
 /**
@@ -150,9 +170,16 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f18_encode(uint8_t system_id
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f18 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f18_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f18_t* serial_udb_extra_f18)
-{
-    return mavlink_msg_serial_udb_extra_f18_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f18->angle_of_attack_normal, serial_udb_extra_f18->angle_of_attack_inverted, serial_udb_extra_f18->elevator_trim_normal, serial_udb_extra_f18->elevator_trim_inverted, serial_udb_extra_f18->reference_speed);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f18_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                             mavlink_message_t *msg,
+                                             const mavlink_serial_udb_extra_f18_t *serial_udb_extra_f18) {
+    return mavlink_msg_serial_udb_extra_f18_pack_chan(system_id, component_id, chan, msg,
+                                                      serial_udb_extra_f18->angle_of_attack_normal,
+                                                      serial_udb_extra_f18->angle_of_attack_inverted,
+                                                      serial_udb_extra_f18->elevator_trim_normal,
+                                                      serial_udb_extra_f18->elevator_trim_inverted,
+                                                      serial_udb_extra_f18->reference_speed);
 }
 
 /**
@@ -246,9 +273,9 @@ static inline void mavlink_msg_serial_udb_extra_f18_send_buf(mavlink_message_t *
  *
  * @return  SUE Angle of Attack Normal
  */
-static inline float mavlink_msg_serial_udb_extra_f18_get_angle_of_attack_normal(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float
+mavlink_msg_serial_udb_extra_f18_get_angle_of_attack_normal(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -256,9 +283,9 @@ static inline float mavlink_msg_serial_udb_extra_f18_get_angle_of_attack_normal(
  *
  * @return  SUE Angle of Attack Inverted
  */
-static inline float mavlink_msg_serial_udb_extra_f18_get_angle_of_attack_inverted(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float
+mavlink_msg_serial_udb_extra_f18_get_angle_of_attack_inverted(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -266,9 +293,9 @@ static inline float mavlink_msg_serial_udb_extra_f18_get_angle_of_attack_inverte
  *
  * @return  SUE Elevator Trim Normal
  */
-static inline float mavlink_msg_serial_udb_extra_f18_get_elevator_trim_normal(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float
+mavlink_msg_serial_udb_extra_f18_get_elevator_trim_normal(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -276,9 +303,9 @@ static inline float mavlink_msg_serial_udb_extra_f18_get_elevator_trim_normal(co
  *
  * @return  SUE Elevator Trim Inverted
  */
-static inline float mavlink_msg_serial_udb_extra_f18_get_elevator_trim_inverted(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float
+mavlink_msg_serial_udb_extra_f18_get_elevator_trim_inverted(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -286,9 +313,9 @@ static inline float mavlink_msg_serial_udb_extra_f18_get_elevator_trim_inverted(
  *
  * @return  SUE reference_speed
  */
-static inline float mavlink_msg_serial_udb_extra_f18_get_reference_speed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float
+mavlink_msg_serial_udb_extra_f18_get_reference_speed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -297,17 +324,22 @@ static inline float mavlink_msg_serial_udb_extra_f18_get_reference_speed(const m
  * @param msg The message to decode
  * @param serial_udb_extra_f18 C-struct to decode the message contents into
  */
-static inline void mavlink_msg_serial_udb_extra_f18_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f18_t* serial_udb_extra_f18)
-{
+static inline void mavlink_msg_serial_udb_extra_f18_decode(const mavlink_message_t *msg,
+                                                           mavlink_serial_udb_extra_f18_t *serial_udb_extra_f18) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    serial_udb_extra_f18->angle_of_attack_normal = mavlink_msg_serial_udb_extra_f18_get_angle_of_attack_normal(msg);
-    serial_udb_extra_f18->angle_of_attack_inverted = mavlink_msg_serial_udb_extra_f18_get_angle_of_attack_inverted(msg);
-    serial_udb_extra_f18->elevator_trim_normal = mavlink_msg_serial_udb_extra_f18_get_elevator_trim_normal(msg);
-    serial_udb_extra_f18->elevator_trim_inverted = mavlink_msg_serial_udb_extra_f18_get_elevator_trim_inverted(msg);
-    serial_udb_extra_f18->reference_speed = mavlink_msg_serial_udb_extra_f18_get_reference_speed(msg);
+    serial_udb_extra_f18->angle_of_attack_normal = mavlink_msg_serial_udb_extra_f18_get_angle_of_attack_normal(
+            msg);
+    serial_udb_extra_f18->angle_of_attack_inverted = mavlink_msg_serial_udb_extra_f18_get_angle_of_attack_inverted(
+            msg);
+    serial_udb_extra_f18->elevator_trim_normal = mavlink_msg_serial_udb_extra_f18_get_elevator_trim_normal(
+            msg);
+    serial_udb_extra_f18->elevator_trim_inverted = mavlink_msg_serial_udb_extra_f18_get_elevator_trim_inverted(
+            msg);
+    serial_udb_extra_f18->reference_speed = mavlink_msg_serial_udb_extra_f18_get_reference_speed(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN;
-        memset(serial_udb_extra_f18, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN);
-    memcpy(serial_udb_extra_f18, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN;
+    memset(serial_udb_extra_f18, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F18_LEN);
+memcpy(serial_udb_extra_f18, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -9,81 +9,89 @@
 #include <android/log.h>
 #include <fstream>
 
-VideoPlayer::VideoPlayer(JNIEnv* env, jobject context) :
+VideoPlayer::VideoPlayer(JNIEnv *env, jobject context) :
         mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)},
         videoDecoder(env) {
     env->GetJavaVM(&javaVm);
     videoDecoder.registerOnDecoderRatioChangedCallback([this](const VideoRatio ratio) {
-        const bool changed=ratio!=this->latestVideoRatio;
-        this->latestVideoRatio=ratio;
-        latestVideoRatioChanged=changed;
+        const bool changed = ratio != this->latestVideoRatio;
+        this->latestVideoRatio = ratio;
+        latestVideoRatioChanged = changed;
     });
     videoDecoder.registerOnDecodingInfoChangedCallback([this](const DecodingInfo info) {
-        const bool changed=info!=this->latestDecodingInfo;
-        this->latestDecodingInfo=info;
-        latestDecodingInfoChanged=changed;
+        const bool changed = info != this->latestDecodingInfo;
+        this->latestDecodingInfo = info;
+        latestDecodingInfoChanged = changed;
     });
 }
 
-static int write_callback(int64_t offset, const void *buffer, size_t size, void *token){
-    FILE *f = (FILE*)token;
+static int write_callback(int64_t offset, const void *buffer, size_t size, void *token) {
+    FILE *f = (FILE *) token;
     fseek(f, offset, SEEK_SET);
     return fwrite(buffer, 1, size, f) != size;
 }
 
 void VideoPlayer::processQueue() {
-        ::FILE * fout = fdopen(dvr_fd, "wb");
-        MP4E_mux_t *mux = MP4E_open(0 /*sequential_mode*/, dvr_mp4_fragmentation, fout, write_callback);
-        mp4_h26x_writer_t mp4wr;
-        float framerate = 0;
+    ::FILE *fout = fdopen(dvr_fd, "wb");
+    MP4E_mux_t *mux = MP4E_open(0 /*sequential_mode*/, dvr_mp4_fragmentation, fout, write_callback);
+    mp4_h26x_writer_t mp4wr;
+    float framerate = 0;
 
-        while (true) {
-            last_dvr_write = get_time_ms();
-            std::unique_lock<std::mutex> lock(mtx);
-            cv.wait(lock, [this] { return !naluQueue.empty() || stopFlag; });
-            if (stopFlag) {
-                break;
+    while (true) {
+        last_dvr_write = get_time_ms();
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [this] { return !naluQueue.empty() || stopFlag; });
+        if (stopFlag) {
+            break;
+        }
+        if (!naluQueue.empty()) {
+            NALU nalu = naluQueue.front();
+            if (framerate == 0) {
+                if (latestDecodingInfo.currentFPS <= 0) {
+                    continue;
+                }
+                if (MP4E_STATUS_OK != mp4_h26x_write_init(&mp4wr, mux, latestVideoRatio.width,
+                                                          latestVideoRatio.height,
+                                                          nalu.IS_H265_PACKET)) {
+                    __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue",
+                                        "error: mp4_h26x_write_init failed");
+                }
+                framerate = latestDecodingInfo.currentFPS;
+                __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue",
+                                    "mp4 init with fps=%.2f, res=%dx%d, hevc=%d", framerate,
+                                    latestVideoRatio.width, latestVideoRatio.height,
+                                    nalu.IS_H265_PACKET);
             }
-            if (!naluQueue.empty()) {
-                NALU nalu = naluQueue.front();
-                if (framerate == 0) {
-                    if (latestDecodingInfo.currentFPS <= 0) {
-                        continue;
-                    }
-                    if (MP4E_STATUS_OK != mp4_h26x_write_init(&mp4wr, mux, latestVideoRatio.width, latestVideoRatio.height, nalu.IS_H265_PACKET))
-                    {
-                        __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue", "error: mp4_h26x_write_init failed");
-                    }
-                    framerate = latestDecodingInfo.currentFPS;
-                    __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue", "mp4 init with fps=%.2f, res=%dx%d, hevc=%d", framerate, latestVideoRatio.width, latestVideoRatio.height, nalu.IS_H265_PACKET);
-                }
-                naluQueue.pop();
-                lock.unlock();
-                // Process the NALU
-                auto res = mp4_h26x_write_nal(&mp4wr, nalu.getData(), nalu.getSize(), 90000/framerate);
-                if (MP4E_STATUS_OK != res) {
-                    __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue", "mp4_h26x_write_nal failed with %d", res);
-                }
+            naluQueue.pop();
+            lock.unlock();
+            // Process the NALU
+            auto res = mp4_h26x_write_nal(&mp4wr, nalu.getData(), nalu.getSize(),
+                                          90000 / framerate);
+            if (MP4E_STATUS_OK != res) {
+                __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue",
+                                    "mp4_h26x_write_nal failed with %d", res);
             }
         }
-
-        MP4E_close(mux);
-        mp4_h26x_write_close(&mp4wr);
-        if (fout) {
-            fclose(fout);
-            fout = NULL;
-        }
-        dvr_fd = -1;
-        __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue", "dvr thread done");
     }
 
+    MP4E_close(mux);
+    mp4_h26x_write_close(&mp4wr);
+    if (fout) {
+        fclose(fout);
+        fout = NULL;
+    }
+    dvr_fd = -1;
+    __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue", "dvr thread done");
+}
+
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
-void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_length,const VIDEO_DATA_TYPE videoDataType){
+void VideoPlayer::onNewVideoData(const uint8_t *data, const std::size_t data_length,
+                                 const VIDEO_DATA_TYPE videoDataType) {
     //MLOGD << "onNewVideoData " << data_length;
-    switch(videoDataType){
+    switch (videoDataType) {
         case VIDEO_DATA_TYPE::RTP_H264:
             // MLOGD << "onNewVideoData RTP_H264 " << data_length;
-            mParser.parse_rtp_h264_stream(data,data_length);
+            mParser.parse_rtp_h264_stream(data, data_length);
             break;
         case VIDEO_DATA_TYPE::RAW_H264:
             // mParser.parse_raw_h264_stream(data,data_length);
@@ -92,7 +100,7 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
         case VIDEO_DATA_TYPE::RTP_H265:
             //MLOGD << "onNewVideoData RTP_H265 " << data_length;
             //rtpToNalu(data,data_length);
-            mParser.parse_rtp_h265_stream(data,data_length);
+            mParser.parse_rtp_h265_stream(data, data_length);
             break;
         case VIDEO_DATA_TYPE::RAW_H265:
 //            MLOGD << "onNewVideoData RTP_H265 " << data_length;
@@ -101,13 +109,13 @@ void VideoPlayer::onNewVideoData(const uint8_t* data, const std::size_t data_len
     }
 }
 
-void VideoPlayer::onNewNALU(const NALU& nalu){
+void VideoPlayer::onNewNALU(const NALU &nalu) {
     videoDecoder.interpretNALU(nalu);
     if (dvr_fd <= 0 || latestDecodingInfo.currentFPS <= 0) {
         return;
     }
     // Copy data to write if from a different thread.
-    uint8_t* m_data_copy = new uint8_t[nalu.getSize()];
+    uint8_t *m_data_copy = new uint8_t[nalu.getSize()];
     memcpy(m_data_copy, nalu.getData(), nalu.getSize());
     NALU nalu_(m_data_copy, nalu.getSize(), nalu.IS_H265_PACKET);
     enqueueNALU(nalu_);
@@ -121,36 +129,39 @@ void VideoPlayer::setVideoSurface(JNIEnv *env, jobject surface) {
 }
 
 
-void VideoPlayer::start(JNIEnv *env,jobject androidContext, jstring codec) {
-    AAssetManager *assetManager=NDKHelper::getAssetManagerFromContext2(env,androidContext);
+void VideoPlayer::start(JNIEnv *env, jobject androidContext, jstring codec) {
+    AAssetManager *assetManager = NDKHelper::getAssetManagerFromContext2(env, androidContext);
     //mParser.setLimitFPS(-1); //Default: Real time !
-    const int VS_PORT=5600;
-    const char* codec_ = env->GetStringUTFChars(codec, nullptr);
-    const int VS_PROTOCOL = strcmp(codec_, "h265")==0 ? RTP_H265 : RTP_H264;
+    const int VS_PORT = 5600;
+    const char *codec_ = env->GetStringUTFChars(codec, nullptr);
+    const int VS_PROTOCOL = strcmp(codec_, "h265") == 0 ? RTP_H265 : RTP_H264;
     env->ReleaseStringUTFChars(codec, codec_);
-    const auto videoDataType=static_cast<VIDEO_DATA_TYPE>(VS_PROTOCOL);
+    const auto videoDataType = static_cast<VIDEO_DATA_TYPE>(VS_PROTOCOL);
     mUDPReceiver.release();
-    mUDPReceiver=std::make_unique<UDPReceiver>(javaVm, VS_PORT, "UdpReceiver", -16, [this,videoDataType](const uint8_t* data, size_t data_length) {
-        onNewVideoData(data,data_length,videoDataType);
-    }, WANTED_UDP_RCVBUF_SIZE);
+    mUDPReceiver = std::make_unique<UDPReceiver>(javaVm, VS_PORT, "UdpReceiver", -16,
+                                                 [this, videoDataType](const uint8_t *data,
+                                                                       size_t data_length) {
+                                                     onNewVideoData(data, data_length,
+                                                                    videoDataType);
+                                                 }, WANTED_UDP_RCVBUF_SIZE);
     mUDPReceiver->startReceiving();
 }
 
-void VideoPlayer::stop(JNIEnv *env,jobject androidContext) {
-    if(mUDPReceiver){
+void VideoPlayer::stop(JNIEnv *env, jobject androidContext) {
+    if (mUDPReceiver) {
         mUDPReceiver->stopReceiving();
         mUDPReceiver.reset();
     }
 }
 
-std::string VideoPlayer::getInfoString()const{
+std::string VideoPlayer::getInfoString() const {
     std::stringstream ss;
-    if(mUDPReceiver){
+    if (mUDPReceiver) {
         ss << "Listening for video on port " << mUDPReceiver->getPort();
         ss << "\nReceived: " << mUDPReceiver->getNReceivedBytes() << "B"
            << " | parsed frames: ";
-          // << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKonfigurationFrames;
-    } else{
+        // << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKonfigurationFrames;
+    } else {
         ss << "Not receiving udp raw / rtp / rtsp";
     }
     return ss.str();
@@ -162,7 +173,8 @@ void VideoPlayer::startDvr(JNIEnv *env, jint fd, jint dvr_fmp4_enabled) {
     dvr_mp4_fragmentation = dvr_fmp4_enabled;
     __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue", "dvr_fd=%d", dvr_fd);
     if (dvr_fd == -1) {
-        __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue", "Failed to duplicate dvr file descriptor");
+        __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue",
+                            "Failed to duplicate dvr file descriptor");
         return;
     }
     startProcessing();
@@ -180,102 +192,115 @@ void VideoPlayer::stopDvr() {
 inline jlong jptr(VideoPlayer *videoPlayerN) {
     return reinterpret_cast<intptr_t>(videoPlayerN);
 }
+
 inline VideoPlayer *native(jlong ptr) {
     return reinterpret_cast<VideoPlayer *>(ptr);
 }
 
 
-extern "C"{
+extern "C" {
 
 
 extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_geehe_videonative_VideoPlayer_nativeInitialize(JNIEnv *env, jclass clazz,
                                                         jobject context) {
-    auto* p= new VideoPlayer(env, context);
+    auto *p = new VideoPlayer(env, context);
     return jptr(p);
 }
 
 JNI_METHOD(void, nativeFinalize)
-(JNIEnv * env, jclass jclass1,jlong videoPlayerN) {
-    VideoPlayer* p=native(videoPlayerN);
+(JNIEnv *env, jclass jclass1, jlong videoPlayerN) {
+    VideoPlayer *p = native(videoPlayerN);
     delete (p);
 }
 
 JNI_METHOD(void, nativeStart)
-(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject androidContext, jstring codec){
-    native(videoPlayerN)->start(env,androidContext, codec);
+(JNIEnv *env, jclass jclass1, jlong videoPlayerN, jobject androidContext, jstring codec) {
+    native(videoPlayerN)->start(env, androidContext, codec);
 }
 
 JNI_METHOD(void, nativeStop)
-(JNIEnv * env,jclass jclass1,jlong videoPlayerN,jobject androidContext){
-    native(videoPlayerN)->stop(env,androidContext);
+(JNIEnv *env, jclass jclass1, jlong videoPlayerN, jobject androidContext) {
+    native(videoPlayerN)->stop(env, androidContext);
 }
 
 JNI_METHOD(void, nativeSetVideoSurface)
-(JNIEnv * env, jclass jclass1,jlong videoPlayerN,jobject surface, jint codec){
-    native(videoPlayerN)->setVideoSurface(env,surface);
+(JNIEnv *env, jclass jclass1, jlong videoPlayerN, jobject surface, jint codec) {
+    native(videoPlayerN)->setVideoSurface(env, surface);
 }
 
-JNI_METHOD(jstring , getVideoInfoString)
-(JNIEnv *env,jclass jclass1,jlong testReceiverN) {
-    VideoPlayer* p=native(testReceiverN);
+JNI_METHOD(jstring, getVideoInfoString)
+(JNIEnv *env, jclass jclass1, jlong testReceiverN) {
+    VideoPlayer *p = native(testReceiverN);
     jstring ret = env->NewStringUTF(p->getInfoString().c_str());
     return ret;
 }
 
-JNI_METHOD(jboolean , anyVideoDataReceived)
-(JNIEnv *env,jclass jclass1,jlong testReceiverN) {
-    VideoPlayer* p=native(testReceiverN);
-    if(p->mUDPReceiver== nullptr){
+JNI_METHOD(jboolean, anyVideoDataReceived)
+(JNIEnv *env, jclass jclass1, jlong testReceiverN) {
+    VideoPlayer *p = native(testReceiverN);
+    if (p->mUDPReceiver == nullptr) {
         return (jboolean) false;
     }
     bool ret = (p->mUDPReceiver->getNReceivedBytes() > 0);
     return (jboolean) ret;
 }
 
-JNI_METHOD(jboolean , receivingVideoButCannotParse)
-(JNIEnv *env,jclass jclass1,jlong testReceiverN) {
-    VideoPlayer* p=native(testReceiverN);
+JNI_METHOD(jboolean, receivingVideoButCannotParse)
+(JNIEnv *env, jclass jclass1, jlong testReceiverN) {
+    VideoPlayer *p = native(testReceiverN);
 //    if(p->mUDPReceiver){
 //        return (jboolean) (p->mUDPReceiver->getNReceivedBytes() > 1024 * 1024 && p->mParser.nParsedNALUs == 0);
 //    }
     return (jboolean) false;
 }
 
-JNI_METHOD(jboolean , anyVideoBytesParsedSinceLastCall)
-(JNIEnv *env,jclass jclass1,jlong testReceiverN) {
-    VideoPlayer* p=native(testReceiverN);
-    long nalusSinceLast = 0 ;// p->mParser.nParsedNALUs - p->nNALUsAtLastCall;
+JNI_METHOD(jboolean, anyVideoBytesParsedSinceLastCall)
+(JNIEnv *env, jclass jclass1, jlong testReceiverN) {
+    VideoPlayer *p = native(testReceiverN);
+    long nalusSinceLast = 0;// p->mParser.nParsedNALUs - p->nNALUsAtLastCall;
     p->nNALUsAtLastCall += nalusSinceLast;
     return (jboolean) (nalusSinceLast > 0);
 }
 
 
-JNI_METHOD(void,nativeCallBack)
-(JNIEnv *env,jclass jclass1,jobject videoParamsChangedI, jlong testReceiverN){
-    VideoPlayer* p=native(testReceiverN);
+JNI_METHOD(void, nativeCallBack)
+(JNIEnv *env, jclass jclass1, jobject videoParamsChangedI, jlong testReceiverN) {
+    VideoPlayer *p = native(testReceiverN);
     //Update all java stuff
-    if(p->latestDecodingInfoChanged || p->latestVideoRatioChanged){
-        jclass jClassExtendsIVideoParamsChanged= env->GetObjectClass(videoParamsChangedI);
-        if(p->latestVideoRatioChanged){
-            jmethodID onVideoRatioChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onVideoRatioChanged", "(II)V");
-            env->CallVoidMethod(videoParamsChangedI,onVideoRatioChangedJAVA,(jint)p->latestVideoRatio.width,(jint)p->latestVideoRatio.height);
-            p->latestVideoRatioChanged=false;
+    if (p->latestDecodingInfoChanged || p->latestVideoRatioChanged) {
+        jclass jClassExtendsIVideoParamsChanged = env->GetObjectClass(videoParamsChangedI);
+        if (p->latestVideoRatioChanged) {
+            jmethodID onVideoRatioChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged,
+                                                                 "onVideoRatioChanged", "(II)V");
+            env->CallVoidMethod(videoParamsChangedI, onVideoRatioChangedJAVA,
+                                (jint) p->latestVideoRatio.width,
+                                (jint) p->latestVideoRatio.height);
+            p->latestVideoRatioChanged = false;
         }
-        if(p->latestDecodingInfoChanged){
+        if (p->latestDecodingInfoChanged) {
             jclass jcDecodingInfo = env->FindClass("com/geehe/videonative/DecodingInfo");
-            assert(jcDecodingInfo!=nullptr);
-            jmethodID jcDecodingInfoConstructor = env->GetMethodID(jcDecodingInfo, "<init>", "(FFFFFIII)V");
-            assert(jcDecodingInfoConstructor!= nullptr);
-            const auto info=p->latestDecodingInfo;
-            auto decodingInfo=env->NewObject(jcDecodingInfo,jcDecodingInfoConstructor,(jfloat)info.currentFPS,(jfloat)info.currentKiloBitsPerSecond,
-                           (jfloat)info.avgParsingTime_ms,(jfloat)info.avgWaitForInputBTime_ms,(jfloat)info.avgDecodingTime_ms,(jint)info.nNALU,(jint)info.nNALUSFeeded,(jint)info.nDecodedFrames);
-            assert(decodingInfo!=nullptr);
-            jmethodID onDecodingInfoChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged, "onDecodingInfoChanged", "(Lcom/geehe/videonative/DecodingInfo;)V");
-            assert(onDecodingInfoChangedJAVA!=nullptr);
-            env->CallVoidMethod(videoParamsChangedI,onDecodingInfoChangedJAVA,decodingInfo);
-            p->latestDecodingInfoChanged=false;
+            assert(jcDecodingInfo != nullptr);
+            jmethodID jcDecodingInfoConstructor = env->GetMethodID(jcDecodingInfo, "<init>",
+                                                                   "(FFFFFIII)V");
+            assert(jcDecodingInfoConstructor != nullptr);
+            const auto info = p->latestDecodingInfo;
+            auto decodingInfo = env->NewObject(jcDecodingInfo, jcDecodingInfoConstructor,
+                                               (jfloat) info.currentFPS,
+                                               (jfloat) info.currentKiloBitsPerSecond,
+                                               (jfloat) info.avgParsingTime_ms,
+                                               (jfloat) info.avgWaitForInputBTime_ms,
+                                               (jfloat) info.avgDecodingTime_ms, (jint) info.nNALU,
+                                               (jint) info.nNALUSFeeded,
+                                               (jint) info.nDecodedFrames);
+            assert(decodingInfo != nullptr);
+            jmethodID onDecodingInfoChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged,
+                                                                   "onDecodingInfoChanged",
+                                                                   "(Lcom/geehe/videonative/DecodingInfo;)V");
+            assert(onDecodingInfoChangedJAVA != nullptr);
+            env->CallVoidMethod(videoParamsChangedI, onDecodingInfoChangedJAVA, decodingInfo);
+            p->latestDecodingInfoChanged = false;
         }
     }
 }
@@ -286,14 +311,15 @@ JNI_METHOD(void,nativeCallBack)
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_geehe_videonative_VideoPlayer_nativeStartDvr(JNIEnv *env, jclass clazz,
-                                                        jlong native_instance,
-                                                        jint fd, jint fmp4_enabled) {
+                                                      jlong native_instance,
+                                                      jint fd, jint fmp4_enabled) {
     native(native_instance)->startDvr(env, fd, fmp4_enabled);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_geehe_videonative_VideoPlayer_nativeStopDvr(JNIEnv *env, jclass clazz, jlong native_instance) {
+Java_com_geehe_videonative_VideoPlayer_nativeStopDvr(JNIEnv *env, jclass clazz,
+                                                     jlong native_instance) {
     native(native_instance)->stopDvr();
 }
 

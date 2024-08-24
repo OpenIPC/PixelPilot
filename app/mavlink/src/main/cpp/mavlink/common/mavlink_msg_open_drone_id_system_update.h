@@ -5,12 +5,12 @@
 
 
 typedef struct __mavlink_open_drone_id_system_update_t {
- int32_t operator_latitude; /*< [degE7] Latitude of the operator. If unknown: 0 (both Lat/Lon).*/
- int32_t operator_longitude; /*< [degE7] Longitude of the operator. If unknown: 0 (both Lat/Lon).*/
- float operator_altitude_geo; /*< [m] Geodetic altitude of the operator relative to WGS84. If unknown: -1000 m.*/
- uint32_t timestamp; /*< [s] 32 bit Unix Timestamp in seconds since 00:00:00 01/01/2019.*/
- uint8_t target_system; /*<  System ID (0 for broadcast).*/
- uint8_t target_component; /*<  Component ID (0 for broadcast).*/
+    int32_t operator_latitude; /*< [degE7] Latitude of the operator. If unknown: 0 (both Lat/Lon).*/
+    int32_t operator_longitude; /*< [degE7] Longitude of the operator. If unknown: 0 (both Lat/Lon).*/
+    float operator_altitude_geo; /*< [m] Geodetic altitude of the operator relative to WGS84. If unknown: -1000 m.*/
+    uint32_t timestamp; /*< [s] 32 bit Unix Timestamp in seconds since 00:00:00 01/01/2019.*/
+    uint8_t target_system; /*<  System ID (0 for broadcast).*/
+    uint8_t target_component; /*<  Component ID (0 for broadcast).*/
 } mavlink_open_drone_id_system_update_t;
 
 #define MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN 18
@@ -20,7 +20,6 @@ typedef struct __mavlink_open_drone_id_system_update_t {
 
 #define MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_CRC 7
 #define MAVLINK_MSG_ID_12919_CRC 7
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -64,9 +63,12 @@ typedef struct __mavlink_open_drone_id_system_update_t {
  * @param timestamp [s] 32 bit Unix Timestamp in seconds since 00:00:00 01/01/2019.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_open_drone_id_system_update_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, int32_t operator_latitude, int32_t operator_longitude, float operator_altitude_geo, uint32_t timestamp)
-{
+static inline uint16_t
+mavlink_msg_open_drone_id_system_update_pack(uint8_t system_id, uint8_t component_id,
+                                             mavlink_message_t *msg,
+                                             uint8_t target_system, uint8_t target_component,
+                                             int32_t operator_latitude, int32_t operator_longitude,
+                                             float operator_altitude_geo, uint32_t timestamp) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN];
     _mav_put_int32_t(buf, 0, operator_latitude);
@@ -76,7 +78,7 @@ static inline uint16_t mavlink_msg_open_drone_id_system_update_pack(uint8_t syst
     _mav_put_uint8_t(buf, 16, target_system);
     _mav_put_uint8_t(buf, 17, target_component);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN);
 #else
     mavlink_open_drone_id_system_update_t packet;
     packet.operator_latitude = operator_latitude;
@@ -90,7 +92,10 @@ static inline uint16_t mavlink_msg_open_drone_id_system_update_pack(uint8_t syst
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_MIN_LEN, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_MIN_LEN,
+                                    MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN,
+                                    MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_CRC);
 }
 
 /**
@@ -107,10 +112,14 @@ static inline uint16_t mavlink_msg_open_drone_id_system_update_pack(uint8_t syst
  * @param timestamp [s] 32 bit Unix Timestamp in seconds since 00:00:00 01/01/2019.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_open_drone_id_system_update_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,int32_t operator_latitude,int32_t operator_longitude,float operator_altitude_geo,uint32_t timestamp)
-{
+static inline uint16_t
+mavlink_msg_open_drone_id_system_update_pack_chan(uint8_t system_id, uint8_t component_id,
+                                                  uint8_t chan,
+                                                  mavlink_message_t *msg,
+                                                  uint8_t target_system, uint8_t target_component,
+                                                  int32_t operator_latitude,
+                                                  int32_t operator_longitude,
+                                                  float operator_altitude_geo, uint32_t timestamp) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN];
     _mav_put_int32_t(buf, 0, operator_latitude);
@@ -120,7 +129,7 @@ static inline uint16_t mavlink_msg_open_drone_id_system_update_pack_chan(uint8_t
     _mav_put_uint8_t(buf, 16, target_system);
     _mav_put_uint8_t(buf, 17, target_component);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN);
 #else
     mavlink_open_drone_id_system_update_t packet;
     packet.operator_latitude = operator_latitude;
@@ -134,7 +143,10 @@ static inline uint16_t mavlink_msg_open_drone_id_system_update_pack_chan(uint8_t
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_MIN_LEN, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_MIN_LEN,
+                                         MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN,
+                                         MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_CRC);
 }
 
 /**
@@ -145,9 +157,17 @@ static inline uint16_t mavlink_msg_open_drone_id_system_update_pack_chan(uint8_t
  * @param msg The MAVLink message to compress the data into
  * @param open_drone_id_system_update C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_open_drone_id_system_update_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_open_drone_id_system_update_t* open_drone_id_system_update)
-{
-    return mavlink_msg_open_drone_id_system_update_pack(system_id, component_id, msg, open_drone_id_system_update->target_system, open_drone_id_system_update->target_component, open_drone_id_system_update->operator_latitude, open_drone_id_system_update->operator_longitude, open_drone_id_system_update->operator_altitude_geo, open_drone_id_system_update->timestamp);
+static inline uint16_t
+mavlink_msg_open_drone_id_system_update_encode(uint8_t system_id, uint8_t component_id,
+                                               mavlink_message_t *msg,
+                                               const mavlink_open_drone_id_system_update_t *open_drone_id_system_update) {
+    return mavlink_msg_open_drone_id_system_update_pack(system_id, component_id, msg,
+                                                        open_drone_id_system_update->target_system,
+                                                        open_drone_id_system_update->target_component,
+                                                        open_drone_id_system_update->operator_latitude,
+                                                        open_drone_id_system_update->operator_longitude,
+                                                        open_drone_id_system_update->operator_altitude_geo,
+                                                        open_drone_id_system_update->timestamp);
 }
 
 /**
@@ -159,9 +179,17 @@ static inline uint16_t mavlink_msg_open_drone_id_system_update_encode(uint8_t sy
  * @param msg The MAVLink message to compress the data into
  * @param open_drone_id_system_update C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_open_drone_id_system_update_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_open_drone_id_system_update_t* open_drone_id_system_update)
-{
-    return mavlink_msg_open_drone_id_system_update_pack_chan(system_id, component_id, chan, msg, open_drone_id_system_update->target_system, open_drone_id_system_update->target_component, open_drone_id_system_update->operator_latitude, open_drone_id_system_update->operator_longitude, open_drone_id_system_update->operator_altitude_geo, open_drone_id_system_update->timestamp);
+static inline uint16_t
+mavlink_msg_open_drone_id_system_update_encode_chan(uint8_t system_id, uint8_t component_id,
+                                                    uint8_t chan, mavlink_message_t *msg,
+                                                    const mavlink_open_drone_id_system_update_t *open_drone_id_system_update) {
+    return mavlink_msg_open_drone_id_system_update_pack_chan(system_id, component_id, chan, msg,
+                                                             open_drone_id_system_update->target_system,
+                                                             open_drone_id_system_update->target_component,
+                                                             open_drone_id_system_update->operator_latitude,
+                                                             open_drone_id_system_update->operator_longitude,
+                                                             open_drone_id_system_update->operator_altitude_geo,
+                                                             open_drone_id_system_update->timestamp);
 }
 
 /**
@@ -260,9 +288,9 @@ static inline void mavlink_msg_open_drone_id_system_update_send_buf(mavlink_mess
  *
  * @return  System ID (0 for broadcast).
  */
-static inline uint8_t mavlink_msg_open_drone_id_system_update_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  16);
+static inline uint8_t
+mavlink_msg_open_drone_id_system_update_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 16);
 }
 
 /**
@@ -270,9 +298,9 @@ static inline uint8_t mavlink_msg_open_drone_id_system_update_get_target_system(
  *
  * @return  Component ID (0 for broadcast).
  */
-static inline uint8_t mavlink_msg_open_drone_id_system_update_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  17);
+static inline uint8_t
+mavlink_msg_open_drone_id_system_update_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 17);
 }
 
 /**
@@ -280,9 +308,9 @@ static inline uint8_t mavlink_msg_open_drone_id_system_update_get_target_compone
  *
  * @return [degE7] Latitude of the operator. If unknown: 0 (both Lat/Lon).
  */
-static inline int32_t mavlink_msg_open_drone_id_system_update_get_operator_latitude(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  0);
+static inline int32_t
+mavlink_msg_open_drone_id_system_update_get_operator_latitude(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 0);
 }
 
 /**
@@ -290,9 +318,9 @@ static inline int32_t mavlink_msg_open_drone_id_system_update_get_operator_latit
  *
  * @return [degE7] Longitude of the operator. If unknown: 0 (both Lat/Lon).
  */
-static inline int32_t mavlink_msg_open_drone_id_system_update_get_operator_longitude(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  4);
+static inline int32_t
+mavlink_msg_open_drone_id_system_update_get_operator_longitude(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 4);
 }
 
 /**
@@ -300,9 +328,9 @@ static inline int32_t mavlink_msg_open_drone_id_system_update_get_operator_longi
  *
  * @return [m] Geodetic altitude of the operator relative to WGS84. If unknown: -1000 m.
  */
-static inline float mavlink_msg_open_drone_id_system_update_get_operator_altitude_geo(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float
+mavlink_msg_open_drone_id_system_update_get_operator_altitude_geo(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -310,9 +338,9 @@ static inline float mavlink_msg_open_drone_id_system_update_get_operator_altitud
  *
  * @return [s] 32 bit Unix Timestamp in seconds since 00:00:00 01/01/2019.
  */
-static inline uint32_t mavlink_msg_open_drone_id_system_update_get_timestamp(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  12);
+static inline uint32_t
+mavlink_msg_open_drone_id_system_update_get_timestamp(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 12);
 }
 
 /**
@@ -321,18 +349,24 @@ static inline uint32_t mavlink_msg_open_drone_id_system_update_get_timestamp(con
  * @param msg The message to decode
  * @param open_drone_id_system_update C-struct to decode the message contents into
  */
-static inline void mavlink_msg_open_drone_id_system_update_decode(const mavlink_message_t* msg, mavlink_open_drone_id_system_update_t* open_drone_id_system_update)
-{
+static inline void mavlink_msg_open_drone_id_system_update_decode(const mavlink_message_t *msg,
+                                                                  mavlink_open_drone_id_system_update_t *open_drone_id_system_update) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    open_drone_id_system_update->operator_latitude = mavlink_msg_open_drone_id_system_update_get_operator_latitude(msg);
-    open_drone_id_system_update->operator_longitude = mavlink_msg_open_drone_id_system_update_get_operator_longitude(msg);
-    open_drone_id_system_update->operator_altitude_geo = mavlink_msg_open_drone_id_system_update_get_operator_altitude_geo(msg);
-    open_drone_id_system_update->timestamp = mavlink_msg_open_drone_id_system_update_get_timestamp(msg);
-    open_drone_id_system_update->target_system = mavlink_msg_open_drone_id_system_update_get_target_system(msg);
-    open_drone_id_system_update->target_component = mavlink_msg_open_drone_id_system_update_get_target_component(msg);
+    open_drone_id_system_update->operator_latitude = mavlink_msg_open_drone_id_system_update_get_operator_latitude(
+            msg);
+    open_drone_id_system_update->operator_longitude = mavlink_msg_open_drone_id_system_update_get_operator_longitude(
+            msg);
+    open_drone_id_system_update->operator_altitude_geo = mavlink_msg_open_drone_id_system_update_get_operator_altitude_geo(
+            msg);
+    open_drone_id_system_update->timestamp = mavlink_msg_open_drone_id_system_update_get_timestamp(
+            msg);
+    open_drone_id_system_update->target_system = mavlink_msg_open_drone_id_system_update_get_target_system(
+            msg);
+    open_drone_id_system_update->target_component = mavlink_msg_open_drone_id_system_update_get_target_component(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN? msg->len : MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN;
-        memset(open_drone_id_system_update, 0, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN);
-    memcpy(open_drone_id_system_update, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN? msg->len : MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN;
+    memset(open_drone_id_system_update, 0, MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE_LEN);
+memcpy(open_drone_id_system_update, _MAV_PAYLOAD(msg), len);
 #endif
 }

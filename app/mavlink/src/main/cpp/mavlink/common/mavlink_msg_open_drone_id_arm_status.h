@@ -5,8 +5,8 @@
 
 
 typedef struct __mavlink_open_drone_id_arm_status_t {
- uint8_t status; /*<  Status level indicating if arming is allowed.*/
- char error[50]; /*<  Text error message, should be empty if status is good to arm. Fill with nulls in unused portion.*/
+    uint8_t status; /*<  Status level indicating if arming is allowed.*/
+    char error[50]; /*<  Text error message, should be empty if status is good to arm. Fill with nulls in unused portion.*/
 } mavlink_open_drone_id_arm_status_t;
 
 #define MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN 51
@@ -48,14 +48,15 @@ typedef struct __mavlink_open_drone_id_arm_status_t {
  * @param error  Text error message, should be empty if status is good to arm. Fill with nulls in unused portion.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_open_drone_id_arm_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t status, const char *error)
-{
+static inline uint16_t
+mavlink_msg_open_drone_id_arm_status_pack(uint8_t system_id, uint8_t component_id,
+                                          mavlink_message_t *msg,
+                                          uint8_t status, const char *error) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN];
     _mav_put_uint8_t(buf, 0, status);
     _mav_put_char_array(buf, 1, error, 50);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN);
 #else
     mavlink_open_drone_id_arm_status_t packet;
     packet.status = status;
@@ -64,7 +65,10 @@ static inline uint16_t mavlink_msg_open_drone_id_arm_status_pack(uint8_t system_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_MIN_LEN, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_MIN_LEN,
+                                    MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN,
+                                    MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_CRC);
 }
 
 /**
@@ -77,15 +81,16 @@ static inline uint16_t mavlink_msg_open_drone_id_arm_status_pack(uint8_t system_
  * @param error  Text error message, should be empty if status is good to arm. Fill with nulls in unused portion.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_open_drone_id_arm_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t status,const char *error)
-{
+static inline uint16_t
+mavlink_msg_open_drone_id_arm_status_pack_chan(uint8_t system_id, uint8_t component_id,
+                                               uint8_t chan,
+                                               mavlink_message_t *msg,
+                                               uint8_t status, const char *error) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN];
     _mav_put_uint8_t(buf, 0, status);
     _mav_put_char_array(buf, 1, error, 50);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN);
 #else
     mavlink_open_drone_id_arm_status_t packet;
     packet.status = status;
@@ -94,7 +99,10 @@ static inline uint16_t mavlink_msg_open_drone_id_arm_status_pack_chan(uint8_t sy
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_MIN_LEN, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_MIN_LEN,
+                                         MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN,
+                                         MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_CRC);
 }
 
 /**
@@ -105,9 +113,13 @@ static inline uint16_t mavlink_msg_open_drone_id_arm_status_pack_chan(uint8_t sy
  * @param msg The MAVLink message to compress the data into
  * @param open_drone_id_arm_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_open_drone_id_arm_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_open_drone_id_arm_status_t* open_drone_id_arm_status)
-{
-    return mavlink_msg_open_drone_id_arm_status_pack(system_id, component_id, msg, open_drone_id_arm_status->status, open_drone_id_arm_status->error);
+static inline uint16_t
+mavlink_msg_open_drone_id_arm_status_encode(uint8_t system_id, uint8_t component_id,
+                                            mavlink_message_t *msg,
+                                            const mavlink_open_drone_id_arm_status_t *open_drone_id_arm_status) {
+    return mavlink_msg_open_drone_id_arm_status_pack(system_id, component_id, msg,
+                                                     open_drone_id_arm_status->status,
+                                                     open_drone_id_arm_status->error);
 }
 
 /**
@@ -119,9 +131,13 @@ static inline uint16_t mavlink_msg_open_drone_id_arm_status_encode(uint8_t syste
  * @param msg The MAVLink message to compress the data into
  * @param open_drone_id_arm_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_open_drone_id_arm_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_open_drone_id_arm_status_t* open_drone_id_arm_status)
-{
-    return mavlink_msg_open_drone_id_arm_status_pack_chan(system_id, component_id, chan, msg, open_drone_id_arm_status->status, open_drone_id_arm_status->error);
+static inline uint16_t
+mavlink_msg_open_drone_id_arm_status_encode_chan(uint8_t system_id, uint8_t component_id,
+                                                 uint8_t chan, mavlink_message_t *msg,
+                                                 const mavlink_open_drone_id_arm_status_t *open_drone_id_arm_status) {
+    return mavlink_msg_open_drone_id_arm_status_pack_chan(system_id, component_id, chan, msg,
+                                                          open_drone_id_arm_status->status,
+                                                          open_drone_id_arm_status->error);
 }
 
 /**
@@ -196,9 +212,9 @@ static inline void mavlink_msg_open_drone_id_arm_status_send_buf(mavlink_message
  *
  * @return  Status level indicating if arming is allowed.
  */
-static inline uint8_t mavlink_msg_open_drone_id_arm_status_get_status(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  0);
+static inline uint8_t
+mavlink_msg_open_drone_id_arm_status_get_status(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 0);
 }
 
 /**
@@ -206,9 +222,9 @@ static inline uint8_t mavlink_msg_open_drone_id_arm_status_get_status(const mavl
  *
  * @return  Text error message, should be empty if status is good to arm. Fill with nulls in unused portion.
  */
-static inline uint16_t mavlink_msg_open_drone_id_arm_status_get_error(const mavlink_message_t* msg, char *error)
-{
-    return _MAV_RETURN_char_array(msg, error, 50,  1);
+static inline uint16_t
+mavlink_msg_open_drone_id_arm_status_get_error(const mavlink_message_t *msg, char *error) {
+    return _MAV_RETURN_char_array(msg, error, 50, 1);
 }
 
 /**
@@ -217,14 +233,14 @@ static inline uint16_t mavlink_msg_open_drone_id_arm_status_get_error(const mavl
  * @param msg The message to decode
  * @param open_drone_id_arm_status C-struct to decode the message contents into
  */
-static inline void mavlink_msg_open_drone_id_arm_status_decode(const mavlink_message_t* msg, mavlink_open_drone_id_arm_status_t* open_drone_id_arm_status)
-{
+static inline void mavlink_msg_open_drone_id_arm_status_decode(const mavlink_message_t *msg,
+                                                               mavlink_open_drone_id_arm_status_t *open_drone_id_arm_status) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     open_drone_id_arm_status->status = mavlink_msg_open_drone_id_arm_status_get_status(msg);
     mavlink_msg_open_drone_id_arm_status_get_error(msg, open_drone_id_arm_status->error);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN? msg->len : MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN;
-        memset(open_drone_id_arm_status, 0, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN);
-    memcpy(open_drone_id_arm_status, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN? msg->len : MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN;
+    memset(open_drone_id_arm_status, 0, MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS_LEN);
+memcpy(open_drone_id_arm_status, _MAV_PAYLOAD(msg), len);
 #endif
 }

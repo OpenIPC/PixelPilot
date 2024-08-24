@@ -16,15 +16,15 @@ extern "C" {
 typedef crypto_onetimeauth_poly1305_state crypto_onetimeauth_state;
 
 SODIUM_EXPORT
-size_t  crypto_onetimeauth_statebytes(void);
+size_t crypto_onetimeauth_statebytes(void);
 
 #define crypto_onetimeauth_BYTES crypto_onetimeauth_poly1305_BYTES
 SODIUM_EXPORT
-size_t  crypto_onetimeauth_bytes(void);
+size_t crypto_onetimeauth_bytes(void);
 
 #define crypto_onetimeauth_KEYBYTES crypto_onetimeauth_poly1305_KEYBYTES
 SODIUM_EXPORT
-size_t  crypto_onetimeauth_keybytes(void);
+size_t crypto_onetimeauth_keybytes(void);
 
 #define crypto_onetimeauth_PRIMITIVE "poly1305"
 SODIUM_EXPORT
@@ -33,12 +33,12 @@ const char *crypto_onetimeauth_primitive(void);
 SODIUM_EXPORT
 int crypto_onetimeauth(unsigned char *out, const unsigned char *in,
                        unsigned long long inlen, const unsigned char *k)
-            __attribute__ ((nonnull(1, 4)));
+__attribute__ ((nonnull(1, 4)));
 
 SODIUM_EXPORT
 int crypto_onetimeauth_verify(const unsigned char *h, const unsigned char *in,
                               unsigned long long inlen, const unsigned char *k)
-            __attribute__ ((warn_unused_result)) __attribute__ ((nonnull(1, 4)));
+__attribute__ ((warn_unused_result)) __attribute__ ((nonnull(1, 4)));
 
 SODIUM_EXPORT
 int crypto_onetimeauth_init(crypto_onetimeauth_state *state,
@@ -48,7 +48,7 @@ SODIUM_EXPORT
 int crypto_onetimeauth_update(crypto_onetimeauth_state *state,
                               const unsigned char *in,
                               unsigned long long inlen)
-            __attribute__ ((nonnull(1)));
+__attribute__ ((nonnull(1)));
 
 SODIUM_EXPORT
 int crypto_onetimeauth_final(crypto_onetimeauth_state *state,
@@ -56,7 +56,7 @@ int crypto_onetimeauth_final(crypto_onetimeauth_state *state,
 
 SODIUM_EXPORT
 void crypto_onetimeauth_keygen(unsigned char k[crypto_onetimeauth_KEYBYTES])
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 #ifdef __cplusplus
 }

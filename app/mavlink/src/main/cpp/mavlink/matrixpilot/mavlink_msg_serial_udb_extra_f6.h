@@ -4,13 +4,15 @@
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6 174
 
 MAVPACKED(
-typedef struct __mavlink_serial_udb_extra_f6_t {
- float sue_PITCHGAIN; /*<  Serial UDB Extra PITCHGAIN Proportional Control*/
- float sue_PITCHKD; /*<  Serial UDB Extra Pitch Rate Control*/
- float sue_RUDDER_ELEV_MIX; /*<  Serial UDB Extra Rudder to Elevator Mix*/
- float sue_ROLL_ELEV_MIX; /*<  Serial UDB Extra Roll to Elevator Mix*/
- float sue_ELEVATOR_BOOST; /*<  Gain For Boosting Manual Elevator control When Plane Stabilized*/
-}) mavlink_serial_udb_extra_f6_t;
+        typedef struct __mavlink_serial_udb_extra_f6_t {
+            float sue_PITCHGAIN; /*<  Serial UDB Extra PITCHGAIN Proportional Control*/
+            float sue_PITCHKD; /*<  Serial UDB Extra Pitch Rate Control*/
+            float sue_RUDDER_ELEV_MIX; /*<  Serial UDB Extra Rudder to Elevator Mix*/
+            float sue_ROLL_ELEV_MIX; /*<  Serial UDB Extra Roll to Elevator Mix*/
+            float sue_ELEVATOR_BOOST; /*<  Gain For Boosting Manual Elevator control When Plane Stabilized*/
+        })
+
+mavlink_serial_udb_extra_f6_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN 20
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_MIN_LEN 20
@@ -19,7 +21,6 @@ typedef struct __mavlink_serial_udb_extra_f6_t {
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_CRC 54
 #define MAVLINK_MSG_ID_174_CRC 54
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -60,9 +61,12 @@ typedef struct __mavlink_serial_udb_extra_f6_t {
  * @param sue_ELEVATOR_BOOST  Gain For Boosting Manual Elevator control When Plane Stabilized
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               float sue_PITCHGAIN, float sue_PITCHKD, float sue_RUDDER_ELEV_MIX, float sue_ROLL_ELEV_MIX, float sue_ELEVATOR_BOOST)
-{
+static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack(uint8_t system_id, uint8_t component_id,
+                                                            mavlink_message_t *msg,
+                                                            float sue_PITCHGAIN, float sue_PITCHKD,
+                                                            float sue_RUDDER_ELEV_MIX,
+                                                            float sue_ROLL_ELEV_MIX,
+                                                            float sue_ELEVATOR_BOOST) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN];
     _mav_put_float(buf, 0, sue_PITCHGAIN);
@@ -71,7 +75,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack(uint8_t system_id, u
     _mav_put_float(buf, 12, sue_ROLL_ELEV_MIX);
     _mav_put_float(buf, 16, sue_ELEVATOR_BOOST);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN);
 #else
     mavlink_serial_udb_extra_f6_t packet;
     packet.sue_PITCHGAIN = sue_PITCHGAIN;
@@ -84,7 +88,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack(uint8_t system_id, u
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_MIN_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_CRC);
 }
 
 /**
@@ -100,10 +107,12 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack(uint8_t system_id, u
  * @param sue_ELEVATOR_BOOST  Gain For Boosting Manual Elevator control When Plane Stabilized
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   float sue_PITCHGAIN,float sue_PITCHKD,float sue_RUDDER_ELEV_MIX,float sue_ROLL_ELEV_MIX,float sue_ELEVATOR_BOOST)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f6_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                          mavlink_message_t *msg,
+                                          float sue_PITCHGAIN, float sue_PITCHKD,
+                                          float sue_RUDDER_ELEV_MIX, float sue_ROLL_ELEV_MIX,
+                                          float sue_ELEVATOR_BOOST) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN];
     _mav_put_float(buf, 0, sue_PITCHGAIN);
@@ -112,7 +121,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack_chan(uint8_t system_
     _mav_put_float(buf, 12, sue_ROLL_ELEV_MIX);
     _mav_put_float(buf, 16, sue_ELEVATOR_BOOST);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN);
 #else
     mavlink_serial_udb_extra_f6_t packet;
     packet.sue_PITCHGAIN = sue_PITCHGAIN;
@@ -125,7 +134,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack_chan(uint8_t system_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_MIN_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_CRC);
 }
 
 /**
@@ -136,9 +148,16 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_pack_chan(uint8_t system_
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f6 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f6_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f6_t* serial_udb_extra_f6)
-{
-    return mavlink_msg_serial_udb_extra_f6_pack(system_id, component_id, msg, serial_udb_extra_f6->sue_PITCHGAIN, serial_udb_extra_f6->sue_PITCHKD, serial_udb_extra_f6->sue_RUDDER_ELEV_MIX, serial_udb_extra_f6->sue_ROLL_ELEV_MIX, serial_udb_extra_f6->sue_ELEVATOR_BOOST);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f6_encode(uint8_t system_id, uint8_t component_id,
+                                       mavlink_message_t *msg,
+                                       const mavlink_serial_udb_extra_f6_t *serial_udb_extra_f6) {
+    return mavlink_msg_serial_udb_extra_f6_pack(system_id, component_id, msg,
+                                                serial_udb_extra_f6->sue_PITCHGAIN,
+                                                serial_udb_extra_f6->sue_PITCHKD,
+                                                serial_udb_extra_f6->sue_RUDDER_ELEV_MIX,
+                                                serial_udb_extra_f6->sue_ROLL_ELEV_MIX,
+                                                serial_udb_extra_f6->sue_ELEVATOR_BOOST);
 }
 
 /**
@@ -150,9 +169,16 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f6_encode(uint8_t system_id,
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f6 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f6_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f6_t* serial_udb_extra_f6)
-{
-    return mavlink_msg_serial_udb_extra_f6_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f6->sue_PITCHGAIN, serial_udb_extra_f6->sue_PITCHKD, serial_udb_extra_f6->sue_RUDDER_ELEV_MIX, serial_udb_extra_f6->sue_ROLL_ELEV_MIX, serial_udb_extra_f6->sue_ELEVATOR_BOOST);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f6_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                            mavlink_message_t *msg,
+                                            const mavlink_serial_udb_extra_f6_t *serial_udb_extra_f6) {
+    return mavlink_msg_serial_udb_extra_f6_pack_chan(system_id, component_id, chan, msg,
+                                                     serial_udb_extra_f6->sue_PITCHGAIN,
+                                                     serial_udb_extra_f6->sue_PITCHKD,
+                                                     serial_udb_extra_f6->sue_RUDDER_ELEV_MIX,
+                                                     serial_udb_extra_f6->sue_ROLL_ELEV_MIX,
+                                                     serial_udb_extra_f6->sue_ELEVATOR_BOOST);
 }
 
 /**
@@ -246,9 +272,9 @@ static inline void mavlink_msg_serial_udb_extra_f6_send_buf(mavlink_message_t *m
  *
  * @return  Serial UDB Extra PITCHGAIN Proportional Control
  */
-static inline float mavlink_msg_serial_udb_extra_f6_get_sue_PITCHGAIN(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float
+mavlink_msg_serial_udb_extra_f6_get_sue_PITCHGAIN(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -256,9 +282,8 @@ static inline float mavlink_msg_serial_udb_extra_f6_get_sue_PITCHGAIN(const mavl
  *
  * @return  Serial UDB Extra Pitch Rate Control
  */
-static inline float mavlink_msg_serial_udb_extra_f6_get_sue_PITCHKD(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_serial_udb_extra_f6_get_sue_PITCHKD(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -266,9 +291,9 @@ static inline float mavlink_msg_serial_udb_extra_f6_get_sue_PITCHKD(const mavlin
  *
  * @return  Serial UDB Extra Rudder to Elevator Mix
  */
-static inline float mavlink_msg_serial_udb_extra_f6_get_sue_RUDDER_ELEV_MIX(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float
+mavlink_msg_serial_udb_extra_f6_get_sue_RUDDER_ELEV_MIX(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -276,9 +301,9 @@ static inline float mavlink_msg_serial_udb_extra_f6_get_sue_RUDDER_ELEV_MIX(cons
  *
  * @return  Serial UDB Extra Roll to Elevator Mix
  */
-static inline float mavlink_msg_serial_udb_extra_f6_get_sue_ROLL_ELEV_MIX(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float
+mavlink_msg_serial_udb_extra_f6_get_sue_ROLL_ELEV_MIX(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -286,9 +311,9 @@ static inline float mavlink_msg_serial_udb_extra_f6_get_sue_ROLL_ELEV_MIX(const 
  *
  * @return  Gain For Boosting Manual Elevator control When Plane Stabilized
  */
-static inline float mavlink_msg_serial_udb_extra_f6_get_sue_ELEVATOR_BOOST(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float
+mavlink_msg_serial_udb_extra_f6_get_sue_ELEVATOR_BOOST(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -297,17 +322,20 @@ static inline float mavlink_msg_serial_udb_extra_f6_get_sue_ELEVATOR_BOOST(const
  * @param msg The message to decode
  * @param serial_udb_extra_f6 C-struct to decode the message contents into
  */
-static inline void mavlink_msg_serial_udb_extra_f6_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f6_t* serial_udb_extra_f6)
-{
+static inline void mavlink_msg_serial_udb_extra_f6_decode(const mavlink_message_t *msg,
+                                                          mavlink_serial_udb_extra_f6_t *serial_udb_extra_f6) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     serial_udb_extra_f6->sue_PITCHGAIN = mavlink_msg_serial_udb_extra_f6_get_sue_PITCHGAIN(msg);
     serial_udb_extra_f6->sue_PITCHKD = mavlink_msg_serial_udb_extra_f6_get_sue_PITCHKD(msg);
-    serial_udb_extra_f6->sue_RUDDER_ELEV_MIX = mavlink_msg_serial_udb_extra_f6_get_sue_RUDDER_ELEV_MIX(msg);
-    serial_udb_extra_f6->sue_ROLL_ELEV_MIX = mavlink_msg_serial_udb_extra_f6_get_sue_ROLL_ELEV_MIX(msg);
-    serial_udb_extra_f6->sue_ELEVATOR_BOOST = mavlink_msg_serial_udb_extra_f6_get_sue_ELEVATOR_BOOST(msg);
+    serial_udb_extra_f6->sue_RUDDER_ELEV_MIX = mavlink_msg_serial_udb_extra_f6_get_sue_RUDDER_ELEV_MIX(
+            msg);
+    serial_udb_extra_f6->sue_ROLL_ELEV_MIX = mavlink_msg_serial_udb_extra_f6_get_sue_ROLL_ELEV_MIX(
+            msg);
+    serial_udb_extra_f6->sue_ELEVATOR_BOOST = mavlink_msg_serial_udb_extra_f6_get_sue_ELEVATOR_BOOST(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN;
-        memset(serial_udb_extra_f6, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN);
-    memcpy(serial_udb_extra_f6, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN;
+    memset(serial_udb_extra_f6, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F6_LEN);
+memcpy(serial_udb_extra_f6, _MAV_PAYLOAD(msg), len);
 #endif
 }

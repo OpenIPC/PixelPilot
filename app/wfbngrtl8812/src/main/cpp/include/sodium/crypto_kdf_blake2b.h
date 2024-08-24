@@ -35,7 +35,7 @@ int crypto_kdf_blake2b_derive_from_key(unsigned char *subkey, size_t subkey_len,
                                        uint64_t subkey_id,
                                        const char ctx[crypto_kdf_blake2b_CONTEXTBYTES],
                                        const unsigned char key[crypto_kdf_blake2b_KEYBYTES])
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 #ifdef __cplusplus
 }

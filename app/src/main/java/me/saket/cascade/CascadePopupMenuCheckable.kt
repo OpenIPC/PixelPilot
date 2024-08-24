@@ -47,6 +47,7 @@ open class CascadePopupMenuCheckable @JvmOverloads constructor(
     private val sharedViewPool = RecycledViewPool()
 
     private var cascadeAdapter: CascadeMenuAdapter? = null;
+
     init {
         backNavigator.onBackNavigate = {
             if (backstack.isNotEmpty() && backstack.peek() is SubMenu) {
@@ -173,10 +174,12 @@ internal class CascadeMenuAdapter(
                 itemView.setBackgroundResource(themeAttrs.touchFeedbackRes)
                 itemView.setOnClickListener { onTitleClick(model.menu) }
             }
+
             VIEW_TYPE_ITEM -> MenuItemViewHolder.inflate(parent).apply {
                 itemView.setBackgroundResource(themeAttrs.touchFeedbackRes)
                 itemView.setOnClickListener { onItemClick(model.item) }
             }
+
             else -> TODO()
         }
     }
@@ -217,13 +220,15 @@ internal fun Context.dip(dp: Int): Int {
     val metrics = resources.displayMetrics
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), metrics).toInt()
 }
+
 internal class OverScrollIfContentScrolls : RecyclerView.OnScrollListener() {
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) = Unit
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         if (dy == 0 && dx == 0) {
             // RecyclerView sends 0,0 if the visible item range changes after a layout calculation.
             val canScrollVertical = recyclerView.computeVerticalScrollRange() > recyclerView.height
-            recyclerView.overScrollMode = if (canScrollVertical) View.OVER_SCROLL_ALWAYS else View.OVER_SCROLL_NEVER
+            recyclerView.overScrollMode =
+                if (canScrollVertical) View.OVER_SCROLL_ALWAYS else View.OVER_SCROLL_NEVER
         }
     }
 }
@@ -245,12 +250,14 @@ internal fun buildModels(menu: MenuBuilder, canNavigateBack: Boolean): List<Adap
                 showBackIcon = canNavigateBack,
                 nextGroupId = (items.getOrNull(index + 1) as? MenuItem)?.groupId
             )
+
             is MenuItem -> AdapterModel.ItemModel(
                 item = item,
                 hasSubMenuSiblings = hasSubMenuItems,
                 prevGroupId = (items.getOrNull(index - 1) as? MenuItem)?.groupId,
                 nextGroupId = (items.getOrNull(index + 1) as? MenuItem)?.groupId
             )
+
             else -> error("unknown $item")
         }
     }

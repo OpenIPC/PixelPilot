@@ -4,23 +4,23 @@
 #define MAVLINK_MSG_ID_ODOMETRY 331
 
 MAVPACKED(
-typedef struct __mavlink_odometry_t {
- uint64_t time_usec; /*< [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.*/
- float x; /*< [m] X Position*/
- float y; /*< [m] Y Position*/
- float z; /*< [m] Z Position*/
- float q[4]; /*<  Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation)*/
- float vx; /*< [m/s] X linear speed*/
- float vy; /*< [m/s] Y linear speed*/
- float vz; /*< [m/s] Z linear speed*/
- float rollspeed; /*< [rad/s] Roll angular speed*/
- float pitchspeed; /*< [rad/s] Pitch angular speed*/
- float yawspeed; /*< [rad/s] Yaw angular speed*/
- float pose_covariance[21]; /*<  Pose (states: x, y, z, roll, pitch, yaw) covariance matrix upper right triangle (first six entries are the first ROW, next five entries are the second ROW, etc.)*/
- float twist_covariance[21]; /*<  Twist (states: vx, vy, vz, rollspeed, pitchspeed, yawspeed) covariance matrix upper right triangle (first six entries are the first ROW, next five entries are the second ROW, etc.)*/
- uint8_t frame_id; /*<  Coordinate frame of reference for the pose data.*/
- uint8_t child_frame_id; /*<  Coordinate frame of reference for the velocity in free space (twist) data.*/
-}) mavlink_odometry_t;
+        typedef struct __mavlink_odometry_t {
+            uint64_t time_usec; /*< [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.*/
+            float x; /*< [m] X Position*/
+            float y; /*< [m] Y Position*/
+            float z; /*< [m] Z Position*/
+            float q[4]; /*<  Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation)*/
+            float vx; /*< [m/s] X linear speed*/
+            float vy; /*< [m/s] Y linear speed*/
+            float vz; /*< [m/s] Z linear speed*/
+            float rollspeed; /*< [rad/s] Roll angular speed*/
+            float pitchspeed; /*< [rad/s] Pitch angular speed*/
+            float yawspeed; /*< [rad/s] Yaw angular speed*/
+            float pose_covariance[21]; /*<  Pose (states: x, y, z, roll, pitch, yaw) covariance matrix upper right triangle (first six entries are the first ROW, next five entries are the second ROW, etc.)*/
+            float twist_covariance[21]; /*<  Twist (states: vx, vy, vz, rollspeed, pitchspeed, yawspeed) covariance matrix upper right triangle (first six entries are the first ROW, next five entries are the second ROW, etc.)*/
+            uint8_t frame_id; /*<  Coordinate frame of reference for the pose data.*/
+            uint8_t child_frame_id; /*<  Coordinate frame of reference for the velocity in free space (twist) data.*/
+        }) mavlink_odometry_t;
 
 #define MAVLINK_MSG_ID_ODOMETRY_LEN 230
 #define MAVLINK_MSG_ID_ODOMETRY_MIN_LEN 230
@@ -102,9 +102,12 @@ typedef struct __mavlink_odometry_t {
  * @param twist_covariance  Twist (states: vx, vy, vz, rollspeed, pitchspeed, yawspeed) covariance matrix upper right triangle (first six entries are the first ROW, next five entries are the second ROW, etc.)
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_odometry_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint64_t time_usec, uint8_t frame_id, uint8_t child_frame_id, float x, float y, float z, const float *q, float vx, float vy, float vz, float rollspeed, float pitchspeed, float yawspeed, const float *pose_covariance, const float *twist_covariance)
-{
+static inline uint16_t
+mavlink_msg_odometry_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                          uint64_t time_usec, uint8_t frame_id, uint8_t child_frame_id, float x,
+                          float y, float z, const float *q, float vx, float vy, float vz,
+                          float rollspeed, float pitchspeed, float yawspeed,
+                          const float *pose_covariance, const float *twist_covariance) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_ODOMETRY_LEN];
     _mav_put_uint64_t(buf, 0, time_usec);
@@ -137,14 +140,15 @@ static inline uint16_t mavlink_msg_odometry_pack(uint8_t system_id, uint8_t comp
     packet.yawspeed = yawspeed;
     packet.frame_id = frame_id;
     packet.child_frame_id = child_frame_id;
-    mav_array_memcpy(packet.q, q, sizeof(float)*4);
-    mav_array_memcpy(packet.pose_covariance, pose_covariance, sizeof(float)*21);
-    mav_array_memcpy(packet.twist_covariance, twist_covariance, sizeof(float)*21);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ODOMETRY_LEN);
+    mav_array_memcpy(packet.q, q, sizeof(float) * 4);
+    mav_array_memcpy(packet.pose_covariance, pose_covariance, sizeof(float) * 21);
+    mav_array_memcpy(packet.twist_covariance, twist_covariance, sizeof(float) * 21);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ODOMETRY_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_ODOMETRY;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ODOMETRY_MIN_LEN, MAVLINK_MSG_ID_ODOMETRY_LEN, MAVLINK_MSG_ID_ODOMETRY_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ODOMETRY_MIN_LEN,
+                                    MAVLINK_MSG_ID_ODOMETRY_LEN, MAVLINK_MSG_ID_ODOMETRY_CRC);
 }
 
 /**
@@ -170,10 +174,13 @@ static inline uint16_t mavlink_msg_odometry_pack(uint8_t system_id, uint8_t comp
  * @param twist_covariance  Twist (states: vx, vy, vz, rollspeed, pitchspeed, yawspeed) covariance matrix upper right triangle (first six entries are the first ROW, next five entries are the second ROW, etc.)
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_odometry_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint64_t time_usec,uint8_t frame_id,uint8_t child_frame_id,float x,float y,float z,const float *q,float vx,float vy,float vz,float rollspeed,float pitchspeed,float yawspeed,const float *pose_covariance,const float *twist_covariance)
-{
+static inline uint16_t
+mavlink_msg_odometry_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                               mavlink_message_t *msg,
+                               uint64_t time_usec, uint8_t frame_id, uint8_t child_frame_id,
+                               float x, float y, float z, const float *q, float vx, float vy,
+                               float vz, float rollspeed, float pitchspeed, float yawspeed,
+                               const float *pose_covariance, const float *twist_covariance) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_ODOMETRY_LEN];
     _mav_put_uint64_t(buf, 0, time_usec);
@@ -206,14 +213,16 @@ static inline uint16_t mavlink_msg_odometry_pack_chan(uint8_t system_id, uint8_t
     packet.yawspeed = yawspeed;
     packet.frame_id = frame_id;
     packet.child_frame_id = child_frame_id;
-    mav_array_memcpy(packet.q, q, sizeof(float)*4);
-    mav_array_memcpy(packet.pose_covariance, pose_covariance, sizeof(float)*21);
-    mav_array_memcpy(packet.twist_covariance, twist_covariance, sizeof(float)*21);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ODOMETRY_LEN);
+    mav_array_memcpy(packet.q, q, sizeof(float) * 4);
+    mav_array_memcpy(packet.pose_covariance, pose_covariance, sizeof(float) * 21);
+    mav_array_memcpy(packet.twist_covariance, twist_covariance, sizeof(float) * 21);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ODOMETRY_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_ODOMETRY;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ODOMETRY_MIN_LEN, MAVLINK_MSG_ID_ODOMETRY_LEN, MAVLINK_MSG_ID_ODOMETRY_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_ODOMETRY_MIN_LEN,
+                                         MAVLINK_MSG_ID_ODOMETRY_LEN, MAVLINK_MSG_ID_ODOMETRY_CRC);
 }
 
 /**
@@ -224,9 +233,15 @@ static inline uint16_t mavlink_msg_odometry_pack_chan(uint8_t system_id, uint8_t
  * @param msg The MAVLink message to compress the data into
  * @param odometry C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_odometry_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_odometry_t* odometry)
-{
-    return mavlink_msg_odometry_pack(system_id, component_id, msg, odometry->time_usec, odometry->frame_id, odometry->child_frame_id, odometry->x, odometry->y, odometry->z, odometry->q, odometry->vx, odometry->vy, odometry->vz, odometry->rollspeed, odometry->pitchspeed, odometry->yawspeed, odometry->pose_covariance, odometry->twist_covariance);
+static inline uint16_t
+mavlink_msg_odometry_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            const mavlink_odometry_t *odometry) {
+    return mavlink_msg_odometry_pack(system_id, component_id, msg, odometry->time_usec,
+                                     odometry->frame_id, odometry->child_frame_id, odometry->x,
+                                     odometry->y, odometry->z, odometry->q, odometry->vx,
+                                     odometry->vy, odometry->vz, odometry->rollspeed,
+                                     odometry->pitchspeed, odometry->yawspeed,
+                                     odometry->pose_covariance, odometry->twist_covariance);
 }
 
 /**
@@ -238,9 +253,15 @@ static inline uint16_t mavlink_msg_odometry_encode(uint8_t system_id, uint8_t co
  * @param msg The MAVLink message to compress the data into
  * @param odometry C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_odometry_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_odometry_t* odometry)
-{
-    return mavlink_msg_odometry_pack_chan(system_id, component_id, chan, msg, odometry->time_usec, odometry->frame_id, odometry->child_frame_id, odometry->x, odometry->y, odometry->z, odometry->q, odometry->vx, odometry->vy, odometry->vz, odometry->rollspeed, odometry->pitchspeed, odometry->yawspeed, odometry->pose_covariance, odometry->twist_covariance);
+static inline uint16_t
+mavlink_msg_odometry_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg, const mavlink_odometry_t *odometry) {
+    return mavlink_msg_odometry_pack_chan(system_id, component_id, chan, msg, odometry->time_usec,
+                                          odometry->frame_id, odometry->child_frame_id, odometry->x,
+                                          odometry->y, odometry->z, odometry->q, odometry->vx,
+                                          odometry->vy, odometry->vz, odometry->rollspeed,
+                                          odometry->pitchspeed, odometry->yawspeed,
+                                          odometry->pose_covariance, odometry->twist_covariance);
 }
 
 /**
@@ -380,9 +401,8 @@ static inline void mavlink_msg_odometry_send_buf(mavlink_message_t *msgbuf, mavl
  *
  * @return [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
  */
-static inline uint64_t mavlink_msg_odometry_get_time_usec(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint64_t(msg,  0);
+static inline uint64_t mavlink_msg_odometry_get_time_usec(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint64_t(msg, 0);
 }
 
 /**
@@ -390,9 +410,8 @@ static inline uint64_t mavlink_msg_odometry_get_time_usec(const mavlink_message_
  *
  * @return  Coordinate frame of reference for the pose data.
  */
-static inline uint8_t mavlink_msg_odometry_get_frame_id(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  228);
+static inline uint8_t mavlink_msg_odometry_get_frame_id(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 228);
 }
 
 /**
@@ -400,9 +419,8 @@ static inline uint8_t mavlink_msg_odometry_get_frame_id(const mavlink_message_t*
  *
  * @return  Coordinate frame of reference for the velocity in free space (twist) data.
  */
-static inline uint8_t mavlink_msg_odometry_get_child_frame_id(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  229);
+static inline uint8_t mavlink_msg_odometry_get_child_frame_id(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 229);
 }
 
 /**
@@ -410,9 +428,8 @@ static inline uint8_t mavlink_msg_odometry_get_child_frame_id(const mavlink_mess
  *
  * @return [m] X Position
  */
-static inline float mavlink_msg_odometry_get_x(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_odometry_get_x(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -420,9 +437,8 @@ static inline float mavlink_msg_odometry_get_x(const mavlink_message_t* msg)
  *
  * @return [m] Y Position
  */
-static inline float mavlink_msg_odometry_get_y(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_odometry_get_y(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -430,9 +446,8 @@ static inline float mavlink_msg_odometry_get_y(const mavlink_message_t* msg)
  *
  * @return [m] Z Position
  */
-static inline float mavlink_msg_odometry_get_z(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float mavlink_msg_odometry_get_z(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -440,9 +455,8 @@ static inline float mavlink_msg_odometry_get_z(const mavlink_message_t* msg)
  *
  * @return  Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation)
  */
-static inline uint16_t mavlink_msg_odometry_get_q(const mavlink_message_t* msg, float *q)
-{
-    return _MAV_RETURN_float_array(msg, q, 4,  20);
+static inline uint16_t mavlink_msg_odometry_get_q(const mavlink_message_t *msg, float *q) {
+    return _MAV_RETURN_float_array(msg, q, 4, 20);
 }
 
 /**
@@ -450,9 +464,8 @@ static inline uint16_t mavlink_msg_odometry_get_q(const mavlink_message_t* msg, 
  *
  * @return [m/s] X linear speed
  */
-static inline float mavlink_msg_odometry_get_vx(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  36);
+static inline float mavlink_msg_odometry_get_vx(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 36);
 }
 
 /**
@@ -460,9 +473,8 @@ static inline float mavlink_msg_odometry_get_vx(const mavlink_message_t* msg)
  *
  * @return [m/s] Y linear speed
  */
-static inline float mavlink_msg_odometry_get_vy(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  40);
+static inline float mavlink_msg_odometry_get_vy(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 40);
 }
 
 /**
@@ -470,9 +482,8 @@ static inline float mavlink_msg_odometry_get_vy(const mavlink_message_t* msg)
  *
  * @return [m/s] Z linear speed
  */
-static inline float mavlink_msg_odometry_get_vz(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  44);
+static inline float mavlink_msg_odometry_get_vz(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 44);
 }
 
 /**
@@ -480,9 +491,8 @@ static inline float mavlink_msg_odometry_get_vz(const mavlink_message_t* msg)
  *
  * @return [rad/s] Roll angular speed
  */
-static inline float mavlink_msg_odometry_get_rollspeed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  48);
+static inline float mavlink_msg_odometry_get_rollspeed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 48);
 }
 
 /**
@@ -490,9 +500,8 @@ static inline float mavlink_msg_odometry_get_rollspeed(const mavlink_message_t* 
  *
  * @return [rad/s] Pitch angular speed
  */
-static inline float mavlink_msg_odometry_get_pitchspeed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  52);
+static inline float mavlink_msg_odometry_get_pitchspeed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 52);
 }
 
 /**
@@ -500,9 +509,8 @@ static inline float mavlink_msg_odometry_get_pitchspeed(const mavlink_message_t*
  *
  * @return [rad/s] Yaw angular speed
  */
-static inline float mavlink_msg_odometry_get_yawspeed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  56);
+static inline float mavlink_msg_odometry_get_yawspeed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 56);
 }
 
 /**
@@ -510,9 +518,9 @@ static inline float mavlink_msg_odometry_get_yawspeed(const mavlink_message_t* m
  *
  * @return  Pose (states: x, y, z, roll, pitch, yaw) covariance matrix upper right triangle (first six entries are the first ROW, next five entries are the second ROW, etc.)
  */
-static inline uint16_t mavlink_msg_odometry_get_pose_covariance(const mavlink_message_t* msg, float *pose_covariance)
-{
-    return _MAV_RETURN_float_array(msg, pose_covariance, 21,  60);
+static inline uint16_t
+mavlink_msg_odometry_get_pose_covariance(const mavlink_message_t *msg, float *pose_covariance) {
+    return _MAV_RETURN_float_array(msg, pose_covariance, 21, 60);
 }
 
 /**
@@ -520,9 +528,9 @@ static inline uint16_t mavlink_msg_odometry_get_pose_covariance(const mavlink_me
  *
  * @return  Twist (states: vx, vy, vz, rollspeed, pitchspeed, yawspeed) covariance matrix upper right triangle (first six entries are the first ROW, next five entries are the second ROW, etc.)
  */
-static inline uint16_t mavlink_msg_odometry_get_twist_covariance(const mavlink_message_t* msg, float *twist_covariance)
-{
-    return _MAV_RETURN_float_array(msg, twist_covariance, 21,  144);
+static inline uint16_t
+mavlink_msg_odometry_get_twist_covariance(const mavlink_message_t *msg, float *twist_covariance) {
+    return _MAV_RETURN_float_array(msg, twist_covariance, 21, 144);
 }
 
 /**
@@ -531,8 +539,8 @@ static inline uint16_t mavlink_msg_odometry_get_twist_covariance(const mavlink_m
  * @param msg The message to decode
  * @param odometry C-struct to decode the message contents into
  */
-static inline void mavlink_msg_odometry_decode(const mavlink_message_t* msg, mavlink_odometry_t* odometry)
-{
+static inline void
+mavlink_msg_odometry_decode(const mavlink_message_t *msg, mavlink_odometry_t *odometry) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     odometry->time_usec = mavlink_msg_odometry_get_time_usec(msg);
     odometry->x = mavlink_msg_odometry_get_x(msg);
@@ -550,8 +558,8 @@ static inline void mavlink_msg_odometry_decode(const mavlink_message_t* msg, mav
     odometry->frame_id = mavlink_msg_odometry_get_frame_id(msg);
     odometry->child_frame_id = mavlink_msg_odometry_get_child_frame_id(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_ODOMETRY_LEN? msg->len : MAVLINK_MSG_ID_ODOMETRY_LEN;
-        memset(odometry, 0, MAVLINK_MSG_ID_ODOMETRY_LEN);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_ODOMETRY_LEN ? msg->len : MAVLINK_MSG_ID_ODOMETRY_LEN;
+    memset(odometry, 0, MAVLINK_MSG_ID_ODOMETRY_LEN);
     memcpy(odometry, _MAV_PAYLOAD(msg), len);
 #endif
 }

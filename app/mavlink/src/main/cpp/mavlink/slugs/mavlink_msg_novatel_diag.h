@@ -4,15 +4,17 @@
 #define MAVLINK_MSG_ID_NOVATEL_DIAG 195
 
 MAVPACKED(
-typedef struct __mavlink_novatel_diag_t {
- uint32_t receiverStatus; /*<  Status Bitfield. See table 69 page 350 Novatel OEMstar Manual*/
- float posSolAge; /*< [s] Age of the position solution*/
- uint16_t csFails; /*<  Times the CRC has failed since boot*/
- uint8_t timeStatus; /*<  The Time Status. See Table 8 page 27 Novatel OEMStar Manual*/
- uint8_t solStatus; /*<  solution Status. See table 44 page 197*/
- uint8_t posType; /*<  position type. See table 43 page 196*/
- uint8_t velType; /*<  velocity type. See table 43 page 196*/
-}) mavlink_novatel_diag_t;
+        typedef struct __mavlink_novatel_diag_t {
+            uint32_t receiverStatus; /*<  Status Bitfield. See table 69 page 350 Novatel OEMstar Manual*/
+            float posSolAge; /*< [s] Age of the position solution*/
+            uint16_t csFails; /*<  Times the CRC has failed since boot*/
+            uint8_t timeStatus; /*<  The Time Status. See Table 8 page 27 Novatel OEMStar Manual*/
+            uint8_t solStatus; /*<  solution Status. See table 44 page 197*/
+            uint8_t posType; /*<  position type. See table 43 page 196*/
+            uint8_t velType; /*<  velocity type. See table 43 page 196*/
+        })
+
+mavlink_novatel_diag_t;
 
 #define MAVLINK_MSG_ID_NOVATEL_DIAG_LEN 14
 #define MAVLINK_MSG_ID_NOVATEL_DIAG_MIN_LEN 14
@@ -21,7 +23,6 @@ typedef struct __mavlink_novatel_diag_t {
 
 #define MAVLINK_MSG_ID_NOVATEL_DIAG_CRC 59
 #define MAVLINK_MSG_ID_195_CRC 59
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -68,9 +69,10 @@ typedef struct __mavlink_novatel_diag_t {
  * @param csFails  Times the CRC has failed since boot
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_novatel_diag_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t timeStatus, uint32_t receiverStatus, uint8_t solStatus, uint8_t posType, uint8_t velType, float posSolAge, uint16_t csFails)
-{
+static inline uint16_t
+mavlink_msg_novatel_diag_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                              uint8_t timeStatus, uint32_t receiverStatus, uint8_t solStatus,
+                              uint8_t posType, uint8_t velType, float posSolAge, uint16_t csFails) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_NOVATEL_DIAG_LEN];
     _mav_put_uint32_t(buf, 0, receiverStatus);
@@ -81,7 +83,7 @@ static inline uint16_t mavlink_msg_novatel_diag_pack(uint8_t system_id, uint8_t 
     _mav_put_uint8_t(buf, 12, posType);
     _mav_put_uint8_t(buf, 13, velType);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_NOVATEL_DIAG_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_NOVATEL_DIAG_LEN);
 #else
     mavlink_novatel_diag_t packet;
     packet.receiverStatus = receiverStatus;
@@ -96,7 +98,10 @@ static inline uint16_t mavlink_msg_novatel_diag_pack(uint8_t system_id, uint8_t 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_NOVATEL_DIAG;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_NOVATEL_DIAG_MIN_LEN, MAVLINK_MSG_ID_NOVATEL_DIAG_LEN, MAVLINK_MSG_ID_NOVATEL_DIAG_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_NOVATEL_DIAG_MIN_LEN,
+                                    MAVLINK_MSG_ID_NOVATEL_DIAG_LEN,
+                                    MAVLINK_MSG_ID_NOVATEL_DIAG_CRC);
 }
 
 /**
@@ -114,10 +119,12 @@ static inline uint16_t mavlink_msg_novatel_diag_pack(uint8_t system_id, uint8_t 
  * @param csFails  Times the CRC has failed since boot
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_novatel_diag_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t timeStatus,uint32_t receiverStatus,uint8_t solStatus,uint8_t posType,uint8_t velType,float posSolAge,uint16_t csFails)
-{
+static inline uint16_t
+mavlink_msg_novatel_diag_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                   mavlink_message_t *msg,
+                                   uint8_t timeStatus, uint32_t receiverStatus, uint8_t solStatus,
+                                   uint8_t posType, uint8_t velType, float posSolAge,
+                                   uint16_t csFails) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_NOVATEL_DIAG_LEN];
     _mav_put_uint32_t(buf, 0, receiverStatus);
@@ -128,7 +135,7 @@ static inline uint16_t mavlink_msg_novatel_diag_pack_chan(uint8_t system_id, uin
     _mav_put_uint8_t(buf, 12, posType);
     _mav_put_uint8_t(buf, 13, velType);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_NOVATEL_DIAG_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_NOVATEL_DIAG_LEN);
 #else
     mavlink_novatel_diag_t packet;
     packet.receiverStatus = receiverStatus;
@@ -143,7 +150,10 @@ static inline uint16_t mavlink_msg_novatel_diag_pack_chan(uint8_t system_id, uin
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_NOVATEL_DIAG;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_NOVATEL_DIAG_MIN_LEN, MAVLINK_MSG_ID_NOVATEL_DIAG_LEN, MAVLINK_MSG_ID_NOVATEL_DIAG_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_NOVATEL_DIAG_MIN_LEN,
+                                         MAVLINK_MSG_ID_NOVATEL_DIAG_LEN,
+                                         MAVLINK_MSG_ID_NOVATEL_DIAG_CRC);
 }
 
 /**
@@ -154,9 +164,13 @@ static inline uint16_t mavlink_msg_novatel_diag_pack_chan(uint8_t system_id, uin
  * @param msg The MAVLink message to compress the data into
  * @param novatel_diag C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_novatel_diag_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_novatel_diag_t* novatel_diag)
-{
-    return mavlink_msg_novatel_diag_pack(system_id, component_id, msg, novatel_diag->timeStatus, novatel_diag->receiverStatus, novatel_diag->solStatus, novatel_diag->posType, novatel_diag->velType, novatel_diag->posSolAge, novatel_diag->csFails);
+static inline uint16_t
+mavlink_msg_novatel_diag_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                const mavlink_novatel_diag_t *novatel_diag) {
+    return mavlink_msg_novatel_diag_pack(system_id, component_id, msg, novatel_diag->timeStatus,
+                                         novatel_diag->receiverStatus, novatel_diag->solStatus,
+                                         novatel_diag->posType, novatel_diag->velType,
+                                         novatel_diag->posSolAge, novatel_diag->csFails);
 }
 
 /**
@@ -168,9 +182,15 @@ static inline uint16_t mavlink_msg_novatel_diag_encode(uint8_t system_id, uint8_
  * @param msg The MAVLink message to compress the data into
  * @param novatel_diag C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_novatel_diag_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_novatel_diag_t* novatel_diag)
-{
-    return mavlink_msg_novatel_diag_pack_chan(system_id, component_id, chan, msg, novatel_diag->timeStatus, novatel_diag->receiverStatus, novatel_diag->solStatus, novatel_diag->posType, novatel_diag->velType, novatel_diag->posSolAge, novatel_diag->csFails);
+static inline uint16_t
+mavlink_msg_novatel_diag_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                     mavlink_message_t *msg,
+                                     const mavlink_novatel_diag_t *novatel_diag) {
+    return mavlink_msg_novatel_diag_pack_chan(system_id, component_id, chan, msg,
+                                              novatel_diag->timeStatus,
+                                              novatel_diag->receiverStatus, novatel_diag->solStatus,
+                                              novatel_diag->posType, novatel_diag->velType,
+                                              novatel_diag->posSolAge, novatel_diag->csFails);
 }
 
 /**
@@ -274,9 +294,8 @@ static inline void mavlink_msg_novatel_diag_send_buf(mavlink_message_t *msgbuf, 
  *
  * @return  The Time Status. See Table 8 page 27 Novatel OEMStar Manual
  */
-static inline uint8_t mavlink_msg_novatel_diag_get_timeStatus(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  10);
+static inline uint8_t mavlink_msg_novatel_diag_get_timeStatus(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 10);
 }
 
 /**
@@ -284,9 +303,8 @@ static inline uint8_t mavlink_msg_novatel_diag_get_timeStatus(const mavlink_mess
  *
  * @return  Status Bitfield. See table 69 page 350 Novatel OEMstar Manual
  */
-static inline uint32_t mavlink_msg_novatel_diag_get_receiverStatus(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  0);
+static inline uint32_t mavlink_msg_novatel_diag_get_receiverStatus(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 0);
 }
 
 /**
@@ -294,9 +312,8 @@ static inline uint32_t mavlink_msg_novatel_diag_get_receiverStatus(const mavlink
  *
  * @return  solution Status. See table 44 page 197
  */
-static inline uint8_t mavlink_msg_novatel_diag_get_solStatus(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  11);
+static inline uint8_t mavlink_msg_novatel_diag_get_solStatus(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 11);
 }
 
 /**
@@ -304,9 +321,8 @@ static inline uint8_t mavlink_msg_novatel_diag_get_solStatus(const mavlink_messa
  *
  * @return  position type. See table 43 page 196
  */
-static inline uint8_t mavlink_msg_novatel_diag_get_posType(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  12);
+static inline uint8_t mavlink_msg_novatel_diag_get_posType(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 12);
 }
 
 /**
@@ -314,9 +330,8 @@ static inline uint8_t mavlink_msg_novatel_diag_get_posType(const mavlink_message
  *
  * @return  velocity type. See table 43 page 196
  */
-static inline uint8_t mavlink_msg_novatel_diag_get_velType(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  13);
+static inline uint8_t mavlink_msg_novatel_diag_get_velType(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 13);
 }
 
 /**
@@ -324,9 +339,8 @@ static inline uint8_t mavlink_msg_novatel_diag_get_velType(const mavlink_message
  *
  * @return [s] Age of the position solution
  */
-static inline float mavlink_msg_novatel_diag_get_posSolAge(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_novatel_diag_get_posSolAge(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -334,9 +348,8 @@ static inline float mavlink_msg_novatel_diag_get_posSolAge(const mavlink_message
  *
  * @return  Times the CRC has failed since boot
  */
-static inline uint16_t mavlink_msg_novatel_diag_get_csFails(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  8);
+static inline uint16_t mavlink_msg_novatel_diag_get_csFails(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 8);
 }
 
 /**
@@ -345,8 +358,8 @@ static inline uint16_t mavlink_msg_novatel_diag_get_csFails(const mavlink_messag
  * @param msg The message to decode
  * @param novatel_diag C-struct to decode the message contents into
  */
-static inline void mavlink_msg_novatel_diag_decode(const mavlink_message_t* msg, mavlink_novatel_diag_t* novatel_diag)
-{
+static inline void mavlink_msg_novatel_diag_decode(const mavlink_message_t *msg,
+                                                   mavlink_novatel_diag_t *novatel_diag) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     novatel_diag->receiverStatus = mavlink_msg_novatel_diag_get_receiverStatus(msg);
     novatel_diag->posSolAge = mavlink_msg_novatel_diag_get_posSolAge(msg);
@@ -356,8 +369,8 @@ static inline void mavlink_msg_novatel_diag_decode(const mavlink_message_t* msg,
     novatel_diag->posType = mavlink_msg_novatel_diag_get_posType(msg);
     novatel_diag->velType = mavlink_msg_novatel_diag_get_velType(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_NOVATEL_DIAG_LEN? msg->len : MAVLINK_MSG_ID_NOVATEL_DIAG_LEN;
-        memset(novatel_diag, 0, MAVLINK_MSG_ID_NOVATEL_DIAG_LEN);
-    memcpy(novatel_diag, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_NOVATEL_DIAG_LEN? msg->len : MAVLINK_MSG_ID_NOVATEL_DIAG_LEN;
+    memset(novatel_diag, 0, MAVLINK_MSG_ID_NOVATEL_DIAG_LEN);
+memcpy(novatel_diag, _MAV_PAYLOAD(msg), len);
 #endif
 }

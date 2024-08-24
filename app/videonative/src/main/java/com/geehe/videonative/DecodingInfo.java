@@ -16,54 +16,55 @@ public class DecodingInfo {
     public final int nNALUSFeeded;
     public final int nDecodedFrames;
 
-    public DecodingInfo(){
-        currentFPS=0;
-        currentKiloBitsPerSecond=0;
-        avgParsingTime_ms=0;
-        avgWaitForInputBTime_ms=0;
-        avgHWDecodingTime_ms=0;
-        nNALU=0;
-        nNALUSFeeded=0;
-        avgTotalDecodingTime_ms =0;
-        nDecodedFrames=0;
+    public DecodingInfo() {
+        currentFPS = 0;
+        currentKiloBitsPerSecond = 0;
+        avgParsingTime_ms = 0;
+        avgWaitForInputBTime_ms = 0;
+        avgHWDecodingTime_ms = 0;
+        nNALU = 0;
+        nNALUSFeeded = 0;
+        avgTotalDecodingTime_ms = 0;
+        nDecodedFrames = 0;
     }
 
-    public DecodingInfo(float currentFPS, float currentKiloBitsPerSecond,float avgParsingTime_ms,float avgWaitForInputBTime_ms,float avgHWDecodingTime_ms,
-                        int nNALU,int nNALUSFeeded,int nDecodedFrames){
-        this.currentFPS=currentFPS;
-        this.currentKiloBitsPerSecond=currentKiloBitsPerSecond;
-        this.avgParsingTime_ms=avgParsingTime_ms;
-        this.avgWaitForInputBTime_ms=avgWaitForInputBTime_ms;
-        this.avgHWDecodingTime_ms =avgHWDecodingTime_ms;
-        this.avgTotalDecodingTime_ms =avgParsingTime_ms+avgWaitForInputBTime_ms+avgHWDecodingTime_ms;
-        this.nNALU=nNALU;
-        this.nNALUSFeeded=nNALUSFeeded;
-        this.nDecodedFrames=nDecodedFrames;
+    public DecodingInfo(float currentFPS, float currentKiloBitsPerSecond, float avgParsingTime_ms,
+                        float avgWaitForInputBTime_ms, float avgHWDecodingTime_ms,
+                        int nNALU, int nNALUSFeeded, int nDecodedFrames) {
+        this.currentFPS = currentFPS;
+        this.currentKiloBitsPerSecond = currentKiloBitsPerSecond;
+        this.avgParsingTime_ms = avgParsingTime_ms;
+        this.avgWaitForInputBTime_ms = avgWaitForInputBTime_ms;
+        this.avgHWDecodingTime_ms = avgHWDecodingTime_ms;
+        this.avgTotalDecodingTime_ms = avgParsingTime_ms + avgWaitForInputBTime_ms + avgHWDecodingTime_ms;
+        this.nNALU = nNALU;
+        this.nNALUSFeeded = nNALUSFeeded;
+        this.nDecodedFrames = nDecodedFrames;
     }
 
-    public LinkedHashMap<String,Object> toMap(){
+    public LinkedHashMap<String, Object> toMap() {
         LinkedHashMap<String, Object> decodingInfo = new LinkedHashMap<>();
         decodingInfo.put("avgTotalDecodingTime_ms", avgTotalDecodingTime_ms);
-        decodingInfo.put("avgParsingTime_ms",avgParsingTime_ms);
-        decodingInfo.put("avgWaitForInputBTime_ms",avgWaitForInputBTime_ms);
+        decodingInfo.put("avgParsingTime_ms", avgParsingTime_ms);
+        decodingInfo.put("avgWaitForInputBTime_ms", avgWaitForInputBTime_ms);
         decodingInfo.put("avgHWDecodingTime_ms", avgHWDecodingTime_ms);
-        decodingInfo.put("currentFPS",currentFPS);
-        decodingInfo.put("currentKiloBitsPerSecond",currentKiloBitsPerSecond);
-        decodingInfo.put("nNALU",nNALU);
-        decodingInfo.put("nNALUSFeeded",nNALUSFeeded);
-        decodingInfo.put("nDecodedFrames",nDecodedFrames);
+        decodingInfo.put("currentFPS", currentFPS);
+        decodingInfo.put("currentKiloBitsPerSecond", currentKiloBitsPerSecond);
+        decodingInfo.put("nNALU", nNALU);
+        decodingInfo.put("nNALUSFeeded", nNALUSFeeded);
+        decodingInfo.put("nDecodedFrames", nDecodedFrames);
         return decodingInfo;
     }
 
-    public String toString(final boolean newline){
-        final StringBuilder builder=new StringBuilder();
-        builder.append( "Decoding info:\n");
-        final Map<String,Object> map=toMap();
-        for(final String key:map.keySet()){
+    public String toString(final boolean newline) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Decoding info:\n");
+        final Map<String, Object> map = toMap();
+        for (final String key : map.keySet()) {
             //Either float or int, toString available
-            final Object value=map.get(key);
+            final Object value = map.get(key);
             builder.append(key).append(":").append(value);
-            if(newline)builder.append("\n");
+            if (newline) builder.append("\n");
         }
         return builder.toString();
     }

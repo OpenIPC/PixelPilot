@@ -27,7 +27,7 @@ size_t crypto_core_hchacha20_constbytes(void);
 SODIUM_EXPORT
 int crypto_core_hchacha20(unsigned char *out, const unsigned char *in,
                           const unsigned char *k, const unsigned char *c)
-            __attribute__ ((nonnull(1, 2, 3)));
+__attribute__ ((nonnull(1, 2, 3)));
 
 #ifdef __cplusplus
 }

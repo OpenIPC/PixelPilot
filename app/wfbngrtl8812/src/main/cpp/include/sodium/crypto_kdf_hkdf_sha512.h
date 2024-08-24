@@ -32,17 +32,17 @@ SODIUM_EXPORT
 int crypto_kdf_hkdf_sha512_extract(unsigned char prk[crypto_kdf_hkdf_sha512_KEYBYTES],
                                    const unsigned char *salt, size_t salt_len,
                                    const unsigned char *ikm, size_t ikm_len)
-            __attribute__ ((nonnull(1)));
+__attribute__ ((nonnull(1)));
 
 SODIUM_EXPORT
 void crypto_kdf_hkdf_sha512_keygen(unsigned char prk[crypto_kdf_hkdf_sha512_KEYBYTES])
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 SODIUM_EXPORT
 int crypto_kdf_hkdf_sha512_expand(unsigned char *out, size_t out_len,
                                   const char *ctx, size_t ctx_len,
                                   const unsigned char prk[crypto_kdf_hkdf_sha512_KEYBYTES])
-            __attribute__ ((nonnull(1)));
+__attribute__ ((nonnull(1)));
 
 /* ------------------------------------------------------------------------- */
 
@@ -56,17 +56,17 @@ size_t crypto_kdf_hkdf_sha512_statebytes(void);
 SODIUM_EXPORT
 int crypto_kdf_hkdf_sha512_extract_init(crypto_kdf_hkdf_sha512_state *state,
                                         const unsigned char *salt, size_t salt_len)
-            __attribute__ ((nonnull(1)));
+__attribute__ ((nonnull(1)));
 
 SODIUM_EXPORT
 int crypto_kdf_hkdf_sha512_extract_update(crypto_kdf_hkdf_sha512_state *state,
                                           const unsigned char *ikm, size_t ikm_len)
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 SODIUM_EXPORT
 int crypto_kdf_hkdf_sha512_extract_final(crypto_kdf_hkdf_sha512_state *state,
                                          unsigned char prk[crypto_kdf_hkdf_sha512_KEYBYTES])
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 #ifdef __cplusplus
 }

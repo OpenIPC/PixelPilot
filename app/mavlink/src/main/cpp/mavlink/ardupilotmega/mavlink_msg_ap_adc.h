@@ -4,14 +4,16 @@
 #define MAVLINK_MSG_ID_AP_ADC 153
 
 MAVPACKED(
-typedef struct __mavlink_ap_adc_t {
- uint16_t adc1; /*<  ADC output 1.*/
- uint16_t adc2; /*<  ADC output 2.*/
- uint16_t adc3; /*<  ADC output 3.*/
- uint16_t adc4; /*<  ADC output 4.*/
- uint16_t adc5; /*<  ADC output 5.*/
- uint16_t adc6; /*<  ADC output 6.*/
-}) mavlink_ap_adc_t;
+        typedef struct __mavlink_ap_adc_t {
+            uint16_t adc1; /*<  ADC output 1.*/
+            uint16_t adc2; /*<  ADC output 2.*/
+            uint16_t adc3; /*<  ADC output 3.*/
+            uint16_t adc4; /*<  ADC output 4.*/
+            uint16_t adc5; /*<  ADC output 5.*/
+            uint16_t adc6; /*<  ADC output 6.*/
+        })
+
+mavlink_ap_adc_t;
 
 #define MAVLINK_MSG_ID_AP_ADC_LEN 12
 #define MAVLINK_MSG_ID_AP_ADC_MIN_LEN 12
@@ -20,7 +22,6 @@ typedef struct __mavlink_ap_adc_t {
 
 #define MAVLINK_MSG_ID_AP_ADC_CRC 188
 #define MAVLINK_MSG_ID_153_CRC 188
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -64,9 +65,10 @@ typedef struct __mavlink_ap_adc_t {
  * @param adc6  ADC output 6.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_ap_adc_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint16_t adc1, uint16_t adc2, uint16_t adc3, uint16_t adc4, uint16_t adc5, uint16_t adc6)
-{
+static inline uint16_t
+mavlink_msg_ap_adc_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                        uint16_t adc1, uint16_t adc2, uint16_t adc3, uint16_t adc4, uint16_t adc5,
+                        uint16_t adc6) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AP_ADC_LEN];
     _mav_put_uint16_t(buf, 0, adc1);
@@ -76,7 +78,7 @@ static inline uint16_t mavlink_msg_ap_adc_pack(uint8_t system_id, uint8_t compon
     _mav_put_uint16_t(buf, 8, adc5);
     _mav_put_uint16_t(buf, 10, adc6);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AP_ADC_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AP_ADC_LEN);
 #else
     mavlink_ap_adc_t packet;
     packet.adc1 = adc1;
@@ -90,7 +92,8 @@ static inline uint16_t mavlink_msg_ap_adc_pack(uint8_t system_id, uint8_t compon
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AP_ADC;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AP_ADC_MIN_LEN, MAVLINK_MSG_ID_AP_ADC_LEN, MAVLINK_MSG_ID_AP_ADC_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AP_ADC_MIN_LEN,
+                                    MAVLINK_MSG_ID_AP_ADC_LEN, MAVLINK_MSG_ID_AP_ADC_CRC);
 }
 
 /**
@@ -107,10 +110,11 @@ static inline uint16_t mavlink_msg_ap_adc_pack(uint8_t system_id, uint8_t compon
  * @param adc6  ADC output 6.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_ap_adc_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint16_t adc1,uint16_t adc2,uint16_t adc3,uint16_t adc4,uint16_t adc5,uint16_t adc6)
-{
+static inline uint16_t
+mavlink_msg_ap_adc_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                             mavlink_message_t *msg,
+                             uint16_t adc1, uint16_t adc2, uint16_t adc3, uint16_t adc4,
+                             uint16_t adc5, uint16_t adc6) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AP_ADC_LEN];
     _mav_put_uint16_t(buf, 0, adc1);
@@ -120,7 +124,7 @@ static inline uint16_t mavlink_msg_ap_adc_pack_chan(uint8_t system_id, uint8_t c
     _mav_put_uint16_t(buf, 8, adc5);
     _mav_put_uint16_t(buf, 10, adc6);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AP_ADC_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AP_ADC_LEN);
 #else
     mavlink_ap_adc_t packet;
     packet.adc1 = adc1;
@@ -134,7 +138,9 @@ static inline uint16_t mavlink_msg_ap_adc_pack_chan(uint8_t system_id, uint8_t c
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AP_ADC;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AP_ADC_MIN_LEN, MAVLINK_MSG_ID_AP_ADC_LEN, MAVLINK_MSG_ID_AP_ADC_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_AP_ADC_MIN_LEN, MAVLINK_MSG_ID_AP_ADC_LEN,
+                                         MAVLINK_MSG_ID_AP_ADC_CRC);
 }
 
 /**
@@ -145,9 +151,11 @@ static inline uint16_t mavlink_msg_ap_adc_pack_chan(uint8_t system_id, uint8_t c
  * @param msg The MAVLink message to compress the data into
  * @param ap_adc C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_ap_adc_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_ap_adc_t* ap_adc)
-{
-    return mavlink_msg_ap_adc_pack(system_id, component_id, msg, ap_adc->adc1, ap_adc->adc2, ap_adc->adc3, ap_adc->adc4, ap_adc->adc5, ap_adc->adc6);
+static inline uint16_t
+mavlink_msg_ap_adc_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                          const mavlink_ap_adc_t *ap_adc) {
+    return mavlink_msg_ap_adc_pack(system_id, component_id, msg, ap_adc->adc1, ap_adc->adc2,
+                                   ap_adc->adc3, ap_adc->adc4, ap_adc->adc5, ap_adc->adc6);
 }
 
 /**
@@ -159,9 +167,12 @@ static inline uint16_t mavlink_msg_ap_adc_encode(uint8_t system_id, uint8_t comp
  * @param msg The MAVLink message to compress the data into
  * @param ap_adc C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_ap_adc_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_ap_adc_t* ap_adc)
-{
-    return mavlink_msg_ap_adc_pack_chan(system_id, component_id, chan, msg, ap_adc->adc1, ap_adc->adc2, ap_adc->adc3, ap_adc->adc4, ap_adc->adc5, ap_adc->adc6);
+static inline uint16_t
+mavlink_msg_ap_adc_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                               mavlink_message_t *msg, const mavlink_ap_adc_t *ap_adc) {
+    return mavlink_msg_ap_adc_pack_chan(system_id, component_id, chan, msg, ap_adc->adc1,
+                                        ap_adc->adc2, ap_adc->adc3, ap_adc->adc4, ap_adc->adc5,
+                                        ap_adc->adc6);
 }
 
 /**
@@ -260,9 +271,8 @@ static inline void mavlink_msg_ap_adc_send_buf(mavlink_message_t *msgbuf, mavlin
  *
  * @return  ADC output 1.
  */
-static inline uint16_t mavlink_msg_ap_adc_get_adc1(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  0);
+static inline uint16_t mavlink_msg_ap_adc_get_adc1(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 0);
 }
 
 /**
@@ -270,9 +280,8 @@ static inline uint16_t mavlink_msg_ap_adc_get_adc1(const mavlink_message_t* msg)
  *
  * @return  ADC output 2.
  */
-static inline uint16_t mavlink_msg_ap_adc_get_adc2(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  2);
+static inline uint16_t mavlink_msg_ap_adc_get_adc2(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 2);
 }
 
 /**
@@ -280,9 +289,8 @@ static inline uint16_t mavlink_msg_ap_adc_get_adc2(const mavlink_message_t* msg)
  *
  * @return  ADC output 3.
  */
-static inline uint16_t mavlink_msg_ap_adc_get_adc3(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  4);
+static inline uint16_t mavlink_msg_ap_adc_get_adc3(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 4);
 }
 
 /**
@@ -290,9 +298,8 @@ static inline uint16_t mavlink_msg_ap_adc_get_adc3(const mavlink_message_t* msg)
  *
  * @return  ADC output 4.
  */
-static inline uint16_t mavlink_msg_ap_adc_get_adc4(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  6);
+static inline uint16_t mavlink_msg_ap_adc_get_adc4(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 6);
 }
 
 /**
@@ -300,9 +307,8 @@ static inline uint16_t mavlink_msg_ap_adc_get_adc4(const mavlink_message_t* msg)
  *
  * @return  ADC output 5.
  */
-static inline uint16_t mavlink_msg_ap_adc_get_adc5(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  8);
+static inline uint16_t mavlink_msg_ap_adc_get_adc5(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 8);
 }
 
 /**
@@ -310,9 +316,8 @@ static inline uint16_t mavlink_msg_ap_adc_get_adc5(const mavlink_message_t* msg)
  *
  * @return  ADC output 6.
  */
-static inline uint16_t mavlink_msg_ap_adc_get_adc6(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  10);
+static inline uint16_t mavlink_msg_ap_adc_get_adc6(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 10);
 }
 
 /**
@@ -321,8 +326,8 @@ static inline uint16_t mavlink_msg_ap_adc_get_adc6(const mavlink_message_t* msg)
  * @param msg The message to decode
  * @param ap_adc C-struct to decode the message contents into
  */
-static inline void mavlink_msg_ap_adc_decode(const mavlink_message_t* msg, mavlink_ap_adc_t* ap_adc)
-{
+static inline void
+mavlink_msg_ap_adc_decode(const mavlink_message_t *msg, mavlink_ap_adc_t *ap_adc) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     ap_adc->adc1 = mavlink_msg_ap_adc_get_adc1(msg);
     ap_adc->adc2 = mavlink_msg_ap_adc_get_adc2(msg);
@@ -331,8 +336,8 @@ static inline void mavlink_msg_ap_adc_decode(const mavlink_message_t* msg, mavli
     ap_adc->adc5 = mavlink_msg_ap_adc_get_adc5(msg);
     ap_adc->adc6 = mavlink_msg_ap_adc_get_adc6(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_AP_ADC_LEN? msg->len : MAVLINK_MSG_ID_AP_ADC_LEN;
-        memset(ap_adc, 0, MAVLINK_MSG_ID_AP_ADC_LEN);
-    memcpy(ap_adc, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_AP_ADC_LEN? msg->len : MAVLINK_MSG_ID_AP_ADC_LEN;
+    memset(ap_adc, 0, MAVLINK_MSG_ID_AP_ADC_LEN);
+memcpy(ap_adc, _MAV_PAYLOAD(msg), len);
 #endif
 }

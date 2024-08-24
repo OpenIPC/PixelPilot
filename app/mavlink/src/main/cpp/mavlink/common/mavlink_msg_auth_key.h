@@ -4,9 +4,9 @@
 #define MAVLINK_MSG_ID_AUTH_KEY 7
 
 MAVPACKED(
-typedef struct __mavlink_auth_key_t {
- char key[32]; /*<  key*/
-}) mavlink_auth_key_t;
+        typedef struct __mavlink_auth_key_t {
+            char key[32]; /*<  key*/
+        }) mavlink_auth_key_t;
 
 #define MAVLINK_MSG_ID_AUTH_KEY_LEN 32
 #define MAVLINK_MSG_ID_AUTH_KEY_MIN_LEN 32
@@ -44,9 +44,9 @@ typedef struct __mavlink_auth_key_t {
  * @param key  key
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_auth_key_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               const char *key)
-{
+static inline uint16_t
+mavlink_msg_auth_key_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                          const char *key) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AUTH_KEY_LEN];
 
@@ -55,12 +55,13 @@ static inline uint16_t mavlink_msg_auth_key_pack(uint8_t system_id, uint8_t comp
 #else
     mavlink_auth_key_t packet;
 
-    mav_array_memcpy(packet.key, key, sizeof(char)*32);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_AUTH_KEY_LEN);
+    mav_array_memcpy(packet.key, key, sizeof(char) * 32);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_AUTH_KEY_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AUTH_KEY;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AUTH_KEY_MIN_LEN, MAVLINK_MSG_ID_AUTH_KEY_LEN, MAVLINK_MSG_ID_AUTH_KEY_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AUTH_KEY_MIN_LEN,
+                                    MAVLINK_MSG_ID_AUTH_KEY_LEN, MAVLINK_MSG_ID_AUTH_KEY_CRC);
 }
 
 /**
@@ -72,10 +73,10 @@ static inline uint16_t mavlink_msg_auth_key_pack(uint8_t system_id, uint8_t comp
  * @param key  key
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_auth_key_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   const char *key)
-{
+static inline uint16_t
+mavlink_msg_auth_key_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                               mavlink_message_t *msg,
+                               const char *key) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AUTH_KEY_LEN];
 
@@ -84,12 +85,14 @@ static inline uint16_t mavlink_msg_auth_key_pack_chan(uint8_t system_id, uint8_t
 #else
     mavlink_auth_key_t packet;
 
-    mav_array_memcpy(packet.key, key, sizeof(char)*32);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_AUTH_KEY_LEN);
+    mav_array_memcpy(packet.key, key, sizeof(char) * 32);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_AUTH_KEY_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AUTH_KEY;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AUTH_KEY_MIN_LEN, MAVLINK_MSG_ID_AUTH_KEY_LEN, MAVLINK_MSG_ID_AUTH_KEY_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_AUTH_KEY_MIN_LEN,
+                                         MAVLINK_MSG_ID_AUTH_KEY_LEN, MAVLINK_MSG_ID_AUTH_KEY_CRC);
 }
 
 /**
@@ -100,8 +103,9 @@ static inline uint16_t mavlink_msg_auth_key_pack_chan(uint8_t system_id, uint8_t
  * @param msg The MAVLink message to compress the data into
  * @param auth_key C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_auth_key_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_auth_key_t* auth_key)
-{
+static inline uint16_t
+mavlink_msg_auth_key_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            const mavlink_auth_key_t *auth_key) {
     return mavlink_msg_auth_key_pack(system_id, component_id, msg, auth_key->key);
 }
 
@@ -114,8 +118,9 @@ static inline uint16_t mavlink_msg_auth_key_encode(uint8_t system_id, uint8_t co
  * @param msg The MAVLink message to compress the data into
  * @param auth_key C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_auth_key_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_auth_key_t* auth_key)
-{
+static inline uint16_t
+mavlink_msg_auth_key_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg, const mavlink_auth_key_t *auth_key) {
     return mavlink_msg_auth_key_pack_chan(system_id, component_id, chan, msg, auth_key->key);
 }
 
@@ -190,9 +195,8 @@ static inline void mavlink_msg_auth_key_send_buf(mavlink_message_t *msgbuf, mavl
  *
  * @return  key
  */
-static inline uint16_t mavlink_msg_auth_key_get_key(const mavlink_message_t* msg, char *key)
-{
-    return _MAV_RETURN_char_array(msg, key, 32,  0);
+static inline uint16_t mavlink_msg_auth_key_get_key(const mavlink_message_t *msg, char *key) {
+    return _MAV_RETURN_char_array(msg, key, 32, 0);
 }
 
 /**
@@ -201,13 +205,13 @@ static inline uint16_t mavlink_msg_auth_key_get_key(const mavlink_message_t* msg
  * @param msg The message to decode
  * @param auth_key C-struct to decode the message contents into
  */
-static inline void mavlink_msg_auth_key_decode(const mavlink_message_t* msg, mavlink_auth_key_t* auth_key)
-{
+static inline void
+mavlink_msg_auth_key_decode(const mavlink_message_t *msg, mavlink_auth_key_t *auth_key) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     mavlink_msg_auth_key_get_key(msg, auth_key->key);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_AUTH_KEY_LEN? msg->len : MAVLINK_MSG_ID_AUTH_KEY_LEN;
-        memset(auth_key, 0, MAVLINK_MSG_ID_AUTH_KEY_LEN);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_AUTH_KEY_LEN ? msg->len : MAVLINK_MSG_ID_AUTH_KEY_LEN;
+    memset(auth_key, 0, MAVLINK_MSG_ID_AUTH_KEY_LEN);
     memcpy(auth_key, _MAV_PAYLOAD(msg), len);
 #endif
 }

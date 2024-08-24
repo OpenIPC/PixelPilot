@@ -7,7 +7,7 @@
 #define MAVLINK_ICAROUS_H
 
 #ifndef MAVLINK_H
-    #error Wrong include order: MAVLINK_ICAROUS.H MUST NOT BE DIRECTLY USED. Include mavlink.h from the same directory instead or set ALL AND EVERY defines from MAVLINK.H manually accordingly, including the #define MAVLINK_H call.
+#error Wrong include order: MAVLINK_ICAROUS.H MUST NOT BE DIRECTLY USED. Include mavlink.h from the same directory instead or set ALL AND EVERY defines from MAVLINK.H manually accordingly, including the #define MAVLINK_H call.
 #endif
 
 #undef MAVLINK_THIS_XML_IDX
@@ -37,27 +37,25 @@ extern "C" {
 /** @brief  */
 #ifndef HAVE_ENUM_ICAROUS_TRACK_BAND_TYPES
 #define HAVE_ENUM_ICAROUS_TRACK_BAND_TYPES
-typedef enum ICAROUS_TRACK_BAND_TYPES
-{
-   ICAROUS_TRACK_BAND_TYPE_NONE=0, /*  | */
-   ICAROUS_TRACK_BAND_TYPE_NEAR=1, /*  | */
-   ICAROUS_TRACK_BAND_TYPE_RECOVERY=2, /*  | */
-   ICAROUS_TRACK_BAND_TYPES_ENUM_END=3, /*  | */
+typedef enum ICAROUS_TRACK_BAND_TYPES {
+    ICAROUS_TRACK_BAND_TYPE_NONE = 0, /*  | */
+    ICAROUS_TRACK_BAND_TYPE_NEAR = 1, /*  | */
+    ICAROUS_TRACK_BAND_TYPE_RECOVERY = 2, /*  | */
+    ICAROUS_TRACK_BAND_TYPES_ENUM_END = 3, /*  | */
 } ICAROUS_TRACK_BAND_TYPES;
 #endif
 
 /** @brief  */
 #ifndef HAVE_ENUM_ICAROUS_FMS_STATE
 #define HAVE_ENUM_ICAROUS_FMS_STATE
-typedef enum ICAROUS_FMS_STATE
-{
-   ICAROUS_FMS_STATE_IDLE=0, /*  | */
-   ICAROUS_FMS_STATE_TAKEOFF=1, /*  | */
-   ICAROUS_FMS_STATE_CLIMB=2, /*  | */
-   ICAROUS_FMS_STATE_CRUISE=3, /*  | */
-   ICAROUS_FMS_STATE_APPROACH=4, /*  | */
-   ICAROUS_FMS_STATE_LAND=5, /*  | */
-   ICAROUS_FMS_STATE_ENUM_END=6, /*  | */
+typedef enum ICAROUS_FMS_STATE {
+    ICAROUS_FMS_STATE_IDLE = 0, /*  | */
+    ICAROUS_FMS_STATE_TAKEOFF = 1, /*  | */
+    ICAROUS_FMS_STATE_CLIMB = 2, /*  | */
+    ICAROUS_FMS_STATE_CRUISE = 3, /*  | */
+    ICAROUS_FMS_STATE_APPROACH = 4, /*  | */
+    ICAROUS_FMS_STATE_LAND = 5, /*  | */
+    ICAROUS_FMS_STATE_ENUM_END = 6, /*  | */
 } ICAROUS_FMS_STATE;
 #endif
 

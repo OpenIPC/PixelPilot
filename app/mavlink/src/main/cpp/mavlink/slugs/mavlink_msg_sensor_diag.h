@@ -4,12 +4,14 @@
 #define MAVLINK_MSG_ID_SENSOR_DIAG 196
 
 MAVPACKED(
-typedef struct __mavlink_sensor_diag_t {
- float float1; /*<  Float field 1*/
- float float2; /*<  Float field 2*/
- int16_t int1; /*<  Int 16 field 1*/
- int8_t char1; /*<  Int 8 field 1*/
-}) mavlink_sensor_diag_t;
+        typedef struct __mavlink_sensor_diag_t {
+            float float1; /*<  Float field 1*/
+            float float2; /*<  Float field 2*/
+            int16_t int1; /*<  Int 16 field 1*/
+            int8_t char1; /*<  Int 8 field 1*/
+        })
+
+mavlink_sensor_diag_t;
 
 #define MAVLINK_MSG_ID_SENSOR_DIAG_LEN 11
 #define MAVLINK_MSG_ID_SENSOR_DIAG_MIN_LEN 11
@@ -18,7 +20,6 @@ typedef struct __mavlink_sensor_diag_t {
 
 #define MAVLINK_MSG_ID_SENSOR_DIAG_CRC 129
 #define MAVLINK_MSG_ID_196_CRC 129
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -56,9 +57,9 @@ typedef struct __mavlink_sensor_diag_t {
  * @param char1  Int 8 field 1
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_sensor_diag_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               float float1, float float2, int16_t int1, int8_t char1)
-{
+static inline uint16_t
+mavlink_msg_sensor_diag_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                             float float1, float float2, int16_t int1, int8_t char1) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SENSOR_DIAG_LEN];
     _mav_put_float(buf, 0, float1);
@@ -66,7 +67,7 @@ static inline uint16_t mavlink_msg_sensor_diag_pack(uint8_t system_id, uint8_t c
     _mav_put_int16_t(buf, 8, int1);
     _mav_put_int8_t(buf, 10, char1);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENSOR_DIAG_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENSOR_DIAG_LEN);
 #else
     mavlink_sensor_diag_t packet;
     packet.float1 = float1;
@@ -78,7 +79,9 @@ static inline uint16_t mavlink_msg_sensor_diag_pack(uint8_t system_id, uint8_t c
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SENSOR_DIAG;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SENSOR_DIAG_MIN_LEN, MAVLINK_MSG_ID_SENSOR_DIAG_LEN, MAVLINK_MSG_ID_SENSOR_DIAG_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SENSOR_DIAG_MIN_LEN,
+                                    MAVLINK_MSG_ID_SENSOR_DIAG_LEN, MAVLINK_MSG_ID_SENSOR_DIAG_CRC);
 }
 
 /**
@@ -93,10 +96,10 @@ static inline uint16_t mavlink_msg_sensor_diag_pack(uint8_t system_id, uint8_t c
  * @param char1  Int 8 field 1
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_sensor_diag_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   float float1,float float2,int16_t int1,int8_t char1)
-{
+static inline uint16_t
+mavlink_msg_sensor_diag_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                  mavlink_message_t *msg,
+                                  float float1, float float2, int16_t int1, int8_t char1) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SENSOR_DIAG_LEN];
     _mav_put_float(buf, 0, float1);
@@ -104,7 +107,7 @@ static inline uint16_t mavlink_msg_sensor_diag_pack_chan(uint8_t system_id, uint
     _mav_put_int16_t(buf, 8, int1);
     _mav_put_int8_t(buf, 10, char1);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENSOR_DIAG_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENSOR_DIAG_LEN);
 #else
     mavlink_sensor_diag_t packet;
     packet.float1 = float1;
@@ -116,7 +119,10 @@ static inline uint16_t mavlink_msg_sensor_diag_pack_chan(uint8_t system_id, uint
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SENSOR_DIAG;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SENSOR_DIAG_MIN_LEN, MAVLINK_MSG_ID_SENSOR_DIAG_LEN, MAVLINK_MSG_ID_SENSOR_DIAG_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SENSOR_DIAG_MIN_LEN,
+                                         MAVLINK_MSG_ID_SENSOR_DIAG_LEN,
+                                         MAVLINK_MSG_ID_SENSOR_DIAG_CRC);
 }
 
 /**
@@ -127,9 +133,11 @@ static inline uint16_t mavlink_msg_sensor_diag_pack_chan(uint8_t system_id, uint
  * @param msg The MAVLink message to compress the data into
  * @param sensor_diag C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_sensor_diag_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_sensor_diag_t* sensor_diag)
-{
-    return mavlink_msg_sensor_diag_pack(system_id, component_id, msg, sensor_diag->float1, sensor_diag->float2, sensor_diag->int1, sensor_diag->char1);
+static inline uint16_t
+mavlink_msg_sensor_diag_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                               const mavlink_sensor_diag_t *sensor_diag) {
+    return mavlink_msg_sensor_diag_pack(system_id, component_id, msg, sensor_diag->float1,
+                                        sensor_diag->float2, sensor_diag->int1, sensor_diag->char1);
 }
 
 /**
@@ -141,9 +149,13 @@ static inline uint16_t mavlink_msg_sensor_diag_encode(uint8_t system_id, uint8_t
  * @param msg The MAVLink message to compress the data into
  * @param sensor_diag C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_sensor_diag_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_sensor_diag_t* sensor_diag)
-{
-    return mavlink_msg_sensor_diag_pack_chan(system_id, component_id, chan, msg, sensor_diag->float1, sensor_diag->float2, sensor_diag->int1, sensor_diag->char1);
+static inline uint16_t
+mavlink_msg_sensor_diag_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                    mavlink_message_t *msg,
+                                    const mavlink_sensor_diag_t *sensor_diag) {
+    return mavlink_msg_sensor_diag_pack_chan(system_id, component_id, chan, msg,
+                                             sensor_diag->float1, sensor_diag->float2,
+                                             sensor_diag->int1, sensor_diag->char1);
 }
 
 /**
@@ -232,9 +244,8 @@ static inline void mavlink_msg_sensor_diag_send_buf(mavlink_message_t *msgbuf, m
  *
  * @return  Float field 1
  */
-static inline float mavlink_msg_sensor_diag_get_float1(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_sensor_diag_get_float1(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -242,9 +253,8 @@ static inline float mavlink_msg_sensor_diag_get_float1(const mavlink_message_t* 
  *
  * @return  Float field 2
  */
-static inline float mavlink_msg_sensor_diag_get_float2(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_sensor_diag_get_float2(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -252,9 +262,8 @@ static inline float mavlink_msg_sensor_diag_get_float2(const mavlink_message_t* 
  *
  * @return  Int 16 field 1
  */
-static inline int16_t mavlink_msg_sensor_diag_get_int1(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  8);
+static inline int16_t mavlink_msg_sensor_diag_get_int1(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 8);
 }
 
 /**
@@ -262,9 +271,8 @@ static inline int16_t mavlink_msg_sensor_diag_get_int1(const mavlink_message_t* 
  *
  * @return  Int 8 field 1
  */
-static inline int8_t mavlink_msg_sensor_diag_get_char1(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int8_t(msg,  10);
+static inline int8_t mavlink_msg_sensor_diag_get_char1(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int8_t(msg, 10);
 }
 
 /**
@@ -273,16 +281,16 @@ static inline int8_t mavlink_msg_sensor_diag_get_char1(const mavlink_message_t* 
  * @param msg The message to decode
  * @param sensor_diag C-struct to decode the message contents into
  */
-static inline void mavlink_msg_sensor_diag_decode(const mavlink_message_t* msg, mavlink_sensor_diag_t* sensor_diag)
-{
+static inline void
+mavlink_msg_sensor_diag_decode(const mavlink_message_t *msg, mavlink_sensor_diag_t *sensor_diag) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     sensor_diag->float1 = mavlink_msg_sensor_diag_get_float1(msg);
     sensor_diag->float2 = mavlink_msg_sensor_diag_get_float2(msg);
     sensor_diag->int1 = mavlink_msg_sensor_diag_get_int1(msg);
     sensor_diag->char1 = mavlink_msg_sensor_diag_get_char1(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SENSOR_DIAG_LEN? msg->len : MAVLINK_MSG_ID_SENSOR_DIAG_LEN;
-        memset(sensor_diag, 0, MAVLINK_MSG_ID_SENSOR_DIAG_LEN);
-    memcpy(sensor_diag, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SENSOR_DIAG_LEN? msg->len : MAVLINK_MSG_ID_SENSOR_DIAG_LEN;
+    memset(sensor_diag, 0, MAVLINK_MSG_ID_SENSOR_DIAG_LEN);
+memcpy(sensor_diag, _MAV_PAYLOAD(msg), len);
 #endif
 }

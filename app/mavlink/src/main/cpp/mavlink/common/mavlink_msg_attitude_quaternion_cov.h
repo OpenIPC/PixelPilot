@@ -4,14 +4,14 @@
 #define MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV 61
 
 MAVPACKED(
-typedef struct __mavlink_attitude_quaternion_cov_t {
- uint64_t time_usec; /*< [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.*/
- float q[4]; /*<  Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation)*/
- float rollspeed; /*< [rad/s] Roll angular speed*/
- float pitchspeed; /*< [rad/s] Pitch angular speed*/
- float yawspeed; /*< [rad/s] Yaw angular speed*/
- float covariance[9]; /*<  Attitude covariance*/
-}) mavlink_attitude_quaternion_cov_t;
+        typedef struct __mavlink_attitude_quaternion_cov_t {
+            uint64_t time_usec; /*< [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.*/
+            float q[4]; /*<  Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation)*/
+            float rollspeed; /*< [rad/s] Roll angular speed*/
+            float pitchspeed; /*< [rad/s] Pitch angular speed*/
+            float yawspeed; /*< [rad/s] Yaw angular speed*/
+            float covariance[9]; /*<  Attitude covariance*/
+        }) mavlink_attitude_quaternion_cov_t;
 
 #define MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN 72
 #define MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_MIN_LEN 72
@@ -65,9 +65,12 @@ typedef struct __mavlink_attitude_quaternion_cov_t {
  * @param covariance  Attitude covariance
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_attitude_quaternion_cov_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint64_t time_usec, const float *q, float rollspeed, float pitchspeed, float yawspeed, const float *covariance)
-{
+static inline uint16_t
+mavlink_msg_attitude_quaternion_cov_pack(uint8_t system_id, uint8_t component_id,
+                                         mavlink_message_t *msg,
+                                         uint64_t time_usec, const float *q, float rollspeed,
+                                         float pitchspeed, float yawspeed,
+                                         const float *covariance) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN];
     _mav_put_uint64_t(buf, 0, time_usec);
@@ -83,13 +86,16 @@ static inline uint16_t mavlink_msg_attitude_quaternion_cov_pack(uint8_t system_i
     packet.rollspeed = rollspeed;
     packet.pitchspeed = pitchspeed;
     packet.yawspeed = yawspeed;
-    mav_array_memcpy(packet.q, q, sizeof(float)*4);
-    mav_array_memcpy(packet.covariance, covariance, sizeof(float)*9);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN);
+    mav_array_memcpy(packet.q, q, sizeof(float) * 4);
+    mav_array_memcpy(packet.covariance, covariance, sizeof(float) * 9);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_MIN_LEN, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_MIN_LEN,
+                                    MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN,
+                                    MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_CRC);
 }
 
 /**
@@ -106,10 +112,12 @@ static inline uint16_t mavlink_msg_attitude_quaternion_cov_pack(uint8_t system_i
  * @param covariance  Attitude covariance
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_attitude_quaternion_cov_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint64_t time_usec,const float *q,float rollspeed,float pitchspeed,float yawspeed,const float *covariance)
-{
+static inline uint16_t
+mavlink_msg_attitude_quaternion_cov_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                              mavlink_message_t *msg,
+                                              uint64_t time_usec, const float *q, float rollspeed,
+                                              float pitchspeed, float yawspeed,
+                                              const float *covariance) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN];
     _mav_put_uint64_t(buf, 0, time_usec);
@@ -125,13 +133,16 @@ static inline uint16_t mavlink_msg_attitude_quaternion_cov_pack_chan(uint8_t sys
     packet.rollspeed = rollspeed;
     packet.pitchspeed = pitchspeed;
     packet.yawspeed = yawspeed;
-    mav_array_memcpy(packet.q, q, sizeof(float)*4);
-    mav_array_memcpy(packet.covariance, covariance, sizeof(float)*9);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN);
+    mav_array_memcpy(packet.q, q, sizeof(float) * 4);
+    mav_array_memcpy(packet.covariance, covariance, sizeof(float) * 9);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_MIN_LEN, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_MIN_LEN,
+                                         MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN,
+                                         MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_CRC);
 }
 
 /**
@@ -142,9 +153,17 @@ static inline uint16_t mavlink_msg_attitude_quaternion_cov_pack_chan(uint8_t sys
  * @param msg The MAVLink message to compress the data into
  * @param attitude_quaternion_cov C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_attitude_quaternion_cov_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_attitude_quaternion_cov_t* attitude_quaternion_cov)
-{
-    return mavlink_msg_attitude_quaternion_cov_pack(system_id, component_id, msg, attitude_quaternion_cov->time_usec, attitude_quaternion_cov->q, attitude_quaternion_cov->rollspeed, attitude_quaternion_cov->pitchspeed, attitude_quaternion_cov->yawspeed, attitude_quaternion_cov->covariance);
+static inline uint16_t
+mavlink_msg_attitude_quaternion_cov_encode(uint8_t system_id, uint8_t component_id,
+                                           mavlink_message_t *msg,
+                                           const mavlink_attitude_quaternion_cov_t *attitude_quaternion_cov) {
+    return mavlink_msg_attitude_quaternion_cov_pack(system_id, component_id, msg,
+                                                    attitude_quaternion_cov->time_usec,
+                                                    attitude_quaternion_cov->q,
+                                                    attitude_quaternion_cov->rollspeed,
+                                                    attitude_quaternion_cov->pitchspeed,
+                                                    attitude_quaternion_cov->yawspeed,
+                                                    attitude_quaternion_cov->covariance);
 }
 
 /**
@@ -156,9 +175,17 @@ static inline uint16_t mavlink_msg_attitude_quaternion_cov_encode(uint8_t system
  * @param msg The MAVLink message to compress the data into
  * @param attitude_quaternion_cov C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_attitude_quaternion_cov_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_attitude_quaternion_cov_t* attitude_quaternion_cov)
-{
-    return mavlink_msg_attitude_quaternion_cov_pack_chan(system_id, component_id, chan, msg, attitude_quaternion_cov->time_usec, attitude_quaternion_cov->q, attitude_quaternion_cov->rollspeed, attitude_quaternion_cov->pitchspeed, attitude_quaternion_cov->yawspeed, attitude_quaternion_cov->covariance);
+static inline uint16_t
+mavlink_msg_attitude_quaternion_cov_encode_chan(uint8_t system_id, uint8_t component_id,
+                                                uint8_t chan, mavlink_message_t *msg,
+                                                const mavlink_attitude_quaternion_cov_t *attitude_quaternion_cov) {
+    return mavlink_msg_attitude_quaternion_cov_pack_chan(system_id, component_id, chan, msg,
+                                                         attitude_quaternion_cov->time_usec,
+                                                         attitude_quaternion_cov->q,
+                                                         attitude_quaternion_cov->rollspeed,
+                                                         attitude_quaternion_cov->pitchspeed,
+                                                         attitude_quaternion_cov->yawspeed,
+                                                         attitude_quaternion_cov->covariance);
 }
 
 /**
@@ -253,9 +280,9 @@ static inline void mavlink_msg_attitude_quaternion_cov_send_buf(mavlink_message_
  *
  * @return [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
  */
-static inline uint64_t mavlink_msg_attitude_quaternion_cov_get_time_usec(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint64_t(msg,  0);
+static inline uint64_t
+mavlink_msg_attitude_quaternion_cov_get_time_usec(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint64_t(msg, 0);
 }
 
 /**
@@ -263,9 +290,9 @@ static inline uint64_t mavlink_msg_attitude_quaternion_cov_get_time_usec(const m
  *
  * @return  Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation)
  */
-static inline uint16_t mavlink_msg_attitude_quaternion_cov_get_q(const mavlink_message_t* msg, float *q)
-{
-    return _MAV_RETURN_float_array(msg, q, 4,  8);
+static inline uint16_t
+mavlink_msg_attitude_quaternion_cov_get_q(const mavlink_message_t *msg, float *q) {
+    return _MAV_RETURN_float_array(msg, q, 4, 8);
 }
 
 /**
@@ -273,9 +300,9 @@ static inline uint16_t mavlink_msg_attitude_quaternion_cov_get_q(const mavlink_m
  *
  * @return [rad/s] Roll angular speed
  */
-static inline float mavlink_msg_attitude_quaternion_cov_get_rollspeed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float
+mavlink_msg_attitude_quaternion_cov_get_rollspeed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -283,9 +310,9 @@ static inline float mavlink_msg_attitude_quaternion_cov_get_rollspeed(const mavl
  *
  * @return [rad/s] Pitch angular speed
  */
-static inline float mavlink_msg_attitude_quaternion_cov_get_pitchspeed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float
+mavlink_msg_attitude_quaternion_cov_get_pitchspeed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -293,9 +320,8 @@ static inline float mavlink_msg_attitude_quaternion_cov_get_pitchspeed(const mav
  *
  * @return [rad/s] Yaw angular speed
  */
-static inline float mavlink_msg_attitude_quaternion_cov_get_yawspeed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  32);
+static inline float mavlink_msg_attitude_quaternion_cov_get_yawspeed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 32);
 }
 
 /**
@@ -303,9 +329,10 @@ static inline float mavlink_msg_attitude_quaternion_cov_get_yawspeed(const mavli
  *
  * @return  Attitude covariance
  */
-static inline uint16_t mavlink_msg_attitude_quaternion_cov_get_covariance(const mavlink_message_t* msg, float *covariance)
-{
-    return _MAV_RETURN_float_array(msg, covariance, 9,  36);
+static inline uint16_t
+mavlink_msg_attitude_quaternion_cov_get_covariance(const mavlink_message_t *msg,
+                                                   float *covariance) {
+    return _MAV_RETURN_float_array(msg, covariance, 9, 36);
 }
 
 /**
@@ -314,8 +341,8 @@ static inline uint16_t mavlink_msg_attitude_quaternion_cov_get_covariance(const 
  * @param msg The message to decode
  * @param attitude_quaternion_cov C-struct to decode the message contents into
  */
-static inline void mavlink_msg_attitude_quaternion_cov_decode(const mavlink_message_t* msg, mavlink_attitude_quaternion_cov_t* attitude_quaternion_cov)
-{
+static inline void mavlink_msg_attitude_quaternion_cov_decode(const mavlink_message_t *msg,
+                                                              mavlink_attitude_quaternion_cov_t *attitude_quaternion_cov) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     attitude_quaternion_cov->time_usec = mavlink_msg_attitude_quaternion_cov_get_time_usec(msg);
     mavlink_msg_attitude_quaternion_cov_get_q(msg, attitude_quaternion_cov->q);
@@ -324,8 +351,9 @@ static inline void mavlink_msg_attitude_quaternion_cov_decode(const mavlink_mess
     attitude_quaternion_cov->yawspeed = mavlink_msg_attitude_quaternion_cov_get_yawspeed(msg);
     mavlink_msg_attitude_quaternion_cov_get_covariance(msg, attitude_quaternion_cov->covariance);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN? msg->len : MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN;
-        memset(attitude_quaternion_cov, 0, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN ? msg->len
+                                                                        : MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN;
+    memset(attitude_quaternion_cov, 0, MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV_LEN);
     memcpy(attitude_quaternion_cov, _MAV_PAYLOAD(msg), len);
 #endif
 }

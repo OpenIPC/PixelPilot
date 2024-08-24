@@ -4,25 +4,27 @@
 #define MAVLINK_MSG_ID_SMART_BATTERY_INFO 370
 
 MAVPACKED(
-typedef struct __mavlink_smart_battery_info_t {
- int32_t capacity_full_specification; /*< [mAh] Capacity when full according to manufacturer, -1: field not provided.*/
- int32_t capacity_full; /*< [mAh] Capacity when full (accounting for battery degradation), -1: field not provided.*/
- uint16_t cycle_count; /*<  Charge/discharge cycle count. UINT16_MAX: field not provided.*/
- uint16_t weight; /*< [g] Battery weight. 0: field not provided.*/
- uint16_t discharge_minimum_voltage; /*< [mV] Minimum per-cell voltage when discharging. If not supplied set to UINT16_MAX value.*/
- uint16_t charging_minimum_voltage; /*< [mV] Minimum per-cell voltage when charging. If not supplied set to UINT16_MAX value.*/
- uint16_t resting_minimum_voltage; /*< [mV] Minimum per-cell voltage when resting. If not supplied set to UINT16_MAX value.*/
- uint8_t id; /*<  Battery ID*/
- uint8_t battery_function; /*<  Function of the battery*/
- uint8_t type; /*<  Type (chemistry) of the battery*/
- char serial_number[16]; /*<  Serial number in ASCII characters, 0 terminated. All 0: field not provided.*/
- char device_name[50]; /*<  Static device name in ASCII characters, 0 terminated. All 0: field not provided. Encode as manufacturer name then product name separated using an underscore.*/
- uint16_t charging_maximum_voltage; /*< [mV] Maximum per-cell voltage when charged. 0: field not provided.*/
- uint8_t cells_in_series; /*<  Number of battery cells in series. 0: field not provided.*/
- uint32_t discharge_maximum_current; /*< [mA] Maximum pack discharge current. 0: field not provided.*/
- uint32_t discharge_maximum_burst_current; /*< [mA] Maximum pack discharge burst current. 0: field not provided.*/
- char manufacture_date[11]; /*<  Manufacture date (DD/MM/YYYY) in ASCII characters, 0 terminated. All 0: field not provided.*/
-}) mavlink_smart_battery_info_t;
+        typedef struct __mavlink_smart_battery_info_t {
+            int32_t capacity_full_specification; /*< [mAh] Capacity when full according to manufacturer, -1: field not provided.*/
+            int32_t capacity_full; /*< [mAh] Capacity when full (accounting for battery degradation), -1: field not provided.*/
+            uint16_t cycle_count; /*<  Charge/discharge cycle count. UINT16_MAX: field not provided.*/
+            uint16_t weight; /*< [g] Battery weight. 0: field not provided.*/
+            uint16_t discharge_minimum_voltage; /*< [mV] Minimum per-cell voltage when discharging. If not supplied set to UINT16_MAX value.*/
+            uint16_t charging_minimum_voltage; /*< [mV] Minimum per-cell voltage when charging. If not supplied set to UINT16_MAX value.*/
+            uint16_t resting_minimum_voltage; /*< [mV] Minimum per-cell voltage when resting. If not supplied set to UINT16_MAX value.*/
+            uint8_t id; /*<  Battery ID*/
+            uint8_t battery_function; /*<  Function of the battery*/
+            uint8_t type; /*<  Type (chemistry) of the battery*/
+            char serial_number[16]; /*<  Serial number in ASCII characters, 0 terminated. All 0: field not provided.*/
+            char device_name[50]; /*<  Static device name in ASCII characters, 0 terminated. All 0: field not provided. Encode as manufacturer name then product name separated using an underscore.*/
+            uint16_t charging_maximum_voltage; /*< [mV] Maximum per-cell voltage when charged. 0: field not provided.*/
+            uint8_t cells_in_series; /*<  Number of battery cells in series. 0: field not provided.*/
+            uint32_t discharge_maximum_current; /*< [mA] Maximum pack discharge current. 0: field not provided.*/
+            uint32_t discharge_maximum_burst_current; /*< [mA] Maximum pack discharge burst current. 0: field not provided.*/
+            char manufacture_date[11]; /*<  Manufacture date (DD/MM/YYYY) in ASCII characters, 0 terminated. All 0: field not provided.*/
+        })
+
+mavlink_smart_battery_info_t;
 
 #define MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN 109
 #define MAVLINK_MSG_ID_SMART_BATTERY_INFO_MIN_LEN 87
@@ -110,9 +112,19 @@ typedef struct __mavlink_smart_battery_info_t {
  * @param manufacture_date  Manufacture date (DD/MM/YYYY) in ASCII characters, 0 terminated. All 0: field not provided.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_smart_battery_info_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t id, uint8_t battery_function, uint8_t type, int32_t capacity_full_specification, int32_t capacity_full, uint16_t cycle_count, const char *serial_number, const char *device_name, uint16_t weight, uint16_t discharge_minimum_voltage, uint16_t charging_minimum_voltage, uint16_t resting_minimum_voltage, uint16_t charging_maximum_voltage, uint8_t cells_in_series, uint32_t discharge_maximum_current, uint32_t discharge_maximum_burst_current, const char *manufacture_date)
-{
+static inline uint16_t
+mavlink_msg_smart_battery_info_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                    uint8_t id, uint8_t battery_function, uint8_t type,
+                                    int32_t capacity_full_specification, int32_t capacity_full,
+                                    uint16_t cycle_count, const char *serial_number,
+                                    const char *device_name, uint16_t weight,
+                                    uint16_t discharge_minimum_voltage,
+                                    uint16_t charging_minimum_voltage,
+                                    uint16_t resting_minimum_voltage,
+                                    uint16_t charging_maximum_voltage, uint8_t cells_in_series,
+                                    uint32_t discharge_maximum_current,
+                                    uint32_t discharge_maximum_burst_current,
+                                    const char *manufacture_date) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN];
     _mav_put_int32_t(buf, 0, capacity_full_specification);
@@ -132,7 +144,7 @@ static inline uint16_t mavlink_msg_smart_battery_info_pack(uint8_t system_id, ui
     _mav_put_char_array(buf, 21, serial_number, 16);
     _mav_put_char_array(buf, 37, device_name, 50);
     _mav_put_char_array(buf, 98, manufacture_date, 11);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN);
 #else
     mavlink_smart_battery_info_t packet;
     packet.capacity_full_specification = capacity_full_specification;
@@ -156,7 +168,10 @@ static inline uint16_t mavlink_msg_smart_battery_info_pack(uint8_t system_id, ui
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SMART_BATTERY_INFO;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SMART_BATTERY_INFO_MIN_LEN, MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN, MAVLINK_MSG_ID_SMART_BATTERY_INFO_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SMART_BATTERY_INFO_MIN_LEN,
+                                    MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN,
+                                    MAVLINK_MSG_ID_SMART_BATTERY_INFO_CRC);
 }
 
 /**
@@ -184,10 +199,20 @@ static inline uint16_t mavlink_msg_smart_battery_info_pack(uint8_t system_id, ui
  * @param manufacture_date  Manufacture date (DD/MM/YYYY) in ASCII characters, 0 terminated. All 0: field not provided.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_smart_battery_info_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t id,uint8_t battery_function,uint8_t type,int32_t capacity_full_specification,int32_t capacity_full,uint16_t cycle_count,const char *serial_number,const char *device_name,uint16_t weight,uint16_t discharge_minimum_voltage,uint16_t charging_minimum_voltage,uint16_t resting_minimum_voltage,uint16_t charging_maximum_voltage,uint8_t cells_in_series,uint32_t discharge_maximum_current,uint32_t discharge_maximum_burst_current,const char *manufacture_date)
-{
+static inline uint16_t
+mavlink_msg_smart_battery_info_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                         mavlink_message_t *msg,
+                                         uint8_t id, uint8_t battery_function, uint8_t type,
+                                         int32_t capacity_full_specification, int32_t capacity_full,
+                                         uint16_t cycle_count, const char *serial_number,
+                                         const char *device_name, uint16_t weight,
+                                         uint16_t discharge_minimum_voltage,
+                                         uint16_t charging_minimum_voltage,
+                                         uint16_t resting_minimum_voltage,
+                                         uint16_t charging_maximum_voltage, uint8_t cells_in_series,
+                                         uint32_t discharge_maximum_current,
+                                         uint32_t discharge_maximum_burst_current,
+                                         const char *manufacture_date) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN];
     _mav_put_int32_t(buf, 0, capacity_full_specification);
@@ -207,7 +232,7 @@ static inline uint16_t mavlink_msg_smart_battery_info_pack_chan(uint8_t system_i
     _mav_put_char_array(buf, 21, serial_number, 16);
     _mav_put_char_array(buf, 37, device_name, 50);
     _mav_put_char_array(buf, 98, manufacture_date, 11);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN);
 #else
     mavlink_smart_battery_info_t packet;
     packet.capacity_full_specification = capacity_full_specification;
@@ -231,7 +256,10 @@ static inline uint16_t mavlink_msg_smart_battery_info_pack_chan(uint8_t system_i
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SMART_BATTERY_INFO;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SMART_BATTERY_INFO_MIN_LEN, MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN, MAVLINK_MSG_ID_SMART_BATTERY_INFO_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SMART_BATTERY_INFO_MIN_LEN,
+                                         MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN,
+                                         MAVLINK_MSG_ID_SMART_BATTERY_INFO_CRC);
 }
 
 /**
@@ -242,9 +270,27 @@ static inline uint16_t mavlink_msg_smart_battery_info_pack_chan(uint8_t system_i
  * @param msg The MAVLink message to compress the data into
  * @param smart_battery_info C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_smart_battery_info_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_smart_battery_info_t* smart_battery_info)
-{
-    return mavlink_msg_smart_battery_info_pack(system_id, component_id, msg, smart_battery_info->id, smart_battery_info->battery_function, smart_battery_info->type, smart_battery_info->capacity_full_specification, smart_battery_info->capacity_full, smart_battery_info->cycle_count, smart_battery_info->serial_number, smart_battery_info->device_name, smart_battery_info->weight, smart_battery_info->discharge_minimum_voltage, smart_battery_info->charging_minimum_voltage, smart_battery_info->resting_minimum_voltage, smart_battery_info->charging_maximum_voltage, smart_battery_info->cells_in_series, smart_battery_info->discharge_maximum_current, smart_battery_info->discharge_maximum_burst_current, smart_battery_info->manufacture_date);
+static inline uint16_t
+mavlink_msg_smart_battery_info_encode(uint8_t system_id, uint8_t component_id,
+                                      mavlink_message_t *msg,
+                                      const mavlink_smart_battery_info_t *smart_battery_info) {
+    return mavlink_msg_smart_battery_info_pack(system_id, component_id, msg, smart_battery_info->id,
+                                               smart_battery_info->battery_function,
+                                               smart_battery_info->type,
+                                               smart_battery_info->capacity_full_specification,
+                                               smart_battery_info->capacity_full,
+                                               smart_battery_info->cycle_count,
+                                               smart_battery_info->serial_number,
+                                               smart_battery_info->device_name,
+                                               smart_battery_info->weight,
+                                               smart_battery_info->discharge_minimum_voltage,
+                                               smart_battery_info->charging_minimum_voltage,
+                                               smart_battery_info->resting_minimum_voltage,
+                                               smart_battery_info->charging_maximum_voltage,
+                                               smart_battery_info->cells_in_series,
+                                               smart_battery_info->discharge_maximum_current,
+                                               smart_battery_info->discharge_maximum_burst_current,
+                                               smart_battery_info->manufacture_date);
 }
 
 /**
@@ -256,9 +302,28 @@ static inline uint16_t mavlink_msg_smart_battery_info_encode(uint8_t system_id, 
  * @param msg The MAVLink message to compress the data into
  * @param smart_battery_info C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_smart_battery_info_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_smart_battery_info_t* smart_battery_info)
-{
-    return mavlink_msg_smart_battery_info_pack_chan(system_id, component_id, chan, msg, smart_battery_info->id, smart_battery_info->battery_function, smart_battery_info->type, smart_battery_info->capacity_full_specification, smart_battery_info->capacity_full, smart_battery_info->cycle_count, smart_battery_info->serial_number, smart_battery_info->device_name, smart_battery_info->weight, smart_battery_info->discharge_minimum_voltage, smart_battery_info->charging_minimum_voltage, smart_battery_info->resting_minimum_voltage, smart_battery_info->charging_maximum_voltage, smart_battery_info->cells_in_series, smart_battery_info->discharge_maximum_current, smart_battery_info->discharge_maximum_burst_current, smart_battery_info->manufacture_date);
+static inline uint16_t
+mavlink_msg_smart_battery_info_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                           mavlink_message_t *msg,
+                                           const mavlink_smart_battery_info_t *smart_battery_info) {
+    return mavlink_msg_smart_battery_info_pack_chan(system_id, component_id, chan, msg,
+                                                    smart_battery_info->id,
+                                                    smart_battery_info->battery_function,
+                                                    smart_battery_info->type,
+                                                    smart_battery_info->capacity_full_specification,
+                                                    smart_battery_info->capacity_full,
+                                                    smart_battery_info->cycle_count,
+                                                    smart_battery_info->serial_number,
+                                                    smart_battery_info->device_name,
+                                                    smart_battery_info->weight,
+                                                    smart_battery_info->discharge_minimum_voltage,
+                                                    smart_battery_info->charging_minimum_voltage,
+                                                    smart_battery_info->resting_minimum_voltage,
+                                                    smart_battery_info->charging_maximum_voltage,
+                                                    smart_battery_info->cells_in_series,
+                                                    smart_battery_info->discharge_maximum_current,
+                                                    smart_battery_info->discharge_maximum_burst_current,
+                                                    smart_battery_info->manufacture_date);
 }
 
 /**
@@ -408,9 +473,8 @@ static inline void mavlink_msg_smart_battery_info_send_buf(mavlink_message_t *ms
  *
  * @return  Battery ID
  */
-static inline uint8_t mavlink_msg_smart_battery_info_get_id(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  18);
+static inline uint8_t mavlink_msg_smart_battery_info_get_id(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 18);
 }
 
 /**
@@ -418,9 +482,9 @@ static inline uint8_t mavlink_msg_smart_battery_info_get_id(const mavlink_messag
  *
  * @return  Function of the battery
  */
-static inline uint8_t mavlink_msg_smart_battery_info_get_battery_function(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  19);
+static inline uint8_t
+mavlink_msg_smart_battery_info_get_battery_function(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 19);
 }
 
 /**
@@ -428,9 +492,8 @@ static inline uint8_t mavlink_msg_smart_battery_info_get_battery_function(const 
  *
  * @return  Type (chemistry) of the battery
  */
-static inline uint8_t mavlink_msg_smart_battery_info_get_type(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  20);
+static inline uint8_t mavlink_msg_smart_battery_info_get_type(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 20);
 }
 
 /**
@@ -438,9 +501,9 @@ static inline uint8_t mavlink_msg_smart_battery_info_get_type(const mavlink_mess
  *
  * @return [mAh] Capacity when full according to manufacturer, -1: field not provided.
  */
-static inline int32_t mavlink_msg_smart_battery_info_get_capacity_full_specification(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  0);
+static inline int32_t
+mavlink_msg_smart_battery_info_get_capacity_full_specification(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 0);
 }
 
 /**
@@ -448,9 +511,9 @@ static inline int32_t mavlink_msg_smart_battery_info_get_capacity_full_specifica
  *
  * @return [mAh] Capacity when full (accounting for battery degradation), -1: field not provided.
  */
-static inline int32_t mavlink_msg_smart_battery_info_get_capacity_full(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  4);
+static inline int32_t
+mavlink_msg_smart_battery_info_get_capacity_full(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 4);
 }
 
 /**
@@ -458,9 +521,9 @@ static inline int32_t mavlink_msg_smart_battery_info_get_capacity_full(const mav
  *
  * @return  Charge/discharge cycle count. UINT16_MAX: field not provided.
  */
-static inline uint16_t mavlink_msg_smart_battery_info_get_cycle_count(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  8);
+static inline uint16_t
+mavlink_msg_smart_battery_info_get_cycle_count(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 8);
 }
 
 /**
@@ -468,9 +531,10 @@ static inline uint16_t mavlink_msg_smart_battery_info_get_cycle_count(const mavl
  *
  * @return  Serial number in ASCII characters, 0 terminated. All 0: field not provided.
  */
-static inline uint16_t mavlink_msg_smart_battery_info_get_serial_number(const mavlink_message_t* msg, char *serial_number)
-{
-    return _MAV_RETURN_char_array(msg, serial_number, 16,  21);
+static inline uint16_t
+mavlink_msg_smart_battery_info_get_serial_number(const mavlink_message_t *msg,
+                                                 char *serial_number) {
+    return _MAV_RETURN_char_array(msg, serial_number, 16, 21);
 }
 
 /**
@@ -478,9 +542,9 @@ static inline uint16_t mavlink_msg_smart_battery_info_get_serial_number(const ma
  *
  * @return  Static device name in ASCII characters, 0 terminated. All 0: field not provided. Encode as manufacturer name then product name separated using an underscore.
  */
-static inline uint16_t mavlink_msg_smart_battery_info_get_device_name(const mavlink_message_t* msg, char *device_name)
-{
-    return _MAV_RETURN_char_array(msg, device_name, 50,  37);
+static inline uint16_t
+mavlink_msg_smart_battery_info_get_device_name(const mavlink_message_t *msg, char *device_name) {
+    return _MAV_RETURN_char_array(msg, device_name, 50, 37);
 }
 
 /**
@@ -488,9 +552,8 @@ static inline uint16_t mavlink_msg_smart_battery_info_get_device_name(const mavl
  *
  * @return [g] Battery weight. 0: field not provided.
  */
-static inline uint16_t mavlink_msg_smart_battery_info_get_weight(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  10);
+static inline uint16_t mavlink_msg_smart_battery_info_get_weight(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 10);
 }
 
 /**
@@ -498,9 +561,9 @@ static inline uint16_t mavlink_msg_smart_battery_info_get_weight(const mavlink_m
  *
  * @return [mV] Minimum per-cell voltage when discharging. If not supplied set to UINT16_MAX value.
  */
-static inline uint16_t mavlink_msg_smart_battery_info_get_discharge_minimum_voltage(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  12);
+static inline uint16_t
+mavlink_msg_smart_battery_info_get_discharge_minimum_voltage(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 12);
 }
 
 /**
@@ -508,9 +571,9 @@ static inline uint16_t mavlink_msg_smart_battery_info_get_discharge_minimum_volt
  *
  * @return [mV] Minimum per-cell voltage when charging. If not supplied set to UINT16_MAX value.
  */
-static inline uint16_t mavlink_msg_smart_battery_info_get_charging_minimum_voltage(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  14);
+static inline uint16_t
+mavlink_msg_smart_battery_info_get_charging_minimum_voltage(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 14);
 }
 
 /**
@@ -518,9 +581,9 @@ static inline uint16_t mavlink_msg_smart_battery_info_get_charging_minimum_volta
  *
  * @return [mV] Minimum per-cell voltage when resting. If not supplied set to UINT16_MAX value.
  */
-static inline uint16_t mavlink_msg_smart_battery_info_get_resting_minimum_voltage(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  16);
+static inline uint16_t
+mavlink_msg_smart_battery_info_get_resting_minimum_voltage(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 16);
 }
 
 /**
@@ -528,9 +591,9 @@ static inline uint16_t mavlink_msg_smart_battery_info_get_resting_minimum_voltag
  *
  * @return [mV] Maximum per-cell voltage when charged. 0: field not provided.
  */
-static inline uint16_t mavlink_msg_smart_battery_info_get_charging_maximum_voltage(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  87);
+static inline uint16_t
+mavlink_msg_smart_battery_info_get_charging_maximum_voltage(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 87);
 }
 
 /**
@@ -538,9 +601,9 @@ static inline uint16_t mavlink_msg_smart_battery_info_get_charging_maximum_volta
  *
  * @return  Number of battery cells in series. 0: field not provided.
  */
-static inline uint8_t mavlink_msg_smart_battery_info_get_cells_in_series(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  89);
+static inline uint8_t
+mavlink_msg_smart_battery_info_get_cells_in_series(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 89);
 }
 
 /**
@@ -548,9 +611,9 @@ static inline uint8_t mavlink_msg_smart_battery_info_get_cells_in_series(const m
  *
  * @return [mA] Maximum pack discharge current. 0: field not provided.
  */
-static inline uint32_t mavlink_msg_smart_battery_info_get_discharge_maximum_current(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  90);
+static inline uint32_t
+mavlink_msg_smart_battery_info_get_discharge_maximum_current(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 90);
 }
 
 /**
@@ -558,9 +621,9 @@ static inline uint32_t mavlink_msg_smart_battery_info_get_discharge_maximum_curr
  *
  * @return [mA] Maximum pack discharge burst current. 0: field not provided.
  */
-static inline uint32_t mavlink_msg_smart_battery_info_get_discharge_maximum_burst_current(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  94);
+static inline uint32_t
+mavlink_msg_smart_battery_info_get_discharge_maximum_burst_current(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 94);
 }
 
 /**
@@ -568,9 +631,10 @@ static inline uint32_t mavlink_msg_smart_battery_info_get_discharge_maximum_burs
  *
  * @return  Manufacture date (DD/MM/YYYY) in ASCII characters, 0 terminated. All 0: field not provided.
  */
-static inline uint16_t mavlink_msg_smart_battery_info_get_manufacture_date(const mavlink_message_t* msg, char *manufacture_date)
-{
-    return _MAV_RETURN_char_array(msg, manufacture_date, 11,  98);
+static inline uint16_t
+mavlink_msg_smart_battery_info_get_manufacture_date(const mavlink_message_t *msg,
+                                                    char *manufacture_date) {
+    return _MAV_RETURN_char_array(msg, manufacture_date, 11, 98);
 }
 
 /**
@@ -579,29 +643,36 @@ static inline uint16_t mavlink_msg_smart_battery_info_get_manufacture_date(const
  * @param msg The message to decode
  * @param smart_battery_info C-struct to decode the message contents into
  */
-static inline void mavlink_msg_smart_battery_info_decode(const mavlink_message_t* msg, mavlink_smart_battery_info_t* smart_battery_info)
-{
+static inline void mavlink_msg_smart_battery_info_decode(const mavlink_message_t *msg,
+                                                         mavlink_smart_battery_info_t *smart_battery_info) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    smart_battery_info->capacity_full_specification = mavlink_msg_smart_battery_info_get_capacity_full_specification(msg);
+    smart_battery_info->capacity_full_specification = mavlink_msg_smart_battery_info_get_capacity_full_specification(
+            msg);
     smart_battery_info->capacity_full = mavlink_msg_smart_battery_info_get_capacity_full(msg);
     smart_battery_info->cycle_count = mavlink_msg_smart_battery_info_get_cycle_count(msg);
     smart_battery_info->weight = mavlink_msg_smart_battery_info_get_weight(msg);
-    smart_battery_info->discharge_minimum_voltage = mavlink_msg_smart_battery_info_get_discharge_minimum_voltage(msg);
-    smart_battery_info->charging_minimum_voltage = mavlink_msg_smart_battery_info_get_charging_minimum_voltage(msg);
-    smart_battery_info->resting_minimum_voltage = mavlink_msg_smart_battery_info_get_resting_minimum_voltage(msg);
+    smart_battery_info->discharge_minimum_voltage = mavlink_msg_smart_battery_info_get_discharge_minimum_voltage(
+            msg);
+    smart_battery_info->charging_minimum_voltage = mavlink_msg_smart_battery_info_get_charging_minimum_voltage(
+            msg);
+    smart_battery_info->resting_minimum_voltage = mavlink_msg_smart_battery_info_get_resting_minimum_voltage(
+            msg);
     smart_battery_info->id = mavlink_msg_smart_battery_info_get_id(msg);
     smart_battery_info->battery_function = mavlink_msg_smart_battery_info_get_battery_function(msg);
     smart_battery_info->type = mavlink_msg_smart_battery_info_get_type(msg);
     mavlink_msg_smart_battery_info_get_serial_number(msg, smart_battery_info->serial_number);
     mavlink_msg_smart_battery_info_get_device_name(msg, smart_battery_info->device_name);
-    smart_battery_info->charging_maximum_voltage = mavlink_msg_smart_battery_info_get_charging_maximum_voltage(msg);
+    smart_battery_info->charging_maximum_voltage = mavlink_msg_smart_battery_info_get_charging_maximum_voltage(
+            msg);
     smart_battery_info->cells_in_series = mavlink_msg_smart_battery_info_get_cells_in_series(msg);
-    smart_battery_info->discharge_maximum_current = mavlink_msg_smart_battery_info_get_discharge_maximum_current(msg);
-    smart_battery_info->discharge_maximum_burst_current = mavlink_msg_smart_battery_info_get_discharge_maximum_burst_current(msg);
+    smart_battery_info->discharge_maximum_current = mavlink_msg_smart_battery_info_get_discharge_maximum_current(
+            msg);
+    smart_battery_info->discharge_maximum_burst_current = mavlink_msg_smart_battery_info_get_discharge_maximum_burst_current(
+            msg);
     mavlink_msg_smart_battery_info_get_manufacture_date(msg, smart_battery_info->manufacture_date);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN? msg->len : MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN;
-        memset(smart_battery_info, 0, MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN);
-    memcpy(smart_battery_info, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN? msg->len : MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN;
+    memset(smart_battery_info, 0, MAVLINK_MSG_ID_SMART_BATTERY_INFO_LEN);
+memcpy(smart_battery_info, _MAV_PAYLOAD(msg), len);
 #endif
 }

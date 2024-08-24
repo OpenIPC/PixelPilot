@@ -36,8 +36,8 @@
  * SUCH DAMAGE.
  */
 
-#define	IPH_AF_INET	2		/* Matches Solaris's AF_INET */
-#define	IPH_AF_INET6	26		/* Matches Solaris's AF_INET6 */
+#define    IPH_AF_INET    2        /* Matches Solaris's AF_INET */
+#define    IPH_AF_INET6    26        /* Matches Solaris's AF_INET6 */
 
-#define	IPNET_OUTBOUND		1
-#define	IPNET_INBOUND		2
+#define    IPNET_OUTBOUND        1
+#define    IPNET_INBOUND        2

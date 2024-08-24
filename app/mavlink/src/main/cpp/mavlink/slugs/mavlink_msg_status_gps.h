@@ -4,15 +4,17 @@
 #define MAVLINK_MSG_ID_STATUS_GPS 194
 
 MAVPACKED(
-typedef struct __mavlink_status_gps_t {
- float magVar; /*< [deg] Magnetic variation*/
- uint16_t csFails; /*<  Number of times checksum has failed*/
- uint8_t gpsQuality; /*<  The quality indicator, 0=fix not available or invalid, 1=GPS fix, 2=C/A differential GPS, 6=Dead reckoning mode, 7=Manual input mode (fixed position), 8=Simulator mode, 9= WAAS a*/
- uint8_t msgsType; /*<   Indicates if GN, GL or GP messages are being received*/
- uint8_t posStatus; /*<   A = data valid, V = data invalid*/
- int8_t magDir; /*<   Magnetic variation direction E/W. Easterly variation (E) subtracts from True course and Westerly variation (W) adds to True course*/
- uint8_t modeInd; /*<   Positioning system mode indicator. A - Autonomous;D-Differential; E-Estimated (dead reckoning) mode;M-Manual input; N-Data not valid*/
-}) mavlink_status_gps_t;
+        typedef struct __mavlink_status_gps_t {
+            float magVar; /*< [deg] Magnetic variation*/
+            uint16_t csFails; /*<  Number of times checksum has failed*/
+            uint8_t gpsQuality; /*<  The quality indicator, 0=fix not available or invalid, 1=GPS fix, 2=C/A differential GPS, 6=Dead reckoning mode, 7=Manual input mode (fixed position), 8=Simulator mode, 9= WAAS a*/
+            uint8_t msgsType; /*<   Indicates if GN, GL or GP messages are being received*/
+            uint8_t posStatus; /*<   A = data valid, V = data invalid*/
+            int8_t magDir; /*<   Magnetic variation direction E/W. Easterly variation (E) subtracts from True course and Westerly variation (W) adds to True course*/
+            uint8_t modeInd; /*<   Positioning system mode indicator. A - Autonomous;D-Differential; E-Estimated (dead reckoning) mode;M-Manual input; N-Data not valid*/
+        })
+
+mavlink_status_gps_t;
 
 #define MAVLINK_MSG_ID_STATUS_GPS_LEN 11
 #define MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN 11
@@ -21,7 +23,6 @@ typedef struct __mavlink_status_gps_t {
 
 #define MAVLINK_MSG_ID_STATUS_GPS_CRC 51
 #define MAVLINK_MSG_ID_194_CRC 51
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -68,9 +69,10 @@ typedef struct __mavlink_status_gps_t {
  * @param modeInd   Positioning system mode indicator. A - Autonomous;D-Differential; E-Estimated (dead reckoning) mode;M-Manual input; N-Data not valid
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_status_gps_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint16_t csFails, uint8_t gpsQuality, uint8_t msgsType, uint8_t posStatus, float magVar, int8_t magDir, uint8_t modeInd)
-{
+static inline uint16_t
+mavlink_msg_status_gps_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            uint16_t csFails, uint8_t gpsQuality, uint8_t msgsType,
+                            uint8_t posStatus, float magVar, int8_t magDir, uint8_t modeInd) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_STATUS_GPS_LEN];
     _mav_put_float(buf, 0, magVar);
@@ -81,7 +83,7 @@ static inline uint16_t mavlink_msg_status_gps_pack(uint8_t system_id, uint8_t co
     _mav_put_int8_t(buf, 9, magDir);
     _mav_put_uint8_t(buf, 10, modeInd);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_STATUS_GPS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_STATUS_GPS_LEN);
 #else
     mavlink_status_gps_t packet;
     packet.magVar = magVar;
@@ -96,7 +98,8 @@ static inline uint16_t mavlink_msg_status_gps_pack(uint8_t system_id, uint8_t co
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_STATUS_GPS;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN, MAVLINK_MSG_ID_STATUS_GPS_LEN, MAVLINK_MSG_ID_STATUS_GPS_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN,
+                                    MAVLINK_MSG_ID_STATUS_GPS_LEN, MAVLINK_MSG_ID_STATUS_GPS_CRC);
 }
 
 /**
@@ -114,10 +117,11 @@ static inline uint16_t mavlink_msg_status_gps_pack(uint8_t system_id, uint8_t co
  * @param modeInd   Positioning system mode indicator. A - Autonomous;D-Differential; E-Estimated (dead reckoning) mode;M-Manual input; N-Data not valid
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_status_gps_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint16_t csFails,uint8_t gpsQuality,uint8_t msgsType,uint8_t posStatus,float magVar,int8_t magDir,uint8_t modeInd)
-{
+static inline uint16_t
+mavlink_msg_status_gps_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg,
+                                 uint16_t csFails, uint8_t gpsQuality, uint8_t msgsType,
+                                 uint8_t posStatus, float magVar, int8_t magDir, uint8_t modeInd) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_STATUS_GPS_LEN];
     _mav_put_float(buf, 0, magVar);
@@ -128,7 +132,7 @@ static inline uint16_t mavlink_msg_status_gps_pack_chan(uint8_t system_id, uint8
     _mav_put_int8_t(buf, 9, magDir);
     _mav_put_uint8_t(buf, 10, modeInd);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_STATUS_GPS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_STATUS_GPS_LEN);
 #else
     mavlink_status_gps_t packet;
     packet.magVar = magVar;
@@ -143,7 +147,10 @@ static inline uint16_t mavlink_msg_status_gps_pack_chan(uint8_t system_id, uint8
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_STATUS_GPS;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN, MAVLINK_MSG_ID_STATUS_GPS_LEN, MAVLINK_MSG_ID_STATUS_GPS_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN,
+                                         MAVLINK_MSG_ID_STATUS_GPS_LEN,
+                                         MAVLINK_MSG_ID_STATUS_GPS_CRC);
 }
 
 /**
@@ -154,9 +161,13 @@ static inline uint16_t mavlink_msg_status_gps_pack_chan(uint8_t system_id, uint8
  * @param msg The MAVLink message to compress the data into
  * @param status_gps C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_status_gps_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_status_gps_t* status_gps)
-{
-    return mavlink_msg_status_gps_pack(system_id, component_id, msg, status_gps->csFails, status_gps->gpsQuality, status_gps->msgsType, status_gps->posStatus, status_gps->magVar, status_gps->magDir, status_gps->modeInd);
+static inline uint16_t
+mavlink_msg_status_gps_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                              const mavlink_status_gps_t *status_gps) {
+    return mavlink_msg_status_gps_pack(system_id, component_id, msg, status_gps->csFails,
+                                       status_gps->gpsQuality, status_gps->msgsType,
+                                       status_gps->posStatus, status_gps->magVar,
+                                       status_gps->magDir, status_gps->modeInd);
 }
 
 /**
@@ -168,9 +179,13 @@ static inline uint16_t mavlink_msg_status_gps_encode(uint8_t system_id, uint8_t 
  * @param msg The MAVLink message to compress the data into
  * @param status_gps C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_status_gps_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_status_gps_t* status_gps)
-{
-    return mavlink_msg_status_gps_pack_chan(system_id, component_id, chan, msg, status_gps->csFails, status_gps->gpsQuality, status_gps->msgsType, status_gps->posStatus, status_gps->magVar, status_gps->magDir, status_gps->modeInd);
+static inline uint16_t
+mavlink_msg_status_gps_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                   mavlink_message_t *msg, const mavlink_status_gps_t *status_gps) {
+    return mavlink_msg_status_gps_pack_chan(system_id, component_id, chan, msg, status_gps->csFails,
+                                            status_gps->gpsQuality, status_gps->msgsType,
+                                            status_gps->posStatus, status_gps->magVar,
+                                            status_gps->magDir, status_gps->modeInd);
 }
 
 /**
@@ -274,9 +289,8 @@ static inline void mavlink_msg_status_gps_send_buf(mavlink_message_t *msgbuf, ma
  *
  * @return  Number of times checksum has failed
  */
-static inline uint16_t mavlink_msg_status_gps_get_csFails(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  4);
+static inline uint16_t mavlink_msg_status_gps_get_csFails(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 4);
 }
 
 /**
@@ -284,9 +298,8 @@ static inline uint16_t mavlink_msg_status_gps_get_csFails(const mavlink_message_
  *
  * @return  The quality indicator, 0=fix not available or invalid, 1=GPS fix, 2=C/A differential GPS, 6=Dead reckoning mode, 7=Manual input mode (fixed position), 8=Simulator mode, 9= WAAS a
  */
-static inline uint8_t mavlink_msg_status_gps_get_gpsQuality(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  6);
+static inline uint8_t mavlink_msg_status_gps_get_gpsQuality(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 6);
 }
 
 /**
@@ -294,9 +307,8 @@ static inline uint8_t mavlink_msg_status_gps_get_gpsQuality(const mavlink_messag
  *
  * @return   Indicates if GN, GL or GP messages are being received
  */
-static inline uint8_t mavlink_msg_status_gps_get_msgsType(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  7);
+static inline uint8_t mavlink_msg_status_gps_get_msgsType(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 7);
 }
 
 /**
@@ -304,9 +316,8 @@ static inline uint8_t mavlink_msg_status_gps_get_msgsType(const mavlink_message_
  *
  * @return   A = data valid, V = data invalid
  */
-static inline uint8_t mavlink_msg_status_gps_get_posStatus(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  8);
+static inline uint8_t mavlink_msg_status_gps_get_posStatus(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 8);
 }
 
 /**
@@ -314,9 +325,8 @@ static inline uint8_t mavlink_msg_status_gps_get_posStatus(const mavlink_message
  *
  * @return [deg] Magnetic variation
  */
-static inline float mavlink_msg_status_gps_get_magVar(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_status_gps_get_magVar(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -324,9 +334,8 @@ static inline float mavlink_msg_status_gps_get_magVar(const mavlink_message_t* m
  *
  * @return   Magnetic variation direction E/W. Easterly variation (E) subtracts from True course and Westerly variation (W) adds to True course
  */
-static inline int8_t mavlink_msg_status_gps_get_magDir(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int8_t(msg,  9);
+static inline int8_t mavlink_msg_status_gps_get_magDir(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int8_t(msg, 9);
 }
 
 /**
@@ -334,9 +343,8 @@ static inline int8_t mavlink_msg_status_gps_get_magDir(const mavlink_message_t* 
  *
  * @return   Positioning system mode indicator. A - Autonomous;D-Differential; E-Estimated (dead reckoning) mode;M-Manual input; N-Data not valid
  */
-static inline uint8_t mavlink_msg_status_gps_get_modeInd(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  10);
+static inline uint8_t mavlink_msg_status_gps_get_modeInd(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 10);
 }
 
 /**
@@ -345,8 +353,8 @@ static inline uint8_t mavlink_msg_status_gps_get_modeInd(const mavlink_message_t
  * @param msg The message to decode
  * @param status_gps C-struct to decode the message contents into
  */
-static inline void mavlink_msg_status_gps_decode(const mavlink_message_t* msg, mavlink_status_gps_t* status_gps)
-{
+static inline void
+mavlink_msg_status_gps_decode(const mavlink_message_t *msg, mavlink_status_gps_t *status_gps) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     status_gps->magVar = mavlink_msg_status_gps_get_magVar(msg);
     status_gps->csFails = mavlink_msg_status_gps_get_csFails(msg);
@@ -356,8 +364,8 @@ static inline void mavlink_msg_status_gps_decode(const mavlink_message_t* msg, m
     status_gps->magDir = mavlink_msg_status_gps_get_magDir(msg);
     status_gps->modeInd = mavlink_msg_status_gps_get_modeInd(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_STATUS_GPS_LEN? msg->len : MAVLINK_MSG_ID_STATUS_GPS_LEN;
-        memset(status_gps, 0, MAVLINK_MSG_ID_STATUS_GPS_LEN);
-    memcpy(status_gps, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_STATUS_GPS_LEN? msg->len : MAVLINK_MSG_ID_STATUS_GPS_LEN;
+    memset(status_gps, 0, MAVLINK_MSG_ID_STATUS_GPS_LEN);
+memcpy(status_gps, _MAV_PAYLOAD(msg), len);
 #endif
 }

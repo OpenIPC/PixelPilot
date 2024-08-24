@@ -5,12 +5,12 @@
 
 
 typedef struct __mavlink_can_filter_modify_t {
- uint16_t ids[16]; /*<  filter IDs, length num_ids*/
- uint8_t target_system; /*<  System ID.*/
- uint8_t target_component; /*<  Component ID.*/
- uint8_t bus; /*<  bus number*/
- uint8_t operation; /*<  what operation to perform on the filter list. See CAN_FILTER_OP enum.*/
- uint8_t num_ids; /*<  number of IDs in filter list*/
+    uint16_t ids[16]; /*<  filter IDs, length num_ids*/
+    uint8_t target_system; /*<  System ID.*/
+    uint8_t target_component; /*<  Component ID.*/
+    uint8_t bus; /*<  bus number*/
+    uint8_t operation; /*<  what operation to perform on the filter list. See CAN_FILTER_OP enum.*/
+    uint8_t num_ids; /*<  number of IDs in filter list*/
 } mavlink_can_filter_modify_t;
 
 #define MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN 37
@@ -64,9 +64,10 @@ typedef struct __mavlink_can_filter_modify_t {
  * @param ids  filter IDs, length num_ids
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_can_filter_modify_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, uint8_t bus, uint8_t operation, uint8_t num_ids, const uint16_t *ids)
-{
+static inline uint16_t
+mavlink_msg_can_filter_modify_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                   uint8_t target_system, uint8_t target_component, uint8_t bus,
+                                   uint8_t operation, uint8_t num_ids, const uint16_t *ids) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN];
     _mav_put_uint8_t(buf, 32, target_system);
@@ -75,7 +76,7 @@ static inline uint16_t mavlink_msg_can_filter_modify_pack(uint8_t system_id, uin
     _mav_put_uint8_t(buf, 35, operation);
     _mav_put_uint8_t(buf, 36, num_ids);
     _mav_put_uint16_t_array(buf, 0, ids, 16);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN);
 #else
     mavlink_can_filter_modify_t packet;
     packet.target_system = target_system;
@@ -88,7 +89,10 @@ static inline uint16_t mavlink_msg_can_filter_modify_pack(uint8_t system_id, uin
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_CAN_FILTER_MODIFY;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_MIN_LEN, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_CAN_FILTER_MODIFY_MIN_LEN,
+                                    MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN,
+                                    MAVLINK_MSG_ID_CAN_FILTER_MODIFY_CRC);
 }
 
 /**
@@ -105,10 +109,12 @@ static inline uint16_t mavlink_msg_can_filter_modify_pack(uint8_t system_id, uin
  * @param ids  filter IDs, length num_ids
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_can_filter_modify_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,uint8_t bus,uint8_t operation,uint8_t num_ids,const uint16_t *ids)
-{
+static inline uint16_t
+mavlink_msg_can_filter_modify_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                        mavlink_message_t *msg,
+                                        uint8_t target_system, uint8_t target_component,
+                                        uint8_t bus, uint8_t operation, uint8_t num_ids,
+                                        const uint16_t *ids) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN];
     _mav_put_uint8_t(buf, 32, target_system);
@@ -117,7 +123,7 @@ static inline uint16_t mavlink_msg_can_filter_modify_pack_chan(uint8_t system_id
     _mav_put_uint8_t(buf, 35, operation);
     _mav_put_uint8_t(buf, 36, num_ids);
     _mav_put_uint16_t_array(buf, 0, ids, 16);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN);
 #else
     mavlink_can_filter_modify_t packet;
     packet.target_system = target_system;
@@ -130,7 +136,10 @@ static inline uint16_t mavlink_msg_can_filter_modify_pack_chan(uint8_t system_id
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_CAN_FILTER_MODIFY;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_MIN_LEN, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_CAN_FILTER_MODIFY_MIN_LEN,
+                                         MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN,
+                                         MAVLINK_MSG_ID_CAN_FILTER_MODIFY_CRC);
 }
 
 /**
@@ -141,9 +150,14 @@ static inline uint16_t mavlink_msg_can_filter_modify_pack_chan(uint8_t system_id
  * @param msg The MAVLink message to compress the data into
  * @param can_filter_modify C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_can_filter_modify_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_can_filter_modify_t* can_filter_modify)
-{
-    return mavlink_msg_can_filter_modify_pack(system_id, component_id, msg, can_filter_modify->target_system, can_filter_modify->target_component, can_filter_modify->bus, can_filter_modify->operation, can_filter_modify->num_ids, can_filter_modify->ids);
+static inline uint16_t mavlink_msg_can_filter_modify_encode(uint8_t system_id, uint8_t component_id,
+                                                            mavlink_message_t *msg,
+                                                            const mavlink_can_filter_modify_t *can_filter_modify) {
+    return mavlink_msg_can_filter_modify_pack(system_id, component_id, msg,
+                                              can_filter_modify->target_system,
+                                              can_filter_modify->target_component,
+                                              can_filter_modify->bus, can_filter_modify->operation,
+                                              can_filter_modify->num_ids, can_filter_modify->ids);
 }
 
 /**
@@ -155,9 +169,17 @@ static inline uint16_t mavlink_msg_can_filter_modify_encode(uint8_t system_id, u
  * @param msg The MAVLink message to compress the data into
  * @param can_filter_modify C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_can_filter_modify_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_can_filter_modify_t* can_filter_modify)
-{
-    return mavlink_msg_can_filter_modify_pack_chan(system_id, component_id, chan, msg, can_filter_modify->target_system, can_filter_modify->target_component, can_filter_modify->bus, can_filter_modify->operation, can_filter_modify->num_ids, can_filter_modify->ids);
+static inline uint16_t
+mavlink_msg_can_filter_modify_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                          mavlink_message_t *msg,
+                                          const mavlink_can_filter_modify_t *can_filter_modify) {
+    return mavlink_msg_can_filter_modify_pack_chan(system_id, component_id, chan, msg,
+                                                   can_filter_modify->target_system,
+                                                   can_filter_modify->target_component,
+                                                   can_filter_modify->bus,
+                                                   can_filter_modify->operation,
+                                                   can_filter_modify->num_ids,
+                                                   can_filter_modify->ids);
 }
 
 /**
@@ -252,9 +274,9 @@ static inline void mavlink_msg_can_filter_modify_send_buf(mavlink_message_t *msg
  *
  * @return  System ID.
  */
-static inline uint8_t mavlink_msg_can_filter_modify_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  32);
+static inline uint8_t
+mavlink_msg_can_filter_modify_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 32);
 }
 
 /**
@@ -262,9 +284,9 @@ static inline uint8_t mavlink_msg_can_filter_modify_get_target_system(const mavl
  *
  * @return  Component ID.
  */
-static inline uint8_t mavlink_msg_can_filter_modify_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  33);
+static inline uint8_t
+mavlink_msg_can_filter_modify_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 33);
 }
 
 /**
@@ -272,9 +294,8 @@ static inline uint8_t mavlink_msg_can_filter_modify_get_target_component(const m
  *
  * @return  bus number
  */
-static inline uint8_t mavlink_msg_can_filter_modify_get_bus(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  34);
+static inline uint8_t mavlink_msg_can_filter_modify_get_bus(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 34);
 }
 
 /**
@@ -282,9 +303,8 @@ static inline uint8_t mavlink_msg_can_filter_modify_get_bus(const mavlink_messag
  *
  * @return  what operation to perform on the filter list. See CAN_FILTER_OP enum.
  */
-static inline uint8_t mavlink_msg_can_filter_modify_get_operation(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  35);
+static inline uint8_t mavlink_msg_can_filter_modify_get_operation(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 35);
 }
 
 /**
@@ -292,9 +312,8 @@ static inline uint8_t mavlink_msg_can_filter_modify_get_operation(const mavlink_
  *
  * @return  number of IDs in filter list
  */
-static inline uint8_t mavlink_msg_can_filter_modify_get_num_ids(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  36);
+static inline uint8_t mavlink_msg_can_filter_modify_get_num_ids(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 36);
 }
 
 /**
@@ -302,9 +321,9 @@ static inline uint8_t mavlink_msg_can_filter_modify_get_num_ids(const mavlink_me
  *
  * @return  filter IDs, length num_ids
  */
-static inline uint16_t mavlink_msg_can_filter_modify_get_ids(const mavlink_message_t* msg, uint16_t *ids)
-{
-    return _MAV_RETURN_uint16_t_array(msg, ids, 16,  0);
+static inline uint16_t
+mavlink_msg_can_filter_modify_get_ids(const mavlink_message_t *msg, uint16_t *ids) {
+    return _MAV_RETURN_uint16_t_array(msg, ids, 16, 0);
 }
 
 /**
@@ -313,8 +332,8 @@ static inline uint16_t mavlink_msg_can_filter_modify_get_ids(const mavlink_messa
  * @param msg The message to decode
  * @param can_filter_modify C-struct to decode the message contents into
  */
-static inline void mavlink_msg_can_filter_modify_decode(const mavlink_message_t* msg, mavlink_can_filter_modify_t* can_filter_modify)
-{
+static inline void mavlink_msg_can_filter_modify_decode(const mavlink_message_t *msg,
+                                                        mavlink_can_filter_modify_t *can_filter_modify) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     mavlink_msg_can_filter_modify_get_ids(msg, can_filter_modify->ids);
     can_filter_modify->target_system = mavlink_msg_can_filter_modify_get_target_system(msg);
@@ -323,8 +342,8 @@ static inline void mavlink_msg_can_filter_modify_decode(const mavlink_message_t*
     can_filter_modify->operation = mavlink_msg_can_filter_modify_get_operation(msg);
     can_filter_modify->num_ids = mavlink_msg_can_filter_modify_get_num_ids(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN? msg->len : MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN;
-        memset(can_filter_modify, 0, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN);
-    memcpy(can_filter_modify, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN? msg->len : MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN;
+    memset(can_filter_modify, 0, MAVLINK_MSG_ID_CAN_FILTER_MODIFY_LEN);
+memcpy(can_filter_modify, _MAV_PAYLOAD(msg), len);
 #endif
 }

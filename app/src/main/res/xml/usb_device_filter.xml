@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <usb-device vendor-id="3034" product-id="34834" /> <!-- RTL8812AU -->
-    <usb-device vendor-id="3034" product-id="34842" /> <!-- RTL8812AU-VS -->
-    <usb-device vendor-id="2821" product-id="6098" /> <!-- Asus AC56 -->
+    <usb-device
+        product-id="34834"
+        vendor-id="3034" /> <!-- RTL8812AU -->
+    <usb-device
+        product-id="34842"
+        vendor-id="3034" /> <!-- RTL8812AU-VS -->
+    <usb-device
+        product-id="6098"
+        vendor-id="2821" /> <!-- Asus AC56 -->
 </resources>

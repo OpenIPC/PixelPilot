@@ -4,12 +4,14 @@
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13 177
 
 MAVPACKED(
-typedef struct __mavlink_serial_udb_extra_f13_t {
- int32_t sue_lat_origin; /*<  Serial UDB Extra MP Origin Latitude*/
- int32_t sue_lon_origin; /*<  Serial UDB Extra MP Origin Longitude*/
- int32_t sue_alt_origin; /*<  Serial UDB Extra MP Origin Altitude Above Sea Level*/
- int16_t sue_week_no; /*<  Serial UDB Extra GPS Week Number*/
-}) mavlink_serial_udb_extra_f13_t;
+        typedef struct __mavlink_serial_udb_extra_f13_t {
+            int32_t sue_lat_origin; /*<  Serial UDB Extra MP Origin Latitude*/
+            int32_t sue_lon_origin; /*<  Serial UDB Extra MP Origin Longitude*/
+            int32_t sue_alt_origin; /*<  Serial UDB Extra MP Origin Altitude Above Sea Level*/
+            int16_t sue_week_no; /*<  Serial UDB Extra GPS Week Number*/
+        })
+
+mavlink_serial_udb_extra_f13_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN 14
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_MIN_LEN 14
@@ -18,7 +20,6 @@ typedef struct __mavlink_serial_udb_extra_f13_t {
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_CRC 249
 #define MAVLINK_MSG_ID_177_CRC 249
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -56,9 +57,11 @@ typedef struct __mavlink_serial_udb_extra_f13_t {
  * @param sue_alt_origin  Serial UDB Extra MP Origin Altitude Above Sea Level
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               int16_t sue_week_no, int32_t sue_lat_origin, int32_t sue_lon_origin, int32_t sue_alt_origin)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f13_pack(uint8_t system_id, uint8_t component_id,
+                                      mavlink_message_t *msg,
+                                      int16_t sue_week_no, int32_t sue_lat_origin,
+                                      int32_t sue_lon_origin, int32_t sue_alt_origin) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN];
     _mav_put_int32_t(buf, 0, sue_lat_origin);
@@ -66,7 +69,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack(uint8_t system_id, 
     _mav_put_int32_t(buf, 8, sue_alt_origin);
     _mav_put_int16_t(buf, 12, sue_week_no);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN);
 #else
     mavlink_serial_udb_extra_f13_t packet;
     packet.sue_lat_origin = sue_lat_origin;
@@ -78,7 +81,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack(uint8_t system_id, 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_MIN_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_CRC);
 }
 
 /**
@@ -93,10 +99,11 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack(uint8_t system_id, 
  * @param sue_alt_origin  Serial UDB Extra MP Origin Altitude Above Sea Level
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   int16_t sue_week_no,int32_t sue_lat_origin,int32_t sue_lon_origin,int32_t sue_alt_origin)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f13_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                           mavlink_message_t *msg,
+                                           int16_t sue_week_no, int32_t sue_lat_origin,
+                                           int32_t sue_lon_origin, int32_t sue_alt_origin) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN];
     _mav_put_int32_t(buf, 0, sue_lat_origin);
@@ -104,7 +111,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack_chan(uint8_t system
     _mav_put_int32_t(buf, 8, sue_alt_origin);
     _mav_put_int16_t(buf, 12, sue_week_no);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN);
 #else
     mavlink_serial_udb_extra_f13_t packet;
     packet.sue_lat_origin = sue_lat_origin;
@@ -116,7 +123,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack_chan(uint8_t system
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_MIN_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_CRC);
 }
 
 /**
@@ -127,9 +137,15 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_pack_chan(uint8_t system
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f13 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f13_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f13_t* serial_udb_extra_f13)
-{
-    return mavlink_msg_serial_udb_extra_f13_pack(system_id, component_id, msg, serial_udb_extra_f13->sue_week_no, serial_udb_extra_f13->sue_lat_origin, serial_udb_extra_f13->sue_lon_origin, serial_udb_extra_f13->sue_alt_origin);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f13_encode(uint8_t system_id, uint8_t component_id,
+                                        mavlink_message_t *msg,
+                                        const mavlink_serial_udb_extra_f13_t *serial_udb_extra_f13) {
+    return mavlink_msg_serial_udb_extra_f13_pack(system_id, component_id, msg,
+                                                 serial_udb_extra_f13->sue_week_no,
+                                                 serial_udb_extra_f13->sue_lat_origin,
+                                                 serial_udb_extra_f13->sue_lon_origin,
+                                                 serial_udb_extra_f13->sue_alt_origin);
 }
 
 /**
@@ -141,9 +157,15 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f13_encode(uint8_t system_id
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f13 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f13_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f13_t* serial_udb_extra_f13)
-{
-    return mavlink_msg_serial_udb_extra_f13_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f13->sue_week_no, serial_udb_extra_f13->sue_lat_origin, serial_udb_extra_f13->sue_lon_origin, serial_udb_extra_f13->sue_alt_origin);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f13_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                             mavlink_message_t *msg,
+                                             const mavlink_serial_udb_extra_f13_t *serial_udb_extra_f13) {
+    return mavlink_msg_serial_udb_extra_f13_pack_chan(system_id, component_id, chan, msg,
+                                                      serial_udb_extra_f13->sue_week_no,
+                                                      serial_udb_extra_f13->sue_lat_origin,
+                                                      serial_udb_extra_f13->sue_lon_origin,
+                                                      serial_udb_extra_f13->sue_alt_origin);
 }
 
 /**
@@ -232,9 +254,9 @@ static inline void mavlink_msg_serial_udb_extra_f13_send_buf(mavlink_message_t *
  *
  * @return  Serial UDB Extra GPS Week Number
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f13_get_sue_week_no(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  12);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f13_get_sue_week_no(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 12);
 }
 
 /**
@@ -242,9 +264,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f13_get_sue_week_no(const mav
  *
  * @return  Serial UDB Extra MP Origin Latitude
  */
-static inline int32_t mavlink_msg_serial_udb_extra_f13_get_sue_lat_origin(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  0);
+static inline int32_t
+mavlink_msg_serial_udb_extra_f13_get_sue_lat_origin(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 0);
 }
 
 /**
@@ -252,9 +274,9 @@ static inline int32_t mavlink_msg_serial_udb_extra_f13_get_sue_lat_origin(const 
  *
  * @return  Serial UDB Extra MP Origin Longitude
  */
-static inline int32_t mavlink_msg_serial_udb_extra_f13_get_sue_lon_origin(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  4);
+static inline int32_t
+mavlink_msg_serial_udb_extra_f13_get_sue_lon_origin(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 4);
 }
 
 /**
@@ -262,9 +284,9 @@ static inline int32_t mavlink_msg_serial_udb_extra_f13_get_sue_lon_origin(const 
  *
  * @return  Serial UDB Extra MP Origin Altitude Above Sea Level
  */
-static inline int32_t mavlink_msg_serial_udb_extra_f13_get_sue_alt_origin(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  8);
+static inline int32_t
+mavlink_msg_serial_udb_extra_f13_get_sue_alt_origin(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 8);
 }
 
 /**
@@ -273,16 +295,16 @@ static inline int32_t mavlink_msg_serial_udb_extra_f13_get_sue_alt_origin(const 
  * @param msg The message to decode
  * @param serial_udb_extra_f13 C-struct to decode the message contents into
  */
-static inline void mavlink_msg_serial_udb_extra_f13_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f13_t* serial_udb_extra_f13)
-{
+static inline void mavlink_msg_serial_udb_extra_f13_decode(const mavlink_message_t *msg,
+                                                           mavlink_serial_udb_extra_f13_t *serial_udb_extra_f13) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     serial_udb_extra_f13->sue_lat_origin = mavlink_msg_serial_udb_extra_f13_get_sue_lat_origin(msg);
     serial_udb_extra_f13->sue_lon_origin = mavlink_msg_serial_udb_extra_f13_get_sue_lon_origin(msg);
     serial_udb_extra_f13->sue_alt_origin = mavlink_msg_serial_udb_extra_f13_get_sue_alt_origin(msg);
     serial_udb_extra_f13->sue_week_no = mavlink_msg_serial_udb_extra_f13_get_sue_week_no(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN;
-        memset(serial_udb_extra_f13, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN);
-    memcpy(serial_udb_extra_f13, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN;
+    memset(serial_udb_extra_f13, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F13_LEN);
+memcpy(serial_udb_extra_f13, _MAV_PAYLOAD(msg), len);
 #endif
 }

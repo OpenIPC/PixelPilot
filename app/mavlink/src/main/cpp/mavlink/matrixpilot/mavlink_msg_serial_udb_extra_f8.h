@@ -4,15 +4,17 @@
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8 176
 
 MAVPACKED(
-typedef struct __mavlink_serial_udb_extra_f8_t {
- float sue_HEIGHT_TARGET_MAX; /*<  Serial UDB Extra HEIGHT_TARGET_MAX*/
- float sue_HEIGHT_TARGET_MIN; /*<  Serial UDB Extra HEIGHT_TARGET_MIN*/
- float sue_ALT_HOLD_THROTTLE_MIN; /*<  Serial UDB Extra ALT_HOLD_THROTTLE_MIN*/
- float sue_ALT_HOLD_THROTTLE_MAX; /*<  Serial UDB Extra ALT_HOLD_THROTTLE_MAX*/
- float sue_ALT_HOLD_PITCH_MIN; /*<  Serial UDB Extra ALT_HOLD_PITCH_MIN*/
- float sue_ALT_HOLD_PITCH_MAX; /*<  Serial UDB Extra ALT_HOLD_PITCH_MAX*/
- float sue_ALT_HOLD_PITCH_HIGH; /*<  Serial UDB Extra ALT_HOLD_PITCH_HIGH*/
-}) mavlink_serial_udb_extra_f8_t;
+        typedef struct __mavlink_serial_udb_extra_f8_t {
+            float sue_HEIGHT_TARGET_MAX; /*<  Serial UDB Extra HEIGHT_TARGET_MAX*/
+            float sue_HEIGHT_TARGET_MIN; /*<  Serial UDB Extra HEIGHT_TARGET_MIN*/
+            float sue_ALT_HOLD_THROTTLE_MIN; /*<  Serial UDB Extra ALT_HOLD_THROTTLE_MIN*/
+            float sue_ALT_HOLD_THROTTLE_MAX; /*<  Serial UDB Extra ALT_HOLD_THROTTLE_MAX*/
+            float sue_ALT_HOLD_PITCH_MIN; /*<  Serial UDB Extra ALT_HOLD_PITCH_MIN*/
+            float sue_ALT_HOLD_PITCH_MAX; /*<  Serial UDB Extra ALT_HOLD_PITCH_MAX*/
+            float sue_ALT_HOLD_PITCH_HIGH; /*<  Serial UDB Extra ALT_HOLD_PITCH_HIGH*/
+        })
+
+mavlink_serial_udb_extra_f8_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN 28
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_MIN_LEN 28
@@ -21,7 +23,6 @@ typedef struct __mavlink_serial_udb_extra_f8_t {
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_CRC 142
 #define MAVLINK_MSG_ID_176_CRC 142
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -68,9 +69,15 @@ typedef struct __mavlink_serial_udb_extra_f8_t {
  * @param sue_ALT_HOLD_PITCH_HIGH  Serial UDB Extra ALT_HOLD_PITCH_HIGH
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f8_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               float sue_HEIGHT_TARGET_MAX, float sue_HEIGHT_TARGET_MIN, float sue_ALT_HOLD_THROTTLE_MIN, float sue_ALT_HOLD_THROTTLE_MAX, float sue_ALT_HOLD_PITCH_MIN, float sue_ALT_HOLD_PITCH_MAX, float sue_ALT_HOLD_PITCH_HIGH)
-{
+static inline uint16_t mavlink_msg_serial_udb_extra_f8_pack(uint8_t system_id, uint8_t component_id,
+                                                            mavlink_message_t *msg,
+                                                            float sue_HEIGHT_TARGET_MAX,
+                                                            float sue_HEIGHT_TARGET_MIN,
+                                                            float sue_ALT_HOLD_THROTTLE_MIN,
+                                                            float sue_ALT_HOLD_THROTTLE_MAX,
+                                                            float sue_ALT_HOLD_PITCH_MIN,
+                                                            float sue_ALT_HOLD_PITCH_MAX,
+                                                            float sue_ALT_HOLD_PITCH_HIGH) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN];
     _mav_put_float(buf, 0, sue_HEIGHT_TARGET_MAX);
@@ -81,7 +88,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f8_pack(uint8_t system_id, u
     _mav_put_float(buf, 20, sue_ALT_HOLD_PITCH_MAX);
     _mav_put_float(buf, 24, sue_ALT_HOLD_PITCH_HIGH);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN);
 #else
     mavlink_serial_udb_extra_f8_t packet;
     packet.sue_HEIGHT_TARGET_MAX = sue_HEIGHT_TARGET_MAX;
@@ -96,7 +103,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f8_pack(uint8_t system_id, u
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_MIN_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_CRC);
 }
 
 /**
@@ -114,10 +124,15 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f8_pack(uint8_t system_id, u
  * @param sue_ALT_HOLD_PITCH_HIGH  Serial UDB Extra ALT_HOLD_PITCH_HIGH
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f8_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   float sue_HEIGHT_TARGET_MAX,float sue_HEIGHT_TARGET_MIN,float sue_ALT_HOLD_THROTTLE_MIN,float sue_ALT_HOLD_THROTTLE_MAX,float sue_ALT_HOLD_PITCH_MIN,float sue_ALT_HOLD_PITCH_MAX,float sue_ALT_HOLD_PITCH_HIGH)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f8_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                          mavlink_message_t *msg,
+                                          float sue_HEIGHT_TARGET_MAX, float sue_HEIGHT_TARGET_MIN,
+                                          float sue_ALT_HOLD_THROTTLE_MIN,
+                                          float sue_ALT_HOLD_THROTTLE_MAX,
+                                          float sue_ALT_HOLD_PITCH_MIN,
+                                          float sue_ALT_HOLD_PITCH_MAX,
+                                          float sue_ALT_HOLD_PITCH_HIGH) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN];
     _mav_put_float(buf, 0, sue_HEIGHT_TARGET_MAX);
@@ -128,7 +143,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f8_pack_chan(uint8_t system_
     _mav_put_float(buf, 20, sue_ALT_HOLD_PITCH_MAX);
     _mav_put_float(buf, 24, sue_ALT_HOLD_PITCH_HIGH);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN);
 #else
     mavlink_serial_udb_extra_f8_t packet;
     packet.sue_HEIGHT_TARGET_MAX = sue_HEIGHT_TARGET_MAX;
@@ -143,7 +158,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f8_pack_chan(uint8_t system_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_MIN_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_CRC);
 }
 
 /**
@@ -154,9 +172,18 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f8_pack_chan(uint8_t system_
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f8 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f8_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f8_t* serial_udb_extra_f8)
-{
-    return mavlink_msg_serial_udb_extra_f8_pack(system_id, component_id, msg, serial_udb_extra_f8->sue_HEIGHT_TARGET_MAX, serial_udb_extra_f8->sue_HEIGHT_TARGET_MIN, serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MIN, serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MAX, serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MIN, serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MAX, serial_udb_extra_f8->sue_ALT_HOLD_PITCH_HIGH);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f8_encode(uint8_t system_id, uint8_t component_id,
+                                       mavlink_message_t *msg,
+                                       const mavlink_serial_udb_extra_f8_t *serial_udb_extra_f8) {
+    return mavlink_msg_serial_udb_extra_f8_pack(system_id, component_id, msg,
+                                                serial_udb_extra_f8->sue_HEIGHT_TARGET_MAX,
+                                                serial_udb_extra_f8->sue_HEIGHT_TARGET_MIN,
+                                                serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MIN,
+                                                serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MAX,
+                                                serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MIN,
+                                                serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MAX,
+                                                serial_udb_extra_f8->sue_ALT_HOLD_PITCH_HIGH);
 }
 
 /**
@@ -168,9 +195,18 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f8_encode(uint8_t system_id,
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f8 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f8_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f8_t* serial_udb_extra_f8)
-{
-    return mavlink_msg_serial_udb_extra_f8_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f8->sue_HEIGHT_TARGET_MAX, serial_udb_extra_f8->sue_HEIGHT_TARGET_MIN, serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MIN, serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MAX, serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MIN, serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MAX, serial_udb_extra_f8->sue_ALT_HOLD_PITCH_HIGH);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f8_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                            mavlink_message_t *msg,
+                                            const mavlink_serial_udb_extra_f8_t *serial_udb_extra_f8) {
+    return mavlink_msg_serial_udb_extra_f8_pack_chan(system_id, component_id, chan, msg,
+                                                     serial_udb_extra_f8->sue_HEIGHT_TARGET_MAX,
+                                                     serial_udb_extra_f8->sue_HEIGHT_TARGET_MIN,
+                                                     serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MIN,
+                                                     serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MAX,
+                                                     serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MIN,
+                                                     serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MAX,
+                                                     serial_udb_extra_f8->sue_ALT_HOLD_PITCH_HIGH);
 }
 
 /**
@@ -274,9 +310,9 @@ static inline void mavlink_msg_serial_udb_extra_f8_send_buf(mavlink_message_t *m
  *
  * @return  Serial UDB Extra HEIGHT_TARGET_MAX
  */
-static inline float mavlink_msg_serial_udb_extra_f8_get_sue_HEIGHT_TARGET_MAX(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float
+mavlink_msg_serial_udb_extra_f8_get_sue_HEIGHT_TARGET_MAX(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -284,9 +320,9 @@ static inline float mavlink_msg_serial_udb_extra_f8_get_sue_HEIGHT_TARGET_MAX(co
  *
  * @return  Serial UDB Extra HEIGHT_TARGET_MIN
  */
-static inline float mavlink_msg_serial_udb_extra_f8_get_sue_HEIGHT_TARGET_MIN(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float
+mavlink_msg_serial_udb_extra_f8_get_sue_HEIGHT_TARGET_MIN(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -294,9 +330,9 @@ static inline float mavlink_msg_serial_udb_extra_f8_get_sue_HEIGHT_TARGET_MIN(co
  *
  * @return  Serial UDB Extra ALT_HOLD_THROTTLE_MIN
  */
-static inline float mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_THROTTLE_MIN(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float
+mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_THROTTLE_MIN(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -304,9 +340,9 @@ static inline float mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_THROTTLE_MI
  *
  * @return  Serial UDB Extra ALT_HOLD_THROTTLE_MAX
  */
-static inline float mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_THROTTLE_MAX(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float
+mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_THROTTLE_MAX(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -314,9 +350,9 @@ static inline float mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_THROTTLE_MA
  *
  * @return  Serial UDB Extra ALT_HOLD_PITCH_MIN
  */
-static inline float mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_MIN(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float
+mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_MIN(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -324,9 +360,9 @@ static inline float mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_MIN(c
  *
  * @return  Serial UDB Extra ALT_HOLD_PITCH_MAX
  */
-static inline float mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_MAX(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  20);
+static inline float
+mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_MAX(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 20);
 }
 
 /**
@@ -334,9 +370,9 @@ static inline float mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_MAX(c
  *
  * @return  Serial UDB Extra ALT_HOLD_PITCH_HIGH
  */
-static inline float mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_HIGH(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float
+mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_HIGH(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -345,19 +381,26 @@ static inline float mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_HIGH(
  * @param msg The message to decode
  * @param serial_udb_extra_f8 C-struct to decode the message contents into
  */
-static inline void mavlink_msg_serial_udb_extra_f8_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f8_t* serial_udb_extra_f8)
-{
+static inline void mavlink_msg_serial_udb_extra_f8_decode(const mavlink_message_t *msg,
+                                                          mavlink_serial_udb_extra_f8_t *serial_udb_extra_f8) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    serial_udb_extra_f8->sue_HEIGHT_TARGET_MAX = mavlink_msg_serial_udb_extra_f8_get_sue_HEIGHT_TARGET_MAX(msg);
-    serial_udb_extra_f8->sue_HEIGHT_TARGET_MIN = mavlink_msg_serial_udb_extra_f8_get_sue_HEIGHT_TARGET_MIN(msg);
-    serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MIN = mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_THROTTLE_MIN(msg);
-    serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MAX = mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_THROTTLE_MAX(msg);
-    serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MIN = mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_MIN(msg);
-    serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MAX = mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_MAX(msg);
-    serial_udb_extra_f8->sue_ALT_HOLD_PITCH_HIGH = mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_HIGH(msg);
+    serial_udb_extra_f8->sue_HEIGHT_TARGET_MAX = mavlink_msg_serial_udb_extra_f8_get_sue_HEIGHT_TARGET_MAX(
+            msg);
+    serial_udb_extra_f8->sue_HEIGHT_TARGET_MIN = mavlink_msg_serial_udb_extra_f8_get_sue_HEIGHT_TARGET_MIN(
+            msg);
+    serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MIN = mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_THROTTLE_MIN(
+            msg);
+    serial_udb_extra_f8->sue_ALT_HOLD_THROTTLE_MAX = mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_THROTTLE_MAX(
+            msg);
+    serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MIN = mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_MIN(
+            msg);
+    serial_udb_extra_f8->sue_ALT_HOLD_PITCH_MAX = mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_MAX(
+            msg);
+    serial_udb_extra_f8->sue_ALT_HOLD_PITCH_HIGH = mavlink_msg_serial_udb_extra_f8_get_sue_ALT_HOLD_PITCH_HIGH(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN;
-        memset(serial_udb_extra_f8, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN);
-    memcpy(serial_udb_extra_f8, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN;
+    memset(serial_udb_extra_f8, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F8_LEN);
+memcpy(serial_udb_extra_f8, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -4,13 +4,13 @@
 #define MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST 37
 
 MAVPACKED(
-typedef struct __mavlink_mission_request_partial_list_t {
- int16_t start_index; /*<  Start index*/
- int16_t end_index; /*<  End index, -1 by default (-1: send list to end). Else a valid index of the list*/
- uint8_t target_system; /*<  System ID*/
- uint8_t target_component; /*<  Component ID*/
- uint8_t mission_type; /*<  Mission type.*/
-}) mavlink_mission_request_partial_list_t;
+        typedef struct __mavlink_mission_request_partial_list_t {
+            int16_t start_index; /*<  Start index*/
+            int16_t end_index; /*<  End index, -1 by default (-1: send list to end). Else a valid index of the list*/
+            uint8_t target_system; /*<  System ID*/
+            uint8_t target_component; /*<  Component ID*/
+            uint8_t mission_type; /*<  Mission type.*/
+        }) mavlink_mission_request_partial_list_t;
 
 #define MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN 7
 #define MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_MIN_LEN 6
@@ -19,7 +19,6 @@ typedef struct __mavlink_mission_request_partial_list_t {
 
 #define MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_CRC 212
 #define MAVLINK_MSG_ID_37_CRC 212
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -60,9 +59,12 @@ typedef struct __mavlink_mission_request_partial_list_t {
  * @param mission_type  Mission type.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_mission_request_partial_list_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, int16_t start_index, int16_t end_index, uint8_t mission_type)
-{
+static inline uint16_t
+mavlink_msg_mission_request_partial_list_pack(uint8_t system_id, uint8_t component_id,
+                                              mavlink_message_t *msg,
+                                              uint8_t target_system, uint8_t target_component,
+                                              int16_t start_index, int16_t end_index,
+                                              uint8_t mission_type) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN];
     _mav_put_int16_t(buf, 0, start_index);
@@ -80,11 +82,14 @@ static inline uint16_t mavlink_msg_mission_request_partial_list_pack(uint8_t sys
     packet.target_component = target_component;
     packet.mission_type = mission_type;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_MIN_LEN, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_MIN_LEN,
+                                    MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN,
+                                    MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_CRC);
 }
 
 /**
@@ -100,10 +105,13 @@ static inline uint16_t mavlink_msg_mission_request_partial_list_pack(uint8_t sys
  * @param mission_type  Mission type.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_mission_request_partial_list_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,int16_t start_index,int16_t end_index,uint8_t mission_type)
-{
+static inline uint16_t
+mavlink_msg_mission_request_partial_list_pack_chan(uint8_t system_id, uint8_t component_id,
+                                                   uint8_t chan,
+                                                   mavlink_message_t *msg,
+                                                   uint8_t target_system, uint8_t target_component,
+                                                   int16_t start_index, int16_t end_index,
+                                                   uint8_t mission_type) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN];
     _mav_put_int16_t(buf, 0, start_index);
@@ -121,11 +129,14 @@ static inline uint16_t mavlink_msg_mission_request_partial_list_pack_chan(uint8_
     packet.target_component = target_component;
     packet.mission_type = mission_type;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_MIN_LEN, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_MIN_LEN,
+                                         MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN,
+                                         MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_CRC);
 }
 
 /**
@@ -136,9 +147,16 @@ static inline uint16_t mavlink_msg_mission_request_partial_list_pack_chan(uint8_
  * @param msg The MAVLink message to compress the data into
  * @param mission_request_partial_list C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_mission_request_partial_list_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_mission_request_partial_list_t* mission_request_partial_list)
-{
-    return mavlink_msg_mission_request_partial_list_pack(system_id, component_id, msg, mission_request_partial_list->target_system, mission_request_partial_list->target_component, mission_request_partial_list->start_index, mission_request_partial_list->end_index, mission_request_partial_list->mission_type);
+static inline uint16_t
+mavlink_msg_mission_request_partial_list_encode(uint8_t system_id, uint8_t component_id,
+                                                mavlink_message_t *msg,
+                                                const mavlink_mission_request_partial_list_t *mission_request_partial_list) {
+    return mavlink_msg_mission_request_partial_list_pack(system_id, component_id, msg,
+                                                         mission_request_partial_list->target_system,
+                                                         mission_request_partial_list->target_component,
+                                                         mission_request_partial_list->start_index,
+                                                         mission_request_partial_list->end_index,
+                                                         mission_request_partial_list->mission_type);
 }
 
 /**
@@ -150,9 +168,16 @@ static inline uint16_t mavlink_msg_mission_request_partial_list_encode(uint8_t s
  * @param msg The MAVLink message to compress the data into
  * @param mission_request_partial_list C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_mission_request_partial_list_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_mission_request_partial_list_t* mission_request_partial_list)
-{
-    return mavlink_msg_mission_request_partial_list_pack_chan(system_id, component_id, chan, msg, mission_request_partial_list->target_system, mission_request_partial_list->target_component, mission_request_partial_list->start_index, mission_request_partial_list->end_index, mission_request_partial_list->mission_type);
+static inline uint16_t
+mavlink_msg_mission_request_partial_list_encode_chan(uint8_t system_id, uint8_t component_id,
+                                                     uint8_t chan, mavlink_message_t *msg,
+                                                     const mavlink_mission_request_partial_list_t *mission_request_partial_list) {
+    return mavlink_msg_mission_request_partial_list_pack_chan(system_id, component_id, chan, msg,
+                                                              mission_request_partial_list->target_system,
+                                                              mission_request_partial_list->target_component,
+                                                              mission_request_partial_list->start_index,
+                                                              mission_request_partial_list->end_index,
+                                                              mission_request_partial_list->mission_type);
 }
 
 /**
@@ -246,9 +271,9 @@ static inline void mavlink_msg_mission_request_partial_list_send_buf(mavlink_mes
  *
  * @return  System ID
  */
-static inline uint8_t mavlink_msg_mission_request_partial_list_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  4);
+static inline uint8_t
+mavlink_msg_mission_request_partial_list_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 4);
 }
 
 /**
@@ -256,9 +281,9 @@ static inline uint8_t mavlink_msg_mission_request_partial_list_get_target_system
  *
  * @return  Component ID
  */
-static inline uint8_t mavlink_msg_mission_request_partial_list_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  5);
+static inline uint8_t
+mavlink_msg_mission_request_partial_list_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 5);
 }
 
 /**
@@ -266,9 +291,9 @@ static inline uint8_t mavlink_msg_mission_request_partial_list_get_target_compon
  *
  * @return  Start index
  */
-static inline int16_t mavlink_msg_mission_request_partial_list_get_start_index(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  0);
+static inline int16_t
+mavlink_msg_mission_request_partial_list_get_start_index(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 0);
 }
 
 /**
@@ -276,9 +301,9 @@ static inline int16_t mavlink_msg_mission_request_partial_list_get_start_index(c
  *
  * @return  End index, -1 by default (-1: send list to end). Else a valid index of the list
  */
-static inline int16_t mavlink_msg_mission_request_partial_list_get_end_index(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  2);
+static inline int16_t
+mavlink_msg_mission_request_partial_list_get_end_index(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 2);
 }
 
 /**
@@ -286,9 +311,9 @@ static inline int16_t mavlink_msg_mission_request_partial_list_get_end_index(con
  *
  * @return  Mission type.
  */
-static inline uint8_t mavlink_msg_mission_request_partial_list_get_mission_type(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  6);
+static inline uint8_t
+mavlink_msg_mission_request_partial_list_get_mission_type(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 6);
 }
 
 /**
@@ -297,8 +322,8 @@ static inline uint8_t mavlink_msg_mission_request_partial_list_get_mission_type(
  * @param msg The message to decode
  * @param mission_request_partial_list C-struct to decode the message contents into
  */
-static inline void mavlink_msg_mission_request_partial_list_decode(const mavlink_message_t* msg, mavlink_mission_request_partial_list_t* mission_request_partial_list)
-{
+static inline void mavlink_msg_mission_request_partial_list_decode(const mavlink_message_t *msg,
+                                                                   mavlink_mission_request_partial_list_t *mission_request_partial_list) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     mission_request_partial_list->start_index = mavlink_msg_mission_request_partial_list_get_start_index(msg);
     mission_request_partial_list->end_index = mavlink_msg_mission_request_partial_list_get_end_index(msg);
@@ -306,8 +331,9 @@ static inline void mavlink_msg_mission_request_partial_list_decode(const mavlink
     mission_request_partial_list->target_component = mavlink_msg_mission_request_partial_list_get_target_component(msg);
     mission_request_partial_list->mission_type = mavlink_msg_mission_request_partial_list_get_mission_type(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN? msg->len : MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN;
-        memset(mission_request_partial_list, 0, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN ? msg->len
+                                                                             : MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN;
+    memset(mission_request_partial_list, 0, MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST_LEN);
     memcpy(mission_request_partial_list, _MAV_PAYLOAD(msg), len);
 #endif
 }

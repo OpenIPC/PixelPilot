@@ -4,21 +4,21 @@
 #define MAVLINK_MSG_ID_COMMAND_INT 75
 
 MAVPACKED(
-typedef struct __mavlink_command_int_t {
- float param1; /*<  PARAM1, see MAV_CMD enum*/
- float param2; /*<  PARAM2, see MAV_CMD enum*/
- float param3; /*<  PARAM3, see MAV_CMD enum*/
- float param4; /*<  PARAM4, see MAV_CMD enum*/
- int32_t x; /*<  PARAM5 / local: x position in meters * 1e4, global: latitude in degrees * 10^7*/
- int32_t y; /*<  PARAM6 / local: y position in meters * 1e4, global: longitude in degrees * 10^7*/
- float z; /*<  PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame).*/
- uint16_t command; /*<  The scheduled action for the mission item.*/
- uint8_t target_system; /*<  System ID*/
- uint8_t target_component; /*<  Component ID*/
- uint8_t frame; /*<  The coordinate system of the COMMAND.*/
- uint8_t current; /*<  false:0, true:1*/
- uint8_t autocontinue; /*<  autocontinue to next wp*/
-}) mavlink_command_int_t;
+        typedef struct __mavlink_command_int_t {
+            float param1; /*<  PARAM1, see MAV_CMD enum*/
+            float param2; /*<  PARAM2, see MAV_CMD enum*/
+            float param3; /*<  PARAM3, see MAV_CMD enum*/
+            float param4; /*<  PARAM4, see MAV_CMD enum*/
+            int32_t x; /*<  PARAM5 / local: x position in meters * 1e4, global: latitude in degrees * 10^7*/
+            int32_t y; /*<  PARAM6 / local: y position in meters * 1e4, global: longitude in degrees * 10^7*/
+            float z; /*<  PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame).*/
+            uint16_t command; /*<  The scheduled action for the mission item.*/
+            uint8_t target_system; /*<  System ID*/
+            uint8_t target_component; /*<  Component ID*/
+            uint8_t frame; /*<  The coordinate system of the COMMAND.*/
+            uint8_t current; /*<  false:0, true:1*/
+            uint8_t autocontinue; /*<  autocontinue to next wp*/
+        }) mavlink_command_int_t;
 
 #define MAVLINK_MSG_ID_COMMAND_INT_LEN 35
 #define MAVLINK_MSG_ID_COMMAND_INT_MIN_LEN 35
@@ -27,7 +27,6 @@ typedef struct __mavlink_command_int_t {
 
 #define MAVLINK_MSG_ID_COMMAND_INT_CRC 158
 #define MAVLINK_MSG_ID_75_CRC 158
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -92,9 +91,12 @@ typedef struct __mavlink_command_int_t {
  * @param z  PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame).
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_command_int_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, uint8_t frame, uint16_t command, uint8_t current, uint8_t autocontinue, float param1, float param2, float param3, float param4, int32_t x, int32_t y, float z)
-{
+static inline uint16_t
+mavlink_msg_command_int_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                             uint8_t target_system, uint8_t target_component, uint8_t frame,
+                             uint16_t command, uint8_t current, uint8_t autocontinue, float param1,
+                             float param2, float param3, float param4, int32_t x, int32_t y,
+                             float z) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_COMMAND_INT_LEN];
     _mav_put_float(buf, 0, param1);
@@ -128,11 +130,13 @@ static inline uint16_t mavlink_msg_command_int_pack(uint8_t system_id, uint8_t c
     packet.current = current;
     packet.autocontinue = autocontinue;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_COMMAND_INT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_COMMAND_INT_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_COMMAND_INT;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_COMMAND_INT_MIN_LEN, MAVLINK_MSG_ID_COMMAND_INT_LEN, MAVLINK_MSG_ID_COMMAND_INT_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_COMMAND_INT_MIN_LEN,
+                                    MAVLINK_MSG_ID_COMMAND_INT_LEN, MAVLINK_MSG_ID_COMMAND_INT_CRC);
 }
 
 /**
@@ -156,10 +160,13 @@ static inline uint16_t mavlink_msg_command_int_pack(uint8_t system_id, uint8_t c
  * @param z  PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame).
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_command_int_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,uint8_t frame,uint16_t command,uint8_t current,uint8_t autocontinue,float param1,float param2,float param3,float param4,int32_t x,int32_t y,float z)
-{
+static inline uint16_t
+mavlink_msg_command_int_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                  mavlink_message_t *msg,
+                                  uint8_t target_system, uint8_t target_component, uint8_t frame,
+                                  uint16_t command, uint8_t current, uint8_t autocontinue,
+                                  float param1, float param2, float param3, float param4, int32_t x,
+                                  int32_t y, float z) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_COMMAND_INT_LEN];
     _mav_put_float(buf, 0, param1);
@@ -193,11 +200,14 @@ static inline uint16_t mavlink_msg_command_int_pack_chan(uint8_t system_id, uint
     packet.current = current;
     packet.autocontinue = autocontinue;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_COMMAND_INT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_COMMAND_INT_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_COMMAND_INT;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_COMMAND_INT_MIN_LEN, MAVLINK_MSG_ID_COMMAND_INT_LEN, MAVLINK_MSG_ID_COMMAND_INT_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_COMMAND_INT_MIN_LEN,
+                                         MAVLINK_MSG_ID_COMMAND_INT_LEN,
+                                         MAVLINK_MSG_ID_COMMAND_INT_CRC);
 }
 
 /**
@@ -208,9 +218,16 @@ static inline uint16_t mavlink_msg_command_int_pack_chan(uint8_t system_id, uint
  * @param msg The MAVLink message to compress the data into
  * @param command_int C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_command_int_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_command_int_t* command_int)
-{
-    return mavlink_msg_command_int_pack(system_id, component_id, msg, command_int->target_system, command_int->target_component, command_int->frame, command_int->command, command_int->current, command_int->autocontinue, command_int->param1, command_int->param2, command_int->param3, command_int->param4, command_int->x, command_int->y, command_int->z);
+static inline uint16_t
+mavlink_msg_command_int_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                               const mavlink_command_int_t *command_int) {
+    return mavlink_msg_command_int_pack(system_id, component_id, msg, command_int->target_system,
+                                        command_int->target_component, command_int->frame,
+                                        command_int->command, command_int->current,
+                                        command_int->autocontinue, command_int->param1,
+                                        command_int->param2, command_int->param3,
+                                        command_int->param4, command_int->x, command_int->y,
+                                        command_int->z);
 }
 
 /**
@@ -222,9 +239,18 @@ static inline uint16_t mavlink_msg_command_int_encode(uint8_t system_id, uint8_t
  * @param msg The MAVLink message to compress the data into
  * @param command_int C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_command_int_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_command_int_t* command_int)
-{
-    return mavlink_msg_command_int_pack_chan(system_id, component_id, chan, msg, command_int->target_system, command_int->target_component, command_int->frame, command_int->command, command_int->current, command_int->autocontinue, command_int->param1, command_int->param2, command_int->param3, command_int->param4, command_int->x, command_int->y, command_int->z);
+static inline uint16_t
+mavlink_msg_command_int_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                    mavlink_message_t *msg,
+                                    const mavlink_command_int_t *command_int) {
+    return mavlink_msg_command_int_pack_chan(system_id, component_id, chan, msg,
+                                             command_int->target_system,
+                                             command_int->target_component, command_int->frame,
+                                             command_int->command, command_int->current,
+                                             command_int->autocontinue, command_int->param1,
+                                             command_int->param2, command_int->param3,
+                                             command_int->param4, command_int->x, command_int->y,
+                                             command_int->z);
 }
 
 /**
@@ -358,9 +384,8 @@ static inline void mavlink_msg_command_int_send_buf(mavlink_message_t *msgbuf, m
  *
  * @return  System ID
  */
-static inline uint8_t mavlink_msg_command_int_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  30);
+static inline uint8_t mavlink_msg_command_int_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 30);
 }
 
 /**
@@ -368,9 +393,8 @@ static inline uint8_t mavlink_msg_command_int_get_target_system(const mavlink_me
  *
  * @return  Component ID
  */
-static inline uint8_t mavlink_msg_command_int_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  31);
+static inline uint8_t mavlink_msg_command_int_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 31);
 }
 
 /**
@@ -378,9 +402,8 @@ static inline uint8_t mavlink_msg_command_int_get_target_component(const mavlink
  *
  * @return  The coordinate system of the COMMAND.
  */
-static inline uint8_t mavlink_msg_command_int_get_frame(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  32);
+static inline uint8_t mavlink_msg_command_int_get_frame(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 32);
 }
 
 /**
@@ -388,9 +411,8 @@ static inline uint8_t mavlink_msg_command_int_get_frame(const mavlink_message_t*
  *
  * @return  The scheduled action for the mission item.
  */
-static inline uint16_t mavlink_msg_command_int_get_command(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  28);
+static inline uint16_t mavlink_msg_command_int_get_command(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 28);
 }
 
 /**
@@ -398,9 +420,8 @@ static inline uint16_t mavlink_msg_command_int_get_command(const mavlink_message
  *
  * @return  false:0, true:1
  */
-static inline uint8_t mavlink_msg_command_int_get_current(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  33);
+static inline uint8_t mavlink_msg_command_int_get_current(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 33);
 }
 
 /**
@@ -408,9 +429,8 @@ static inline uint8_t mavlink_msg_command_int_get_current(const mavlink_message_
  *
  * @return  autocontinue to next wp
  */
-static inline uint8_t mavlink_msg_command_int_get_autocontinue(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  34);
+static inline uint8_t mavlink_msg_command_int_get_autocontinue(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 34);
 }
 
 /**
@@ -418,9 +438,8 @@ static inline uint8_t mavlink_msg_command_int_get_autocontinue(const mavlink_mes
  *
  * @return  PARAM1, see MAV_CMD enum
  */
-static inline float mavlink_msg_command_int_get_param1(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_command_int_get_param1(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -428,9 +447,8 @@ static inline float mavlink_msg_command_int_get_param1(const mavlink_message_t* 
  *
  * @return  PARAM2, see MAV_CMD enum
  */
-static inline float mavlink_msg_command_int_get_param2(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_command_int_get_param2(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -438,9 +456,8 @@ static inline float mavlink_msg_command_int_get_param2(const mavlink_message_t* 
  *
  * @return  PARAM3, see MAV_CMD enum
  */
-static inline float mavlink_msg_command_int_get_param3(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_command_int_get_param3(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -448,9 +465,8 @@ static inline float mavlink_msg_command_int_get_param3(const mavlink_message_t* 
  *
  * @return  PARAM4, see MAV_CMD enum
  */
-static inline float mavlink_msg_command_int_get_param4(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_command_int_get_param4(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -458,9 +474,8 @@ static inline float mavlink_msg_command_int_get_param4(const mavlink_message_t* 
  *
  * @return  PARAM5 / local: x position in meters * 1e4, global: latitude in degrees * 10^7
  */
-static inline int32_t mavlink_msg_command_int_get_x(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  16);
+static inline int32_t mavlink_msg_command_int_get_x(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 16);
 }
 
 /**
@@ -468,9 +483,8 @@ static inline int32_t mavlink_msg_command_int_get_x(const mavlink_message_t* msg
  *
  * @return  PARAM6 / local: y position in meters * 1e4, global: longitude in degrees * 10^7
  */
-static inline int32_t mavlink_msg_command_int_get_y(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  20);
+static inline int32_t mavlink_msg_command_int_get_y(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 20);
 }
 
 /**
@@ -478,9 +492,8 @@ static inline int32_t mavlink_msg_command_int_get_y(const mavlink_message_t* msg
  *
  * @return  PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame).
  */
-static inline float mavlink_msg_command_int_get_z(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float mavlink_msg_command_int_get_z(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -489,8 +502,8 @@ static inline float mavlink_msg_command_int_get_z(const mavlink_message_t* msg)
  * @param msg The message to decode
  * @param command_int C-struct to decode the message contents into
  */
-static inline void mavlink_msg_command_int_decode(const mavlink_message_t* msg, mavlink_command_int_t* command_int)
-{
+static inline void
+mavlink_msg_command_int_decode(const mavlink_message_t *msg, mavlink_command_int_t *command_int) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     command_int->param1 = mavlink_msg_command_int_get_param1(msg);
     command_int->param2 = mavlink_msg_command_int_get_param2(msg);
@@ -506,8 +519,9 @@ static inline void mavlink_msg_command_int_decode(const mavlink_message_t* msg, 
     command_int->current = mavlink_msg_command_int_get_current(msg);
     command_int->autocontinue = mavlink_msg_command_int_get_autocontinue(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_COMMAND_INT_LEN? msg->len : MAVLINK_MSG_ID_COMMAND_INT_LEN;
-        memset(command_int, 0, MAVLINK_MSG_ID_COMMAND_INT_LEN);
+    uint8_t len =
+            msg->len < MAVLINK_MSG_ID_COMMAND_INT_LEN ? msg->len : MAVLINK_MSG_ID_COMMAND_INT_LEN;
+    memset(command_int, 0, MAVLINK_MSG_ID_COMMAND_INT_LEN);
     memcpy(command_int, _MAV_PAYLOAD(msg), len);
 #endif
 }

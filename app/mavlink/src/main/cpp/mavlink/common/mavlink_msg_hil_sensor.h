@@ -4,23 +4,23 @@
 #define MAVLINK_MSG_ID_HIL_SENSOR 107
 
 MAVPACKED(
-typedef struct __mavlink_hil_sensor_t {
- uint64_t time_usec; /*< [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.*/
- float xacc; /*< [m/s/s] X acceleration*/
- float yacc; /*< [m/s/s] Y acceleration*/
- float zacc; /*< [m/s/s] Z acceleration*/
- float xgyro; /*< [rad/s] Angular speed around X axis in body frame*/
- float ygyro; /*< [rad/s] Angular speed around Y axis in body frame*/
- float zgyro; /*< [rad/s] Angular speed around Z axis in body frame*/
- float xmag; /*< [gauss] X Magnetic field*/
- float ymag; /*< [gauss] Y Magnetic field*/
- float zmag; /*< [gauss] Z Magnetic field*/
- float abs_pressure; /*< [mbar] Absolute pressure*/
- float diff_pressure; /*< [mbar] Differential pressure (airspeed)*/
- float pressure_alt; /*<  Altitude calculated from pressure*/
- float temperature; /*< [degC] Temperature*/
- uint32_t fields_updated; /*<  Bitmap for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim.*/
-}) mavlink_hil_sensor_t;
+        typedef struct __mavlink_hil_sensor_t {
+            uint64_t time_usec; /*< [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.*/
+            float xacc; /*< [m/s/s] X acceleration*/
+            float yacc; /*< [m/s/s] Y acceleration*/
+            float zacc; /*< [m/s/s] Z acceleration*/
+            float xgyro; /*< [rad/s] Angular speed around X axis in body frame*/
+            float ygyro; /*< [rad/s] Angular speed around Y axis in body frame*/
+            float zgyro; /*< [rad/s] Angular speed around Z axis in body frame*/
+            float xmag; /*< [gauss] X Magnetic field*/
+            float ymag; /*< [gauss] Y Magnetic field*/
+            float zmag; /*< [gauss] Z Magnetic field*/
+            float abs_pressure; /*< [mbar] Absolute pressure*/
+            float diff_pressure; /*< [mbar] Differential pressure (airspeed)*/
+            float pressure_alt; /*<  Altitude calculated from pressure*/
+            float temperature; /*< [degC] Temperature*/
+            uint32_t fields_updated; /*<  Bitmap for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim.*/
+        }) mavlink_hil_sensor_t;
 
 #define MAVLINK_MSG_ID_HIL_SENSOR_LEN 64
 #define MAVLINK_MSG_ID_HIL_SENSOR_MIN_LEN 64
@@ -29,7 +29,6 @@ typedef struct __mavlink_hil_sensor_t {
 
 #define MAVLINK_MSG_ID_HIL_SENSOR_CRC 108
 #define MAVLINK_MSG_ID_107_CRC 108
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -100,9 +99,12 @@ typedef struct __mavlink_hil_sensor_t {
  * @param fields_updated  Bitmap for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_hil_sensor_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint64_t time_usec, float xacc, float yacc, float zacc, float xgyro, float ygyro, float zgyro, float xmag, float ymag, float zmag, float abs_pressure, float diff_pressure, float pressure_alt, float temperature, uint32_t fields_updated)
-{
+static inline uint16_t
+mavlink_msg_hil_sensor_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            uint64_t time_usec, float xacc, float yacc, float zacc, float xgyro,
+                            float ygyro, float zgyro, float xmag, float ymag, float zmag,
+                            float abs_pressure, float diff_pressure, float pressure_alt,
+                            float temperature, uint32_t fields_updated) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_HIL_SENSOR_LEN];
     _mav_put_uint64_t(buf, 0, time_usec);
@@ -140,11 +142,12 @@ static inline uint16_t mavlink_msg_hil_sensor_pack(uint8_t system_id, uint8_t co
     packet.temperature = temperature;
     packet.fields_updated = fields_updated;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_HIL_SENSOR_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_HIL_SENSOR_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_HIL_SENSOR;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_HIL_SENSOR_MIN_LEN, MAVLINK_MSG_ID_HIL_SENSOR_LEN, MAVLINK_MSG_ID_HIL_SENSOR_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_HIL_SENSOR_MIN_LEN,
+                                    MAVLINK_MSG_ID_HIL_SENSOR_LEN, MAVLINK_MSG_ID_HIL_SENSOR_CRC);
 }
 
 /**
@@ -170,10 +173,13 @@ static inline uint16_t mavlink_msg_hil_sensor_pack(uint8_t system_id, uint8_t co
  * @param fields_updated  Bitmap for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_hil_sensor_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint64_t time_usec,float xacc,float yacc,float zacc,float xgyro,float ygyro,float zgyro,float xmag,float ymag,float zmag,float abs_pressure,float diff_pressure,float pressure_alt,float temperature,uint32_t fields_updated)
-{
+static inline uint16_t
+mavlink_msg_hil_sensor_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg,
+                                 uint64_t time_usec, float xacc, float yacc, float zacc,
+                                 float xgyro, float ygyro, float zgyro, float xmag, float ymag,
+                                 float zmag, float abs_pressure, float diff_pressure,
+                                 float pressure_alt, float temperature, uint32_t fields_updated) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_HIL_SENSOR_LEN];
     _mav_put_uint64_t(buf, 0, time_usec);
@@ -211,11 +217,14 @@ static inline uint16_t mavlink_msg_hil_sensor_pack_chan(uint8_t system_id, uint8
     packet.temperature = temperature;
     packet.fields_updated = fields_updated;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_HIL_SENSOR_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_HIL_SENSOR_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_HIL_SENSOR;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_HIL_SENSOR_MIN_LEN, MAVLINK_MSG_ID_HIL_SENSOR_LEN, MAVLINK_MSG_ID_HIL_SENSOR_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_HIL_SENSOR_MIN_LEN,
+                                         MAVLINK_MSG_ID_HIL_SENSOR_LEN,
+                                         MAVLINK_MSG_ID_HIL_SENSOR_CRC);
 }
 
 /**
@@ -226,9 +235,16 @@ static inline uint16_t mavlink_msg_hil_sensor_pack_chan(uint8_t system_id, uint8
  * @param msg The MAVLink message to compress the data into
  * @param hil_sensor C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_hil_sensor_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_hil_sensor_t* hil_sensor)
-{
-    return mavlink_msg_hil_sensor_pack(system_id, component_id, msg, hil_sensor->time_usec, hil_sensor->xacc, hil_sensor->yacc, hil_sensor->zacc, hil_sensor->xgyro, hil_sensor->ygyro, hil_sensor->zgyro, hil_sensor->xmag, hil_sensor->ymag, hil_sensor->zmag, hil_sensor->abs_pressure, hil_sensor->diff_pressure, hil_sensor->pressure_alt, hil_sensor->temperature, hil_sensor->fields_updated);
+static inline uint16_t
+mavlink_msg_hil_sensor_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                              const mavlink_hil_sensor_t *hil_sensor) {
+    return mavlink_msg_hil_sensor_pack(system_id, component_id, msg, hil_sensor->time_usec,
+                                       hil_sensor->xacc, hil_sensor->yacc, hil_sensor->zacc,
+                                       hil_sensor->xgyro, hil_sensor->ygyro, hil_sensor->zgyro,
+                                       hil_sensor->xmag, hil_sensor->ymag, hil_sensor->zmag,
+                                       hil_sensor->abs_pressure, hil_sensor->diff_pressure,
+                                       hil_sensor->pressure_alt, hil_sensor->temperature,
+                                       hil_sensor->fields_updated);
 }
 
 /**
@@ -240,9 +256,17 @@ static inline uint16_t mavlink_msg_hil_sensor_encode(uint8_t system_id, uint8_t 
  * @param msg The MAVLink message to compress the data into
  * @param hil_sensor C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_hil_sensor_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_hil_sensor_t* hil_sensor)
-{
-    return mavlink_msg_hil_sensor_pack_chan(system_id, component_id, chan, msg, hil_sensor->time_usec, hil_sensor->xacc, hil_sensor->yacc, hil_sensor->zacc, hil_sensor->xgyro, hil_sensor->ygyro, hil_sensor->zgyro, hil_sensor->xmag, hil_sensor->ymag, hil_sensor->zmag, hil_sensor->abs_pressure, hil_sensor->diff_pressure, hil_sensor->pressure_alt, hil_sensor->temperature, hil_sensor->fields_updated);
+static inline uint16_t
+mavlink_msg_hil_sensor_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                   mavlink_message_t *msg, const mavlink_hil_sensor_t *hil_sensor) {
+    return mavlink_msg_hil_sensor_pack_chan(system_id, component_id, chan, msg,
+                                            hil_sensor->time_usec, hil_sensor->xacc,
+                                            hil_sensor->yacc, hil_sensor->zacc, hil_sensor->xgyro,
+                                            hil_sensor->ygyro, hil_sensor->zgyro, hil_sensor->xmag,
+                                            hil_sensor->ymag, hil_sensor->zmag,
+                                            hil_sensor->abs_pressure, hil_sensor->diff_pressure,
+                                            hil_sensor->pressure_alt, hil_sensor->temperature,
+                                            hil_sensor->fields_updated);
 }
 
 /**
@@ -386,9 +410,8 @@ static inline void mavlink_msg_hil_sensor_send_buf(mavlink_message_t *msgbuf, ma
  *
  * @return [us] Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
  */
-static inline uint64_t mavlink_msg_hil_sensor_get_time_usec(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint64_t(msg,  0);
+static inline uint64_t mavlink_msg_hil_sensor_get_time_usec(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint64_t(msg, 0);
 }
 
 /**
@@ -396,9 +419,8 @@ static inline uint64_t mavlink_msg_hil_sensor_get_time_usec(const mavlink_messag
  *
  * @return [m/s/s] X acceleration
  */
-static inline float mavlink_msg_hil_sensor_get_xacc(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_hil_sensor_get_xacc(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -406,9 +428,8 @@ static inline float mavlink_msg_hil_sensor_get_xacc(const mavlink_message_t* msg
  *
  * @return [m/s/s] Y acceleration
  */
-static inline float mavlink_msg_hil_sensor_get_yacc(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_hil_sensor_get_yacc(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -416,9 +437,8 @@ static inline float mavlink_msg_hil_sensor_get_yacc(const mavlink_message_t* msg
  *
  * @return [m/s/s] Z acceleration
  */
-static inline float mavlink_msg_hil_sensor_get_zacc(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float mavlink_msg_hil_sensor_get_zacc(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -426,9 +446,8 @@ static inline float mavlink_msg_hil_sensor_get_zacc(const mavlink_message_t* msg
  *
  * @return [rad/s] Angular speed around X axis in body frame
  */
-static inline float mavlink_msg_hil_sensor_get_xgyro(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  20);
+static inline float mavlink_msg_hil_sensor_get_xgyro(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 20);
 }
 
 /**
@@ -436,9 +455,8 @@ static inline float mavlink_msg_hil_sensor_get_xgyro(const mavlink_message_t* ms
  *
  * @return [rad/s] Angular speed around Y axis in body frame
  */
-static inline float mavlink_msg_hil_sensor_get_ygyro(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float mavlink_msg_hil_sensor_get_ygyro(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -446,9 +464,8 @@ static inline float mavlink_msg_hil_sensor_get_ygyro(const mavlink_message_t* ms
  *
  * @return [rad/s] Angular speed around Z axis in body frame
  */
-static inline float mavlink_msg_hil_sensor_get_zgyro(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float mavlink_msg_hil_sensor_get_zgyro(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -456,9 +473,8 @@ static inline float mavlink_msg_hil_sensor_get_zgyro(const mavlink_message_t* ms
  *
  * @return [gauss] X Magnetic field
  */
-static inline float mavlink_msg_hil_sensor_get_xmag(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  32);
+static inline float mavlink_msg_hil_sensor_get_xmag(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 32);
 }
 
 /**
@@ -466,9 +482,8 @@ static inline float mavlink_msg_hil_sensor_get_xmag(const mavlink_message_t* msg
  *
  * @return [gauss] Y Magnetic field
  */
-static inline float mavlink_msg_hil_sensor_get_ymag(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  36);
+static inline float mavlink_msg_hil_sensor_get_ymag(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 36);
 }
 
 /**
@@ -476,9 +491,8 @@ static inline float mavlink_msg_hil_sensor_get_ymag(const mavlink_message_t* msg
  *
  * @return [gauss] Z Magnetic field
  */
-static inline float mavlink_msg_hil_sensor_get_zmag(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  40);
+static inline float mavlink_msg_hil_sensor_get_zmag(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 40);
 }
 
 /**
@@ -486,9 +500,8 @@ static inline float mavlink_msg_hil_sensor_get_zmag(const mavlink_message_t* msg
  *
  * @return [mbar] Absolute pressure
  */
-static inline float mavlink_msg_hil_sensor_get_abs_pressure(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  44);
+static inline float mavlink_msg_hil_sensor_get_abs_pressure(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 44);
 }
 
 /**
@@ -496,9 +509,8 @@ static inline float mavlink_msg_hil_sensor_get_abs_pressure(const mavlink_messag
  *
  * @return [mbar] Differential pressure (airspeed)
  */
-static inline float mavlink_msg_hil_sensor_get_diff_pressure(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  48);
+static inline float mavlink_msg_hil_sensor_get_diff_pressure(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 48);
 }
 
 /**
@@ -506,9 +518,8 @@ static inline float mavlink_msg_hil_sensor_get_diff_pressure(const mavlink_messa
  *
  * @return  Altitude calculated from pressure
  */
-static inline float mavlink_msg_hil_sensor_get_pressure_alt(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  52);
+static inline float mavlink_msg_hil_sensor_get_pressure_alt(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 52);
 }
 
 /**
@@ -516,9 +527,8 @@ static inline float mavlink_msg_hil_sensor_get_pressure_alt(const mavlink_messag
  *
  * @return [degC] Temperature
  */
-static inline float mavlink_msg_hil_sensor_get_temperature(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  56);
+static inline float mavlink_msg_hil_sensor_get_temperature(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 56);
 }
 
 /**
@@ -526,9 +536,8 @@ static inline float mavlink_msg_hil_sensor_get_temperature(const mavlink_message
  *
  * @return  Bitmap for fields that have updated since last message, bit 0 = xacc, bit 12: temperature, bit 31: full reset of attitude/position/velocities/etc was performed in sim.
  */
-static inline uint32_t mavlink_msg_hil_sensor_get_fields_updated(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  60);
+static inline uint32_t mavlink_msg_hil_sensor_get_fields_updated(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 60);
 }
 
 /**
@@ -537,8 +546,8 @@ static inline uint32_t mavlink_msg_hil_sensor_get_fields_updated(const mavlink_m
  * @param msg The message to decode
  * @param hil_sensor C-struct to decode the message contents into
  */
-static inline void mavlink_msg_hil_sensor_decode(const mavlink_message_t* msg, mavlink_hil_sensor_t* hil_sensor)
-{
+static inline void
+mavlink_msg_hil_sensor_decode(const mavlink_message_t *msg, mavlink_hil_sensor_t *hil_sensor) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     hil_sensor->time_usec = mavlink_msg_hil_sensor_get_time_usec(msg);
     hil_sensor->xacc = mavlink_msg_hil_sensor_get_xacc(msg);
@@ -556,8 +565,9 @@ static inline void mavlink_msg_hil_sensor_decode(const mavlink_message_t* msg, m
     hil_sensor->temperature = mavlink_msg_hil_sensor_get_temperature(msg);
     hil_sensor->fields_updated = mavlink_msg_hil_sensor_get_fields_updated(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_HIL_SENSOR_LEN? msg->len : MAVLINK_MSG_ID_HIL_SENSOR_LEN;
-        memset(hil_sensor, 0, MAVLINK_MSG_ID_HIL_SENSOR_LEN);
+    uint8_t len =
+            msg->len < MAVLINK_MSG_ID_HIL_SENSOR_LEN ? msg->len : MAVLINK_MSG_ID_HIL_SENSOR_LEN;
+    memset(hil_sensor, 0, MAVLINK_MSG_ID_HIL_SENSOR_LEN);
     memcpy(hil_sensor, _MAV_PAYLOAD(msg), len);
 #endif
 }

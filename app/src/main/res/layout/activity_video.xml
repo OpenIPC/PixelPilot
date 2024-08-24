@@ -108,7 +108,7 @@
                 android:layout_width="16dp"
                 android:layout_height="38dp"
                 android:src="@drawable/baseline_fiber_manual_record_24"
-                android:visibility="invisible"/>
+                android:visibility="invisible" />
 
         </com.geehe.fpvue.osd.MovableLayout>
 

@@ -4,18 +4,20 @@
 #define MAVLINK_MSG_ID_DEEPSTALL 195
 
 MAVPACKED(
-typedef struct __mavlink_deepstall_t {
- int32_t landing_lat; /*< [degE7] Landing latitude.*/
- int32_t landing_lon; /*< [degE7] Landing longitude.*/
- int32_t path_lat; /*< [degE7] Final heading start point, latitude.*/
- int32_t path_lon; /*< [degE7] Final heading start point, longitude.*/
- int32_t arc_entry_lat; /*< [degE7] Arc entry point, latitude.*/
- int32_t arc_entry_lon; /*< [degE7] Arc entry point, longitude.*/
- float altitude; /*< [m] Altitude.*/
- float expected_travel_distance; /*< [m] Distance the aircraft expects to travel during the deepstall.*/
- float cross_track_error; /*< [m] Deepstall cross track error (only valid when in DEEPSTALL_STAGE_LAND).*/
- uint8_t stage; /*<  Deepstall stage.*/
-}) mavlink_deepstall_t;
+        typedef struct __mavlink_deepstall_t {
+            int32_t landing_lat; /*< [degE7] Landing latitude.*/
+            int32_t landing_lon; /*< [degE7] Landing longitude.*/
+            int32_t path_lat; /*< [degE7] Final heading start point, latitude.*/
+            int32_t path_lon; /*< [degE7] Final heading start point, longitude.*/
+            int32_t arc_entry_lat; /*< [degE7] Arc entry point, latitude.*/
+            int32_t arc_entry_lon; /*< [degE7] Arc entry point, longitude.*/
+            float altitude; /*< [m] Altitude.*/
+            float expected_travel_distance; /*< [m] Distance the aircraft expects to travel during the deepstall.*/
+            float cross_track_error; /*< [m] Deepstall cross track error (only valid when in DEEPSTALL_STAGE_LAND).*/
+            uint8_t stage; /*<  Deepstall stage.*/
+        })
+
+mavlink_deepstall_t;
 
 #define MAVLINK_MSG_ID_DEEPSTALL_LEN 37
 #define MAVLINK_MSG_ID_DEEPSTALL_MIN_LEN 37
@@ -24,7 +26,6 @@ typedef struct __mavlink_deepstall_t {
 
 #define MAVLINK_MSG_ID_DEEPSTALL_CRC 120
 #define MAVLINK_MSG_ID_195_CRC 120
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -80,9 +81,12 @@ typedef struct __mavlink_deepstall_t {
  * @param stage  Deepstall stage.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_deepstall_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               int32_t landing_lat, int32_t landing_lon, int32_t path_lat, int32_t path_lon, int32_t arc_entry_lat, int32_t arc_entry_lon, float altitude, float expected_travel_distance, float cross_track_error, uint8_t stage)
-{
+static inline uint16_t
+mavlink_msg_deepstall_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                           int32_t landing_lat, int32_t landing_lon, int32_t path_lat,
+                           int32_t path_lon, int32_t arc_entry_lat, int32_t arc_entry_lon,
+                           float altitude, float expected_travel_distance, float cross_track_error,
+                           uint8_t stage) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_DEEPSTALL_LEN];
     _mav_put_int32_t(buf, 0, landing_lat);
@@ -96,7 +100,7 @@ static inline uint16_t mavlink_msg_deepstall_pack(uint8_t system_id, uint8_t com
     _mav_put_float(buf, 32, cross_track_error);
     _mav_put_uint8_t(buf, 36, stage);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DEEPSTALL_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DEEPSTALL_LEN);
 #else
     mavlink_deepstall_t packet;
     packet.landing_lat = landing_lat;
@@ -114,7 +118,8 @@ static inline uint16_t mavlink_msg_deepstall_pack(uint8_t system_id, uint8_t com
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_DEEPSTALL;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_DEEPSTALL_MIN_LEN, MAVLINK_MSG_ID_DEEPSTALL_LEN, MAVLINK_MSG_ID_DEEPSTALL_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_DEEPSTALL_MIN_LEN,
+                                    MAVLINK_MSG_ID_DEEPSTALL_LEN, MAVLINK_MSG_ID_DEEPSTALL_CRC);
 }
 
 /**
@@ -135,10 +140,13 @@ static inline uint16_t mavlink_msg_deepstall_pack(uint8_t system_id, uint8_t com
  * @param stage  Deepstall stage.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_deepstall_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   int32_t landing_lat,int32_t landing_lon,int32_t path_lat,int32_t path_lon,int32_t arc_entry_lat,int32_t arc_entry_lon,float altitude,float expected_travel_distance,float cross_track_error,uint8_t stage)
-{
+static inline uint16_t
+mavlink_msg_deepstall_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                mavlink_message_t *msg,
+                                int32_t landing_lat, int32_t landing_lon, int32_t path_lat,
+                                int32_t path_lon, int32_t arc_entry_lat, int32_t arc_entry_lon,
+                                float altitude, float expected_travel_distance,
+                                float cross_track_error, uint8_t stage) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_DEEPSTALL_LEN];
     _mav_put_int32_t(buf, 0, landing_lat);
@@ -152,7 +160,7 @@ static inline uint16_t mavlink_msg_deepstall_pack_chan(uint8_t system_id, uint8_
     _mav_put_float(buf, 32, cross_track_error);
     _mav_put_uint8_t(buf, 36, stage);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DEEPSTALL_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DEEPSTALL_LEN);
 #else
     mavlink_deepstall_t packet;
     packet.landing_lat = landing_lat;
@@ -170,7 +178,10 @@ static inline uint16_t mavlink_msg_deepstall_pack_chan(uint8_t system_id, uint8_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_DEEPSTALL;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_DEEPSTALL_MIN_LEN, MAVLINK_MSG_ID_DEEPSTALL_LEN, MAVLINK_MSG_ID_DEEPSTALL_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_DEEPSTALL_MIN_LEN,
+                                         MAVLINK_MSG_ID_DEEPSTALL_LEN,
+                                         MAVLINK_MSG_ID_DEEPSTALL_CRC);
 }
 
 /**
@@ -181,9 +192,15 @@ static inline uint16_t mavlink_msg_deepstall_pack_chan(uint8_t system_id, uint8_
  * @param msg The MAVLink message to compress the data into
  * @param deepstall C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_deepstall_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_deepstall_t* deepstall)
-{
-    return mavlink_msg_deepstall_pack(system_id, component_id, msg, deepstall->landing_lat, deepstall->landing_lon, deepstall->path_lat, deepstall->path_lon, deepstall->arc_entry_lat, deepstall->arc_entry_lon, deepstall->altitude, deepstall->expected_travel_distance, deepstall->cross_track_error, deepstall->stage);
+static inline uint16_t
+mavlink_msg_deepstall_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                             const mavlink_deepstall_t *deepstall) {
+    return mavlink_msg_deepstall_pack(system_id, component_id, msg, deepstall->landing_lat,
+                                      deepstall->landing_lon, deepstall->path_lat,
+                                      deepstall->path_lon, deepstall->arc_entry_lat,
+                                      deepstall->arc_entry_lon, deepstall->altitude,
+                                      deepstall->expected_travel_distance,
+                                      deepstall->cross_track_error, deepstall->stage);
 }
 
 /**
@@ -195,9 +212,15 @@ static inline uint16_t mavlink_msg_deepstall_encode(uint8_t system_id, uint8_t c
  * @param msg The MAVLink message to compress the data into
  * @param deepstall C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_deepstall_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_deepstall_t* deepstall)
-{
-    return mavlink_msg_deepstall_pack_chan(system_id, component_id, chan, msg, deepstall->landing_lat, deepstall->landing_lon, deepstall->path_lat, deepstall->path_lon, deepstall->arc_entry_lat, deepstall->arc_entry_lon, deepstall->altitude, deepstall->expected_travel_distance, deepstall->cross_track_error, deepstall->stage);
+static inline uint16_t
+mavlink_msg_deepstall_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                  mavlink_message_t *msg, const mavlink_deepstall_t *deepstall) {
+    return mavlink_msg_deepstall_pack_chan(system_id, component_id, chan, msg,
+                                           deepstall->landing_lat, deepstall->landing_lon,
+                                           deepstall->path_lat, deepstall->path_lon,
+                                           deepstall->arc_entry_lat, deepstall->arc_entry_lon,
+                                           deepstall->altitude, deepstall->expected_travel_distance,
+                                           deepstall->cross_track_error, deepstall->stage);
 }
 
 /**
@@ -316,9 +339,8 @@ static inline void mavlink_msg_deepstall_send_buf(mavlink_message_t *msgbuf, mav
  *
  * @return [degE7] Landing latitude.
  */
-static inline int32_t mavlink_msg_deepstall_get_landing_lat(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  0);
+static inline int32_t mavlink_msg_deepstall_get_landing_lat(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 0);
 }
 
 /**
@@ -326,9 +348,8 @@ static inline int32_t mavlink_msg_deepstall_get_landing_lat(const mavlink_messag
  *
  * @return [degE7] Landing longitude.
  */
-static inline int32_t mavlink_msg_deepstall_get_landing_lon(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  4);
+static inline int32_t mavlink_msg_deepstall_get_landing_lon(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 4);
 }
 
 /**
@@ -336,9 +357,8 @@ static inline int32_t mavlink_msg_deepstall_get_landing_lon(const mavlink_messag
  *
  * @return [degE7] Final heading start point, latitude.
  */
-static inline int32_t mavlink_msg_deepstall_get_path_lat(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  8);
+static inline int32_t mavlink_msg_deepstall_get_path_lat(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 8);
 }
 
 /**
@@ -346,9 +366,8 @@ static inline int32_t mavlink_msg_deepstall_get_path_lat(const mavlink_message_t
  *
  * @return [degE7] Final heading start point, longitude.
  */
-static inline int32_t mavlink_msg_deepstall_get_path_lon(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  12);
+static inline int32_t mavlink_msg_deepstall_get_path_lon(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 12);
 }
 
 /**
@@ -356,9 +375,8 @@ static inline int32_t mavlink_msg_deepstall_get_path_lon(const mavlink_message_t
  *
  * @return [degE7] Arc entry point, latitude.
  */
-static inline int32_t mavlink_msg_deepstall_get_arc_entry_lat(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  16);
+static inline int32_t mavlink_msg_deepstall_get_arc_entry_lat(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 16);
 }
 
 /**
@@ -366,9 +384,8 @@ static inline int32_t mavlink_msg_deepstall_get_arc_entry_lat(const mavlink_mess
  *
  * @return [degE7] Arc entry point, longitude.
  */
-static inline int32_t mavlink_msg_deepstall_get_arc_entry_lon(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int32_t(msg,  20);
+static inline int32_t mavlink_msg_deepstall_get_arc_entry_lon(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int32_t(msg, 20);
 }
 
 /**
@@ -376,9 +393,8 @@ static inline int32_t mavlink_msg_deepstall_get_arc_entry_lon(const mavlink_mess
  *
  * @return [m] Altitude.
  */
-static inline float mavlink_msg_deepstall_get_altitude(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float mavlink_msg_deepstall_get_altitude(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -386,9 +402,9 @@ static inline float mavlink_msg_deepstall_get_altitude(const mavlink_message_t* 
  *
  * @return [m] Distance the aircraft expects to travel during the deepstall.
  */
-static inline float mavlink_msg_deepstall_get_expected_travel_distance(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float
+mavlink_msg_deepstall_get_expected_travel_distance(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -396,9 +412,8 @@ static inline float mavlink_msg_deepstall_get_expected_travel_distance(const mav
  *
  * @return [m] Deepstall cross track error (only valid when in DEEPSTALL_STAGE_LAND).
  */
-static inline float mavlink_msg_deepstall_get_cross_track_error(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  32);
+static inline float mavlink_msg_deepstall_get_cross_track_error(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 32);
 }
 
 /**
@@ -406,9 +421,8 @@ static inline float mavlink_msg_deepstall_get_cross_track_error(const mavlink_me
  *
  * @return  Deepstall stage.
  */
-static inline uint8_t mavlink_msg_deepstall_get_stage(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  36);
+static inline uint8_t mavlink_msg_deepstall_get_stage(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 36);
 }
 
 /**
@@ -417,8 +431,8 @@ static inline uint8_t mavlink_msg_deepstall_get_stage(const mavlink_message_t* m
  * @param msg The message to decode
  * @param deepstall C-struct to decode the message contents into
  */
-static inline void mavlink_msg_deepstall_decode(const mavlink_message_t* msg, mavlink_deepstall_t* deepstall)
-{
+static inline void
+mavlink_msg_deepstall_decode(const mavlink_message_t *msg, mavlink_deepstall_t *deepstall) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     deepstall->landing_lat = mavlink_msg_deepstall_get_landing_lat(msg);
     deepstall->landing_lon = mavlink_msg_deepstall_get_landing_lon(msg);
@@ -431,8 +445,8 @@ static inline void mavlink_msg_deepstall_decode(const mavlink_message_t* msg, ma
     deepstall->cross_track_error = mavlink_msg_deepstall_get_cross_track_error(msg);
     deepstall->stage = mavlink_msg_deepstall_get_stage(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_DEEPSTALL_LEN? msg->len : MAVLINK_MSG_ID_DEEPSTALL_LEN;
-        memset(deepstall, 0, MAVLINK_MSG_ID_DEEPSTALL_LEN);
-    memcpy(deepstall, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_DEEPSTALL_LEN? msg->len : MAVLINK_MSG_ID_DEEPSTALL_LEN;
+    memset(deepstall, 0, MAVLINK_MSG_ID_DEEPSTALL_LEN);
+memcpy(deepstall, _MAV_PAYLOAD(msg), len);
 #endif
 }

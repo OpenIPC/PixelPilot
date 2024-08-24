@@ -4,21 +4,23 @@
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20 186
 
 MAVPACKED(
-typedef struct __mavlink_serial_udb_extra_f20_t {
- int16_t sue_trim_value_input_1; /*<  SUE UDB PWM Trim Value on Input 1*/
- int16_t sue_trim_value_input_2; /*<  SUE UDB PWM Trim Value on Input 2*/
- int16_t sue_trim_value_input_3; /*<  SUE UDB PWM Trim Value on Input 3*/
- int16_t sue_trim_value_input_4; /*<  SUE UDB PWM Trim Value on Input 4*/
- int16_t sue_trim_value_input_5; /*<  SUE UDB PWM Trim Value on Input 5*/
- int16_t sue_trim_value_input_6; /*<  SUE UDB PWM Trim Value on Input 6*/
- int16_t sue_trim_value_input_7; /*<  SUE UDB PWM Trim Value on Input 7*/
- int16_t sue_trim_value_input_8; /*<  SUE UDB PWM Trim Value on Input 8*/
- int16_t sue_trim_value_input_9; /*<  SUE UDB PWM Trim Value on Input 9*/
- int16_t sue_trim_value_input_10; /*<  SUE UDB PWM Trim Value on Input 10*/
- int16_t sue_trim_value_input_11; /*<  SUE UDB PWM Trim Value on Input 11*/
- int16_t sue_trim_value_input_12; /*<  SUE UDB PWM Trim Value on Input 12*/
- uint8_t sue_number_of_inputs; /*<  SUE Number of Input Channels*/
-}) mavlink_serial_udb_extra_f20_t;
+        typedef struct __mavlink_serial_udb_extra_f20_t {
+            int16_t sue_trim_value_input_1; /*<  SUE UDB PWM Trim Value on Input 1*/
+            int16_t sue_trim_value_input_2; /*<  SUE UDB PWM Trim Value on Input 2*/
+            int16_t sue_trim_value_input_3; /*<  SUE UDB PWM Trim Value on Input 3*/
+            int16_t sue_trim_value_input_4; /*<  SUE UDB PWM Trim Value on Input 4*/
+            int16_t sue_trim_value_input_5; /*<  SUE UDB PWM Trim Value on Input 5*/
+            int16_t sue_trim_value_input_6; /*<  SUE UDB PWM Trim Value on Input 6*/
+            int16_t sue_trim_value_input_7; /*<  SUE UDB PWM Trim Value on Input 7*/
+            int16_t sue_trim_value_input_8; /*<  SUE UDB PWM Trim Value on Input 8*/
+            int16_t sue_trim_value_input_9; /*<  SUE UDB PWM Trim Value on Input 9*/
+            int16_t sue_trim_value_input_10; /*<  SUE UDB PWM Trim Value on Input 10*/
+            int16_t sue_trim_value_input_11; /*<  SUE UDB PWM Trim Value on Input 11*/
+            int16_t sue_trim_value_input_12; /*<  SUE UDB PWM Trim Value on Input 12*/
+            uint8_t sue_number_of_inputs; /*<  SUE Number of Input Channels*/
+        })
+
+mavlink_serial_udb_extra_f20_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN 25
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_MIN_LEN 25
@@ -27,7 +29,6 @@ typedef struct __mavlink_serial_udb_extra_f20_t {
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_CRC 144
 #define MAVLINK_MSG_ID_186_CRC 144
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -92,9 +93,21 @@ typedef struct __mavlink_serial_udb_extra_f20_t {
  * @param sue_trim_value_input_12  SUE UDB PWM Trim Value on Input 12
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f20_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t sue_number_of_inputs, int16_t sue_trim_value_input_1, int16_t sue_trim_value_input_2, int16_t sue_trim_value_input_3, int16_t sue_trim_value_input_4, int16_t sue_trim_value_input_5, int16_t sue_trim_value_input_6, int16_t sue_trim_value_input_7, int16_t sue_trim_value_input_8, int16_t sue_trim_value_input_9, int16_t sue_trim_value_input_10, int16_t sue_trim_value_input_11, int16_t sue_trim_value_input_12)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f20_pack(uint8_t system_id, uint8_t component_id,
+                                      mavlink_message_t *msg,
+                                      uint8_t sue_number_of_inputs, int16_t sue_trim_value_input_1,
+                                      int16_t sue_trim_value_input_2,
+                                      int16_t sue_trim_value_input_3,
+                                      int16_t sue_trim_value_input_4,
+                                      int16_t sue_trim_value_input_5,
+                                      int16_t sue_trim_value_input_6,
+                                      int16_t sue_trim_value_input_7,
+                                      int16_t sue_trim_value_input_8,
+                                      int16_t sue_trim_value_input_9,
+                                      int16_t sue_trim_value_input_10,
+                                      int16_t sue_trim_value_input_11,
+                                      int16_t sue_trim_value_input_12) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN];
     _mav_put_int16_t(buf, 0, sue_trim_value_input_1);
@@ -111,7 +124,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f20_pack(uint8_t system_id, 
     _mav_put_int16_t(buf, 22, sue_trim_value_input_12);
     _mav_put_uint8_t(buf, 24, sue_number_of_inputs);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN);
 #else
     mavlink_serial_udb_extra_f20_t packet;
     packet.sue_trim_value_input_1 = sue_trim_value_input_1;
@@ -132,7 +145,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f20_pack(uint8_t system_id, 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_MIN_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN,
+                                    MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_CRC);
 }
 
 /**
@@ -156,10 +172,22 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f20_pack(uint8_t system_id, 
  * @param sue_trim_value_input_12  SUE UDB PWM Trim Value on Input 12
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f20_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t sue_number_of_inputs,int16_t sue_trim_value_input_1,int16_t sue_trim_value_input_2,int16_t sue_trim_value_input_3,int16_t sue_trim_value_input_4,int16_t sue_trim_value_input_5,int16_t sue_trim_value_input_6,int16_t sue_trim_value_input_7,int16_t sue_trim_value_input_8,int16_t sue_trim_value_input_9,int16_t sue_trim_value_input_10,int16_t sue_trim_value_input_11,int16_t sue_trim_value_input_12)
-{
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f20_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                           mavlink_message_t *msg,
+                                           uint8_t sue_number_of_inputs,
+                                           int16_t sue_trim_value_input_1,
+                                           int16_t sue_trim_value_input_2,
+                                           int16_t sue_trim_value_input_3,
+                                           int16_t sue_trim_value_input_4,
+                                           int16_t sue_trim_value_input_5,
+                                           int16_t sue_trim_value_input_6,
+                                           int16_t sue_trim_value_input_7,
+                                           int16_t sue_trim_value_input_8,
+                                           int16_t sue_trim_value_input_9,
+                                           int16_t sue_trim_value_input_10,
+                                           int16_t sue_trim_value_input_11,
+                                           int16_t sue_trim_value_input_12) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN];
     _mav_put_int16_t(buf, 0, sue_trim_value_input_1);
@@ -176,7 +204,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f20_pack_chan(uint8_t system
     _mav_put_int16_t(buf, 22, sue_trim_value_input_12);
     _mav_put_uint8_t(buf, 24, sue_number_of_inputs);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN);
 #else
     mavlink_serial_udb_extra_f20_t packet;
     packet.sue_trim_value_input_1 = sue_trim_value_input_1;
@@ -197,7 +225,10 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f20_pack_chan(uint8_t system
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_MIN_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN,
+                                         MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_CRC);
 }
 
 /**
@@ -208,9 +239,24 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f20_pack_chan(uint8_t system
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f20 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f20_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f20_t* serial_udb_extra_f20)
-{
-    return mavlink_msg_serial_udb_extra_f20_pack(system_id, component_id, msg, serial_udb_extra_f20->sue_number_of_inputs, serial_udb_extra_f20->sue_trim_value_input_1, serial_udb_extra_f20->sue_trim_value_input_2, serial_udb_extra_f20->sue_trim_value_input_3, serial_udb_extra_f20->sue_trim_value_input_4, serial_udb_extra_f20->sue_trim_value_input_5, serial_udb_extra_f20->sue_trim_value_input_6, serial_udb_extra_f20->sue_trim_value_input_7, serial_udb_extra_f20->sue_trim_value_input_8, serial_udb_extra_f20->sue_trim_value_input_9, serial_udb_extra_f20->sue_trim_value_input_10, serial_udb_extra_f20->sue_trim_value_input_11, serial_udb_extra_f20->sue_trim_value_input_12);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f20_encode(uint8_t system_id, uint8_t component_id,
+                                        mavlink_message_t *msg,
+                                        const mavlink_serial_udb_extra_f20_t *serial_udb_extra_f20) {
+    return mavlink_msg_serial_udb_extra_f20_pack(system_id, component_id, msg,
+                                                 serial_udb_extra_f20->sue_number_of_inputs,
+                                                 serial_udb_extra_f20->sue_trim_value_input_1,
+                                                 serial_udb_extra_f20->sue_trim_value_input_2,
+                                                 serial_udb_extra_f20->sue_trim_value_input_3,
+                                                 serial_udb_extra_f20->sue_trim_value_input_4,
+                                                 serial_udb_extra_f20->sue_trim_value_input_5,
+                                                 serial_udb_extra_f20->sue_trim_value_input_6,
+                                                 serial_udb_extra_f20->sue_trim_value_input_7,
+                                                 serial_udb_extra_f20->sue_trim_value_input_8,
+                                                 serial_udb_extra_f20->sue_trim_value_input_9,
+                                                 serial_udb_extra_f20->sue_trim_value_input_10,
+                                                 serial_udb_extra_f20->sue_trim_value_input_11,
+                                                 serial_udb_extra_f20->sue_trim_value_input_12);
 }
 
 /**
@@ -222,9 +268,24 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f20_encode(uint8_t system_id
  * @param msg The MAVLink message to compress the data into
  * @param serial_udb_extra_f20 C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_serial_udb_extra_f20_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f20_t* serial_udb_extra_f20)
-{
-    return mavlink_msg_serial_udb_extra_f20_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f20->sue_number_of_inputs, serial_udb_extra_f20->sue_trim_value_input_1, serial_udb_extra_f20->sue_trim_value_input_2, serial_udb_extra_f20->sue_trim_value_input_3, serial_udb_extra_f20->sue_trim_value_input_4, serial_udb_extra_f20->sue_trim_value_input_5, serial_udb_extra_f20->sue_trim_value_input_6, serial_udb_extra_f20->sue_trim_value_input_7, serial_udb_extra_f20->sue_trim_value_input_8, serial_udb_extra_f20->sue_trim_value_input_9, serial_udb_extra_f20->sue_trim_value_input_10, serial_udb_extra_f20->sue_trim_value_input_11, serial_udb_extra_f20->sue_trim_value_input_12);
+static inline uint16_t
+mavlink_msg_serial_udb_extra_f20_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                             mavlink_message_t *msg,
+                                             const mavlink_serial_udb_extra_f20_t *serial_udb_extra_f20) {
+    return mavlink_msg_serial_udb_extra_f20_pack_chan(system_id, component_id, chan, msg,
+                                                      serial_udb_extra_f20->sue_number_of_inputs,
+                                                      serial_udb_extra_f20->sue_trim_value_input_1,
+                                                      serial_udb_extra_f20->sue_trim_value_input_2,
+                                                      serial_udb_extra_f20->sue_trim_value_input_3,
+                                                      serial_udb_extra_f20->sue_trim_value_input_4,
+                                                      serial_udb_extra_f20->sue_trim_value_input_5,
+                                                      serial_udb_extra_f20->sue_trim_value_input_6,
+                                                      serial_udb_extra_f20->sue_trim_value_input_7,
+                                                      serial_udb_extra_f20->sue_trim_value_input_8,
+                                                      serial_udb_extra_f20->sue_trim_value_input_9,
+                                                      serial_udb_extra_f20->sue_trim_value_input_10,
+                                                      serial_udb_extra_f20->sue_trim_value_input_11,
+                                                      serial_udb_extra_f20->sue_trim_value_input_12);
 }
 
 /**
@@ -358,9 +419,9 @@ static inline void mavlink_msg_serial_udb_extra_f20_send_buf(mavlink_message_t *
  *
  * @return  SUE Number of Input Channels
  */
-static inline uint8_t mavlink_msg_serial_udb_extra_f20_get_sue_number_of_inputs(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  24);
+static inline uint8_t
+mavlink_msg_serial_udb_extra_f20_get_sue_number_of_inputs(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 24);
 }
 
 /**
@@ -368,9 +429,9 @@ static inline uint8_t mavlink_msg_serial_udb_extra_f20_get_sue_number_of_inputs(
  *
  * @return  SUE UDB PWM Trim Value on Input 1
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_1(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  0);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_1(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 0);
 }
 
 /**
@@ -378,9 +439,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 2
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_2(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  2);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_2(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 2);
 }
 
 /**
@@ -388,9 +449,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 3
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_3(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  4);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_3(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 4);
 }
 
 /**
@@ -398,9 +459,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 4
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_4(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  6);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_4(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 6);
 }
 
 /**
@@ -408,9 +469,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 5
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_5(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  8);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_5(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 8);
 }
 
 /**
@@ -418,9 +479,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 6
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_6(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  10);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_6(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 10);
 }
 
 /**
@@ -428,9 +489,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 7
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_7(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  12);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_7(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 12);
 }
 
 /**
@@ -438,9 +499,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 8
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_8(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  14);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_8(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 14);
 }
 
 /**
@@ -448,9 +509,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 9
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_9(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  16);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_9(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 16);
 }
 
 /**
@@ -458,9 +519,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 10
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_10(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  18);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_10(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 18);
 }
 
 /**
@@ -468,9 +529,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 11
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_11(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  20);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_11(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 20);
 }
 
 /**
@@ -478,9 +539,9 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  *
  * @return  SUE UDB PWM Trim Value on Input 12
  */
-static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_12(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_int16_t(msg,  22);
+static inline int16_t
+mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_12(const mavlink_message_t *msg) {
+    return _MAV_RETURN_int16_t(msg, 22);
 }
 
 /**
@@ -489,25 +550,38 @@ static inline int16_t mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_
  * @param msg The message to decode
  * @param serial_udb_extra_f20 C-struct to decode the message contents into
  */
-static inline void mavlink_msg_serial_udb_extra_f20_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f20_t* serial_udb_extra_f20)
-{
+static inline void mavlink_msg_serial_udb_extra_f20_decode(const mavlink_message_t *msg,
+                                                           mavlink_serial_udb_extra_f20_t *serial_udb_extra_f20) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    serial_udb_extra_f20->sue_trim_value_input_1 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_1(msg);
-    serial_udb_extra_f20->sue_trim_value_input_2 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_2(msg);
-    serial_udb_extra_f20->sue_trim_value_input_3 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_3(msg);
-    serial_udb_extra_f20->sue_trim_value_input_4 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_4(msg);
-    serial_udb_extra_f20->sue_trim_value_input_5 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_5(msg);
-    serial_udb_extra_f20->sue_trim_value_input_6 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_6(msg);
-    serial_udb_extra_f20->sue_trim_value_input_7 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_7(msg);
-    serial_udb_extra_f20->sue_trim_value_input_8 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_8(msg);
-    serial_udb_extra_f20->sue_trim_value_input_9 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_9(msg);
-    serial_udb_extra_f20->sue_trim_value_input_10 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_10(msg);
-    serial_udb_extra_f20->sue_trim_value_input_11 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_11(msg);
-    serial_udb_extra_f20->sue_trim_value_input_12 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_12(msg);
-    serial_udb_extra_f20->sue_number_of_inputs = mavlink_msg_serial_udb_extra_f20_get_sue_number_of_inputs(msg);
+    serial_udb_extra_f20->sue_trim_value_input_1 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_1(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_2 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_2(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_3 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_3(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_4 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_4(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_5 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_5(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_6 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_6(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_7 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_7(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_8 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_8(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_9 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_9(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_10 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_10(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_11 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_11(
+            msg);
+    serial_udb_extra_f20->sue_trim_value_input_12 = mavlink_msg_serial_udb_extra_f20_get_sue_trim_value_input_12(
+            msg);
+    serial_udb_extra_f20->sue_number_of_inputs = mavlink_msg_serial_udb_extra_f20_get_sue_number_of_inputs(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN;
-        memset(serial_udb_extra_f20, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN);
-    memcpy(serial_udb_extra_f20, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN;
+    memset(serial_udb_extra_f20, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F20_LEN);
+memcpy(serial_udb_extra_f20, _MAV_PAYLOAD(msg), len);
 #endif
 }

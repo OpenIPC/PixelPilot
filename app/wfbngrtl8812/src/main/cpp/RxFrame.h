@@ -15,28 +15,41 @@ enum class RadioPort { /* define your RadioPort enum */ };
 class RxFrame {
 private:
     std::span<uint8_t> _data;
-    static constexpr std::array<uint8_t, 2> _dataHeader = { uint8_t(0x08), uint8_t(0x01) }; // Frame control value for QoS Data
+    static constexpr std::array<uint8_t, 2> _dataHeader = {uint8_t(0x08),
+                                                           uint8_t(0x01)}; // Frame control value for QoS Data
 
 
 public:
 
-    RxFrame(const std::span<uint8_t>& data) : _data(data) {
+    RxFrame(const std::span<uint8_t> &data) : _data(data) {
         DataAsMemory = _data;
     }
 
     std::span<uint8_t> DataAsMemory; // useless in c++
 
     std::span<uint8_t> ControlField() const { return {_data.data(), 2}; }
+
     std::span<uint8_t> Duration() const { return {_data.data() + 2, 2}; }
+
     std::span<uint8_t> MacAp() const { return {_data.data() + 4, 6}; } // receiverAddress
-    std::span<uint8_t> MacSrcUniqueIdPart() const { return {_data.data() + 10, 1}; } // transmitterAddress
+    std::span<uint8_t> MacSrcUniqueIdPart() const {
+        return {_data.data() + 10, 1};
+    } // transmitterAddress
     std::span<uint8_t> MacSrcNoncePart1() const { return {_data.data() + 11, 4}; }
+
     std::span<uint8_t> MacSrcRadioPort() const { return {_data.data() + 15, 1}; }
-    std::span<uint8_t> MacDstUniqueIdPart() const { return {_data.data() + 16, 1}; } // destinationAddress
+
+    std::span<uint8_t> MacDstUniqueIdPart() const {
+        return {_data.data() + 16, 1};
+    } // destinationAddress
     std::span<uint8_t> MacDstNoncePart2() const { return {_data.data() + 17, 4}; }
+
     std::span<uint8_t> MacDstRadioPort() const { return {_data.data() + 21, 1}; }
+
     std::span<uint8_t> SequenceControl() const { return {_data.data() + 22, 2}; }
+
     std::span<uint8_t> PayloadSpan() const { return {_data.data() + 24, _data.size() - 28}; }
+
     std::span<uint8_t> GetNonce() const {
         std::array<uint8_t, 8> data;
         std::copy(_data.begin() + 11, _data.begin() + 15, data.begin());
@@ -62,7 +75,7 @@ public:
         return _data[10];
     }
 
-    bool MatchesChannelID(const uint8_t* channel_id) const {
+    bool MatchesChannelID(const uint8_t *channel_id) const {
         //        0x57, 0x42, 0xaa, 0xbb, 0xcc, 0xdd,   // last four bytes are replaced by channel_id (x2)
         return _data[10] == 0x57 &&
                _data[11] == 0x42 &&
@@ -98,7 +111,7 @@ private:
 
 class WifiFrame {
 public:
-    WifiFrame(const std::span<uint8_t>& rawData) {
+    WifiFrame(const std::span<uint8_t> &rawData) {
         // Frame Control (2 bytes)
         frameControl = (rawData[1] << 8) | rawData[0];
 
@@ -130,6 +143,7 @@ public:
 //                                   (rawData[rawData.size() - 3] << 8) |
 //                                   rawData[rawData.size() - 4];
     }
+
     uint16_t frameControl;
     uint16_t durationID;
     std::vector<uint8_t> receiverAddress;

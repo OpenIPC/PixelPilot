@@ -42,7 +42,7 @@ int crypto_aead_xchacha20poly1305_ietf_encrypt(unsigned char *c,
                                                const unsigned char *nsec,
                                                const unsigned char *npub,
                                                const unsigned char *k)
-            __attribute__ ((nonnull(1, 8, 9)));
+__attribute__ ((nonnull(1, 8, 9)));
 
 SODIUM_EXPORT
 int crypto_aead_xchacha20poly1305_ietf_decrypt(unsigned char *m,
@@ -54,7 +54,7 @@ int crypto_aead_xchacha20poly1305_ietf_decrypt(unsigned char *m,
                                                unsigned long long adlen,
                                                const unsigned char *npub,
                                                const unsigned char *k)
-            __attribute__ ((warn_unused_result)) __attribute__ ((nonnull(4, 8, 9)));
+__attribute__ ((warn_unused_result)) __attribute__ ((nonnull(4, 8, 9)));
 
 SODIUM_EXPORT
 int crypto_aead_xchacha20poly1305_ietf_encrypt_detached(unsigned char *c,
@@ -67,7 +67,7 @@ int crypto_aead_xchacha20poly1305_ietf_encrypt_detached(unsigned char *c,
                                                         const unsigned char *nsec,
                                                         const unsigned char *npub,
                                                         const unsigned char *k)
-            __attribute__ ((nonnull(1, 2, 9, 10)));
+__attribute__ ((nonnull(1, 2, 9, 10)));
 
 SODIUM_EXPORT
 int crypto_aead_xchacha20poly1305_ietf_decrypt_detached(unsigned char *m,
@@ -79,11 +79,12 @@ int crypto_aead_xchacha20poly1305_ietf_decrypt_detached(unsigned char *m,
                                                         unsigned long long adlen,
                                                         const unsigned char *npub,
                                                         const unsigned char *k)
-            __attribute__ ((warn_unused_result)) __attribute__ ((nonnull(3, 5, 8, 9)));
+__attribute__ ((warn_unused_result)) __attribute__ ((nonnull(3, 5, 8, 9)));
 
 SODIUM_EXPORT
-void crypto_aead_xchacha20poly1305_ietf_keygen(unsigned char k[crypto_aead_xchacha20poly1305_ietf_KEYBYTES])
-            __attribute__ ((nonnull));
+void crypto_aead_xchacha20poly1305_ietf_keygen(
+        unsigned char k[crypto_aead_xchacha20poly1305_ietf_KEYBYTES])
+__attribute__ ((nonnull));
 
 /* Aliases */
 

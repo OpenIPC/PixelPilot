@@ -4,14 +4,16 @@
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY 155
 
 MAVPACKED(
-typedef struct __mavlink_flexifunction_directory_t {
- uint8_t target_system; /*<  System ID*/
- uint8_t target_component; /*<  Component ID*/
- uint8_t directory_type; /*<  0=inputs, 1=outputs*/
- uint8_t start_index; /*<  index of first directory entry to write*/
- uint8_t count; /*<  count of directory entries to write*/
- int8_t directory_data[48]; /*<  Settings data*/
-}) mavlink_flexifunction_directory_t;
+        typedef struct __mavlink_flexifunction_directory_t {
+            uint8_t target_system; /*<  System ID*/
+            uint8_t target_component; /*<  Component ID*/
+            uint8_t directory_type; /*<  0=inputs, 1=outputs*/
+            uint8_t start_index; /*<  index of first directory entry to write*/
+            uint8_t count; /*<  count of directory entries to write*/
+            int8_t directory_data[48]; /*<  Settings data*/
+        })
+
+mavlink_flexifunction_directory_t;
 
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN 53
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_MIN_LEN 53
@@ -64,9 +66,12 @@ typedef struct __mavlink_flexifunction_directory_t {
  * @param directory_data  Settings data
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_flexifunction_directory_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, uint8_t directory_type, uint8_t start_index, uint8_t count, const int8_t *directory_data)
-{
+static inline uint16_t
+mavlink_msg_flexifunction_directory_pack(uint8_t system_id, uint8_t component_id,
+                                         mavlink_message_t *msg,
+                                         uint8_t target_system, uint8_t target_component,
+                                         uint8_t directory_type, uint8_t start_index, uint8_t count,
+                                         const int8_t *directory_data) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN];
     _mav_put_uint8_t(buf, 0, target_system);
@@ -75,7 +80,7 @@ static inline uint16_t mavlink_msg_flexifunction_directory_pack(uint8_t system_i
     _mav_put_uint8_t(buf, 3, start_index);
     _mav_put_uint8_t(buf, 4, count);
     _mav_put_int8_t_array(buf, 5, directory_data, 48);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN);
 #else
     mavlink_flexifunction_directory_t packet;
     packet.target_system = target_system;
@@ -88,7 +93,10 @@ static inline uint16_t mavlink_msg_flexifunction_directory_pack(uint8_t system_i
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_MIN_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_MIN_LEN,
+                                    MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN,
+                                    MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_CRC);
 }
 
 /**
@@ -105,10 +113,12 @@ static inline uint16_t mavlink_msg_flexifunction_directory_pack(uint8_t system_i
  * @param directory_data  Settings data
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_flexifunction_directory_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,uint8_t directory_type,uint8_t start_index,uint8_t count,const int8_t *directory_data)
-{
+static inline uint16_t
+mavlink_msg_flexifunction_directory_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                              mavlink_message_t *msg,
+                                              uint8_t target_system, uint8_t target_component,
+                                              uint8_t directory_type, uint8_t start_index,
+                                              uint8_t count, const int8_t *directory_data) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN];
     _mav_put_uint8_t(buf, 0, target_system);
@@ -117,7 +127,7 @@ static inline uint16_t mavlink_msg_flexifunction_directory_pack_chan(uint8_t sys
     _mav_put_uint8_t(buf, 3, start_index);
     _mav_put_uint8_t(buf, 4, count);
     _mav_put_int8_t_array(buf, 5, directory_data, 48);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN);
 #else
     mavlink_flexifunction_directory_t packet;
     packet.target_system = target_system;
@@ -130,7 +140,10 @@ static inline uint16_t mavlink_msg_flexifunction_directory_pack_chan(uint8_t sys
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_MIN_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_MIN_LEN,
+                                         MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN,
+                                         MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_CRC);
 }
 
 /**
@@ -141,9 +154,17 @@ static inline uint16_t mavlink_msg_flexifunction_directory_pack_chan(uint8_t sys
  * @param msg The MAVLink message to compress the data into
  * @param flexifunction_directory C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_flexifunction_directory_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_flexifunction_directory_t* flexifunction_directory)
-{
-    return mavlink_msg_flexifunction_directory_pack(system_id, component_id, msg, flexifunction_directory->target_system, flexifunction_directory->target_component, flexifunction_directory->directory_type, flexifunction_directory->start_index, flexifunction_directory->count, flexifunction_directory->directory_data);
+static inline uint16_t
+mavlink_msg_flexifunction_directory_encode(uint8_t system_id, uint8_t component_id,
+                                           mavlink_message_t *msg,
+                                           const mavlink_flexifunction_directory_t *flexifunction_directory) {
+    return mavlink_msg_flexifunction_directory_pack(system_id, component_id, msg,
+                                                    flexifunction_directory->target_system,
+                                                    flexifunction_directory->target_component,
+                                                    flexifunction_directory->directory_type,
+                                                    flexifunction_directory->start_index,
+                                                    flexifunction_directory->count,
+                                                    flexifunction_directory->directory_data);
 }
 
 /**
@@ -155,9 +176,17 @@ static inline uint16_t mavlink_msg_flexifunction_directory_encode(uint8_t system
  * @param msg The MAVLink message to compress the data into
  * @param flexifunction_directory C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_flexifunction_directory_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_flexifunction_directory_t* flexifunction_directory)
-{
-    return mavlink_msg_flexifunction_directory_pack_chan(system_id, component_id, chan, msg, flexifunction_directory->target_system, flexifunction_directory->target_component, flexifunction_directory->directory_type, flexifunction_directory->start_index, flexifunction_directory->count, flexifunction_directory->directory_data);
+static inline uint16_t
+mavlink_msg_flexifunction_directory_encode_chan(uint8_t system_id, uint8_t component_id,
+                                                uint8_t chan, mavlink_message_t *msg,
+                                                const mavlink_flexifunction_directory_t *flexifunction_directory) {
+    return mavlink_msg_flexifunction_directory_pack_chan(system_id, component_id, chan, msg,
+                                                         flexifunction_directory->target_system,
+                                                         flexifunction_directory->target_component,
+                                                         flexifunction_directory->directory_type,
+                                                         flexifunction_directory->start_index,
+                                                         flexifunction_directory->count,
+                                                         flexifunction_directory->directory_data);
 }
 
 /**
@@ -252,9 +281,9 @@ static inline void mavlink_msg_flexifunction_directory_send_buf(mavlink_message_
  *
  * @return  System ID
  */
-static inline uint8_t mavlink_msg_flexifunction_directory_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  0);
+static inline uint8_t
+mavlink_msg_flexifunction_directory_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 0);
 }
 
 /**
@@ -262,9 +291,9 @@ static inline uint8_t mavlink_msg_flexifunction_directory_get_target_system(cons
  *
  * @return  Component ID
  */
-static inline uint8_t mavlink_msg_flexifunction_directory_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  1);
+static inline uint8_t
+mavlink_msg_flexifunction_directory_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 1);
 }
 
 /**
@@ -272,9 +301,9 @@ static inline uint8_t mavlink_msg_flexifunction_directory_get_target_component(c
  *
  * @return  0=inputs, 1=outputs
  */
-static inline uint8_t mavlink_msg_flexifunction_directory_get_directory_type(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  2);
+static inline uint8_t
+mavlink_msg_flexifunction_directory_get_directory_type(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 2);
 }
 
 /**
@@ -282,9 +311,9 @@ static inline uint8_t mavlink_msg_flexifunction_directory_get_directory_type(con
  *
  * @return  index of first directory entry to write
  */
-static inline uint8_t mavlink_msg_flexifunction_directory_get_start_index(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  3);
+static inline uint8_t
+mavlink_msg_flexifunction_directory_get_start_index(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 3);
 }
 
 /**
@@ -292,9 +321,8 @@ static inline uint8_t mavlink_msg_flexifunction_directory_get_start_index(const 
  *
  * @return  count of directory entries to write
  */
-static inline uint8_t mavlink_msg_flexifunction_directory_get_count(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  4);
+static inline uint8_t mavlink_msg_flexifunction_directory_get_count(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 4);
 }
 
 /**
@@ -302,9 +330,10 @@ static inline uint8_t mavlink_msg_flexifunction_directory_get_count(const mavlin
  *
  * @return  Settings data
  */
-static inline uint16_t mavlink_msg_flexifunction_directory_get_directory_data(const mavlink_message_t* msg, int8_t *directory_data)
-{
-    return _MAV_RETURN_int8_t_array(msg, directory_data, 48,  5);
+static inline uint16_t
+mavlink_msg_flexifunction_directory_get_directory_data(const mavlink_message_t *msg,
+                                                       int8_t *directory_data) {
+    return _MAV_RETURN_int8_t_array(msg, directory_data, 48, 5);
 }
 
 /**
@@ -313,18 +342,22 @@ static inline uint16_t mavlink_msg_flexifunction_directory_get_directory_data(co
  * @param msg The message to decode
  * @param flexifunction_directory C-struct to decode the message contents into
  */
-static inline void mavlink_msg_flexifunction_directory_decode(const mavlink_message_t* msg, mavlink_flexifunction_directory_t* flexifunction_directory)
-{
+static inline void mavlink_msg_flexifunction_directory_decode(const mavlink_message_t *msg,
+                                                              mavlink_flexifunction_directory_t *flexifunction_directory) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    flexifunction_directory->target_system = mavlink_msg_flexifunction_directory_get_target_system(msg);
-    flexifunction_directory->target_component = mavlink_msg_flexifunction_directory_get_target_component(msg);
-    flexifunction_directory->directory_type = mavlink_msg_flexifunction_directory_get_directory_type(msg);
+    flexifunction_directory->target_system = mavlink_msg_flexifunction_directory_get_target_system(
+            msg);
+    flexifunction_directory->target_component = mavlink_msg_flexifunction_directory_get_target_component(
+            msg);
+    flexifunction_directory->directory_type = mavlink_msg_flexifunction_directory_get_directory_type(
+            msg);
     flexifunction_directory->start_index = mavlink_msg_flexifunction_directory_get_start_index(msg);
     flexifunction_directory->count = mavlink_msg_flexifunction_directory_get_count(msg);
-    mavlink_msg_flexifunction_directory_get_directory_data(msg, flexifunction_directory->directory_data);
+    mavlink_msg_flexifunction_directory_get_directory_data(msg,
+                                                           flexifunction_directory->directory_data);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN? msg->len : MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN;
-        memset(flexifunction_directory, 0, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN);
-    memcpy(flexifunction_directory, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN? msg->len : MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN;
+    memset(flexifunction_directory, 0, MAVLINK_MSG_ID_FLEXIFUNCTION_DIRECTORY_LEN);
+memcpy(flexifunction_directory, _MAV_PAYLOAD(msg), len);
 #endif
 }

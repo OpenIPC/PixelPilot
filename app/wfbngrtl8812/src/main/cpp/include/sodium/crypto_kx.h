@@ -36,12 +36,12 @@ SODIUM_EXPORT
 int crypto_kx_seed_keypair(unsigned char pk[crypto_kx_PUBLICKEYBYTES],
                            unsigned char sk[crypto_kx_SECRETKEYBYTES],
                            const unsigned char seed[crypto_kx_SEEDBYTES])
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 SODIUM_EXPORT
 int crypto_kx_keypair(unsigned char pk[crypto_kx_PUBLICKEYBYTES],
                       unsigned char sk[crypto_kx_SECRETKEYBYTES])
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 SODIUM_EXPORT
 int crypto_kx_client_session_keys(unsigned char rx[crypto_kx_SESSIONKEYBYTES],
@@ -49,7 +49,7 @@ int crypto_kx_client_session_keys(unsigned char rx[crypto_kx_SESSIONKEYBYTES],
                                   const unsigned char client_pk[crypto_kx_PUBLICKEYBYTES],
                                   const unsigned char client_sk[crypto_kx_SECRETKEYBYTES],
                                   const unsigned char server_pk[crypto_kx_PUBLICKEYBYTES])
-            __attribute__ ((warn_unused_result))  __attribute__ ((nonnull(3, 4, 5)));
+__attribute__ ((warn_unused_result))  __attribute__ ((nonnull(3, 4, 5)));
 
 SODIUM_EXPORT
 int crypto_kx_server_session_keys(unsigned char rx[crypto_kx_SESSIONKEYBYTES],
@@ -57,7 +57,7 @@ int crypto_kx_server_session_keys(unsigned char rx[crypto_kx_SESSIONKEYBYTES],
                                   const unsigned char server_pk[crypto_kx_PUBLICKEYBYTES],
                                   const unsigned char server_sk[crypto_kx_SECRETKEYBYTES],
                                   const unsigned char client_pk[crypto_kx_PUBLICKEYBYTES])
-            __attribute__ ((warn_unused_result))  __attribute__ ((nonnull(3, 4, 5)));
+__attribute__ ((warn_unused_result))  __attribute__ ((nonnull(3, 4, 5)));
 
 #ifdef __cplusplus
 }

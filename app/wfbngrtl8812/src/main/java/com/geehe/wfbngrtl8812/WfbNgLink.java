@@ -15,37 +15,48 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class WfbNgLink implements WfbNGStatsChanged {
+    public static String TAG = "com.geehe.fpvue";
+
     // Load the 'Rtl8812au_Wfbng' library on application startup.
     static {
         System.loadLibrary("WfbngRtl8812");
     }
 
-    public static String TAG = "com.geehe.fpvue";
-
     private final long nativeWfbngLink;
     private final Timer timer;
-    private WfbNGStatsChanged statsChanged;
     private final Context context;
     Map<UsbDevice, Thread> linkThreads = new HashMap<UsbDevice, Thread>();
     Map<UsbDevice, UsbDeviceConnection> linkConns = new HashMap<UsbDevice, UsbDeviceConnection>();
+    private WfbNGStatsChanged statsChanged;
 
     public WfbNgLink(final AppCompatActivity parent) {
-        this.context=parent;
+        this.context = parent;
         nativeWfbngLink = nativeInitialize(context);
-        timer=new Timer();
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 nativeCallBack(WfbNgLink.this, nativeWfbngLink);
             }
-        },0,500);
+        }, 0, 500);
     }
+
+    // Native cpp methods.
+    public static native long nativeInitialize(Context context);
+
+    public static native void nativeRun(long nativeInstance, Context context, int wifiChannel, int fd);
+
+    public static native void nativeStop(long nativeInstance, Context context, int fd);
+
+    public static native void nativeRefreshKey(long nativeInstance);
+
+    public static native <T extends WfbNGStatsChanged> void nativeCallBack(T t, long nativeInstance);
 
     public boolean isRunning() {
         return !linkThreads.isEmpty();
     }
 
-    public void refreshKey(){
+    public void refreshKey() {
         nativeRefreshKey(nativeWfbngLink);
     }
 
@@ -55,11 +66,11 @@ public class WfbNgLink implements WfbNGStatsChanged {
         UsbDeviceConnection usbDeviceConnection = usbManager.openDevice(usbDevice);
         int fd = usbDeviceConnection.getFileDescriptor();
         Thread t = new Thread(() -> nativeRun(nativeWfbngLink, context, wifiChannel, fd));
-        t.setName("wfb-"+usbDevice.getDeviceName().split("/dev/bus/usb/")[1]);
+        t.setName("wfb-" + usbDevice.getDeviceName().split("/dev/bus/usb/")[1]);
         linkThreads.put(usbDevice, t);
         linkConns.put(usbDevice, usbDeviceConnection);
         linkThreads.get(usbDevice).start();
-        Log.d(TAG, "wfb-ng thread on "+ usbDevice.getDeviceName()+ " started.");
+        Log.d(TAG, "wfb-ng thread on " + usbDevice.getDeviceName() + " started.");
     }
 
     public synchronized void stopAll() throws InterruptedException {
@@ -71,7 +82,7 @@ public class WfbNgLink implements WfbNGStatsChanged {
             if (t != null) {
                 t.join();
             }
-            Log.d(TAG, "wfb-ng thread on "+ entry.getKey().getDeviceName()+ " done.");
+            Log.d(TAG, "wfb-ng thread on " + entry.getKey().getDeviceName() + " done.");
         }
         linkThreads.clear();
     }
@@ -89,22 +100,16 @@ public class WfbNgLink implements WfbNGStatsChanged {
         }
         linkThreads.remove(dev);
     }
-    public void SetWfbNGStatsChanged(final WfbNGStatsChanged callback){
-        statsChanged=callback;
+
+    public void SetWfbNGStatsChanged(final WfbNGStatsChanged callback) {
+        statsChanged = callback;
     }
 
     // called by native code via NDK
     @Override
-    public void onWfbNgStatsChanged (WfbNGStats stats) {
-        if(statsChanged !=null){
+    public void onWfbNgStatsChanged(WfbNGStats stats) {
+        if (statsChanged != null) {
             statsChanged.onWfbNgStatsChanged(stats);
         }
     }
-
-    // Native cpp methods.
-    public static native long nativeInitialize(Context context);
-    public static native void nativeRun(long nativeInstance, Context context, int wifiChannel, int fd);
-    public static native void nativeStop(long nativeInstance, Context context, int fd);
-    public static native void nativeRefreshKey(long nativeInstance);
-    public static native <T extends WfbNGStatsChanged> void nativeCallBack(T t, long nativeInstance);
 }

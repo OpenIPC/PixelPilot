@@ -4,27 +4,29 @@
 #define MAVLINK_MSG_ID_EFI_STATUS 225
 
 MAVPACKED(
-typedef struct __mavlink_efi_status_t {
- float ecu_index; /*<  ECU index*/
- float rpm; /*<  RPM*/
- float fuel_consumed; /*< [cm^3] Fuel consumed*/
- float fuel_flow; /*< [cm^3/min] Fuel flow rate*/
- float engine_load; /*< [%] Engine load*/
- float throttle_position; /*< [%] Throttle position*/
- float spark_dwell_time; /*< [ms] Spark dwell time*/
- float barometric_pressure; /*< [kPa] Barometric pressure*/
- float intake_manifold_pressure; /*< [kPa] Intake manifold pressure(*/
- float intake_manifold_temperature; /*< [degC] Intake manifold temperature*/
- float cylinder_head_temperature; /*< [degC] Cylinder head temperature*/
- float ignition_timing; /*< [deg] Ignition timing (Crank angle degrees)*/
- float injection_time; /*< [ms] Injection time*/
- float exhaust_gas_temperature; /*< [degC] Exhaust gas temperature*/
- float throttle_out; /*< [%] Output throttle*/
- float pt_compensation; /*<  Pressure/temperature compensation*/
- uint8_t health; /*<  EFI health status*/
- float ignition_voltage; /*< [V] Supply voltage to EFI sparking system.  Zero in this value means "unknown", so if the supply voltage really is zero volts use 0.0001 instead.*/
- float fuel_pressure; /*< [kPa] Fuel pressure. Zero in this value means "unknown", so if the fuel pressure really is zero kPa use 0.0001 instead.*/
-}) mavlink_efi_status_t;
+        typedef struct __mavlink_efi_status_t {
+            float ecu_index; /*<  ECU index*/
+            float rpm; /*<  RPM*/
+            float fuel_consumed; /*< [cm^3] Fuel consumed*/
+            float fuel_flow; /*< [cm^3/min] Fuel flow rate*/
+            float engine_load; /*< [%] Engine load*/
+            float throttle_position; /*< [%] Throttle position*/
+            float spark_dwell_time; /*< [ms] Spark dwell time*/
+            float barometric_pressure; /*< [kPa] Barometric pressure*/
+            float intake_manifold_pressure; /*< [kPa] Intake manifold pressure(*/
+            float intake_manifold_temperature; /*< [degC] Intake manifold temperature*/
+            float cylinder_head_temperature; /*< [degC] Cylinder head temperature*/
+            float ignition_timing; /*< [deg] Ignition timing (Crank angle degrees)*/
+            float injection_time; /*< [ms] Injection time*/
+            float exhaust_gas_temperature; /*< [degC] Exhaust gas temperature*/
+            float throttle_out; /*< [%] Output throttle*/
+            float pt_compensation; /*<  Pressure/temperature compensation*/
+            uint8_t health; /*<  EFI health status*/
+            float ignition_voltage; /*< [V] Supply voltage to EFI sparking system.  Zero in this value means "unknown", so if the supply voltage really is zero volts use 0.0001 instead.*/
+            float fuel_pressure; /*< [kPa] Fuel pressure. Zero in this value means "unknown", so if the fuel pressure really is zero kPa use 0.0001 instead.*/
+        })
+
+mavlink_efi_status_t;
 
 #define MAVLINK_MSG_ID_EFI_STATUS_LEN 73
 #define MAVLINK_MSG_ID_EFI_STATUS_MIN_LEN 65
@@ -33,7 +35,6 @@ typedef struct __mavlink_efi_status_t {
 
 #define MAVLINK_MSG_ID_EFI_STATUS_CRC 208
 #define MAVLINK_MSG_ID_225_CRC 208
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -116,9 +117,15 @@ typedef struct __mavlink_efi_status_t {
  * @param fuel_pressure [kPa] Fuel pressure. Zero in this value means "unknown", so if the fuel pressure really is zero kPa use 0.0001 instead.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_efi_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t health, float ecu_index, float rpm, float fuel_consumed, float fuel_flow, float engine_load, float throttle_position, float spark_dwell_time, float barometric_pressure, float intake_manifold_pressure, float intake_manifold_temperature, float cylinder_head_temperature, float ignition_timing, float injection_time, float exhaust_gas_temperature, float throttle_out, float pt_compensation, float ignition_voltage, float fuel_pressure)
-{
+static inline uint16_t
+mavlink_msg_efi_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            uint8_t health, float ecu_index, float rpm, float fuel_consumed,
+                            float fuel_flow, float engine_load, float throttle_position,
+                            float spark_dwell_time, float barometric_pressure,
+                            float intake_manifold_pressure, float intake_manifold_temperature,
+                            float cylinder_head_temperature, float ignition_timing,
+                            float injection_time, float exhaust_gas_temperature, float throttle_out,
+                            float pt_compensation, float ignition_voltage, float fuel_pressure) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_EFI_STATUS_LEN];
     _mav_put_float(buf, 0, ecu_index);
@@ -141,7 +148,7 @@ static inline uint16_t mavlink_msg_efi_status_pack(uint8_t system_id, uint8_t co
     _mav_put_float(buf, 65, ignition_voltage);
     _mav_put_float(buf, 69, fuel_pressure);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_EFI_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_EFI_STATUS_LEN);
 #else
     mavlink_efi_status_t packet;
     packet.ecu_index = ecu_index;
@@ -168,7 +175,8 @@ static inline uint16_t mavlink_msg_efi_status_pack(uint8_t system_id, uint8_t co
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_EFI_STATUS;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_EFI_STATUS_MIN_LEN, MAVLINK_MSG_ID_EFI_STATUS_LEN, MAVLINK_MSG_ID_EFI_STATUS_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_EFI_STATUS_MIN_LEN,
+                                    MAVLINK_MSG_ID_EFI_STATUS_LEN, MAVLINK_MSG_ID_EFI_STATUS_CRC);
 }
 
 /**
@@ -198,10 +206,17 @@ static inline uint16_t mavlink_msg_efi_status_pack(uint8_t system_id, uint8_t co
  * @param fuel_pressure [kPa] Fuel pressure. Zero in this value means "unknown", so if the fuel pressure really is zero kPa use 0.0001 instead.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_efi_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t health,float ecu_index,float rpm,float fuel_consumed,float fuel_flow,float engine_load,float throttle_position,float spark_dwell_time,float barometric_pressure,float intake_manifold_pressure,float intake_manifold_temperature,float cylinder_head_temperature,float ignition_timing,float injection_time,float exhaust_gas_temperature,float throttle_out,float pt_compensation,float ignition_voltage,float fuel_pressure)
-{
+static inline uint16_t
+mavlink_msg_efi_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg,
+                                 uint8_t health, float ecu_index, float rpm, float fuel_consumed,
+                                 float fuel_flow, float engine_load, float throttle_position,
+                                 float spark_dwell_time, float barometric_pressure,
+                                 float intake_manifold_pressure, float intake_manifold_temperature,
+                                 float cylinder_head_temperature, float ignition_timing,
+                                 float injection_time, float exhaust_gas_temperature,
+                                 float throttle_out, float pt_compensation, float ignition_voltage,
+                                 float fuel_pressure) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_EFI_STATUS_LEN];
     _mav_put_float(buf, 0, ecu_index);
@@ -224,7 +239,7 @@ static inline uint16_t mavlink_msg_efi_status_pack_chan(uint8_t system_id, uint8
     _mav_put_float(buf, 65, ignition_voltage);
     _mav_put_float(buf, 69, fuel_pressure);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_EFI_STATUS_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_EFI_STATUS_LEN);
 #else
     mavlink_efi_status_t packet;
     packet.ecu_index = ecu_index;
@@ -251,7 +266,10 @@ static inline uint16_t mavlink_msg_efi_status_pack_chan(uint8_t system_id, uint8
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_EFI_STATUS;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_EFI_STATUS_MIN_LEN, MAVLINK_MSG_ID_EFI_STATUS_LEN, MAVLINK_MSG_ID_EFI_STATUS_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_EFI_STATUS_MIN_LEN,
+                                         MAVLINK_MSG_ID_EFI_STATUS_LEN,
+                                         MAVLINK_MSG_ID_EFI_STATUS_CRC);
 }
 
 /**
@@ -262,9 +280,22 @@ static inline uint16_t mavlink_msg_efi_status_pack_chan(uint8_t system_id, uint8
  * @param msg The MAVLink message to compress the data into
  * @param efi_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_efi_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_efi_status_t* efi_status)
-{
-    return mavlink_msg_efi_status_pack(system_id, component_id, msg, efi_status->health, efi_status->ecu_index, efi_status->rpm, efi_status->fuel_consumed, efi_status->fuel_flow, efi_status->engine_load, efi_status->throttle_position, efi_status->spark_dwell_time, efi_status->barometric_pressure, efi_status->intake_manifold_pressure, efi_status->intake_manifold_temperature, efi_status->cylinder_head_temperature, efi_status->ignition_timing, efi_status->injection_time, efi_status->exhaust_gas_temperature, efi_status->throttle_out, efi_status->pt_compensation, efi_status->ignition_voltage, efi_status->fuel_pressure);
+static inline uint16_t
+mavlink_msg_efi_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                              const mavlink_efi_status_t *efi_status) {
+    return mavlink_msg_efi_status_pack(system_id, component_id, msg, efi_status->health,
+                                       efi_status->ecu_index, efi_status->rpm,
+                                       efi_status->fuel_consumed, efi_status->fuel_flow,
+                                       efi_status->engine_load, efi_status->throttle_position,
+                                       efi_status->spark_dwell_time,
+                                       efi_status->barometric_pressure,
+                                       efi_status->intake_manifold_pressure,
+                                       efi_status->intake_manifold_temperature,
+                                       efi_status->cylinder_head_temperature,
+                                       efi_status->ignition_timing, efi_status->injection_time,
+                                       efi_status->exhaust_gas_temperature,
+                                       efi_status->throttle_out, efi_status->pt_compensation,
+                                       efi_status->ignition_voltage, efi_status->fuel_pressure);
 }
 
 /**
@@ -276,9 +307,23 @@ static inline uint16_t mavlink_msg_efi_status_encode(uint8_t system_id, uint8_t 
  * @param msg The MAVLink message to compress the data into
  * @param efi_status C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_efi_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_efi_status_t* efi_status)
-{
-    return mavlink_msg_efi_status_pack_chan(system_id, component_id, chan, msg, efi_status->health, efi_status->ecu_index, efi_status->rpm, efi_status->fuel_consumed, efi_status->fuel_flow, efi_status->engine_load, efi_status->throttle_position, efi_status->spark_dwell_time, efi_status->barometric_pressure, efi_status->intake_manifold_pressure, efi_status->intake_manifold_temperature, efi_status->cylinder_head_temperature, efi_status->ignition_timing, efi_status->injection_time, efi_status->exhaust_gas_temperature, efi_status->throttle_out, efi_status->pt_compensation, efi_status->ignition_voltage, efi_status->fuel_pressure);
+static inline uint16_t
+mavlink_msg_efi_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                   mavlink_message_t *msg, const mavlink_efi_status_t *efi_status) {
+    return mavlink_msg_efi_status_pack_chan(system_id, component_id, chan, msg, efi_status->health,
+                                            efi_status->ecu_index, efi_status->rpm,
+                                            efi_status->fuel_consumed, efi_status->fuel_flow,
+                                            efi_status->engine_load, efi_status->throttle_position,
+                                            efi_status->spark_dwell_time,
+                                            efi_status->barometric_pressure,
+                                            efi_status->intake_manifold_pressure,
+                                            efi_status->intake_manifold_temperature,
+                                            efi_status->cylinder_head_temperature,
+                                            efi_status->ignition_timing, efi_status->injection_time,
+                                            efi_status->exhaust_gas_temperature,
+                                            efi_status->throttle_out, efi_status->pt_compensation,
+                                            efi_status->ignition_voltage,
+                                            efi_status->fuel_pressure);
 }
 
 /**
@@ -442,9 +487,8 @@ static inline void mavlink_msg_efi_status_send_buf(mavlink_message_t *msgbuf, ma
  *
  * @return  EFI health status
  */
-static inline uint8_t mavlink_msg_efi_status_get_health(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  64);
+static inline uint8_t mavlink_msg_efi_status_get_health(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 64);
 }
 
 /**
@@ -452,9 +496,8 @@ static inline uint8_t mavlink_msg_efi_status_get_health(const mavlink_message_t*
  *
  * @return  ECU index
  */
-static inline float mavlink_msg_efi_status_get_ecu_index(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_efi_status_get_ecu_index(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -462,9 +505,8 @@ static inline float mavlink_msg_efi_status_get_ecu_index(const mavlink_message_t
  *
  * @return  RPM
  */
-static inline float mavlink_msg_efi_status_get_rpm(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_efi_status_get_rpm(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -472,9 +514,8 @@ static inline float mavlink_msg_efi_status_get_rpm(const mavlink_message_t* msg)
  *
  * @return [cm^3] Fuel consumed
  */
-static inline float mavlink_msg_efi_status_get_fuel_consumed(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_efi_status_get_fuel_consumed(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -482,9 +523,8 @@ static inline float mavlink_msg_efi_status_get_fuel_consumed(const mavlink_messa
  *
  * @return [cm^3/min] Fuel flow rate
  */
-static inline float mavlink_msg_efi_status_get_fuel_flow(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_efi_status_get_fuel_flow(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -492,9 +532,8 @@ static inline float mavlink_msg_efi_status_get_fuel_flow(const mavlink_message_t
  *
  * @return [%] Engine load
  */
-static inline float mavlink_msg_efi_status_get_engine_load(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float mavlink_msg_efi_status_get_engine_load(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -502,9 +541,8 @@ static inline float mavlink_msg_efi_status_get_engine_load(const mavlink_message
  *
  * @return [%] Throttle position
  */
-static inline float mavlink_msg_efi_status_get_throttle_position(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  20);
+static inline float mavlink_msg_efi_status_get_throttle_position(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 20);
 }
 
 /**
@@ -512,9 +550,8 @@ static inline float mavlink_msg_efi_status_get_throttle_position(const mavlink_m
  *
  * @return [ms] Spark dwell time
  */
-static inline float mavlink_msg_efi_status_get_spark_dwell_time(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float mavlink_msg_efi_status_get_spark_dwell_time(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -522,9 +559,8 @@ static inline float mavlink_msg_efi_status_get_spark_dwell_time(const mavlink_me
  *
  * @return [kPa] Barometric pressure
  */
-static inline float mavlink_msg_efi_status_get_barometric_pressure(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float mavlink_msg_efi_status_get_barometric_pressure(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -532,9 +568,9 @@ static inline float mavlink_msg_efi_status_get_barometric_pressure(const mavlink
  *
  * @return [kPa] Intake manifold pressure(
  */
-static inline float mavlink_msg_efi_status_get_intake_manifold_pressure(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  32);
+static inline float
+mavlink_msg_efi_status_get_intake_manifold_pressure(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 32);
 }
 
 /**
@@ -542,9 +578,9 @@ static inline float mavlink_msg_efi_status_get_intake_manifold_pressure(const ma
  *
  * @return [degC] Intake manifold temperature
  */
-static inline float mavlink_msg_efi_status_get_intake_manifold_temperature(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  36);
+static inline float
+mavlink_msg_efi_status_get_intake_manifold_temperature(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 36);
 }
 
 /**
@@ -552,9 +588,9 @@ static inline float mavlink_msg_efi_status_get_intake_manifold_temperature(const
  *
  * @return [degC] Cylinder head temperature
  */
-static inline float mavlink_msg_efi_status_get_cylinder_head_temperature(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  40);
+static inline float
+mavlink_msg_efi_status_get_cylinder_head_temperature(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 40);
 }
 
 /**
@@ -562,9 +598,8 @@ static inline float mavlink_msg_efi_status_get_cylinder_head_temperature(const m
  *
  * @return [deg] Ignition timing (Crank angle degrees)
  */
-static inline float mavlink_msg_efi_status_get_ignition_timing(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  44);
+static inline float mavlink_msg_efi_status_get_ignition_timing(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 44);
 }
 
 /**
@@ -572,9 +607,8 @@ static inline float mavlink_msg_efi_status_get_ignition_timing(const mavlink_mes
  *
  * @return [ms] Injection time
  */
-static inline float mavlink_msg_efi_status_get_injection_time(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  48);
+static inline float mavlink_msg_efi_status_get_injection_time(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 48);
 }
 
 /**
@@ -582,9 +616,9 @@ static inline float mavlink_msg_efi_status_get_injection_time(const mavlink_mess
  *
  * @return [degC] Exhaust gas temperature
  */
-static inline float mavlink_msg_efi_status_get_exhaust_gas_temperature(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  52);
+static inline float
+mavlink_msg_efi_status_get_exhaust_gas_temperature(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 52);
 }
 
 /**
@@ -592,9 +626,8 @@ static inline float mavlink_msg_efi_status_get_exhaust_gas_temperature(const mav
  *
  * @return [%] Output throttle
  */
-static inline float mavlink_msg_efi_status_get_throttle_out(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  56);
+static inline float mavlink_msg_efi_status_get_throttle_out(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 56);
 }
 
 /**
@@ -602,9 +635,8 @@ static inline float mavlink_msg_efi_status_get_throttle_out(const mavlink_messag
  *
  * @return  Pressure/temperature compensation
  */
-static inline float mavlink_msg_efi_status_get_pt_compensation(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  60);
+static inline float mavlink_msg_efi_status_get_pt_compensation(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 60);
 }
 
 /**
@@ -612,9 +644,8 @@ static inline float mavlink_msg_efi_status_get_pt_compensation(const mavlink_mes
  *
  * @return [V] Supply voltage to EFI sparking system.  Zero in this value means "unknown", so if the supply voltage really is zero volts use 0.0001 instead.
  */
-static inline float mavlink_msg_efi_status_get_ignition_voltage(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  65);
+static inline float mavlink_msg_efi_status_get_ignition_voltage(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 65);
 }
 
 /**
@@ -622,9 +653,8 @@ static inline float mavlink_msg_efi_status_get_ignition_voltage(const mavlink_me
  *
  * @return [kPa] Fuel pressure. Zero in this value means "unknown", so if the fuel pressure really is zero kPa use 0.0001 instead.
  */
-static inline float mavlink_msg_efi_status_get_fuel_pressure(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  69);
+static inline float mavlink_msg_efi_status_get_fuel_pressure(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 69);
 }
 
 /**
@@ -633,8 +663,8 @@ static inline float mavlink_msg_efi_status_get_fuel_pressure(const mavlink_messa
  * @param msg The message to decode
  * @param efi_status C-struct to decode the message contents into
  */
-static inline void mavlink_msg_efi_status_decode(const mavlink_message_t* msg, mavlink_efi_status_t* efi_status)
-{
+static inline void
+mavlink_msg_efi_status_decode(const mavlink_message_t *msg, mavlink_efi_status_t *efi_status) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     efi_status->ecu_index = mavlink_msg_efi_status_get_ecu_index(msg);
     efi_status->rpm = mavlink_msg_efi_status_get_rpm(msg);
@@ -645,8 +675,10 @@ static inline void mavlink_msg_efi_status_decode(const mavlink_message_t* msg, m
     efi_status->spark_dwell_time = mavlink_msg_efi_status_get_spark_dwell_time(msg);
     efi_status->barometric_pressure = mavlink_msg_efi_status_get_barometric_pressure(msg);
     efi_status->intake_manifold_pressure = mavlink_msg_efi_status_get_intake_manifold_pressure(msg);
-    efi_status->intake_manifold_temperature = mavlink_msg_efi_status_get_intake_manifold_temperature(msg);
-    efi_status->cylinder_head_temperature = mavlink_msg_efi_status_get_cylinder_head_temperature(msg);
+    efi_status->intake_manifold_temperature = mavlink_msg_efi_status_get_intake_manifold_temperature(
+            msg);
+    efi_status->cylinder_head_temperature = mavlink_msg_efi_status_get_cylinder_head_temperature(
+            msg);
     efi_status->ignition_timing = mavlink_msg_efi_status_get_ignition_timing(msg);
     efi_status->injection_time = mavlink_msg_efi_status_get_injection_time(msg);
     efi_status->exhaust_gas_temperature = mavlink_msg_efi_status_get_exhaust_gas_temperature(msg);
@@ -656,8 +688,8 @@ static inline void mavlink_msg_efi_status_decode(const mavlink_message_t* msg, m
     efi_status->ignition_voltage = mavlink_msg_efi_status_get_ignition_voltage(msg);
     efi_status->fuel_pressure = mavlink_msg_efi_status_get_fuel_pressure(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_EFI_STATUS_LEN? msg->len : MAVLINK_MSG_ID_EFI_STATUS_LEN;
-        memset(efi_status, 0, MAVLINK_MSG_ID_EFI_STATUS_LEN);
-    memcpy(efi_status, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_EFI_STATUS_LEN? msg->len : MAVLINK_MSG_ID_EFI_STATUS_LEN;
+    memset(efi_status, 0, MAVLINK_MSG_ID_EFI_STATUS_LEN);
+memcpy(efi_status, _MAV_PAYLOAD(msg), len);
 #endif
 }

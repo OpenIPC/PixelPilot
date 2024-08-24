@@ -5,9 +5,9 @@
 
 
 typedef struct __mavlink_supported_tunes_t {
- uint32_t format; /*<  Bitfield of supported tune formats.*/
- uint8_t target_system; /*<  System ID*/
- uint8_t target_component; /*<  Component ID*/
+    uint32_t format; /*<  Bitfield of supported tune formats.*/
+    uint8_t target_system; /*<  System ID*/
+    uint8_t target_component; /*<  Component ID*/
 } mavlink_supported_tunes_t;
 
 #define MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN 6
@@ -17,7 +17,6 @@ typedef struct __mavlink_supported_tunes_t {
 
 #define MAVLINK_MSG_ID_SUPPORTED_TUNES_CRC 183
 #define MAVLINK_MSG_ID_401_CRC 183
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -52,16 +51,16 @@ typedef struct __mavlink_supported_tunes_t {
  * @param format  Bitfield of supported tune formats.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_supported_tunes_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t target_system, uint8_t target_component, uint32_t format)
-{
+static inline uint16_t
+mavlink_msg_supported_tunes_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                 uint8_t target_system, uint8_t target_component, uint32_t format) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN];
     _mav_put_uint32_t(buf, 0, format);
     _mav_put_uint8_t(buf, 4, target_system);
     _mav_put_uint8_t(buf, 5, target_component);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN);
 #else
     mavlink_supported_tunes_t packet;
     packet.format = format;
@@ -72,7 +71,10 @@ static inline uint16_t mavlink_msg_supported_tunes_pack(uint8_t system_id, uint8
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SUPPORTED_TUNES;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SUPPORTED_TUNES_MIN_LEN, MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN, MAVLINK_MSG_ID_SUPPORTED_TUNES_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SUPPORTED_TUNES_MIN_LEN,
+                                    MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN,
+                                    MAVLINK_MSG_ID_SUPPORTED_TUNES_CRC);
 }
 
 /**
@@ -86,17 +88,18 @@ static inline uint16_t mavlink_msg_supported_tunes_pack(uint8_t system_id, uint8
  * @param format  Bitfield of supported tune formats.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_supported_tunes_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t target_system,uint8_t target_component,uint32_t format)
-{
+static inline uint16_t
+mavlink_msg_supported_tunes_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                      mavlink_message_t *msg,
+                                      uint8_t target_system, uint8_t target_component,
+                                      uint32_t format) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN];
     _mav_put_uint32_t(buf, 0, format);
     _mav_put_uint8_t(buf, 4, target_system);
     _mav_put_uint8_t(buf, 5, target_component);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN);
 #else
     mavlink_supported_tunes_t packet;
     packet.format = format;
@@ -107,7 +110,10 @@ static inline uint16_t mavlink_msg_supported_tunes_pack_chan(uint8_t system_id, 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SUPPORTED_TUNES;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SUPPORTED_TUNES_MIN_LEN, MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN, MAVLINK_MSG_ID_SUPPORTED_TUNES_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SUPPORTED_TUNES_MIN_LEN,
+                                         MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN,
+                                         MAVLINK_MSG_ID_SUPPORTED_TUNES_CRC);
 }
 
 /**
@@ -118,9 +124,13 @@ static inline uint16_t mavlink_msg_supported_tunes_pack_chan(uint8_t system_id, 
  * @param msg The MAVLink message to compress the data into
  * @param supported_tunes C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_supported_tunes_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_supported_tunes_t* supported_tunes)
-{
-    return mavlink_msg_supported_tunes_pack(system_id, component_id, msg, supported_tunes->target_system, supported_tunes->target_component, supported_tunes->format);
+static inline uint16_t
+mavlink_msg_supported_tunes_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                   const mavlink_supported_tunes_t *supported_tunes) {
+    return mavlink_msg_supported_tunes_pack(system_id, component_id, msg,
+                                            supported_tunes->target_system,
+                                            supported_tunes->target_component,
+                                            supported_tunes->format);
 }
 
 /**
@@ -132,9 +142,14 @@ static inline uint16_t mavlink_msg_supported_tunes_encode(uint8_t system_id, uin
  * @param msg The MAVLink message to compress the data into
  * @param supported_tunes C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_supported_tunes_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_supported_tunes_t* supported_tunes)
-{
-    return mavlink_msg_supported_tunes_pack_chan(system_id, component_id, chan, msg, supported_tunes->target_system, supported_tunes->target_component, supported_tunes->format);
+static inline uint16_t
+mavlink_msg_supported_tunes_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                        mavlink_message_t *msg,
+                                        const mavlink_supported_tunes_t *supported_tunes) {
+    return mavlink_msg_supported_tunes_pack_chan(system_id, component_id, chan, msg,
+                                                 supported_tunes->target_system,
+                                                 supported_tunes->target_component,
+                                                 supported_tunes->format);
 }
 
 /**
@@ -218,9 +233,8 @@ static inline void mavlink_msg_supported_tunes_send_buf(mavlink_message_t *msgbu
  *
  * @return  System ID
  */
-static inline uint8_t mavlink_msg_supported_tunes_get_target_system(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  4);
+static inline uint8_t mavlink_msg_supported_tunes_get_target_system(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 4);
 }
 
 /**
@@ -228,9 +242,9 @@ static inline uint8_t mavlink_msg_supported_tunes_get_target_system(const mavlin
  *
  * @return  Component ID
  */
-static inline uint8_t mavlink_msg_supported_tunes_get_target_component(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  5);
+static inline uint8_t
+mavlink_msg_supported_tunes_get_target_component(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 5);
 }
 
 /**
@@ -238,9 +252,8 @@ static inline uint8_t mavlink_msg_supported_tunes_get_target_component(const mav
  *
  * @return  Bitfield of supported tune formats.
  */
-static inline uint32_t mavlink_msg_supported_tunes_get_format(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  0);
+static inline uint32_t mavlink_msg_supported_tunes_get_format(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 0);
 }
 
 /**
@@ -249,15 +262,15 @@ static inline uint32_t mavlink_msg_supported_tunes_get_format(const mavlink_mess
  * @param msg The message to decode
  * @param supported_tunes C-struct to decode the message contents into
  */
-static inline void mavlink_msg_supported_tunes_decode(const mavlink_message_t* msg, mavlink_supported_tunes_t* supported_tunes)
-{
+static inline void mavlink_msg_supported_tunes_decode(const mavlink_message_t *msg,
+                                                      mavlink_supported_tunes_t *supported_tunes) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     supported_tunes->format = mavlink_msg_supported_tunes_get_format(msg);
     supported_tunes->target_system = mavlink_msg_supported_tunes_get_target_system(msg);
     supported_tunes->target_component = mavlink_msg_supported_tunes_get_target_component(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN? msg->len : MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN;
-        memset(supported_tunes, 0, MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN);
-    memcpy(supported_tunes, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN? msg->len : MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN;
+    memset(supported_tunes, 0, MAVLINK_MSG_ID_SUPPORTED_TUNES_LEN);
+memcpy(supported_tunes, _MAV_PAYLOAD(msg), len);
 #endif
 }

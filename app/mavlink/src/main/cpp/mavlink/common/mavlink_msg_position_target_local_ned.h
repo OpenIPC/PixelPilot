@@ -4,22 +4,22 @@
 #define MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED 85
 
 MAVPACKED(
-typedef struct __mavlink_position_target_local_ned_t {
- uint32_t time_boot_ms; /*< [ms] Timestamp (time since system boot).*/
- float x; /*< [m] X Position in NED frame*/
- float y; /*< [m] Y Position in NED frame*/
- float z; /*< [m] Z Position in NED frame (note, altitude is negative in NED)*/
- float vx; /*< [m/s] X velocity in NED frame*/
- float vy; /*< [m/s] Y velocity in NED frame*/
- float vz; /*< [m/s] Z velocity in NED frame*/
- float afx; /*< [m/s/s] X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N*/
- float afy; /*< [m/s/s] Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N*/
- float afz; /*< [m/s/s] Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N*/
- float yaw; /*< [rad] yaw setpoint*/
- float yaw_rate; /*< [rad/s] yaw rate setpoint*/
- uint16_t type_mask; /*<  Bitmap to indicate which dimensions should be ignored by the vehicle.*/
- uint8_t coordinate_frame; /*<  Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9*/
-}) mavlink_position_target_local_ned_t;
+        typedef struct __mavlink_position_target_local_ned_t {
+            uint32_t time_boot_ms; /*< [ms] Timestamp (time since system boot).*/
+            float x; /*< [m] X Position in NED frame*/
+            float y; /*< [m] Y Position in NED frame*/
+            float z; /*< [m] Z Position in NED frame (note, altitude is negative in NED)*/
+            float vx; /*< [m/s] X velocity in NED frame*/
+            float vy; /*< [m/s] Y velocity in NED frame*/
+            float vz; /*< [m/s] Z velocity in NED frame*/
+            float afx; /*< [m/s/s] X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N*/
+            float afy; /*< [m/s/s] Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N*/
+            float afz; /*< [m/s/s] Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N*/
+            float yaw; /*< [rad] yaw setpoint*/
+            float yaw_rate; /*< [rad/s] yaw rate setpoint*/
+            uint16_t type_mask; /*<  Bitmap to indicate which dimensions should be ignored by the vehicle.*/
+            uint8_t coordinate_frame; /*<  Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9*/
+        }) mavlink_position_target_local_ned_t;
 
 #define MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN 51
 #define MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN 51
@@ -28,7 +28,6 @@ typedef struct __mavlink_position_target_local_ned_t {
 
 #define MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC 140
 #define MAVLINK_MSG_ID_85_CRC 140
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -96,9 +95,13 @@ typedef struct __mavlink_position_target_local_ned_t {
  * @param yaw_rate [rad/s] yaw rate setpoint
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_position_target_local_ned_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint32_t time_boot_ms, uint8_t coordinate_frame, uint16_t type_mask, float x, float y, float z, float vx, float vy, float vz, float afx, float afy, float afz, float yaw, float yaw_rate)
-{
+static inline uint16_t
+mavlink_msg_position_target_local_ned_pack(uint8_t system_id, uint8_t component_id,
+                                           mavlink_message_t *msg,
+                                           uint32_t time_boot_ms, uint8_t coordinate_frame,
+                                           uint16_t type_mask, float x, float y, float z, float vx,
+                                           float vy, float vz, float afx, float afy, float afz,
+                                           float yaw, float yaw_rate) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN];
     _mav_put_uint32_t(buf, 0, time_boot_ms);
@@ -134,11 +137,14 @@ static inline uint16_t mavlink_msg_position_target_local_ned_pack(uint8_t system
     packet.type_mask = type_mask;
     packet.coordinate_frame = coordinate_frame;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN,
+                                    MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN,
+                                    MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
 }
 
 /**
@@ -163,10 +169,14 @@ static inline uint16_t mavlink_msg_position_target_local_ned_pack(uint8_t system
  * @param yaw_rate [rad/s] yaw rate setpoint
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_position_target_local_ned_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint32_t time_boot_ms,uint8_t coordinate_frame,uint16_t type_mask,float x,float y,float z,float vx,float vy,float vz,float afx,float afy,float afz,float yaw,float yaw_rate)
-{
+static inline uint16_t
+mavlink_msg_position_target_local_ned_pack_chan(uint8_t system_id, uint8_t component_id,
+                                                uint8_t chan,
+                                                mavlink_message_t *msg,
+                                                uint32_t time_boot_ms, uint8_t coordinate_frame,
+                                                uint16_t type_mask, float x, float y, float z,
+                                                float vx, float vy, float vz, float afx, float afy,
+                                                float afz, float yaw, float yaw_rate) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN];
     _mav_put_uint32_t(buf, 0, time_boot_ms);
@@ -202,11 +212,14 @@ static inline uint16_t mavlink_msg_position_target_local_ned_pack_chan(uint8_t s
     packet.type_mask = type_mask;
     packet.coordinate_frame = coordinate_frame;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN,
+                                         MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN,
+                                         MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
 }
 
 /**
@@ -217,9 +230,25 @@ static inline uint16_t mavlink_msg_position_target_local_ned_pack_chan(uint8_t s
  * @param msg The MAVLink message to compress the data into
  * @param position_target_local_ned C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_position_target_local_ned_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_position_target_local_ned_t* position_target_local_ned)
-{
-    return mavlink_msg_position_target_local_ned_pack(system_id, component_id, msg, position_target_local_ned->time_boot_ms, position_target_local_ned->coordinate_frame, position_target_local_ned->type_mask, position_target_local_ned->x, position_target_local_ned->y, position_target_local_ned->z, position_target_local_ned->vx, position_target_local_ned->vy, position_target_local_ned->vz, position_target_local_ned->afx, position_target_local_ned->afy, position_target_local_ned->afz, position_target_local_ned->yaw, position_target_local_ned->yaw_rate);
+static inline uint16_t
+mavlink_msg_position_target_local_ned_encode(uint8_t system_id, uint8_t component_id,
+                                             mavlink_message_t *msg,
+                                             const mavlink_position_target_local_ned_t *position_target_local_ned) {
+    return mavlink_msg_position_target_local_ned_pack(system_id, component_id, msg,
+                                                      position_target_local_ned->time_boot_ms,
+                                                      position_target_local_ned->coordinate_frame,
+                                                      position_target_local_ned->type_mask,
+                                                      position_target_local_ned->x,
+                                                      position_target_local_ned->y,
+                                                      position_target_local_ned->z,
+                                                      position_target_local_ned->vx,
+                                                      position_target_local_ned->vy,
+                                                      position_target_local_ned->vz,
+                                                      position_target_local_ned->afx,
+                                                      position_target_local_ned->afy,
+                                                      position_target_local_ned->afz,
+                                                      position_target_local_ned->yaw,
+                                                      position_target_local_ned->yaw_rate);
 }
 
 /**
@@ -231,9 +260,25 @@ static inline uint16_t mavlink_msg_position_target_local_ned_encode(uint8_t syst
  * @param msg The MAVLink message to compress the data into
  * @param position_target_local_ned C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_position_target_local_ned_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_position_target_local_ned_t* position_target_local_ned)
-{
-    return mavlink_msg_position_target_local_ned_pack_chan(system_id, component_id, chan, msg, position_target_local_ned->time_boot_ms, position_target_local_ned->coordinate_frame, position_target_local_ned->type_mask, position_target_local_ned->x, position_target_local_ned->y, position_target_local_ned->z, position_target_local_ned->vx, position_target_local_ned->vy, position_target_local_ned->vz, position_target_local_ned->afx, position_target_local_ned->afy, position_target_local_ned->afz, position_target_local_ned->yaw, position_target_local_ned->yaw_rate);
+static inline uint16_t
+mavlink_msg_position_target_local_ned_encode_chan(uint8_t system_id, uint8_t component_id,
+                                                  uint8_t chan, mavlink_message_t *msg,
+                                                  const mavlink_position_target_local_ned_t *position_target_local_ned) {
+    return mavlink_msg_position_target_local_ned_pack_chan(system_id, component_id, chan, msg,
+                                                           position_target_local_ned->time_boot_ms,
+                                                           position_target_local_ned->coordinate_frame,
+                                                           position_target_local_ned->type_mask,
+                                                           position_target_local_ned->x,
+                                                           position_target_local_ned->y,
+                                                           position_target_local_ned->z,
+                                                           position_target_local_ned->vx,
+                                                           position_target_local_ned->vy,
+                                                           position_target_local_ned->vz,
+                                                           position_target_local_ned->afx,
+                                                           position_target_local_ned->afy,
+                                                           position_target_local_ned->afz,
+                                                           position_target_local_ned->yaw,
+                                                           position_target_local_ned->yaw_rate);
 }
 
 /**
@@ -372,9 +417,9 @@ static inline void mavlink_msg_position_target_local_ned_send_buf(mavlink_messag
  *
  * @return [ms] Timestamp (time since system boot).
  */
-static inline uint32_t mavlink_msg_position_target_local_ned_get_time_boot_ms(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  0);
+static inline uint32_t
+mavlink_msg_position_target_local_ned_get_time_boot_ms(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 0);
 }
 
 /**
@@ -382,9 +427,9 @@ static inline uint32_t mavlink_msg_position_target_local_ned_get_time_boot_ms(co
  *
  * @return  Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
  */
-static inline uint8_t mavlink_msg_position_target_local_ned_get_coordinate_frame(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  50);
+static inline uint8_t
+mavlink_msg_position_target_local_ned_get_coordinate_frame(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 50);
 }
 
 /**
@@ -392,9 +437,9 @@ static inline uint8_t mavlink_msg_position_target_local_ned_get_coordinate_frame
  *
  * @return  Bitmap to indicate which dimensions should be ignored by the vehicle.
  */
-static inline uint16_t mavlink_msg_position_target_local_ned_get_type_mask(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  48);
+static inline uint16_t
+mavlink_msg_position_target_local_ned_get_type_mask(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 48);
 }
 
 /**
@@ -402,9 +447,8 @@ static inline uint16_t mavlink_msg_position_target_local_ned_get_type_mask(const
  *
  * @return [m] X Position in NED frame
  */
-static inline float mavlink_msg_position_target_local_ned_get_x(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_position_target_local_ned_get_x(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -412,9 +456,8 @@ static inline float mavlink_msg_position_target_local_ned_get_x(const mavlink_me
  *
  * @return [m] Y Position in NED frame
  */
-static inline float mavlink_msg_position_target_local_ned_get_y(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_position_target_local_ned_get_y(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -422,9 +465,8 @@ static inline float mavlink_msg_position_target_local_ned_get_y(const mavlink_me
  *
  * @return [m] Z Position in NED frame (note, altitude is negative in NED)
  */
-static inline float mavlink_msg_position_target_local_ned_get_z(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_position_target_local_ned_get_z(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -432,9 +474,8 @@ static inline float mavlink_msg_position_target_local_ned_get_z(const mavlink_me
  *
  * @return [m/s] X velocity in NED frame
  */
-static inline float mavlink_msg_position_target_local_ned_get_vx(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float mavlink_msg_position_target_local_ned_get_vx(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -442,9 +483,8 @@ static inline float mavlink_msg_position_target_local_ned_get_vx(const mavlink_m
  *
  * @return [m/s] Y velocity in NED frame
  */
-static inline float mavlink_msg_position_target_local_ned_get_vy(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  20);
+static inline float mavlink_msg_position_target_local_ned_get_vy(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 20);
 }
 
 /**
@@ -452,9 +492,8 @@ static inline float mavlink_msg_position_target_local_ned_get_vy(const mavlink_m
  *
  * @return [m/s] Z velocity in NED frame
  */
-static inline float mavlink_msg_position_target_local_ned_get_vz(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float mavlink_msg_position_target_local_ned_get_vz(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -462,9 +501,8 @@ static inline float mavlink_msg_position_target_local_ned_get_vz(const mavlink_m
  *
  * @return [m/s/s] X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
  */
-static inline float mavlink_msg_position_target_local_ned_get_afx(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float mavlink_msg_position_target_local_ned_get_afx(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -472,9 +510,8 @@ static inline float mavlink_msg_position_target_local_ned_get_afx(const mavlink_
  *
  * @return [m/s/s] Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
  */
-static inline float mavlink_msg_position_target_local_ned_get_afy(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  32);
+static inline float mavlink_msg_position_target_local_ned_get_afy(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 32);
 }
 
 /**
@@ -482,9 +519,8 @@ static inline float mavlink_msg_position_target_local_ned_get_afy(const mavlink_
  *
  * @return [m/s/s] Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
  */
-static inline float mavlink_msg_position_target_local_ned_get_afz(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  36);
+static inline float mavlink_msg_position_target_local_ned_get_afz(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 36);
 }
 
 /**
@@ -492,9 +528,8 @@ static inline float mavlink_msg_position_target_local_ned_get_afz(const mavlink_
  *
  * @return [rad] yaw setpoint
  */
-static inline float mavlink_msg_position_target_local_ned_get_yaw(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  40);
+static inline float mavlink_msg_position_target_local_ned_get_yaw(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 40);
 }
 
 /**
@@ -502,9 +537,9 @@ static inline float mavlink_msg_position_target_local_ned_get_yaw(const mavlink_
  *
  * @return [rad/s] yaw rate setpoint
  */
-static inline float mavlink_msg_position_target_local_ned_get_yaw_rate(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  44);
+static inline float
+mavlink_msg_position_target_local_ned_get_yaw_rate(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 44);
 }
 
 /**
@@ -513,8 +548,8 @@ static inline float mavlink_msg_position_target_local_ned_get_yaw_rate(const mav
  * @param msg The message to decode
  * @param position_target_local_ned C-struct to decode the message contents into
  */
-static inline void mavlink_msg_position_target_local_ned_decode(const mavlink_message_t* msg, mavlink_position_target_local_ned_t* position_target_local_ned)
-{
+static inline void mavlink_msg_position_target_local_ned_decode(const mavlink_message_t *msg,
+                                                                mavlink_position_target_local_ned_t *position_target_local_ned) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     position_target_local_ned->time_boot_ms = mavlink_msg_position_target_local_ned_get_time_boot_ms(msg);
     position_target_local_ned->x = mavlink_msg_position_target_local_ned_get_x(msg);
@@ -531,8 +566,9 @@ static inline void mavlink_msg_position_target_local_ned_decode(const mavlink_me
     position_target_local_ned->type_mask = mavlink_msg_position_target_local_ned_get_type_mask(msg);
     position_target_local_ned->coordinate_frame = mavlink_msg_position_target_local_ned_get_coordinate_frame(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN? msg->len : MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN;
-        memset(position_target_local_ned, 0, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN ? msg->len
+                                                                          : MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN;
+    memset(position_target_local_ned, 0, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
     memcpy(position_target_local_ned, _MAV_PAYLOAD(msg), len);
 #endif
 }

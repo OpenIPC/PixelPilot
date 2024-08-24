@@ -4,10 +4,12 @@
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK 158
 
 MAVPACKED(
-typedef struct __mavlink_flexifunction_command_ack_t {
- uint16_t command_type; /*<  Command acknowledged*/
- uint16_t result; /*<  result of acknowledge*/
-}) mavlink_flexifunction_command_ack_t;
+        typedef struct __mavlink_flexifunction_command_ack_t {
+            uint16_t command_type; /*<  Command acknowledged*/
+            uint16_t result; /*<  result of acknowledge*/
+        })
+
+mavlink_flexifunction_command_ack_t;
 
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN 4
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_MIN_LEN 4
@@ -16,7 +18,6 @@ typedef struct __mavlink_flexifunction_command_ack_t {
 
 #define MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_CRC 208
 #define MAVLINK_MSG_ID_158_CRC 208
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -48,15 +49,16 @@ typedef struct __mavlink_flexifunction_command_ack_t {
  * @param result  result of acknowledge
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_flexifunction_command_ack_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint16_t command_type, uint16_t result)
-{
+static inline uint16_t
+mavlink_msg_flexifunction_command_ack_pack(uint8_t system_id, uint8_t component_id,
+                                           mavlink_message_t *msg,
+                                           uint16_t command_type, uint16_t result) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN];
     _mav_put_uint16_t(buf, 0, command_type);
     _mav_put_uint16_t(buf, 2, result);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN);
 #else
     mavlink_flexifunction_command_ack_t packet;
     packet.command_type = command_type;
@@ -66,7 +68,10 @@ static inline uint16_t mavlink_msg_flexifunction_command_ack_pack(uint8_t system
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_MIN_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_MIN_LEN,
+                                    MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN,
+                                    MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_CRC);
 }
 
 /**
@@ -79,16 +84,17 @@ static inline uint16_t mavlink_msg_flexifunction_command_ack_pack(uint8_t system
  * @param result  result of acknowledge
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_flexifunction_command_ack_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint16_t command_type,uint16_t result)
-{
+static inline uint16_t
+mavlink_msg_flexifunction_command_ack_pack_chan(uint8_t system_id, uint8_t component_id,
+                                                uint8_t chan,
+                                                mavlink_message_t *msg,
+                                                uint16_t command_type, uint16_t result) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN];
     _mav_put_uint16_t(buf, 0, command_type);
     _mav_put_uint16_t(buf, 2, result);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN);
 #else
     mavlink_flexifunction_command_ack_t packet;
     packet.command_type = command_type;
@@ -98,7 +104,10 @@ static inline uint16_t mavlink_msg_flexifunction_command_ack_pack_chan(uint8_t s
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_MIN_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_MIN_LEN,
+                                         MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN,
+                                         MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_CRC);
 }
 
 /**
@@ -109,9 +118,13 @@ static inline uint16_t mavlink_msg_flexifunction_command_ack_pack_chan(uint8_t s
  * @param msg The MAVLink message to compress the data into
  * @param flexifunction_command_ack C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_flexifunction_command_ack_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_flexifunction_command_ack_t* flexifunction_command_ack)
-{
-    return mavlink_msg_flexifunction_command_ack_pack(system_id, component_id, msg, flexifunction_command_ack->command_type, flexifunction_command_ack->result);
+static inline uint16_t
+mavlink_msg_flexifunction_command_ack_encode(uint8_t system_id, uint8_t component_id,
+                                             mavlink_message_t *msg,
+                                             const mavlink_flexifunction_command_ack_t *flexifunction_command_ack) {
+    return mavlink_msg_flexifunction_command_ack_pack(system_id, component_id, msg,
+                                                      flexifunction_command_ack->command_type,
+                                                      flexifunction_command_ack->result);
 }
 
 /**
@@ -123,9 +136,13 @@ static inline uint16_t mavlink_msg_flexifunction_command_ack_encode(uint8_t syst
  * @param msg The MAVLink message to compress the data into
  * @param flexifunction_command_ack C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_flexifunction_command_ack_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_flexifunction_command_ack_t* flexifunction_command_ack)
-{
-    return mavlink_msg_flexifunction_command_ack_pack_chan(system_id, component_id, chan, msg, flexifunction_command_ack->command_type, flexifunction_command_ack->result);
+static inline uint16_t
+mavlink_msg_flexifunction_command_ack_encode_chan(uint8_t system_id, uint8_t component_id,
+                                                  uint8_t chan, mavlink_message_t *msg,
+                                                  const mavlink_flexifunction_command_ack_t *flexifunction_command_ack) {
+    return mavlink_msg_flexifunction_command_ack_pack_chan(system_id, component_id, chan, msg,
+                                                           flexifunction_command_ack->command_type,
+                                                           flexifunction_command_ack->result);
 }
 
 /**
@@ -204,9 +221,9 @@ static inline void mavlink_msg_flexifunction_command_ack_send_buf(mavlink_messag
  *
  * @return  Command acknowledged
  */
-static inline uint16_t mavlink_msg_flexifunction_command_ack_get_command_type(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  0);
+static inline uint16_t
+mavlink_msg_flexifunction_command_ack_get_command_type(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 0);
 }
 
 /**
@@ -214,9 +231,9 @@ static inline uint16_t mavlink_msg_flexifunction_command_ack_get_command_type(co
  *
  * @return  result of acknowledge
  */
-static inline uint16_t mavlink_msg_flexifunction_command_ack_get_result(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  2);
+static inline uint16_t
+mavlink_msg_flexifunction_command_ack_get_result(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 2);
 }
 
 /**
@@ -225,14 +242,15 @@ static inline uint16_t mavlink_msg_flexifunction_command_ack_get_result(const ma
  * @param msg The message to decode
  * @param flexifunction_command_ack C-struct to decode the message contents into
  */
-static inline void mavlink_msg_flexifunction_command_ack_decode(const mavlink_message_t* msg, mavlink_flexifunction_command_ack_t* flexifunction_command_ack)
-{
+static inline void mavlink_msg_flexifunction_command_ack_decode(const mavlink_message_t *msg,
+                                                                mavlink_flexifunction_command_ack_t *flexifunction_command_ack) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    flexifunction_command_ack->command_type = mavlink_msg_flexifunction_command_ack_get_command_type(msg);
+    flexifunction_command_ack->command_type = mavlink_msg_flexifunction_command_ack_get_command_type(
+            msg);
     flexifunction_command_ack->result = mavlink_msg_flexifunction_command_ack_get_result(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN? msg->len : MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN;
-        memset(flexifunction_command_ack, 0, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN);
-    memcpy(flexifunction_command_ack, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN? msg->len : MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN;
+    memset(flexifunction_command_ack, 0, MAVLINK_MSG_ID_FLEXIFUNCTION_COMMAND_ACK_LEN);
+memcpy(flexifunction_command_ack, _MAV_PAYLOAD(msg), len);
 #endif
 }

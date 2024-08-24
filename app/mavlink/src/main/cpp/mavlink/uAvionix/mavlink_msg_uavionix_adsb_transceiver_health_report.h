@@ -4,9 +4,11 @@
 #define MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT 10003
 
 MAVPACKED(
-typedef struct __mavlink_uavionix_adsb_transceiver_health_report_t {
- uint8_t rfHealth; /*<  ADS-B transponder messages*/
-}) mavlink_uavionix_adsb_transceiver_health_report_t;
+        typedef struct __mavlink_uavionix_adsb_transceiver_health_report_t {
+            uint8_t rfHealth; /*<  ADS-B transponder messages*/
+        })
+
+mavlink_uavionix_adsb_transceiver_health_report_t;
 
 #define MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN 1
 #define MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_MIN_LEN 1
@@ -15,7 +17,6 @@ typedef struct __mavlink_uavionix_adsb_transceiver_health_report_t {
 
 #define MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_CRC 4
 #define MAVLINK_MSG_ID_10003_CRC 4
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -44,14 +45,16 @@ typedef struct __mavlink_uavionix_adsb_transceiver_health_report_t {
  * @param rfHealth  ADS-B transponder messages
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_uavionix_adsb_transceiver_health_report_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t rfHealth)
-{
+static inline uint16_t
+mavlink_msg_uavionix_adsb_transceiver_health_report_pack(uint8_t system_id, uint8_t component_id,
+                                                         mavlink_message_t *msg,
+                                                         uint8_t rfHealth) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN];
     _mav_put_uint8_t(buf, 0, rfHealth);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf,
+           MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN);
 #else
     mavlink_uavionix_adsb_transceiver_health_report_t packet;
     packet.rfHealth = rfHealth;
@@ -60,7 +63,10 @@ static inline uint16_t mavlink_msg_uavionix_adsb_transceiver_health_report_pack(
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_MIN_LEN, MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN, MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_MIN_LEN,
+                                    MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN,
+                                    MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_CRC);
 }
 
 /**
@@ -72,15 +78,17 @@ static inline uint16_t mavlink_msg_uavionix_adsb_transceiver_health_report_pack(
  * @param rfHealth  ADS-B transponder messages
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_uavionix_adsb_transceiver_health_report_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t rfHealth)
-{
+static inline uint16_t
+mavlink_msg_uavionix_adsb_transceiver_health_report_pack_chan(uint8_t system_id,
+                                                              uint8_t component_id, uint8_t chan,
+                                                              mavlink_message_t *msg,
+                                                              uint8_t rfHealth) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN];
     _mav_put_uint8_t(buf, 0, rfHealth);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf,
+           MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN);
 #else
     mavlink_uavionix_adsb_transceiver_health_report_t packet;
     packet.rfHealth = rfHealth;
@@ -89,7 +97,10 @@ static inline uint16_t mavlink_msg_uavionix_adsb_transceiver_health_report_pack_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_MIN_LEN, MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN, MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_MIN_LEN,
+                                         MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN,
+                                         MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_CRC);
 }
 
 /**
@@ -100,9 +111,12 @@ static inline uint16_t mavlink_msg_uavionix_adsb_transceiver_health_report_pack_
  * @param msg The MAVLink message to compress the data into
  * @param uavionix_adsb_transceiver_health_report C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_uavionix_adsb_transceiver_health_report_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_uavionix_adsb_transceiver_health_report_t* uavionix_adsb_transceiver_health_report)
-{
-    return mavlink_msg_uavionix_adsb_transceiver_health_report_pack(system_id, component_id, msg, uavionix_adsb_transceiver_health_report->rfHealth);
+static inline uint16_t
+mavlink_msg_uavionix_adsb_transceiver_health_report_encode(uint8_t system_id, uint8_t component_id,
+                                                           mavlink_message_t *msg,
+                                                           const mavlink_uavionix_adsb_transceiver_health_report_t *uavionix_adsb_transceiver_health_report) {
+    return mavlink_msg_uavionix_adsb_transceiver_health_report_pack(system_id, component_id, msg,
+                                                                    uavionix_adsb_transceiver_health_report->rfHealth);
 }
 
 /**
@@ -114,9 +128,14 @@ static inline uint16_t mavlink_msg_uavionix_adsb_transceiver_health_report_encod
  * @param msg The MAVLink message to compress the data into
  * @param uavionix_adsb_transceiver_health_report C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_uavionix_adsb_transceiver_health_report_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_uavionix_adsb_transceiver_health_report_t* uavionix_adsb_transceiver_health_report)
-{
-    return mavlink_msg_uavionix_adsb_transceiver_health_report_pack_chan(system_id, component_id, chan, msg, uavionix_adsb_transceiver_health_report->rfHealth);
+static inline uint16_t
+mavlink_msg_uavionix_adsb_transceiver_health_report_encode_chan(uint8_t system_id,
+                                                                uint8_t component_id, uint8_t chan,
+                                                                mavlink_message_t *msg,
+                                                                const mavlink_uavionix_adsb_transceiver_health_report_t *uavionix_adsb_transceiver_health_report) {
+    return mavlink_msg_uavionix_adsb_transceiver_health_report_pack_chan(system_id, component_id,
+                                                                         chan, msg,
+                                                                         uavionix_adsb_transceiver_health_report->rfHealth);
 }
 
 /**
@@ -190,9 +209,9 @@ static inline void mavlink_msg_uavionix_adsb_transceiver_health_report_send_buf(
  *
  * @return  ADS-B transponder messages
  */
-static inline uint8_t mavlink_msg_uavionix_adsb_transceiver_health_report_get_rfHealth(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  0);
+static inline uint8_t
+mavlink_msg_uavionix_adsb_transceiver_health_report_get_rfHealth(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 0);
 }
 
 /**
@@ -201,13 +220,15 @@ static inline uint8_t mavlink_msg_uavionix_adsb_transceiver_health_report_get_rf
  * @param msg The message to decode
  * @param uavionix_adsb_transceiver_health_report C-struct to decode the message contents into
  */
-static inline void mavlink_msg_uavionix_adsb_transceiver_health_report_decode(const mavlink_message_t* msg, mavlink_uavionix_adsb_transceiver_health_report_t* uavionix_adsb_transceiver_health_report)
-{
+static inline void
+mavlink_msg_uavionix_adsb_transceiver_health_report_decode(const mavlink_message_t *msg,
+                                                           mavlink_uavionix_adsb_transceiver_health_report_t *uavionix_adsb_transceiver_health_report) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-    uavionix_adsb_transceiver_health_report->rfHealth = mavlink_msg_uavionix_adsb_transceiver_health_report_get_rfHealth(msg);
+    uavionix_adsb_transceiver_health_report->rfHealth = mavlink_msg_uavionix_adsb_transceiver_health_report_get_rfHealth(
+            msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN? msg->len : MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN;
-        memset(uavionix_adsb_transceiver_health_report, 0, MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN);
-    memcpy(uavionix_adsb_transceiver_health_report, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN? msg->len : MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN;
+    memset(uavionix_adsb_transceiver_health_report, 0, MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT_LEN);
+memcpy(uavionix_adsb_transceiver_health_report, _MAV_PAYLOAD(msg), len);
 #endif
 }

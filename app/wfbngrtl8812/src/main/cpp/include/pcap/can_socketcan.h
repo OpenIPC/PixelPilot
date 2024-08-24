@@ -46,11 +46,11 @@
  * Documentation/networking/can.rst in the Linux source.
  */
 typedef struct {
-	uint32_t can_id;
-	uint8_t payload_length;
-	uint8_t fd_flags;
-	uint8_t reserved1;
-	uint8_t reserved2;
+    uint32_t can_id;
+    uint8_t payload_length;
+    uint8_t fd_flags;
+    uint8_t reserved1;
+    uint8_t reserved2;
 } pcap_can_socketcan_hdr;
 
 /* Bits in the fd_flags field */
@@ -68,11 +68,11 @@ typedef struct {
  * it's CAN XL or not.
  */
 typedef struct {
-	uint32_t priority_vcid;
-	uint8_t flags;
-	uint8_t sdu_type;
-	uint16_t payload_length;
-	uint32_t acceptance_field;
+    uint32_t priority_vcid;
+    uint8_t flags;
+    uint8_t sdu_type;
+    uint16_t payload_length;
+    uint32_t acceptance_field;
 } pcap_can_socketcan_xl_hdr;
 
 /* Bits in the flags field */

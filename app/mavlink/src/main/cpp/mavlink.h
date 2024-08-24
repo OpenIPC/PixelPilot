@@ -9,7 +9,7 @@ extern int mavlink_port;
 
 size_t numOfChars(const char s[]);
 
-char* insertString(char s1[], const char s2[], size_t pos);
+char *insertString(char s1[], const char s2[], size_t pos);
 
 struct mavlink_data {
     // Mavlink
@@ -44,31 +44,30 @@ struct mavlink_data {
     int8_t wfb_flags;
 } latestMavlinkData;
 
-typedef enum PLANE_MODE
-{
-    PLANE_MODE_MANUAL=0, /*  | */
-    PLANE_MODE_CIRCLE=1, /*  | */
-    PLANE_MODE_STABILIZE=2, /*  | */
-    PLANE_MODE_TRAINING=3, /*  | */
-    PLANE_MODE_ACRO=4, /*  | */
-    PLANE_MODE_FLY_BY_WIRE_A=5, /*  | */
-    PLANE_MODE_FLY_BY_WIRE_B=6, /*  | */
-    PLANE_MODE_CRUISE=7, /*  | */
-    PLANE_MODE_AUTOTUNE=8, /*  | */
-    PLANE_MODE_AUTO=10, /*  | */
-    PLANE_MODE_RTL=11, /*  | */
-    PLANE_MODE_LOITER=12, /*  | */
-    PLANE_MODE_TAKEOFF=13, /*  | */
-    PLANE_MODE_AVOID_ADSB=14, /*  | */
-    PLANE_MODE_GUIDED=15, /*  | */
-    PLANE_MODE_INITIALIZING=16, /*  | */
-    PLANE_MODE_QSTABILIZE=17, /*  | */
-    PLANE_MODE_QHOVER=18, /*  | */
-    PLANE_MODE_QLOITER=19, /*  | */
-    PLANE_MODE_QLAND=20, /*  | */
-    PLANE_MODE_QRTL=21, /*  | */
-    PLANE_MODE_QAUTOTUNE=22, /*  | */
-    PLANE_MODE_ENUM_END=23, /*  | */
+typedef enum PLANE_MODE {
+    PLANE_MODE_MANUAL = 0, /*  | */
+    PLANE_MODE_CIRCLE = 1, /*  | */
+    PLANE_MODE_STABILIZE = 2, /*  | */
+    PLANE_MODE_TRAINING = 3, /*  | */
+    PLANE_MODE_ACRO = 4, /*  | */
+    PLANE_MODE_FLY_BY_WIRE_A = 5, /*  | */
+    PLANE_MODE_FLY_BY_WIRE_B = 6, /*  | */
+    PLANE_MODE_CRUISE = 7, /*  | */
+    PLANE_MODE_AUTOTUNE = 8, /*  | */
+    PLANE_MODE_AUTO = 10, /*  | */
+    PLANE_MODE_RTL = 11, /*  | */
+    PLANE_MODE_LOITER = 12, /*  | */
+    PLANE_MODE_TAKEOFF = 13, /*  | */
+    PLANE_MODE_AVOID_ADSB = 14, /*  | */
+    PLANE_MODE_GUIDED = 15, /*  | */
+    PLANE_MODE_INITIALIZING = 16, /*  | */
+    PLANE_MODE_QSTABILIZE = 17, /*  | */
+    PLANE_MODE_QHOVER = 18, /*  | */
+    PLANE_MODE_QLOITER = 19, /*  | */
+    PLANE_MODE_QLAND = 20, /*  | */
+    PLANE_MODE_QRTL = 21, /*  | */
+    PLANE_MODE_QAUTOTUNE = 22, /*  | */
+    PLANE_MODE_ENUM_END = 23, /*  | */
 } PLANE_MODE;
 
 #define FLIGHT_MODE_ARMED 128 // last bit set to 1, remaining 7 bits are a flight mode as int value
@@ -105,18 +104,17 @@ typedef enum PLANE_MODE
 #define FC_TELE_FLAGS_HAS_ATTITUDE 128 // Set if the attitude was received
 #define FC_MESSAGE_MAX_LENGTH 101
 
-typedef enum MAVLINK_GPS_FIX_TYPE
-{
-    MAVLINK_GPS_FIX_TYPE_NO_GPS=0, /* No GPS connected | */
-    MAVLINK_GPS_FIX_TYPE_NO_FIX=1, /* No position information, GPS is connected | */
-    MAVLINK_GPS_FIX_TYPE_2D_FIX=2, /* 2D position | */
-    MAVLINK_GPS_FIX_TYPE_3D_FIX=3, /* 3D position | */
-    MAVLINK_GPS_FIX_TYPE_DGPS=4, /* DGPS/SBAS aided 3D position | */
-    MAVLINK_GPS_FIX_TYPE_RTK_FLOAT=5, /* RTK float, 3D position | */
-    MAVLINK_GPS_FIX_TYPE_RTK_FIXED=6, /* RTK Fixed, 3D position | */
-    MAVLINK_GPS_FIX_TYPE_STATIC=7, /* Static fixed, typically used for base stations | */
-    MAVLINK_GPS_FIX_TYPE_PPP=8, /* PPP, 3D position. | */
-    MAVLINK_GPS_FIX_TYPE_ENUM_END=9, /*  | */
+typedef enum MAVLINK_GPS_FIX_TYPE {
+    MAVLINK_GPS_FIX_TYPE_NO_GPS = 0, /* No GPS connected | */
+    MAVLINK_GPS_FIX_TYPE_NO_FIX = 1, /* No position information, GPS is connected | */
+    MAVLINK_GPS_FIX_TYPE_2D_FIX = 2, /* 2D position | */
+    MAVLINK_GPS_FIX_TYPE_3D_FIX = 3, /* 3D position | */
+    MAVLINK_GPS_FIX_TYPE_DGPS = 4, /* DGPS/SBAS aided 3D position | */
+    MAVLINK_GPS_FIX_TYPE_RTK_FLOAT = 5, /* RTK float, 3D position | */
+    MAVLINK_GPS_FIX_TYPE_RTK_FIXED = 6, /* RTK Fixed, 3D position | */
+    MAVLINK_GPS_FIX_TYPE_STATIC = 7, /* Static fixed, typically used for base stations | */
+    MAVLINK_GPS_FIX_TYPE_PPP = 8, /* PPP, 3D position. | */
+    MAVLINK_GPS_FIX_TYPE_ENUM_END = 9, /*  | */
 } MAVLINK_GPS_FIX_TYPE;
 
 #endif //FPVUE_MAVLINK_H

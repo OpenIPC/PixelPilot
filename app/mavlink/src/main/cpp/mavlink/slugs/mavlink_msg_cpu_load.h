@@ -4,11 +4,13 @@
 #define MAVLINK_MSG_ID_CPU_LOAD 170
 
 MAVPACKED(
-typedef struct __mavlink_cpu_load_t {
- uint16_t batVolt; /*< [mV] Battery Voltage*/
- uint8_t sensLoad; /*<  Sensor DSC Load*/
- uint8_t ctrlLoad; /*<  Control DSC Load*/
-}) mavlink_cpu_load_t;
+        typedef struct __mavlink_cpu_load_t {
+            uint16_t batVolt; /*< [mV] Battery Voltage*/
+            uint8_t sensLoad; /*<  Sensor DSC Load*/
+            uint8_t ctrlLoad; /*<  Control DSC Load*/
+        })
+
+mavlink_cpu_load_t;
 
 #define MAVLINK_MSG_ID_CPU_LOAD_LEN 4
 #define MAVLINK_MSG_ID_CPU_LOAD_MIN_LEN 4
@@ -17,7 +19,6 @@ typedef struct __mavlink_cpu_load_t {
 
 #define MAVLINK_MSG_ID_CPU_LOAD_CRC 75
 #define MAVLINK_MSG_ID_170_CRC 75
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -52,16 +53,16 @@ typedef struct __mavlink_cpu_load_t {
  * @param batVolt [mV] Battery Voltage
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_cpu_load_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t sensLoad, uint8_t ctrlLoad, uint16_t batVolt)
-{
+static inline uint16_t
+mavlink_msg_cpu_load_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                          uint8_t sensLoad, uint8_t ctrlLoad, uint16_t batVolt) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_CPU_LOAD_LEN];
     _mav_put_uint16_t(buf, 0, batVolt);
     _mav_put_uint8_t(buf, 2, sensLoad);
     _mav_put_uint8_t(buf, 3, ctrlLoad);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CPU_LOAD_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CPU_LOAD_LEN);
 #else
     mavlink_cpu_load_t packet;
     packet.batVolt = batVolt;
@@ -72,7 +73,8 @@ static inline uint16_t mavlink_msg_cpu_load_pack(uint8_t system_id, uint8_t comp
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_CPU_LOAD;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CPU_LOAD_MIN_LEN, MAVLINK_MSG_ID_CPU_LOAD_LEN, MAVLINK_MSG_ID_CPU_LOAD_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CPU_LOAD_MIN_LEN,
+                                    MAVLINK_MSG_ID_CPU_LOAD_LEN, MAVLINK_MSG_ID_CPU_LOAD_CRC);
 }
 
 /**
@@ -86,17 +88,17 @@ static inline uint16_t mavlink_msg_cpu_load_pack(uint8_t system_id, uint8_t comp
  * @param batVolt [mV] Battery Voltage
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_cpu_load_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t sensLoad,uint8_t ctrlLoad,uint16_t batVolt)
-{
+static inline uint16_t
+mavlink_msg_cpu_load_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                               mavlink_message_t *msg,
+                               uint8_t sensLoad, uint8_t ctrlLoad, uint16_t batVolt) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_CPU_LOAD_LEN];
     _mav_put_uint16_t(buf, 0, batVolt);
     _mav_put_uint8_t(buf, 2, sensLoad);
     _mav_put_uint8_t(buf, 3, ctrlLoad);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CPU_LOAD_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CPU_LOAD_LEN);
 #else
     mavlink_cpu_load_t packet;
     packet.batVolt = batVolt;
@@ -107,7 +109,9 @@ static inline uint16_t mavlink_msg_cpu_load_pack_chan(uint8_t system_id, uint8_t
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_CPU_LOAD;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CPU_LOAD_MIN_LEN, MAVLINK_MSG_ID_CPU_LOAD_LEN, MAVLINK_MSG_ID_CPU_LOAD_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_CPU_LOAD_MIN_LEN,
+                                         MAVLINK_MSG_ID_CPU_LOAD_LEN, MAVLINK_MSG_ID_CPU_LOAD_CRC);
 }
 
 /**
@@ -118,9 +122,11 @@ static inline uint16_t mavlink_msg_cpu_load_pack_chan(uint8_t system_id, uint8_t
  * @param msg The MAVLink message to compress the data into
  * @param cpu_load C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_cpu_load_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_cpu_load_t* cpu_load)
-{
-    return mavlink_msg_cpu_load_pack(system_id, component_id, msg, cpu_load->sensLoad, cpu_load->ctrlLoad, cpu_load->batVolt);
+static inline uint16_t
+mavlink_msg_cpu_load_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            const mavlink_cpu_load_t *cpu_load) {
+    return mavlink_msg_cpu_load_pack(system_id, component_id, msg, cpu_load->sensLoad,
+                                     cpu_load->ctrlLoad, cpu_load->batVolt);
 }
 
 /**
@@ -132,9 +138,11 @@ static inline uint16_t mavlink_msg_cpu_load_encode(uint8_t system_id, uint8_t co
  * @param msg The MAVLink message to compress the data into
  * @param cpu_load C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_cpu_load_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_cpu_load_t* cpu_load)
-{
-    return mavlink_msg_cpu_load_pack_chan(system_id, component_id, chan, msg, cpu_load->sensLoad, cpu_load->ctrlLoad, cpu_load->batVolt);
+static inline uint16_t
+mavlink_msg_cpu_load_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg, const mavlink_cpu_load_t *cpu_load) {
+    return mavlink_msg_cpu_load_pack_chan(system_id, component_id, chan, msg, cpu_load->sensLoad,
+                                          cpu_load->ctrlLoad, cpu_load->batVolt);
 }
 
 /**
@@ -218,9 +226,8 @@ static inline void mavlink_msg_cpu_load_send_buf(mavlink_message_t *msgbuf, mavl
  *
  * @return  Sensor DSC Load
  */
-static inline uint8_t mavlink_msg_cpu_load_get_sensLoad(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  2);
+static inline uint8_t mavlink_msg_cpu_load_get_sensLoad(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 2);
 }
 
 /**
@@ -228,9 +235,8 @@ static inline uint8_t mavlink_msg_cpu_load_get_sensLoad(const mavlink_message_t*
  *
  * @return  Control DSC Load
  */
-static inline uint8_t mavlink_msg_cpu_load_get_ctrlLoad(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  3);
+static inline uint8_t mavlink_msg_cpu_load_get_ctrlLoad(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 3);
 }
 
 /**
@@ -238,9 +244,8 @@ static inline uint8_t mavlink_msg_cpu_load_get_ctrlLoad(const mavlink_message_t*
  *
  * @return [mV] Battery Voltage
  */
-static inline uint16_t mavlink_msg_cpu_load_get_batVolt(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  0);
+static inline uint16_t mavlink_msg_cpu_load_get_batVolt(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 0);
 }
 
 /**
@@ -249,15 +254,15 @@ static inline uint16_t mavlink_msg_cpu_load_get_batVolt(const mavlink_message_t*
  * @param msg The message to decode
  * @param cpu_load C-struct to decode the message contents into
  */
-static inline void mavlink_msg_cpu_load_decode(const mavlink_message_t* msg, mavlink_cpu_load_t* cpu_load)
-{
+static inline void
+mavlink_msg_cpu_load_decode(const mavlink_message_t *msg, mavlink_cpu_load_t *cpu_load) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     cpu_load->batVolt = mavlink_msg_cpu_load_get_batVolt(msg);
     cpu_load->sensLoad = mavlink_msg_cpu_load_get_sensLoad(msg);
     cpu_load->ctrlLoad = mavlink_msg_cpu_load_get_ctrlLoad(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_CPU_LOAD_LEN? msg->len : MAVLINK_MSG_ID_CPU_LOAD_LEN;
-        memset(cpu_load, 0, MAVLINK_MSG_ID_CPU_LOAD_LEN);
-    memcpy(cpu_load, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_CPU_LOAD_LEN? msg->len : MAVLINK_MSG_ID_CPU_LOAD_LEN;
+    memset(cpu_load, 0, MAVLINK_MSG_ID_CPU_LOAD_LEN);
+memcpy(cpu_load, _MAV_PAYLOAD(msg), len);
 #endif
 }

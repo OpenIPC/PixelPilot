@@ -4,11 +4,13 @@
 #define MAVLINK_MSG_ID_GOPRO_HEARTBEAT 215
 
 MAVPACKED(
-typedef struct __mavlink_gopro_heartbeat_t {
- uint8_t status; /*<  Status.*/
- uint8_t capture_mode; /*<  Current capture mode.*/
- uint8_t flags; /*<  Additional status bits.*/
-}) mavlink_gopro_heartbeat_t;
+        typedef struct __mavlink_gopro_heartbeat_t {
+            uint8_t status; /*<  Status.*/
+            uint8_t capture_mode; /*<  Current capture mode.*/
+            uint8_t flags; /*<  Additional status bits.*/
+        })
+
+mavlink_gopro_heartbeat_t;
 
 #define MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN 3
 #define MAVLINK_MSG_ID_GOPRO_HEARTBEAT_MIN_LEN 3
@@ -17,7 +19,6 @@ typedef struct __mavlink_gopro_heartbeat_t {
 
 #define MAVLINK_MSG_ID_GOPRO_HEARTBEAT_CRC 101
 #define MAVLINK_MSG_ID_215_CRC 101
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -52,16 +53,16 @@ typedef struct __mavlink_gopro_heartbeat_t {
  * @param flags  Additional status bits.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_gopro_heartbeat_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t status, uint8_t capture_mode, uint8_t flags)
-{
+static inline uint16_t
+mavlink_msg_gopro_heartbeat_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                 uint8_t status, uint8_t capture_mode, uint8_t flags) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN];
     _mav_put_uint8_t(buf, 0, status);
     _mav_put_uint8_t(buf, 1, capture_mode);
     _mav_put_uint8_t(buf, 2, flags);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN);
 #else
     mavlink_gopro_heartbeat_t packet;
     packet.status = status;
@@ -72,7 +73,10 @@ static inline uint16_t mavlink_msg_gopro_heartbeat_pack(uint8_t system_id, uint8
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_GOPRO_HEARTBEAT;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_MIN_LEN, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_GOPRO_HEARTBEAT_MIN_LEN,
+                                    MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN,
+                                    MAVLINK_MSG_ID_GOPRO_HEARTBEAT_CRC);
 }
 
 /**
@@ -86,17 +90,17 @@ static inline uint16_t mavlink_msg_gopro_heartbeat_pack(uint8_t system_id, uint8
  * @param flags  Additional status bits.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_gopro_heartbeat_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t status,uint8_t capture_mode,uint8_t flags)
-{
+static inline uint16_t
+mavlink_msg_gopro_heartbeat_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                      mavlink_message_t *msg,
+                                      uint8_t status, uint8_t capture_mode, uint8_t flags) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN];
     _mav_put_uint8_t(buf, 0, status);
     _mav_put_uint8_t(buf, 1, capture_mode);
     _mav_put_uint8_t(buf, 2, flags);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN);
 #else
     mavlink_gopro_heartbeat_t packet;
     packet.status = status;
@@ -107,7 +111,10 @@ static inline uint16_t mavlink_msg_gopro_heartbeat_pack_chan(uint8_t system_id, 
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_GOPRO_HEARTBEAT;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_MIN_LEN, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_GOPRO_HEARTBEAT_MIN_LEN,
+                                         MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN,
+                                         MAVLINK_MSG_ID_GOPRO_HEARTBEAT_CRC);
 }
 
 /**
@@ -118,9 +125,11 @@ static inline uint16_t mavlink_msg_gopro_heartbeat_pack_chan(uint8_t system_id, 
  * @param msg The MAVLink message to compress the data into
  * @param gopro_heartbeat C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_gopro_heartbeat_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_gopro_heartbeat_t* gopro_heartbeat)
-{
-    return mavlink_msg_gopro_heartbeat_pack(system_id, component_id, msg, gopro_heartbeat->status, gopro_heartbeat->capture_mode, gopro_heartbeat->flags);
+static inline uint16_t
+mavlink_msg_gopro_heartbeat_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                   const mavlink_gopro_heartbeat_t *gopro_heartbeat) {
+    return mavlink_msg_gopro_heartbeat_pack(system_id, component_id, msg, gopro_heartbeat->status,
+                                            gopro_heartbeat->capture_mode, gopro_heartbeat->flags);
 }
 
 /**
@@ -132,9 +141,14 @@ static inline uint16_t mavlink_msg_gopro_heartbeat_encode(uint8_t system_id, uin
  * @param msg The MAVLink message to compress the data into
  * @param gopro_heartbeat C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_gopro_heartbeat_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_gopro_heartbeat_t* gopro_heartbeat)
-{
-    return mavlink_msg_gopro_heartbeat_pack_chan(system_id, component_id, chan, msg, gopro_heartbeat->status, gopro_heartbeat->capture_mode, gopro_heartbeat->flags);
+static inline uint16_t
+mavlink_msg_gopro_heartbeat_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                        mavlink_message_t *msg,
+                                        const mavlink_gopro_heartbeat_t *gopro_heartbeat) {
+    return mavlink_msg_gopro_heartbeat_pack_chan(system_id, component_id, chan, msg,
+                                                 gopro_heartbeat->status,
+                                                 gopro_heartbeat->capture_mode,
+                                                 gopro_heartbeat->flags);
 }
 
 /**
@@ -218,9 +232,8 @@ static inline void mavlink_msg_gopro_heartbeat_send_buf(mavlink_message_t *msgbu
  *
  * @return  Status.
  */
-static inline uint8_t mavlink_msg_gopro_heartbeat_get_status(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  0);
+static inline uint8_t mavlink_msg_gopro_heartbeat_get_status(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 0);
 }
 
 /**
@@ -228,9 +241,8 @@ static inline uint8_t mavlink_msg_gopro_heartbeat_get_status(const mavlink_messa
  *
  * @return  Current capture mode.
  */
-static inline uint8_t mavlink_msg_gopro_heartbeat_get_capture_mode(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  1);
+static inline uint8_t mavlink_msg_gopro_heartbeat_get_capture_mode(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 1);
 }
 
 /**
@@ -238,9 +250,8 @@ static inline uint8_t mavlink_msg_gopro_heartbeat_get_capture_mode(const mavlink
  *
  * @return  Additional status bits.
  */
-static inline uint8_t mavlink_msg_gopro_heartbeat_get_flags(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  2);
+static inline uint8_t mavlink_msg_gopro_heartbeat_get_flags(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 2);
 }
 
 /**
@@ -249,15 +260,15 @@ static inline uint8_t mavlink_msg_gopro_heartbeat_get_flags(const mavlink_messag
  * @param msg The message to decode
  * @param gopro_heartbeat C-struct to decode the message contents into
  */
-static inline void mavlink_msg_gopro_heartbeat_decode(const mavlink_message_t* msg, mavlink_gopro_heartbeat_t* gopro_heartbeat)
-{
+static inline void mavlink_msg_gopro_heartbeat_decode(const mavlink_message_t *msg,
+                                                      mavlink_gopro_heartbeat_t *gopro_heartbeat) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     gopro_heartbeat->status = mavlink_msg_gopro_heartbeat_get_status(msg);
     gopro_heartbeat->capture_mode = mavlink_msg_gopro_heartbeat_get_capture_mode(msg);
     gopro_heartbeat->flags = mavlink_msg_gopro_heartbeat_get_flags(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN? msg->len : MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN;
-        memset(gopro_heartbeat, 0, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN);
-    memcpy(gopro_heartbeat, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN? msg->len : MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN;
+    memset(gopro_heartbeat, 0, MAVLINK_MSG_ID_GOPRO_HEARTBEAT_LEN);
+memcpy(gopro_heartbeat, _MAV_PAYLOAD(msg), len);
 #endif
 }

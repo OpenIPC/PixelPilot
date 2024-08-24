@@ -4,29 +4,31 @@
 #define MAVLINK_MSG_ID_AQ_TELEMETRY_F 150
 
 MAVPACKED(
-typedef struct __mavlink_aq_telemetry_f_t {
- float value1; /*<  value1*/
- float value2; /*<  value2*/
- float value3; /*<  value3*/
- float value4; /*<  value4*/
- float value5; /*<  value5*/
- float value6; /*<  value6*/
- float value7; /*<  value7*/
- float value8; /*<  value8*/
- float value9; /*<  value9*/
- float value10; /*<  value10*/
- float value11; /*<  value11*/
- float value12; /*<  value12*/
- float value13; /*<  value13*/
- float value14; /*<  value14*/
- float value15; /*<  value15*/
- float value16; /*<  value16*/
- float value17; /*<  value17*/
- float value18; /*<  value18*/
- float value19; /*<  value19*/
- float value20; /*<  value20*/
- uint16_t Index; /*<  Index of message*/
-}) mavlink_aq_telemetry_f_t;
+        typedef struct __mavlink_aq_telemetry_f_t {
+            float value1; /*<  value1*/
+            float value2; /*<  value2*/
+            float value3; /*<  value3*/
+            float value4; /*<  value4*/
+            float value5; /*<  value5*/
+            float value6; /*<  value6*/
+            float value7; /*<  value7*/
+            float value8; /*<  value8*/
+            float value9; /*<  value9*/
+            float value10; /*<  value10*/
+            float value11; /*<  value11*/
+            float value12; /*<  value12*/
+            float value13; /*<  value13*/
+            float value14; /*<  value14*/
+            float value15; /*<  value15*/
+            float value16; /*<  value16*/
+            float value17; /*<  value17*/
+            float value18; /*<  value18*/
+            float value19; /*<  value19*/
+            float value20; /*<  value20*/
+            uint16_t Index; /*<  Index of message*/
+        })
+
+mavlink_aq_telemetry_f_t;
 
 #define MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN 82
 #define MAVLINK_MSG_ID_AQ_TELEMETRY_F_MIN_LEN 82
@@ -35,7 +37,6 @@ typedef struct __mavlink_aq_telemetry_f_t {
 
 #define MAVLINK_MSG_ID_AQ_TELEMETRY_F_CRC 241
 #define MAVLINK_MSG_ID_150_CRC 241
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -124,9 +125,14 @@ typedef struct __mavlink_aq_telemetry_f_t {
  * @param value20  value20
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_aq_telemetry_f_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint16_t Index, float value1, float value2, float value3, float value4, float value5, float value6, float value7, float value8, float value9, float value10, float value11, float value12, float value13, float value14, float value15, float value16, float value17, float value18, float value19, float value20)
-{
+static inline uint16_t
+mavlink_msg_aq_telemetry_f_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                uint16_t Index, float value1, float value2, float value3,
+                                float value4, float value5, float value6, float value7,
+                                float value8, float value9, float value10, float value11,
+                                float value12, float value13, float value14, float value15,
+                                float value16, float value17, float value18, float value19,
+                                float value20) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN];
     _mav_put_float(buf, 0, value1);
@@ -151,7 +157,7 @@ static inline uint16_t mavlink_msg_aq_telemetry_f_pack(uint8_t system_id, uint8_
     _mav_put_float(buf, 76, value20);
     _mav_put_uint16_t(buf, 80, Index);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN);
 #else
     mavlink_aq_telemetry_f_t packet;
     packet.value1 = value1;
@@ -180,7 +186,10 @@ static inline uint16_t mavlink_msg_aq_telemetry_f_pack(uint8_t system_id, uint8_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AQ_TELEMETRY_F;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AQ_TELEMETRY_F_MIN_LEN, MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN, MAVLINK_MSG_ID_AQ_TELEMETRY_F_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_AQ_TELEMETRY_F_MIN_LEN,
+                                    MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN,
+                                    MAVLINK_MSG_ID_AQ_TELEMETRY_F_CRC);
 }
 
 /**
@@ -212,10 +221,15 @@ static inline uint16_t mavlink_msg_aq_telemetry_f_pack(uint8_t system_id, uint8_
  * @param value20  value20
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_aq_telemetry_f_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint16_t Index,float value1,float value2,float value3,float value4,float value5,float value6,float value7,float value8,float value9,float value10,float value11,float value12,float value13,float value14,float value15,float value16,float value17,float value18,float value19,float value20)
-{
+static inline uint16_t
+mavlink_msg_aq_telemetry_f_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                     mavlink_message_t *msg,
+                                     uint16_t Index, float value1, float value2, float value3,
+                                     float value4, float value5, float value6, float value7,
+                                     float value8, float value9, float value10, float value11,
+                                     float value12, float value13, float value14, float value15,
+                                     float value16, float value17, float value18, float value19,
+                                     float value20) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN];
     _mav_put_float(buf, 0, value1);
@@ -240,7 +254,7 @@ static inline uint16_t mavlink_msg_aq_telemetry_f_pack_chan(uint8_t system_id, u
     _mav_put_float(buf, 76, value20);
     _mav_put_uint16_t(buf, 80, Index);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN);
 #else
     mavlink_aq_telemetry_f_t packet;
     packet.value1 = value1;
@@ -269,7 +283,10 @@ static inline uint16_t mavlink_msg_aq_telemetry_f_pack_chan(uint8_t system_id, u
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AQ_TELEMETRY_F;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AQ_TELEMETRY_F_MIN_LEN, MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN, MAVLINK_MSG_ID_AQ_TELEMETRY_F_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_AQ_TELEMETRY_F_MIN_LEN,
+                                         MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN,
+                                         MAVLINK_MSG_ID_AQ_TELEMETRY_F_CRC);
 }
 
 /**
@@ -280,9 +297,20 @@ static inline uint16_t mavlink_msg_aq_telemetry_f_pack_chan(uint8_t system_id, u
  * @param msg The MAVLink message to compress the data into
  * @param aq_telemetry_f C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_aq_telemetry_f_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_aq_telemetry_f_t* aq_telemetry_f)
-{
-    return mavlink_msg_aq_telemetry_f_pack(system_id, component_id, msg, aq_telemetry_f->Index, aq_telemetry_f->value1, aq_telemetry_f->value2, aq_telemetry_f->value3, aq_telemetry_f->value4, aq_telemetry_f->value5, aq_telemetry_f->value6, aq_telemetry_f->value7, aq_telemetry_f->value8, aq_telemetry_f->value9, aq_telemetry_f->value10, aq_telemetry_f->value11, aq_telemetry_f->value12, aq_telemetry_f->value13, aq_telemetry_f->value14, aq_telemetry_f->value15, aq_telemetry_f->value16, aq_telemetry_f->value17, aq_telemetry_f->value18, aq_telemetry_f->value19, aq_telemetry_f->value20);
+static inline uint16_t
+mavlink_msg_aq_telemetry_f_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                  const mavlink_aq_telemetry_f_t *aq_telemetry_f) {
+    return mavlink_msg_aq_telemetry_f_pack(system_id, component_id, msg, aq_telemetry_f->Index,
+                                           aq_telemetry_f->value1, aq_telemetry_f->value2,
+                                           aq_telemetry_f->value3, aq_telemetry_f->value4,
+                                           aq_telemetry_f->value5, aq_telemetry_f->value6,
+                                           aq_telemetry_f->value7, aq_telemetry_f->value8,
+                                           aq_telemetry_f->value9, aq_telemetry_f->value10,
+                                           aq_telemetry_f->value11, aq_telemetry_f->value12,
+                                           aq_telemetry_f->value13, aq_telemetry_f->value14,
+                                           aq_telemetry_f->value15, aq_telemetry_f->value16,
+                                           aq_telemetry_f->value17, aq_telemetry_f->value18,
+                                           aq_telemetry_f->value19, aq_telemetry_f->value20);
 }
 
 /**
@@ -294,9 +322,22 @@ static inline uint16_t mavlink_msg_aq_telemetry_f_encode(uint8_t system_id, uint
  * @param msg The MAVLink message to compress the data into
  * @param aq_telemetry_f C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_aq_telemetry_f_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_aq_telemetry_f_t* aq_telemetry_f)
-{
-    return mavlink_msg_aq_telemetry_f_pack_chan(system_id, component_id, chan, msg, aq_telemetry_f->Index, aq_telemetry_f->value1, aq_telemetry_f->value2, aq_telemetry_f->value3, aq_telemetry_f->value4, aq_telemetry_f->value5, aq_telemetry_f->value6, aq_telemetry_f->value7, aq_telemetry_f->value8, aq_telemetry_f->value9, aq_telemetry_f->value10, aq_telemetry_f->value11, aq_telemetry_f->value12, aq_telemetry_f->value13, aq_telemetry_f->value14, aq_telemetry_f->value15, aq_telemetry_f->value16, aq_telemetry_f->value17, aq_telemetry_f->value18, aq_telemetry_f->value19, aq_telemetry_f->value20);
+static inline uint16_t
+mavlink_msg_aq_telemetry_f_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                       mavlink_message_t *msg,
+                                       const mavlink_aq_telemetry_f_t *aq_telemetry_f) {
+    return mavlink_msg_aq_telemetry_f_pack_chan(system_id, component_id, chan, msg,
+                                                aq_telemetry_f->Index, aq_telemetry_f->value1,
+                                                aq_telemetry_f->value2, aq_telemetry_f->value3,
+                                                aq_telemetry_f->value4, aq_telemetry_f->value5,
+                                                aq_telemetry_f->value6, aq_telemetry_f->value7,
+                                                aq_telemetry_f->value8, aq_telemetry_f->value9,
+                                                aq_telemetry_f->value10, aq_telemetry_f->value11,
+                                                aq_telemetry_f->value12, aq_telemetry_f->value13,
+                                                aq_telemetry_f->value14, aq_telemetry_f->value15,
+                                                aq_telemetry_f->value16, aq_telemetry_f->value17,
+                                                aq_telemetry_f->value18, aq_telemetry_f->value19,
+                                                aq_telemetry_f->value20);
 }
 
 /**
@@ -470,9 +511,8 @@ static inline void mavlink_msg_aq_telemetry_f_send_buf(mavlink_message_t *msgbuf
  *
  * @return  Index of message
  */
-static inline uint16_t mavlink_msg_aq_telemetry_f_get_Index(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  80);
+static inline uint16_t mavlink_msg_aq_telemetry_f_get_Index(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 80);
 }
 
 /**
@@ -480,9 +520,8 @@ static inline uint16_t mavlink_msg_aq_telemetry_f_get_Index(const mavlink_messag
  *
  * @return  value1
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value1(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_aq_telemetry_f_get_value1(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -490,9 +529,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value1(const mavlink_message_
  *
  * @return  value2
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value2(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_aq_telemetry_f_get_value2(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -500,9 +538,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value2(const mavlink_message_
  *
  * @return  value3
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value3(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_aq_telemetry_f_get_value3(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -510,9 +547,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value3(const mavlink_message_
  *
  * @return  value4
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value4(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_aq_telemetry_f_get_value4(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -520,9 +556,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value4(const mavlink_message_
  *
  * @return  value5
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value5(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float mavlink_msg_aq_telemetry_f_get_value5(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -530,9 +565,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value5(const mavlink_message_
  *
  * @return  value6
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value6(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  20);
+static inline float mavlink_msg_aq_telemetry_f_get_value6(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 20);
 }
 
 /**
@@ -540,9 +574,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value6(const mavlink_message_
  *
  * @return  value7
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value7(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float mavlink_msg_aq_telemetry_f_get_value7(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -550,9 +583,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value7(const mavlink_message_
  *
  * @return  value8
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value8(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float mavlink_msg_aq_telemetry_f_get_value8(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -560,9 +592,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value8(const mavlink_message_
  *
  * @return  value9
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value9(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  32);
+static inline float mavlink_msg_aq_telemetry_f_get_value9(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 32);
 }
 
 /**
@@ -570,9 +601,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value9(const mavlink_message_
  *
  * @return  value10
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value10(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  36);
+static inline float mavlink_msg_aq_telemetry_f_get_value10(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 36);
 }
 
 /**
@@ -580,9 +610,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value10(const mavlink_message
  *
  * @return  value11
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value11(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  40);
+static inline float mavlink_msg_aq_telemetry_f_get_value11(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 40);
 }
 
 /**
@@ -590,9 +619,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value11(const mavlink_message
  *
  * @return  value12
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value12(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  44);
+static inline float mavlink_msg_aq_telemetry_f_get_value12(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 44);
 }
 
 /**
@@ -600,9 +628,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value12(const mavlink_message
  *
  * @return  value13
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value13(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  48);
+static inline float mavlink_msg_aq_telemetry_f_get_value13(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 48);
 }
 
 /**
@@ -610,9 +637,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value13(const mavlink_message
  *
  * @return  value14
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value14(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  52);
+static inline float mavlink_msg_aq_telemetry_f_get_value14(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 52);
 }
 
 /**
@@ -620,9 +646,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value14(const mavlink_message
  *
  * @return  value15
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value15(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  56);
+static inline float mavlink_msg_aq_telemetry_f_get_value15(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 56);
 }
 
 /**
@@ -630,9 +655,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value15(const mavlink_message
  *
  * @return  value16
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value16(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  60);
+static inline float mavlink_msg_aq_telemetry_f_get_value16(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 60);
 }
 
 /**
@@ -640,9 +664,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value16(const mavlink_message
  *
  * @return  value17
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value17(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  64);
+static inline float mavlink_msg_aq_telemetry_f_get_value17(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 64);
 }
 
 /**
@@ -650,9 +673,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value17(const mavlink_message
  *
  * @return  value18
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value18(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  68);
+static inline float mavlink_msg_aq_telemetry_f_get_value18(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 68);
 }
 
 /**
@@ -660,9 +682,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value18(const mavlink_message
  *
  * @return  value19
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value19(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  72);
+static inline float mavlink_msg_aq_telemetry_f_get_value19(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 72);
 }
 
 /**
@@ -670,9 +691,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value19(const mavlink_message
  *
  * @return  value20
  */
-static inline float mavlink_msg_aq_telemetry_f_get_value20(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  76);
+static inline float mavlink_msg_aq_telemetry_f_get_value20(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 76);
 }
 
 /**
@@ -681,8 +701,8 @@ static inline float mavlink_msg_aq_telemetry_f_get_value20(const mavlink_message
  * @param msg The message to decode
  * @param aq_telemetry_f C-struct to decode the message contents into
  */
-static inline void mavlink_msg_aq_telemetry_f_decode(const mavlink_message_t* msg, mavlink_aq_telemetry_f_t* aq_telemetry_f)
-{
+static inline void mavlink_msg_aq_telemetry_f_decode(const mavlink_message_t *msg,
+                                                     mavlink_aq_telemetry_f_t *aq_telemetry_f) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     aq_telemetry_f->value1 = mavlink_msg_aq_telemetry_f_get_value1(msg);
     aq_telemetry_f->value2 = mavlink_msg_aq_telemetry_f_get_value2(msg);
@@ -706,8 +726,8 @@ static inline void mavlink_msg_aq_telemetry_f_decode(const mavlink_message_t* ms
     aq_telemetry_f->value20 = mavlink_msg_aq_telemetry_f_get_value20(msg);
     aq_telemetry_f->Index = mavlink_msg_aq_telemetry_f_get_Index(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN? msg->len : MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN;
-        memset(aq_telemetry_f, 0, MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN);
-    memcpy(aq_telemetry_f, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN? msg->len : MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN;
+    memset(aq_telemetry_f, 0, MAVLINK_MSG_ID_AQ_TELEMETRY_F_LEN);
+memcpy(aq_telemetry_f, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -4,16 +4,18 @@
 #define MAVLINK_MSG_ID_ASL_OBCTRL 207
 
 MAVPACKED(
-typedef struct __mavlink_asl_obctrl_t {
- uint64_t timestamp; /*< [us]  Time since system start*/
- float uElev; /*<   Elevator command [~]*/
- float uThrot; /*<   Throttle command [~]*/
- float uThrot2; /*<   Throttle 2 command [~]*/
- float uAilL; /*<   Left aileron command [~]*/
- float uAilR; /*<   Right aileron command [~]*/
- float uRud; /*<   Rudder command [~]*/
- uint8_t obctrl_status; /*<   Off-board computer status*/
-}) mavlink_asl_obctrl_t;
+        typedef struct __mavlink_asl_obctrl_t {
+            uint64_t timestamp; /*< [us]  Time since system start*/
+            float uElev; /*<   Elevator command [~]*/
+            float uThrot; /*<   Throttle command [~]*/
+            float uThrot2; /*<   Throttle 2 command [~]*/
+            float uAilL; /*<   Left aileron command [~]*/
+            float uAilR; /*<   Right aileron command [~]*/
+            float uRud; /*<   Rudder command [~]*/
+            uint8_t obctrl_status; /*<   Off-board computer status*/
+        })
+
+mavlink_asl_obctrl_t;
 
 #define MAVLINK_MSG_ID_ASL_OBCTRL_LEN 33
 #define MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN 33
@@ -22,7 +24,6 @@ typedef struct __mavlink_asl_obctrl_t {
 
 #define MAVLINK_MSG_ID_ASL_OBCTRL_CRC 234
 #define MAVLINK_MSG_ID_207_CRC 234
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -72,9 +73,10 @@ typedef struct __mavlink_asl_obctrl_t {
  * @param obctrl_status   Off-board computer status
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_asl_obctrl_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint64_t timestamp, float uElev, float uThrot, float uThrot2, float uAilL, float uAilR, float uRud, uint8_t obctrl_status)
-{
+static inline uint16_t
+mavlink_msg_asl_obctrl_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            uint64_t timestamp, float uElev, float uThrot, float uThrot2,
+                            float uAilL, float uAilR, float uRud, uint8_t obctrl_status) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_ASL_OBCTRL_LEN];
     _mav_put_uint64_t(buf, 0, timestamp);
@@ -86,7 +88,7 @@ static inline uint16_t mavlink_msg_asl_obctrl_pack(uint8_t system_id, uint8_t co
     _mav_put_float(buf, 28, uRud);
     _mav_put_uint8_t(buf, 32, obctrl_status);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
 #else
     mavlink_asl_obctrl_t packet;
     packet.timestamp = timestamp;
@@ -102,7 +104,8 @@ static inline uint16_t mavlink_msg_asl_obctrl_pack(uint8_t system_id, uint8_t co
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_ASL_OBCTRL;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN,
+                                    MAVLINK_MSG_ID_ASL_OBCTRL_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_CRC);
 }
 
 /**
@@ -121,10 +124,11 @@ static inline uint16_t mavlink_msg_asl_obctrl_pack(uint8_t system_id, uint8_t co
  * @param obctrl_status   Off-board computer status
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_asl_obctrl_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint64_t timestamp,float uElev,float uThrot,float uThrot2,float uAilL,float uAilR,float uRud,uint8_t obctrl_status)
-{
+static inline uint16_t
+mavlink_msg_asl_obctrl_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg,
+                                 uint64_t timestamp, float uElev, float uThrot, float uThrot2,
+                                 float uAilL, float uAilR, float uRud, uint8_t obctrl_status) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_ASL_OBCTRL_LEN];
     _mav_put_uint64_t(buf, 0, timestamp);
@@ -136,7 +140,7 @@ static inline uint16_t mavlink_msg_asl_obctrl_pack_chan(uint8_t system_id, uint8
     _mav_put_float(buf, 28, uRud);
     _mav_put_uint8_t(buf, 32, obctrl_status);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
 #else
     mavlink_asl_obctrl_t packet;
     packet.timestamp = timestamp;
@@ -152,7 +156,10 @@ static inline uint16_t mavlink_msg_asl_obctrl_pack_chan(uint8_t system_id, uint8
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_ASL_OBCTRL;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN,
+                                         MAVLINK_MSG_ID_ASL_OBCTRL_LEN,
+                                         MAVLINK_MSG_ID_ASL_OBCTRL_CRC);
 }
 
 /**
@@ -163,9 +170,13 @@ static inline uint16_t mavlink_msg_asl_obctrl_pack_chan(uint8_t system_id, uint8
  * @param msg The MAVLink message to compress the data into
  * @param asl_obctrl C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_asl_obctrl_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_asl_obctrl_t* asl_obctrl)
-{
-    return mavlink_msg_asl_obctrl_pack(system_id, component_id, msg, asl_obctrl->timestamp, asl_obctrl->uElev, asl_obctrl->uThrot, asl_obctrl->uThrot2, asl_obctrl->uAilL, asl_obctrl->uAilR, asl_obctrl->uRud, asl_obctrl->obctrl_status);
+static inline uint16_t
+mavlink_msg_asl_obctrl_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                              const mavlink_asl_obctrl_t *asl_obctrl) {
+    return mavlink_msg_asl_obctrl_pack(system_id, component_id, msg, asl_obctrl->timestamp,
+                                       asl_obctrl->uElev, asl_obctrl->uThrot, asl_obctrl->uThrot2,
+                                       asl_obctrl->uAilL, asl_obctrl->uAilR, asl_obctrl->uRud,
+                                       asl_obctrl->obctrl_status);
 }
 
 /**
@@ -177,9 +188,14 @@ static inline uint16_t mavlink_msg_asl_obctrl_encode(uint8_t system_id, uint8_t 
  * @param msg The MAVLink message to compress the data into
  * @param asl_obctrl C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_asl_obctrl_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_asl_obctrl_t* asl_obctrl)
-{
-    return mavlink_msg_asl_obctrl_pack_chan(system_id, component_id, chan, msg, asl_obctrl->timestamp, asl_obctrl->uElev, asl_obctrl->uThrot, asl_obctrl->uThrot2, asl_obctrl->uAilL, asl_obctrl->uAilR, asl_obctrl->uRud, asl_obctrl->obctrl_status);
+static inline uint16_t
+mavlink_msg_asl_obctrl_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                   mavlink_message_t *msg, const mavlink_asl_obctrl_t *asl_obctrl) {
+    return mavlink_msg_asl_obctrl_pack_chan(system_id, component_id, chan, msg,
+                                            asl_obctrl->timestamp, asl_obctrl->uElev,
+                                            asl_obctrl->uThrot, asl_obctrl->uThrot2,
+                                            asl_obctrl->uAilL, asl_obctrl->uAilR, asl_obctrl->uRud,
+                                            asl_obctrl->obctrl_status);
 }
 
 /**
@@ -288,9 +304,8 @@ static inline void mavlink_msg_asl_obctrl_send_buf(mavlink_message_t *msgbuf, ma
  *
  * @return [us]  Time since system start
  */
-static inline uint64_t mavlink_msg_asl_obctrl_get_timestamp(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint64_t(msg,  0);
+static inline uint64_t mavlink_msg_asl_obctrl_get_timestamp(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint64_t(msg, 0);
 }
 
 /**
@@ -298,9 +313,8 @@ static inline uint64_t mavlink_msg_asl_obctrl_get_timestamp(const mavlink_messag
  *
  * @return   Elevator command [~]
  */
-static inline float mavlink_msg_asl_obctrl_get_uElev(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_asl_obctrl_get_uElev(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -308,9 +322,8 @@ static inline float mavlink_msg_asl_obctrl_get_uElev(const mavlink_message_t* ms
  *
  * @return   Throttle command [~]
  */
-static inline float mavlink_msg_asl_obctrl_get_uThrot(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_asl_obctrl_get_uThrot(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -318,9 +331,8 @@ static inline float mavlink_msg_asl_obctrl_get_uThrot(const mavlink_message_t* m
  *
  * @return   Throttle 2 command [~]
  */
-static inline float mavlink_msg_asl_obctrl_get_uThrot2(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float mavlink_msg_asl_obctrl_get_uThrot2(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -328,9 +340,8 @@ static inline float mavlink_msg_asl_obctrl_get_uThrot2(const mavlink_message_t* 
  *
  * @return   Left aileron command [~]
  */
-static inline float mavlink_msg_asl_obctrl_get_uAilL(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  20);
+static inline float mavlink_msg_asl_obctrl_get_uAilL(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 20);
 }
 
 /**
@@ -338,9 +349,8 @@ static inline float mavlink_msg_asl_obctrl_get_uAilL(const mavlink_message_t* ms
  *
  * @return   Right aileron command [~]
  */
-static inline float mavlink_msg_asl_obctrl_get_uAilR(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float mavlink_msg_asl_obctrl_get_uAilR(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -348,9 +358,8 @@ static inline float mavlink_msg_asl_obctrl_get_uAilR(const mavlink_message_t* ms
  *
  * @return   Rudder command [~]
  */
-static inline float mavlink_msg_asl_obctrl_get_uRud(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float mavlink_msg_asl_obctrl_get_uRud(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -358,9 +367,8 @@ static inline float mavlink_msg_asl_obctrl_get_uRud(const mavlink_message_t* msg
  *
  * @return   Off-board computer status
  */
-static inline uint8_t mavlink_msg_asl_obctrl_get_obctrl_status(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  32);
+static inline uint8_t mavlink_msg_asl_obctrl_get_obctrl_status(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 32);
 }
 
 /**
@@ -369,8 +377,8 @@ static inline uint8_t mavlink_msg_asl_obctrl_get_obctrl_status(const mavlink_mes
  * @param msg The message to decode
  * @param asl_obctrl C-struct to decode the message contents into
  */
-static inline void mavlink_msg_asl_obctrl_decode(const mavlink_message_t* msg, mavlink_asl_obctrl_t* asl_obctrl)
-{
+static inline void
+mavlink_msg_asl_obctrl_decode(const mavlink_message_t *msg, mavlink_asl_obctrl_t *asl_obctrl) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     asl_obctrl->timestamp = mavlink_msg_asl_obctrl_get_timestamp(msg);
     asl_obctrl->uElev = mavlink_msg_asl_obctrl_get_uElev(msg);
@@ -381,8 +389,8 @@ static inline void mavlink_msg_asl_obctrl_decode(const mavlink_message_t* msg, m
     asl_obctrl->uRud = mavlink_msg_asl_obctrl_get_uRud(msg);
     asl_obctrl->obctrl_status = mavlink_msg_asl_obctrl_get_obctrl_status(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_ASL_OBCTRL_LEN? msg->len : MAVLINK_MSG_ID_ASL_OBCTRL_LEN;
-        memset(asl_obctrl, 0, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
-    memcpy(asl_obctrl, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_ASL_OBCTRL_LEN? msg->len : MAVLINK_MSG_ID_ASL_OBCTRL_LEN;
+    memset(asl_obctrl, 0, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
+memcpy(asl_obctrl, _MAV_PAYLOAD(msg), len);
 #endif
 }

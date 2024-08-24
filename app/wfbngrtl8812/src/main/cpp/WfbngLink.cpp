@@ -34,7 +34,7 @@ std::string uint8_to_hex_string(const uint8_t *v, const size_t s) {
     return ss.str();
 }
 
-WfbngLink::WfbngLink(JNIEnv* env, jobject context) {
+WfbngLink::WfbngLink(JNIEnv *env, jobject context) {
     initAgg();
     Logger_t log;
     wifi_driver = std::make_unique<WiFiDriver>(log);
@@ -45,7 +45,7 @@ void WfbngLink::initAgg() {
     int video_client_port = 5600;
     int mavlink_client_port = 14550;
     std::string client_addr = "127.0.0.1";
-    uint32_t link_id = 7669206 ; // sha1 hash of link_domain="default"
+    uint32_t link_id = 7669206; // sha1 hash of link_domain="default"
     uint8_t video_radio_port = 0;
     uint8_t mavlink_radio_port = 0x10;
     uint64_t epoch = 0;
@@ -55,11 +55,13 @@ void WfbngLink::initAgg() {
     uint32_t mavlink_channel_id_f = (link_id << 8) + mavlink_radio_port;
     mavlink_channel_id_be = htobe32(mavlink_channel_id_f);
 
-    video_aggregator = std::make_unique<Aggregator>(client_addr, video_client_port, keyPath, epoch, video_channel_id_f);
-    mavlink_aggregator = std::make_unique<Aggregator>(client_addr, mavlink_client_port, keyPath, epoch, mavlink_channel_id_f);
+    video_aggregator = std::make_unique<Aggregator>(client_addr, video_client_port, keyPath, epoch,
+                                                    video_channel_id_f);
+    mavlink_aggregator = std::make_unique<Aggregator>(client_addr, mavlink_client_port, keyPath,
+                                                      epoch, mavlink_channel_id_f);
 }
 
-int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd) {
+int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint fd) {
     int r;
     libusb_context *ctx = NULL;
 
@@ -93,26 +95,31 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd) {
         return -1;
     }
 
-    uint8_t* video_channel_id_be8 = reinterpret_cast<uint8_t *>(&video_channel_id_be);
-    uint8_t* mavlink_channel_id_be8 = reinterpret_cast<uint8_t *>(&mavlink_channel_id_be);
+    uint8_t *video_channel_id_be8 = reinterpret_cast<uint8_t *>(&video_channel_id_be);
+    uint8_t *mavlink_channel_id_be8 = reinterpret_cast<uint8_t *>(&mavlink_channel_id_be);
 
     try {
-        auto packetProcessor = [this, video_channel_id_be8,mavlink_channel_id_be8](const Packet &packet) {
+        auto packetProcessor = [this, video_channel_id_be8, mavlink_channel_id_be8](
+                const Packet &packet) {
             RxFrame frame(packet.Data);
             if (!frame.IsValidWfbFrame()) {
                 return;
             }
             // TODO(geehe) Get data from libusb?
-            int8_t rssi[4] = {1,1,1,1};
+            int8_t rssi[4] = {1, 1, 1, 1};
             uint32_t freq = 0;
-            int8_t noise[4] = {1,1,1,1};
-            uint8_t antenna[4] = {1,1,1,1};
+            int8_t noise[4] = {1, 1, 1, 1};
+            uint8_t antenna[4] = {1, 1, 1, 1};
 
             std::lock_guard<std::mutex> lock(agg_mutex);
             if (frame.MatchesChannelID(video_channel_id_be8)) {
-                video_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header), packet.Data.size() - sizeof(ieee80211_header) - 4, 0, antenna, rssi, noise, freq, 0, 0, NULL);
+                video_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
+                                                 packet.Data.size() - sizeof(ieee80211_header) - 4,
+                                                 0, antenna, rssi, noise, freq, 0, 0, NULL);
             } else if (frame.MatchesChannelID(mavlink_channel_id_be8)) {
-                mavlink_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header), packet.Data.size() - sizeof(ieee80211_header) - 4, 0, antenna, rssi, noise, freq, 0, 0, NULL);
+                mavlink_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
+                                                   packet.Data.size() - sizeof(ieee80211_header) -
+                                                   4, 0, antenna, rssi, noise, freq, 0, 0, NULL);
             }
         };
         rtl_devices.at(fd)->Init(packetProcessor, SelectedChannel{
@@ -120,7 +127,7 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd) {
                 .ChannelOffset = 0,
                 .ChannelWidth = CHANNEL_WIDTH_20,
         });
-    } catch (const std::runtime_error& error) {
+    } catch (const std::runtime_error &error) {
         __android_log_print(ANDROID_LOG_ERROR, TAG,
                             "runtime_error: %s", error.what());
         return -1;
@@ -136,9 +143,9 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd) {
 }
 
 
-void WfbngLink::stop(JNIEnv* env, jobject context, jint fd) {
+void WfbngLink::stop(JNIEnv *env, jobject context, jint fd) {
     auto dev = rtl_devices.at(fd).get();
-    if (dev){ dev->should_stop = true ;}
+    if (dev) { dev->should_stop = true; }
 }
 
 
@@ -146,6 +153,7 @@ void WfbngLink::stop(JNIEnv* env, jobject context, jint fd) {
 inline jlong jptr(WfbngLink *wfbngLinkN) {
     return reinterpret_cast<intptr_t>(wfbngLinkN);
 }
+
 inline WfbngLink *native(jlong ptr) {
     return reinterpret_cast<WfbngLink *>(ptr);
 }
@@ -181,59 +189,65 @@ inline std::list<int> toList(JNIEnv *env, jobject list) {
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_geehe_wfbngrtl8812_WfbNgLink_nativeInitialize(JNIEnv *env, jclass clazz,
-                                                        jobject context) {
-    auto* p= new WfbngLink(env, context);
+                                                       jobject context) {
+    auto *p = new WfbngLink(env, context);
     return jptr(p);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_geehe_wfbngrtl8812_WfbNgLink_nativeRun(JNIEnv * env, jclass clazz,jlong wfbngLinkN,jobject androidContext, jint wifiChannel, jint fd){
-    native(wfbngLinkN)->run(env,androidContext, wifiChannel, fd);
+Java_com_geehe_wfbngrtl8812_WfbNgLink_nativeRun(JNIEnv *env, jclass clazz, jlong wfbngLinkN,
+                                                jobject androidContext, jint wifiChannel, jint fd) {
+    native(wfbngLinkN)->run(env, androidContext, wifiChannel, fd);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_geehe_wfbngrtl8812_WfbNgLink_nativeStop(JNIEnv * env, jclass clazz,jlong wfbngLinkN,jobject androidContext, jint fd){
-    native(wfbngLinkN)->stop(env,androidContext, fd);
+Java_com_geehe_wfbngrtl8812_WfbNgLink_nativeStop(JNIEnv *env, jclass clazz, jlong wfbngLinkN,
+                                                 jobject androidContext, jint fd) {
+    native(wfbngLinkN)->stop(env, androidContext, fd);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_geehe_wfbngrtl8812_WfbNgLink_nativeCallBack(JNIEnv *env, jclass clazz, jobject wfbStatChangedI, jlong wfbngLinkN) {
+Java_com_geehe_wfbngrtl8812_WfbNgLink_nativeCallBack(JNIEnv *env, jclass clazz,
+                                                     jobject wfbStatChangedI, jlong wfbngLinkN) {
     if (native(wfbngLinkN)->video_aggregator == nullptr) {
         return;
     }
     auto aggregator = native(wfbngLinkN)->video_aggregator.get();
 
-    jclass jClassExtendsIWfbStatChangedI= env->GetObjectClass(wfbStatChangedI);
+    jclass jClassExtendsIWfbStatChangedI = env->GetObjectClass(wfbStatChangedI);
     jclass jcStats = env->FindClass("com/geehe/wfbngrtl8812/WfbNGStats");
-    if(jcStats==nullptr){
+    if (jcStats == nullptr) {
         return;
     }
     jmethodID jcStatsConstructor = env->GetMethodID(jcStats, "<init>", "(IIIIIIII)V");
-    if(jcStatsConstructor==nullptr){
+    if (jcStatsConstructor == nullptr) {
         return;
     }
-    auto stats=env->NewObject(jcStats,jcStatsConstructor,
-                              (jint)aggregator->count_p_all,
-                              (jint)aggregator->count_p_dec_err,
-                              (jint)aggregator->count_p_dec_ok,
-                              (jint)aggregator->count_p_fec_recovered,
-                              (jint)aggregator->count_p_lost,
-                              (jint)aggregator->count_p_bad,
-                              (jint)aggregator->count_p_override,
-                              (jint)aggregator->count_p_outgoing);
-    if(stats==nullptr){
+    auto stats = env->NewObject(jcStats, jcStatsConstructor,
+                                (jint) aggregator->count_p_all,
+                                (jint) aggregator->count_p_dec_err,
+                                (jint) aggregator->count_p_dec_ok,
+                                (jint) aggregator->count_p_fec_recovered,
+                                (jint) aggregator->count_p_lost,
+                                (jint) aggregator->count_p_bad,
+                                (jint) aggregator->count_p_override,
+                                (jint) aggregator->count_p_outgoing);
+    if (stats == nullptr) {
         return;
     }
-    jmethodID onStatsChanged = env->GetMethodID(jClassExtendsIWfbStatChangedI, "onWfbNgStatsChanged", "(Lcom/geehe/wfbngrtl8812/WfbNGStats;)V");
-    if(onStatsChanged==nullptr){
+    jmethodID onStatsChanged = env->GetMethodID(jClassExtendsIWfbStatChangedI,
+                                                "onWfbNgStatsChanged",
+                                                "(Lcom/geehe/wfbngrtl8812/WfbNGStats;)V");
+    if (onStatsChanged == nullptr) {
         return;
     }
-    env->CallVoidMethod(wfbStatChangedI,onStatsChanged,stats);
+    env->CallVoidMethod(wfbStatChangedI, onStatsChanged, stats);
     aggregator->clear_stats();
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_geehe_wfbngrtl8812_WfbNgLink_nativeRefreshKey(JNIEnv * env, jclass clazz,jlong wfbngLinkN) {
+Java_com_geehe_wfbngrtl8812_WfbNgLink_nativeRefreshKey(JNIEnv *env, jclass clazz,
+                                                       jlong wfbngLinkN) {
     native(wfbngLinkN)->initAgg();
 }

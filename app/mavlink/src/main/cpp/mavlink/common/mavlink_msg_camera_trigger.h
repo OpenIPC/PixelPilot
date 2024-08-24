@@ -4,10 +4,10 @@
 #define MAVLINK_MSG_ID_CAMERA_TRIGGER 112
 
 MAVPACKED(
-typedef struct __mavlink_camera_trigger_t {
- uint64_t time_usec; /*< [us] Timestamp for image frame (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.*/
- uint32_t seq; /*<  Image frame sequence*/
-}) mavlink_camera_trigger_t;
+        typedef struct __mavlink_camera_trigger_t {
+            uint64_t time_usec; /*< [us] Timestamp for image frame (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.*/
+            uint32_t seq; /*<  Image frame sequence*/
+        }) mavlink_camera_trigger_t;
 
 #define MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN 12
 #define MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN 12
@@ -16,7 +16,6 @@ typedef struct __mavlink_camera_trigger_t {
 
 #define MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC 174
 #define MAVLINK_MSG_ID_112_CRC 174
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -48,9 +47,9 @@ typedef struct __mavlink_camera_trigger_t {
  * @param seq  Image frame sequence
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_camera_trigger_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint64_t time_usec, uint32_t seq)
-{
+static inline uint16_t
+mavlink_msg_camera_trigger_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                uint64_t time_usec, uint32_t seq) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN];
     _mav_put_uint64_t(buf, 0, time_usec);
@@ -62,11 +61,14 @@ static inline uint16_t mavlink_msg_camera_trigger_pack(uint8_t system_id, uint8_
     packet.time_usec = time_usec;
     packet.seq = seq;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_CAMERA_TRIGGER;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN,
+                                    MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN,
+                                    MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
 }
 
 /**
@@ -79,10 +81,10 @@ static inline uint16_t mavlink_msg_camera_trigger_pack(uint8_t system_id, uint8_
  * @param seq  Image frame sequence
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_camera_trigger_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint64_t time_usec,uint32_t seq)
-{
+static inline uint16_t
+mavlink_msg_camera_trigger_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                     mavlink_message_t *msg,
+                                     uint64_t time_usec, uint32_t seq) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN];
     _mav_put_uint64_t(buf, 0, time_usec);
@@ -94,11 +96,14 @@ static inline uint16_t mavlink_msg_camera_trigger_pack_chan(uint8_t system_id, u
     packet.time_usec = time_usec;
     packet.seq = seq;
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_CAMERA_TRIGGER;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN,
+                                         MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN,
+                                         MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
 }
 
 /**
@@ -109,9 +114,11 @@ static inline uint16_t mavlink_msg_camera_trigger_pack_chan(uint8_t system_id, u
  * @param msg The MAVLink message to compress the data into
  * @param camera_trigger C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_camera_trigger_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_camera_trigger_t* camera_trigger)
-{
-    return mavlink_msg_camera_trigger_pack(system_id, component_id, msg, camera_trigger->time_usec, camera_trigger->seq);
+static inline uint16_t
+mavlink_msg_camera_trigger_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                  const mavlink_camera_trigger_t *camera_trigger) {
+    return mavlink_msg_camera_trigger_pack(system_id, component_id, msg, camera_trigger->time_usec,
+                                           camera_trigger->seq);
 }
 
 /**
@@ -123,9 +130,12 @@ static inline uint16_t mavlink_msg_camera_trigger_encode(uint8_t system_id, uint
  * @param msg The MAVLink message to compress the data into
  * @param camera_trigger C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_camera_trigger_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_camera_trigger_t* camera_trigger)
-{
-    return mavlink_msg_camera_trigger_pack_chan(system_id, component_id, chan, msg, camera_trigger->time_usec, camera_trigger->seq);
+static inline uint16_t
+mavlink_msg_camera_trigger_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                       mavlink_message_t *msg,
+                                       const mavlink_camera_trigger_t *camera_trigger) {
+    return mavlink_msg_camera_trigger_pack_chan(system_id, component_id, chan, msg,
+                                                camera_trigger->time_usec, camera_trigger->seq);
 }
 
 /**
@@ -204,9 +214,8 @@ static inline void mavlink_msg_camera_trigger_send_buf(mavlink_message_t *msgbuf
  *
  * @return [us] Timestamp for image frame (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude the number.
  */
-static inline uint64_t mavlink_msg_camera_trigger_get_time_usec(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint64_t(msg,  0);
+static inline uint64_t mavlink_msg_camera_trigger_get_time_usec(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint64_t(msg, 0);
 }
 
 /**
@@ -214,9 +223,8 @@ static inline uint64_t mavlink_msg_camera_trigger_get_time_usec(const mavlink_me
  *
  * @return  Image frame sequence
  */
-static inline uint32_t mavlink_msg_camera_trigger_get_seq(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  8);
+static inline uint32_t mavlink_msg_camera_trigger_get_seq(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 8);
 }
 
 /**
@@ -225,14 +233,15 @@ static inline uint32_t mavlink_msg_camera_trigger_get_seq(const mavlink_message_
  * @param msg The message to decode
  * @param camera_trigger C-struct to decode the message contents into
  */
-static inline void mavlink_msg_camera_trigger_decode(const mavlink_message_t* msg, mavlink_camera_trigger_t* camera_trigger)
-{
+static inline void mavlink_msg_camera_trigger_decode(const mavlink_message_t *msg,
+                                                     mavlink_camera_trigger_t *camera_trigger) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     camera_trigger->time_usec = mavlink_msg_camera_trigger_get_time_usec(msg);
     camera_trigger->seq = mavlink_msg_camera_trigger_get_seq(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN? msg->len : MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN;
-        memset(camera_trigger, 0, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN ? msg->len
+                                                               : MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN;
+    memset(camera_trigger, 0, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
     memcpy(camera_trigger, _MAV_PAYLOAD(msg), len);
 #endif
 }

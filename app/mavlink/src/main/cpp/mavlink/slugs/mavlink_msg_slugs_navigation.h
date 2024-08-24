@@ -4,18 +4,20 @@
 #define MAVLINK_MSG_ID_SLUGS_NAVIGATION 176
 
 MAVPACKED(
-typedef struct __mavlink_slugs_navigation_t {
- float u_m; /*< [m/s] Measured Airspeed prior to the nav filter*/
- float phi_c; /*<  Commanded Roll*/
- float theta_c; /*<  Commanded Pitch*/
- float psiDot_c; /*<  Commanded Turn rate*/
- float ay_body; /*<  Y component of the body acceleration*/
- float totalDist; /*<  Total Distance to Run on this leg of Navigation*/
- float dist2Go; /*<  Remaining distance to Run on this leg of Navigation*/
- uint16_t h_c; /*< [dm] Commanded altitude (MSL)*/
- uint8_t fromWP; /*<  Origin WP*/
- uint8_t toWP; /*<  Destination WP*/
-}) mavlink_slugs_navigation_t;
+        typedef struct __mavlink_slugs_navigation_t {
+            float u_m; /*< [m/s] Measured Airspeed prior to the nav filter*/
+            float phi_c; /*<  Commanded Roll*/
+            float theta_c; /*<  Commanded Pitch*/
+            float psiDot_c; /*<  Commanded Turn rate*/
+            float ay_body; /*<  Y component of the body acceleration*/
+            float totalDist; /*<  Total Distance to Run on this leg of Navigation*/
+            float dist2Go; /*<  Remaining distance to Run on this leg of Navigation*/
+            uint16_t h_c; /*< [dm] Commanded altitude (MSL)*/
+            uint8_t fromWP; /*<  Origin WP*/
+            uint8_t toWP; /*<  Destination WP*/
+        })
+
+mavlink_slugs_navigation_t;
 
 #define MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN 32
 #define MAVLINK_MSG_ID_SLUGS_NAVIGATION_MIN_LEN 32
@@ -24,7 +26,6 @@ typedef struct __mavlink_slugs_navigation_t {
 
 #define MAVLINK_MSG_ID_SLUGS_NAVIGATION_CRC 228
 #define MAVLINK_MSG_ID_176_CRC 228
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -80,9 +81,11 @@ typedef struct __mavlink_slugs_navigation_t {
  * @param h_c [dm] Commanded altitude (MSL)
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_slugs_navigation_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               float u_m, float phi_c, float theta_c, float psiDot_c, float ay_body, float totalDist, float dist2Go, uint8_t fromWP, uint8_t toWP, uint16_t h_c)
-{
+static inline uint16_t
+mavlink_msg_slugs_navigation_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                  float u_m, float phi_c, float theta_c, float psiDot_c,
+                                  float ay_body, float totalDist, float dist2Go, uint8_t fromWP,
+                                  uint8_t toWP, uint16_t h_c) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN];
     _mav_put_float(buf, 0, u_m);
@@ -96,7 +99,7 @@ static inline uint16_t mavlink_msg_slugs_navigation_pack(uint8_t system_id, uint
     _mav_put_uint8_t(buf, 30, fromWP);
     _mav_put_uint8_t(buf, 31, toWP);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN);
 #else
     mavlink_slugs_navigation_t packet;
     packet.u_m = u_m;
@@ -114,7 +117,10 @@ static inline uint16_t mavlink_msg_slugs_navigation_pack(uint8_t system_id, uint
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SLUGS_NAVIGATION;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SLUGS_NAVIGATION_MIN_LEN, MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN, MAVLINK_MSG_ID_SLUGS_NAVIGATION_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_SLUGS_NAVIGATION_MIN_LEN,
+                                    MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN,
+                                    MAVLINK_MSG_ID_SLUGS_NAVIGATION_CRC);
 }
 
 /**
@@ -135,10 +141,12 @@ static inline uint16_t mavlink_msg_slugs_navigation_pack(uint8_t system_id, uint
  * @param h_c [dm] Commanded altitude (MSL)
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_slugs_navigation_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   float u_m,float phi_c,float theta_c,float psiDot_c,float ay_body,float totalDist,float dist2Go,uint8_t fromWP,uint8_t toWP,uint16_t h_c)
-{
+static inline uint16_t
+mavlink_msg_slugs_navigation_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                       mavlink_message_t *msg,
+                                       float u_m, float phi_c, float theta_c, float psiDot_c,
+                                       float ay_body, float totalDist, float dist2Go,
+                                       uint8_t fromWP, uint8_t toWP, uint16_t h_c) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN];
     _mav_put_float(buf, 0, u_m);
@@ -152,7 +160,7 @@ static inline uint16_t mavlink_msg_slugs_navigation_pack_chan(uint8_t system_id,
     _mav_put_uint8_t(buf, 30, fromWP);
     _mav_put_uint8_t(buf, 31, toWP);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN);
 #else
     mavlink_slugs_navigation_t packet;
     packet.u_m = u_m;
@@ -170,7 +178,10 @@ static inline uint16_t mavlink_msg_slugs_navigation_pack_chan(uint8_t system_id,
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_SLUGS_NAVIGATION;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SLUGS_NAVIGATION_MIN_LEN, MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN, MAVLINK_MSG_ID_SLUGS_NAVIGATION_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_SLUGS_NAVIGATION_MIN_LEN,
+                                         MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN,
+                                         MAVLINK_MSG_ID_SLUGS_NAVIGATION_CRC);
 }
 
 /**
@@ -181,9 +192,15 @@ static inline uint16_t mavlink_msg_slugs_navigation_pack_chan(uint8_t system_id,
  * @param msg The MAVLink message to compress the data into
  * @param slugs_navigation C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_slugs_navigation_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_slugs_navigation_t* slugs_navigation)
-{
-    return mavlink_msg_slugs_navigation_pack(system_id, component_id, msg, slugs_navigation->u_m, slugs_navigation->phi_c, slugs_navigation->theta_c, slugs_navigation->psiDot_c, slugs_navigation->ay_body, slugs_navigation->totalDist, slugs_navigation->dist2Go, slugs_navigation->fromWP, slugs_navigation->toWP, slugs_navigation->h_c);
+static inline uint16_t
+mavlink_msg_slugs_navigation_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                    const mavlink_slugs_navigation_t *slugs_navigation) {
+    return mavlink_msg_slugs_navigation_pack(system_id, component_id, msg, slugs_navigation->u_m,
+                                             slugs_navigation->phi_c, slugs_navigation->theta_c,
+                                             slugs_navigation->psiDot_c, slugs_navigation->ay_body,
+                                             slugs_navigation->totalDist, slugs_navigation->dist2Go,
+                                             slugs_navigation->fromWP, slugs_navigation->toWP,
+                                             slugs_navigation->h_c);
 }
 
 /**
@@ -195,9 +212,19 @@ static inline uint16_t mavlink_msg_slugs_navigation_encode(uint8_t system_id, ui
  * @param msg The MAVLink message to compress the data into
  * @param slugs_navigation C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_slugs_navigation_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_slugs_navigation_t* slugs_navigation)
-{
-    return mavlink_msg_slugs_navigation_pack_chan(system_id, component_id, chan, msg, slugs_navigation->u_m, slugs_navigation->phi_c, slugs_navigation->theta_c, slugs_navigation->psiDot_c, slugs_navigation->ay_body, slugs_navigation->totalDist, slugs_navigation->dist2Go, slugs_navigation->fromWP, slugs_navigation->toWP, slugs_navigation->h_c);
+static inline uint16_t
+mavlink_msg_slugs_navigation_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                         mavlink_message_t *msg,
+                                         const mavlink_slugs_navigation_t *slugs_navigation) {
+    return mavlink_msg_slugs_navigation_pack_chan(system_id, component_id, chan, msg,
+                                                  slugs_navigation->u_m, slugs_navigation->phi_c,
+                                                  slugs_navigation->theta_c,
+                                                  slugs_navigation->psiDot_c,
+                                                  slugs_navigation->ay_body,
+                                                  slugs_navigation->totalDist,
+                                                  slugs_navigation->dist2Go,
+                                                  slugs_navigation->fromWP, slugs_navigation->toWP,
+                                                  slugs_navigation->h_c);
 }
 
 /**
@@ -316,9 +343,8 @@ static inline void mavlink_msg_slugs_navigation_send_buf(mavlink_message_t *msgb
  *
  * @return [m/s] Measured Airspeed prior to the nav filter
  */
-static inline float mavlink_msg_slugs_navigation_get_u_m(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_slugs_navigation_get_u_m(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -326,9 +352,8 @@ static inline float mavlink_msg_slugs_navigation_get_u_m(const mavlink_message_t
  *
  * @return  Commanded Roll
  */
-static inline float mavlink_msg_slugs_navigation_get_phi_c(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_slugs_navigation_get_phi_c(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -336,9 +361,8 @@ static inline float mavlink_msg_slugs_navigation_get_phi_c(const mavlink_message
  *
  * @return  Commanded Pitch
  */
-static inline float mavlink_msg_slugs_navigation_get_theta_c(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_slugs_navigation_get_theta_c(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -346,9 +370,8 @@ static inline float mavlink_msg_slugs_navigation_get_theta_c(const mavlink_messa
  *
  * @return  Commanded Turn rate
  */
-static inline float mavlink_msg_slugs_navigation_get_psiDot_c(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_slugs_navigation_get_psiDot_c(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -356,9 +379,8 @@ static inline float mavlink_msg_slugs_navigation_get_psiDot_c(const mavlink_mess
  *
  * @return  Y component of the body acceleration
  */
-static inline float mavlink_msg_slugs_navigation_get_ay_body(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float mavlink_msg_slugs_navigation_get_ay_body(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -366,9 +388,8 @@ static inline float mavlink_msg_slugs_navigation_get_ay_body(const mavlink_messa
  *
  * @return  Total Distance to Run on this leg of Navigation
  */
-static inline float mavlink_msg_slugs_navigation_get_totalDist(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  20);
+static inline float mavlink_msg_slugs_navigation_get_totalDist(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 20);
 }
 
 /**
@@ -376,9 +397,8 @@ static inline float mavlink_msg_slugs_navigation_get_totalDist(const mavlink_mes
  *
  * @return  Remaining distance to Run on this leg of Navigation
  */
-static inline float mavlink_msg_slugs_navigation_get_dist2Go(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float mavlink_msg_slugs_navigation_get_dist2Go(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -386,9 +406,8 @@ static inline float mavlink_msg_slugs_navigation_get_dist2Go(const mavlink_messa
  *
  * @return  Origin WP
  */
-static inline uint8_t mavlink_msg_slugs_navigation_get_fromWP(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  30);
+static inline uint8_t mavlink_msg_slugs_navigation_get_fromWP(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 30);
 }
 
 /**
@@ -396,9 +415,8 @@ static inline uint8_t mavlink_msg_slugs_navigation_get_fromWP(const mavlink_mess
  *
  * @return  Destination WP
  */
-static inline uint8_t mavlink_msg_slugs_navigation_get_toWP(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  31);
+static inline uint8_t mavlink_msg_slugs_navigation_get_toWP(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 31);
 }
 
 /**
@@ -406,9 +424,8 @@ static inline uint8_t mavlink_msg_slugs_navigation_get_toWP(const mavlink_messag
  *
  * @return [dm] Commanded altitude (MSL)
  */
-static inline uint16_t mavlink_msg_slugs_navigation_get_h_c(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint16_t(msg,  28);
+static inline uint16_t mavlink_msg_slugs_navigation_get_h_c(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint16_t(msg, 28);
 }
 
 /**
@@ -417,8 +434,8 @@ static inline uint16_t mavlink_msg_slugs_navigation_get_h_c(const mavlink_messag
  * @param msg The message to decode
  * @param slugs_navigation C-struct to decode the message contents into
  */
-static inline void mavlink_msg_slugs_navigation_decode(const mavlink_message_t* msg, mavlink_slugs_navigation_t* slugs_navigation)
-{
+static inline void mavlink_msg_slugs_navigation_decode(const mavlink_message_t *msg,
+                                                       mavlink_slugs_navigation_t *slugs_navigation) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     slugs_navigation->u_m = mavlink_msg_slugs_navigation_get_u_m(msg);
     slugs_navigation->phi_c = mavlink_msg_slugs_navigation_get_phi_c(msg);
@@ -431,8 +448,8 @@ static inline void mavlink_msg_slugs_navigation_decode(const mavlink_message_t* 
     slugs_navigation->fromWP = mavlink_msg_slugs_navigation_get_fromWP(msg);
     slugs_navigation->toWP = mavlink_msg_slugs_navigation_get_toWP(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN? msg->len : MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN;
-        memset(slugs_navigation, 0, MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN);
-    memcpy(slugs_navigation, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN? msg->len : MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN;
+    memset(slugs_navigation, 0, MAVLINK_MSG_ID_SLUGS_NAVIGATION_LEN);
+memcpy(slugs_navigation, _MAV_PAYLOAD(msg), len);
 #endif
 }

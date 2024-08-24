@@ -68,7 +68,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         log
         ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}/libusb1.0.so
         ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}/libsodium.so
-        ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}/libpcap.a )
+        ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}/libpcap.a)
 
 set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -fno-omit-frame-pointer)

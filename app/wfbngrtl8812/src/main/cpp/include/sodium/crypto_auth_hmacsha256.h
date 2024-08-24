@@ -31,7 +31,7 @@ int crypto_auth_hmacsha256_verify(const unsigned char *h,
                                   const unsigned char *in,
                                   unsigned long long inlen,
                                   const unsigned char *k)
-            __attribute__ ((warn_unused_result)) __attribute__ ((nonnull(1, 4)));
+__attribute__ ((warn_unused_result)) __attribute__ ((nonnull(1, 4)));
 
 /* ------------------------------------------------------------------------- */
 
@@ -52,7 +52,7 @@ SODIUM_EXPORT
 int crypto_auth_hmacsha256_update(crypto_auth_hmacsha256_state *state,
                                   const unsigned char *in,
                                   unsigned long long inlen)
-            __attribute__ ((nonnull(1)));
+__attribute__ ((nonnull(1)));
 
 SODIUM_EXPORT
 int crypto_auth_hmacsha256_final(crypto_auth_hmacsha256_state *state,
@@ -61,7 +61,7 @@ int crypto_auth_hmacsha256_final(crypto_auth_hmacsha256_state *state,
 
 SODIUM_EXPORT
 void crypto_auth_hmacsha256_keygen(unsigned char k[crypto_auth_hmacsha256_KEYBYTES])
-            __attribute__ ((nonnull));
+__attribute__ ((nonnull));
 
 #ifdef __cplusplus
 }

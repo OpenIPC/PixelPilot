@@ -4,10 +4,10 @@
 #define MAVLINK_MSG_ID_STATUSTEXT 253
 
 MAVPACKED(
-typedef struct __mavlink_statustext_t {
- uint8_t severity; /*<  Severity of status. Relies on the definitions within RFC-5424.*/
- char text[50]; /*<  Status text message, without null termination character*/
-}) mavlink_statustext_t;
+        typedef struct __mavlink_statustext_t {
+            uint8_t severity; /*<  Severity of status. Relies on the definitions within RFC-5424.*/
+            char text[50]; /*<  Status text message, without null termination character*/
+        }) mavlink_statustext_t;
 
 #define MAVLINK_MSG_ID_STATUSTEXT_LEN 51
 #define MAVLINK_MSG_ID_STATUSTEXT_MIN_LEN 51
@@ -48,9 +48,9 @@ typedef struct __mavlink_statustext_t {
  * @param text  Status text message, without null termination character
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_statustext_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t severity, const char *text)
-{
+static inline uint16_t
+mavlink_msg_statustext_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                            uint8_t severity, const char *text) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_STATUSTEXT_LEN];
     _mav_put_uint8_t(buf, 0, severity);
@@ -59,12 +59,13 @@ static inline uint16_t mavlink_msg_statustext_pack(uint8_t system_id, uint8_t co
 #else
     mavlink_statustext_t packet;
     packet.severity = severity;
-    mav_array_memcpy(packet.text, text, sizeof(char)*50);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_STATUSTEXT_LEN);
+    mav_array_memcpy(packet.text, text, sizeof(char) * 50);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_STATUSTEXT_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_STATUSTEXT;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_STATUSTEXT_MIN_LEN, MAVLINK_MSG_ID_STATUSTEXT_LEN, MAVLINK_MSG_ID_STATUSTEXT_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_STATUSTEXT_MIN_LEN,
+                                    MAVLINK_MSG_ID_STATUSTEXT_LEN, MAVLINK_MSG_ID_STATUSTEXT_CRC);
 }
 
 /**
@@ -77,10 +78,10 @@ static inline uint16_t mavlink_msg_statustext_pack(uint8_t system_id, uint8_t co
  * @param text  Status text message, without null termination character
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_statustext_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t severity,const char *text)
-{
+static inline uint16_t
+mavlink_msg_statustext_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                 mavlink_message_t *msg,
+                                 uint8_t severity, const char *text) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_STATUSTEXT_LEN];
     _mav_put_uint8_t(buf, 0, severity);
@@ -89,12 +90,15 @@ static inline uint16_t mavlink_msg_statustext_pack_chan(uint8_t system_id, uint8
 #else
     mavlink_statustext_t packet;
     packet.severity = severity;
-    mav_array_memcpy(packet.text, text, sizeof(char)*50);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_STATUSTEXT_LEN);
+    mav_array_memcpy(packet.text, text, sizeof(char) * 50);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_STATUSTEXT_LEN);
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_STATUSTEXT;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_STATUSTEXT_MIN_LEN, MAVLINK_MSG_ID_STATUSTEXT_LEN, MAVLINK_MSG_ID_STATUSTEXT_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_STATUSTEXT_MIN_LEN,
+                                         MAVLINK_MSG_ID_STATUSTEXT_LEN,
+                                         MAVLINK_MSG_ID_STATUSTEXT_CRC);
 }
 
 /**
@@ -105,9 +109,11 @@ static inline uint16_t mavlink_msg_statustext_pack_chan(uint8_t system_id, uint8
  * @param msg The MAVLink message to compress the data into
  * @param statustext C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_statustext_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_statustext_t* statustext)
-{
-    return mavlink_msg_statustext_pack(system_id, component_id, msg, statustext->severity, statustext->text);
+static inline uint16_t
+mavlink_msg_statustext_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                              const mavlink_statustext_t *statustext) {
+    return mavlink_msg_statustext_pack(system_id, component_id, msg, statustext->severity,
+                                       statustext->text);
 }
 
 /**
@@ -119,9 +125,11 @@ static inline uint16_t mavlink_msg_statustext_encode(uint8_t system_id, uint8_t 
  * @param msg The MAVLink message to compress the data into
  * @param statustext C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_statustext_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_statustext_t* statustext)
-{
-    return mavlink_msg_statustext_pack_chan(system_id, component_id, chan, msg, statustext->severity, statustext->text);
+static inline uint16_t
+mavlink_msg_statustext_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                   mavlink_message_t *msg, const mavlink_statustext_t *statustext) {
+    return mavlink_msg_statustext_pack_chan(system_id, component_id, chan, msg,
+                                            statustext->severity, statustext->text);
 }
 
 /**
@@ -196,9 +204,8 @@ static inline void mavlink_msg_statustext_send_buf(mavlink_message_t *msgbuf, ma
  *
  * @return  Severity of status. Relies on the definitions within RFC-5424.
  */
-static inline uint8_t mavlink_msg_statustext_get_severity(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  0);
+static inline uint8_t mavlink_msg_statustext_get_severity(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 0);
 }
 
 /**
@@ -206,9 +213,8 @@ static inline uint8_t mavlink_msg_statustext_get_severity(const mavlink_message_
  *
  * @return  Status text message, without null termination character
  */
-static inline uint16_t mavlink_msg_statustext_get_text(const mavlink_message_t* msg, char *text)
-{
-    return _MAV_RETURN_char_array(msg, text, 50,  1);
+static inline uint16_t mavlink_msg_statustext_get_text(const mavlink_message_t *msg, char *text) {
+    return _MAV_RETURN_char_array(msg, text, 50, 1);
 }
 
 /**
@@ -217,14 +223,15 @@ static inline uint16_t mavlink_msg_statustext_get_text(const mavlink_message_t* 
  * @param msg The message to decode
  * @param statustext C-struct to decode the message contents into
  */
-static inline void mavlink_msg_statustext_decode(const mavlink_message_t* msg, mavlink_statustext_t* statustext)
-{
+static inline void
+mavlink_msg_statustext_decode(const mavlink_message_t *msg, mavlink_statustext_t *statustext) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     statustext->severity = mavlink_msg_statustext_get_severity(msg);
     mavlink_msg_statustext_get_text(msg, statustext->text);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_STATUSTEXT_LEN? msg->len : MAVLINK_MSG_ID_STATUSTEXT_LEN;
-        memset(statustext, 0, MAVLINK_MSG_ID_STATUSTEXT_LEN);
+    uint8_t len =
+            msg->len < MAVLINK_MSG_ID_STATUSTEXT_LEN ? msg->len : MAVLINK_MSG_ID_STATUSTEXT_LEN;
+    memset(statustext, 0, MAVLINK_MSG_ID_STATUSTEXT_LEN);
     memcpy(statustext, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -4,17 +4,19 @@
 #define MAVLINK_MSG_ID_AQ_ESC_TELEMETRY 152
 
 MAVPACKED(
-typedef struct __mavlink_aq_esc_telemetry_t {
- uint32_t time_boot_ms; /*<  Timestamp of the component clock since boot time in ms.*/
- uint32_t data0[4]; /*<  Data bits 1-32 for each ESC.*/
- uint32_t data1[4]; /*<  Data bits 33-64 for each ESC.*/
- uint16_t status_age[4]; /*<  Age of each ESC telemetry reading in ms compared to boot time. A value of 0xFFFF means timeout/no data.*/
- uint8_t seq; /*<  Sequence number of message (first set of 4 motors is #1, next 4 is #2, etc).*/
- uint8_t num_motors; /*<  Total number of active ESCs/motors on the system.*/
- uint8_t num_in_seq; /*<  Number of active ESCs in this sequence (1 through this many array members will be populated with data)*/
- uint8_t escid[4]; /*<  ESC/Motor ID*/
- uint8_t data_version[4]; /*<  Version of data structure (determines contents).*/
-}) mavlink_aq_esc_telemetry_t;
+        typedef struct __mavlink_aq_esc_telemetry_t {
+            uint32_t time_boot_ms; /*<  Timestamp of the component clock since boot time in ms.*/
+            uint32_t data0[4]; /*<  Data bits 1-32 for each ESC.*/
+            uint32_t data1[4]; /*<  Data bits 33-64 for each ESC.*/
+            uint16_t status_age[4]; /*<  Age of each ESC telemetry reading in ms compared to boot time. A value of 0xFFFF means timeout/no data.*/
+            uint8_t seq; /*<  Sequence number of message (first set of 4 motors is #1, next 4 is #2, etc).*/
+            uint8_t num_motors; /*<  Total number of active ESCs/motors on the system.*/
+            uint8_t num_in_seq; /*<  Number of active ESCs in this sequence (1 through this many array members will be populated with data)*/
+            uint8_t escid[4]; /*<  ESC/Motor ID*/
+            uint8_t data_version[4]; /*<  Version of data structure (determines contents).*/
+        })
+
+mavlink_aq_esc_telemetry_t;
 
 #define MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN 55
 #define MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN 55
@@ -80,9 +82,12 @@ typedef struct __mavlink_aq_esc_telemetry_t {
  * @param data1  Data bits 33-64 for each ESC.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_aq_esc_telemetry_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint32_t time_boot_ms, uint8_t seq, uint8_t num_motors, uint8_t num_in_seq, const uint8_t *escid, const uint16_t *status_age, const uint8_t *data_version, const uint32_t *data0, const uint32_t *data1)
-{
+static inline uint16_t
+mavlink_msg_aq_esc_telemetry_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                  uint32_t time_boot_ms, uint8_t seq, uint8_t num_motors,
+                                  uint8_t num_in_seq, const uint8_t *escid,
+                                  const uint16_t *status_age, const uint8_t *data_version,
+                                  const uint32_t *data0, const uint32_t *data1) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN];
     _mav_put_uint32_t(buf, 0, time_boot_ms);
@@ -94,7 +99,7 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_pack(uint8_t system_id, uint
     _mav_put_uint16_t_array(buf, 36, status_age, 4);
     _mav_put_uint8_t_array(buf, 47, escid, 4);
     _mav_put_uint8_t_array(buf, 51, data_version, 4);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
 #else
     mavlink_aq_esc_telemetry_t packet;
     packet.time_boot_ms = time_boot_ms;
@@ -110,7 +115,10 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_pack(uint8_t system_id, uint
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AQ_ESC_TELEMETRY;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN,
+                                    MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN,
+                                    MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
 }
 
 /**
@@ -130,10 +138,13 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_pack(uint8_t system_id, uint
  * @param data1  Data bits 33-64 for each ESC.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_aq_esc_telemetry_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint32_t time_boot_ms,uint8_t seq,uint8_t num_motors,uint8_t num_in_seq,const uint8_t *escid,const uint16_t *status_age,const uint8_t *data_version,const uint32_t *data0,const uint32_t *data1)
-{
+static inline uint16_t
+mavlink_msg_aq_esc_telemetry_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                       mavlink_message_t *msg,
+                                       uint32_t time_boot_ms, uint8_t seq, uint8_t num_motors,
+                                       uint8_t num_in_seq, const uint8_t *escid,
+                                       const uint16_t *status_age, const uint8_t *data_version,
+                                       const uint32_t *data0, const uint32_t *data1) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN];
     _mav_put_uint32_t(buf, 0, time_boot_ms);
@@ -145,7 +156,7 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_pack_chan(uint8_t system_id,
     _mav_put_uint16_t_array(buf, 36, status_age, 4);
     _mav_put_uint8_t_array(buf, 47, escid, 4);
     _mav_put_uint8_t_array(buf, 51, data_version, 4);
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
 #else
     mavlink_aq_esc_telemetry_t packet;
     packet.time_boot_ms = time_boot_ms;
@@ -161,7 +172,10 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_pack_chan(uint8_t system_id,
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_AQ_ESC_TELEMETRY;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN,
+                                         MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN,
+                                         MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
 }
 
 /**
@@ -172,9 +186,16 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_pack_chan(uint8_t system_id,
  * @param msg The MAVLink message to compress the data into
  * @param aq_esc_telemetry C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_aq_esc_telemetry_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_aq_esc_telemetry_t* aq_esc_telemetry)
-{
-    return mavlink_msg_aq_esc_telemetry_pack(system_id, component_id, msg, aq_esc_telemetry->time_boot_ms, aq_esc_telemetry->seq, aq_esc_telemetry->num_motors, aq_esc_telemetry->num_in_seq, aq_esc_telemetry->escid, aq_esc_telemetry->status_age, aq_esc_telemetry->data_version, aq_esc_telemetry->data0, aq_esc_telemetry->data1);
+static inline uint16_t
+mavlink_msg_aq_esc_telemetry_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                    const mavlink_aq_esc_telemetry_t *aq_esc_telemetry) {
+    return mavlink_msg_aq_esc_telemetry_pack(system_id, component_id, msg,
+                                             aq_esc_telemetry->time_boot_ms, aq_esc_telemetry->seq,
+                                             aq_esc_telemetry->num_motors,
+                                             aq_esc_telemetry->num_in_seq, aq_esc_telemetry->escid,
+                                             aq_esc_telemetry->status_age,
+                                             aq_esc_telemetry->data_version,
+                                             aq_esc_telemetry->data0, aq_esc_telemetry->data1);
 }
 
 /**
@@ -186,9 +207,19 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_encode(uint8_t system_id, ui
  * @param msg The MAVLink message to compress the data into
  * @param aq_esc_telemetry C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_aq_esc_telemetry_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_aq_esc_telemetry_t* aq_esc_telemetry)
-{
-    return mavlink_msg_aq_esc_telemetry_pack_chan(system_id, component_id, chan, msg, aq_esc_telemetry->time_boot_ms, aq_esc_telemetry->seq, aq_esc_telemetry->num_motors, aq_esc_telemetry->num_in_seq, aq_esc_telemetry->escid, aq_esc_telemetry->status_age, aq_esc_telemetry->data_version, aq_esc_telemetry->data0, aq_esc_telemetry->data1);
+static inline uint16_t
+mavlink_msg_aq_esc_telemetry_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                         mavlink_message_t *msg,
+                                         const mavlink_aq_esc_telemetry_t *aq_esc_telemetry) {
+    return mavlink_msg_aq_esc_telemetry_pack_chan(system_id, component_id, chan, msg,
+                                                  aq_esc_telemetry->time_boot_ms,
+                                                  aq_esc_telemetry->seq,
+                                                  aq_esc_telemetry->num_motors,
+                                                  aq_esc_telemetry->num_in_seq,
+                                                  aq_esc_telemetry->escid,
+                                                  aq_esc_telemetry->status_age,
+                                                  aq_esc_telemetry->data_version,
+                                                  aq_esc_telemetry->data0, aq_esc_telemetry->data1);
 }
 
 /**
@@ -298,9 +329,8 @@ static inline void mavlink_msg_aq_esc_telemetry_send_buf(mavlink_message_t *msgb
  *
  * @return  Timestamp of the component clock since boot time in ms.
  */
-static inline uint32_t mavlink_msg_aq_esc_telemetry_get_time_boot_ms(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint32_t(msg,  0);
+static inline uint32_t mavlink_msg_aq_esc_telemetry_get_time_boot_ms(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint32_t(msg, 0);
 }
 
 /**
@@ -308,9 +338,8 @@ static inline uint32_t mavlink_msg_aq_esc_telemetry_get_time_boot_ms(const mavli
  *
  * @return  Sequence number of message (first set of 4 motors is #1, next 4 is #2, etc).
  */
-static inline uint8_t mavlink_msg_aq_esc_telemetry_get_seq(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  44);
+static inline uint8_t mavlink_msg_aq_esc_telemetry_get_seq(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 44);
 }
 
 /**
@@ -318,9 +347,8 @@ static inline uint8_t mavlink_msg_aq_esc_telemetry_get_seq(const mavlink_message
  *
  * @return  Total number of active ESCs/motors on the system.
  */
-static inline uint8_t mavlink_msg_aq_esc_telemetry_get_num_motors(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  45);
+static inline uint8_t mavlink_msg_aq_esc_telemetry_get_num_motors(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 45);
 }
 
 /**
@@ -328,9 +356,8 @@ static inline uint8_t mavlink_msg_aq_esc_telemetry_get_num_motors(const mavlink_
  *
  * @return  Number of active ESCs in this sequence (1 through this many array members will be populated with data)
  */
-static inline uint8_t mavlink_msg_aq_esc_telemetry_get_num_in_seq(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  46);
+static inline uint8_t mavlink_msg_aq_esc_telemetry_get_num_in_seq(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 46);
 }
 
 /**
@@ -338,9 +365,9 @@ static inline uint8_t mavlink_msg_aq_esc_telemetry_get_num_in_seq(const mavlink_
  *
  * @return  ESC/Motor ID
  */
-static inline uint16_t mavlink_msg_aq_esc_telemetry_get_escid(const mavlink_message_t* msg, uint8_t *escid)
-{
-    return _MAV_RETURN_uint8_t_array(msg, escid, 4,  47);
+static inline uint16_t
+mavlink_msg_aq_esc_telemetry_get_escid(const mavlink_message_t *msg, uint8_t *escid) {
+    return _MAV_RETURN_uint8_t_array(msg, escid, 4, 47);
 }
 
 /**
@@ -348,9 +375,9 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_get_escid(const mavlink_mess
  *
  * @return  Age of each ESC telemetry reading in ms compared to boot time. A value of 0xFFFF means timeout/no data.
  */
-static inline uint16_t mavlink_msg_aq_esc_telemetry_get_status_age(const mavlink_message_t* msg, uint16_t *status_age)
-{
-    return _MAV_RETURN_uint16_t_array(msg, status_age, 4,  36);
+static inline uint16_t
+mavlink_msg_aq_esc_telemetry_get_status_age(const mavlink_message_t *msg, uint16_t *status_age) {
+    return _MAV_RETURN_uint16_t_array(msg, status_age, 4, 36);
 }
 
 /**
@@ -358,9 +385,9 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_get_status_age(const mavlink
  *
  * @return  Version of data structure (determines contents).
  */
-static inline uint16_t mavlink_msg_aq_esc_telemetry_get_data_version(const mavlink_message_t* msg, uint8_t *data_version)
-{
-    return _MAV_RETURN_uint8_t_array(msg, data_version, 4,  51);
+static inline uint16_t
+mavlink_msg_aq_esc_telemetry_get_data_version(const mavlink_message_t *msg, uint8_t *data_version) {
+    return _MAV_RETURN_uint8_t_array(msg, data_version, 4, 51);
 }
 
 /**
@@ -368,9 +395,9 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_get_data_version(const mavli
  *
  * @return  Data bits 1-32 for each ESC.
  */
-static inline uint16_t mavlink_msg_aq_esc_telemetry_get_data0(const mavlink_message_t* msg, uint32_t *data0)
-{
-    return _MAV_RETURN_uint32_t_array(msg, data0, 4,  4);
+static inline uint16_t
+mavlink_msg_aq_esc_telemetry_get_data0(const mavlink_message_t *msg, uint32_t *data0) {
+    return _MAV_RETURN_uint32_t_array(msg, data0, 4, 4);
 }
 
 /**
@@ -378,9 +405,9 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_get_data0(const mavlink_mess
  *
  * @return  Data bits 33-64 for each ESC.
  */
-static inline uint16_t mavlink_msg_aq_esc_telemetry_get_data1(const mavlink_message_t* msg, uint32_t *data1)
-{
-    return _MAV_RETURN_uint32_t_array(msg, data1, 4,  20);
+static inline uint16_t
+mavlink_msg_aq_esc_telemetry_get_data1(const mavlink_message_t *msg, uint32_t *data1) {
+    return _MAV_RETURN_uint32_t_array(msg, data1, 4, 20);
 }
 
 /**
@@ -389,8 +416,8 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_get_data1(const mavlink_mess
  * @param msg The message to decode
  * @param aq_esc_telemetry C-struct to decode the message contents into
  */
-static inline void mavlink_msg_aq_esc_telemetry_decode(const mavlink_message_t* msg, mavlink_aq_esc_telemetry_t* aq_esc_telemetry)
-{
+static inline void mavlink_msg_aq_esc_telemetry_decode(const mavlink_message_t *msg,
+                                                       mavlink_aq_esc_telemetry_t *aq_esc_telemetry) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     aq_esc_telemetry->time_boot_ms = mavlink_msg_aq_esc_telemetry_get_time_boot_ms(msg);
     mavlink_msg_aq_esc_telemetry_get_data0(msg, aq_esc_telemetry->data0);
@@ -402,8 +429,8 @@ static inline void mavlink_msg_aq_esc_telemetry_decode(const mavlink_message_t* 
     mavlink_msg_aq_esc_telemetry_get_escid(msg, aq_esc_telemetry->escid);
     mavlink_msg_aq_esc_telemetry_get_data_version(msg, aq_esc_telemetry->data_version);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN? msg->len : MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN;
-        memset(aq_esc_telemetry, 0, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
-    memcpy(aq_esc_telemetry, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN? msg->len : MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN;
+    memset(aq_esc_telemetry, 0, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
+memcpy(aq_esc_telemetry, _MAV_PAYLOAD(msg), len);
 #endif
 }

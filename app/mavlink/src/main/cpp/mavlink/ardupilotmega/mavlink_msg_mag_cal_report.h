@@ -4,25 +4,27 @@
 #define MAVLINK_MSG_ID_MAG_CAL_REPORT 192
 
 MAVPACKED(
-typedef struct __mavlink_mag_cal_report_t {
- float fitness; /*< [mgauss] RMS milligauss residuals.*/
- float ofs_x; /*<  X offset.*/
- float ofs_y; /*<  Y offset.*/
- float ofs_z; /*<  Z offset.*/
- float diag_x; /*<  X diagonal (matrix 11).*/
- float diag_y; /*<  Y diagonal (matrix 22).*/
- float diag_z; /*<  Z diagonal (matrix 33).*/
- float offdiag_x; /*<  X off-diagonal (matrix 12 and 21).*/
- float offdiag_y; /*<  Y off-diagonal (matrix 13 and 31).*/
- float offdiag_z; /*<  Z off-diagonal (matrix 32 and 23).*/
- uint8_t compass_id; /*<  Compass being calibrated.*/
- uint8_t cal_mask; /*<  Bitmask of compasses being calibrated.*/
- uint8_t cal_status; /*<  Calibration Status.*/
- uint8_t autosaved; /*<  0=requires a MAV_CMD_DO_ACCEPT_MAG_CAL, 1=saved to parameters.*/
- float orientation_confidence; /*<  Confidence in orientation (higher is better).*/
- uint8_t old_orientation; /*<  orientation before calibration.*/
- uint8_t new_orientation; /*<  orientation after calibration.*/
-}) mavlink_mag_cal_report_t;
+        typedef struct __mavlink_mag_cal_report_t {
+            float fitness; /*< [mgauss] RMS milligauss residuals.*/
+            float ofs_x; /*<  X offset.*/
+            float ofs_y; /*<  Y offset.*/
+            float ofs_z; /*<  Z offset.*/
+            float diag_x; /*<  X diagonal (matrix 11).*/
+            float diag_y; /*<  Y diagonal (matrix 22).*/
+            float diag_z; /*<  Z diagonal (matrix 33).*/
+            float offdiag_x; /*<  X off-diagonal (matrix 12 and 21).*/
+            float offdiag_y; /*<  Y off-diagonal (matrix 13 and 31).*/
+            float offdiag_z; /*<  Z off-diagonal (matrix 32 and 23).*/
+            uint8_t compass_id; /*<  Compass being calibrated.*/
+            uint8_t cal_mask; /*<  Bitmask of compasses being calibrated.*/
+            uint8_t cal_status; /*<  Calibration Status.*/
+            uint8_t autosaved; /*<  0=requires a MAV_CMD_DO_ACCEPT_MAG_CAL, 1=saved to parameters.*/
+            float orientation_confidence; /*<  Confidence in orientation (higher is better).*/
+            uint8_t old_orientation; /*<  orientation before calibration.*/
+            uint8_t new_orientation; /*<  orientation after calibration.*/
+        })
+
+mavlink_mag_cal_report_t;
 
 #define MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN 50
 #define MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN 44
@@ -31,7 +33,6 @@ typedef struct __mavlink_mag_cal_report_t {
 
 #define MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC 36
 #define MAVLINK_MSG_ID_192_CRC 36
-
 
 
 #if MAVLINK_COMMAND_24BIT
@@ -108,9 +109,14 @@ typedef struct __mavlink_mag_cal_report_t {
  * @param new_orientation  orientation after calibration.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_mag_cal_report_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               uint8_t compass_id, uint8_t cal_mask, uint8_t cal_status, uint8_t autosaved, float fitness, float ofs_x, float ofs_y, float ofs_z, float diag_x, float diag_y, float diag_z, float offdiag_x, float offdiag_y, float offdiag_z, float orientation_confidence, uint8_t old_orientation, uint8_t new_orientation)
-{
+static inline uint16_t
+mavlink_msg_mag_cal_report_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                uint8_t compass_id, uint8_t cal_mask, uint8_t cal_status,
+                                uint8_t autosaved, float fitness, float ofs_x, float ofs_y,
+                                float ofs_z, float diag_x, float diag_y, float diag_z,
+                                float offdiag_x, float offdiag_y, float offdiag_z,
+                                float orientation_confidence, uint8_t old_orientation,
+                                uint8_t new_orientation) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN];
     _mav_put_float(buf, 0, fitness);
@@ -131,7 +137,7 @@ static inline uint16_t mavlink_msg_mag_cal_report_pack(uint8_t system_id, uint8_
     _mav_put_uint8_t(buf, 48, old_orientation);
     _mav_put_uint8_t(buf, 49, new_orientation);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
 #else
     mavlink_mag_cal_report_t packet;
     packet.fitness = fitness;
@@ -156,7 +162,10 @@ static inline uint16_t mavlink_msg_mag_cal_report_pack(uint8_t system_id, uint8_
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_MAG_CAL_REPORT;
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
+    return mavlink_finalize_message(msg, system_id, component_id,
+                                    MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN,
+                                    MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN,
+                                    MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
 }
 
 /**
@@ -184,10 +193,15 @@ static inline uint16_t mavlink_msg_mag_cal_report_pack(uint8_t system_id, uint8_
  * @param new_orientation  orientation after calibration.
  * @return length of the message in bytes (excluding serial stream start sign)
  */
-static inline uint16_t mavlink_msg_mag_cal_report_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-                               mavlink_message_t* msg,
-                                   uint8_t compass_id,uint8_t cal_mask,uint8_t cal_status,uint8_t autosaved,float fitness,float ofs_x,float ofs_y,float ofs_z,float diag_x,float diag_y,float diag_z,float offdiag_x,float offdiag_y,float offdiag_z,float orientation_confidence,uint8_t old_orientation,uint8_t new_orientation)
-{
+static inline uint16_t
+mavlink_msg_mag_cal_report_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                     mavlink_message_t *msg,
+                                     uint8_t compass_id, uint8_t cal_mask, uint8_t cal_status,
+                                     uint8_t autosaved, float fitness, float ofs_x, float ofs_y,
+                                     float ofs_z, float diag_x, float diag_y, float diag_z,
+                                     float offdiag_x, float offdiag_y, float offdiag_z,
+                                     float orientation_confidence, uint8_t old_orientation,
+                                     uint8_t new_orientation) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN];
     _mav_put_float(buf, 0, fitness);
@@ -208,7 +222,7 @@ static inline uint16_t mavlink_msg_mag_cal_report_pack_chan(uint8_t system_id, u
     _mav_put_uint8_t(buf, 48, old_orientation);
     _mav_put_uint8_t(buf, 49, new_orientation);
 
-        memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
+    memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
 #else
     mavlink_mag_cal_report_t packet;
     packet.fitness = fitness;
@@ -233,7 +247,10 @@ static inline uint16_t mavlink_msg_mag_cal_report_pack_chan(uint8_t system_id, u
 #endif
 
     msg->msgid = MAVLINK_MSG_ID_MAG_CAL_REPORT;
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan,
+                                         MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN,
+                                         MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN,
+                                         MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
 }
 
 /**
@@ -244,9 +261,20 @@ static inline uint16_t mavlink_msg_mag_cal_report_pack_chan(uint8_t system_id, u
  * @param msg The MAVLink message to compress the data into
  * @param mag_cal_report C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_mag_cal_report_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_mag_cal_report_t* mag_cal_report)
-{
-    return mavlink_msg_mag_cal_report_pack(system_id, component_id, msg, mag_cal_report->compass_id, mag_cal_report->cal_mask, mag_cal_report->cal_status, mag_cal_report->autosaved, mag_cal_report->fitness, mag_cal_report->ofs_x, mag_cal_report->ofs_y, mag_cal_report->ofs_z, mag_cal_report->diag_x, mag_cal_report->diag_y, mag_cal_report->diag_z, mag_cal_report->offdiag_x, mag_cal_report->offdiag_y, mag_cal_report->offdiag_z, mag_cal_report->orientation_confidence, mag_cal_report->old_orientation, mag_cal_report->new_orientation);
+static inline uint16_t
+mavlink_msg_mag_cal_report_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t *msg,
+                                  const mavlink_mag_cal_report_t *mag_cal_report) {
+    return mavlink_msg_mag_cal_report_pack(system_id, component_id, msg, mag_cal_report->compass_id,
+                                           mag_cal_report->cal_mask, mag_cal_report->cal_status,
+                                           mag_cal_report->autosaved, mag_cal_report->fitness,
+                                           mag_cal_report->ofs_x, mag_cal_report->ofs_y,
+                                           mag_cal_report->ofs_z, mag_cal_report->diag_x,
+                                           mag_cal_report->diag_y, mag_cal_report->diag_z,
+                                           mag_cal_report->offdiag_x, mag_cal_report->offdiag_y,
+                                           mag_cal_report->offdiag_z,
+                                           mag_cal_report->orientation_confidence,
+                                           mag_cal_report->old_orientation,
+                                           mag_cal_report->new_orientation);
 }
 
 /**
@@ -258,9 +286,24 @@ static inline uint16_t mavlink_msg_mag_cal_report_encode(uint8_t system_id, uint
  * @param msg The MAVLink message to compress the data into
  * @param mag_cal_report C-struct to read the message contents from
  */
-static inline uint16_t mavlink_msg_mag_cal_report_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_mag_cal_report_t* mag_cal_report)
-{
-    return mavlink_msg_mag_cal_report_pack_chan(system_id, component_id, chan, msg, mag_cal_report->compass_id, mag_cal_report->cal_mask, mag_cal_report->cal_status, mag_cal_report->autosaved, mag_cal_report->fitness, mag_cal_report->ofs_x, mag_cal_report->ofs_y, mag_cal_report->ofs_z, mag_cal_report->diag_x, mag_cal_report->diag_y, mag_cal_report->diag_z, mag_cal_report->offdiag_x, mag_cal_report->offdiag_y, mag_cal_report->offdiag_z, mag_cal_report->orientation_confidence, mag_cal_report->old_orientation, mag_cal_report->new_orientation);
+static inline uint16_t
+mavlink_msg_mag_cal_report_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
+                                       mavlink_message_t *msg,
+                                       const mavlink_mag_cal_report_t *mag_cal_report) {
+    return mavlink_msg_mag_cal_report_pack_chan(system_id, component_id, chan, msg,
+                                                mag_cal_report->compass_id,
+                                                mag_cal_report->cal_mask,
+                                                mag_cal_report->cal_status,
+                                                mag_cal_report->autosaved, mag_cal_report->fitness,
+                                                mag_cal_report->ofs_x, mag_cal_report->ofs_y,
+                                                mag_cal_report->ofs_z, mag_cal_report->diag_x,
+                                                mag_cal_report->diag_y, mag_cal_report->diag_z,
+                                                mag_cal_report->offdiag_x,
+                                                mag_cal_report->offdiag_y,
+                                                mag_cal_report->offdiag_z,
+                                                mag_cal_report->orientation_confidence,
+                                                mag_cal_report->old_orientation,
+                                                mag_cal_report->new_orientation);
 }
 
 /**
@@ -414,9 +457,8 @@ static inline void mavlink_msg_mag_cal_report_send_buf(mavlink_message_t *msgbuf
  *
  * @return  Compass being calibrated.
  */
-static inline uint8_t mavlink_msg_mag_cal_report_get_compass_id(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  40);
+static inline uint8_t mavlink_msg_mag_cal_report_get_compass_id(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 40);
 }
 
 /**
@@ -424,9 +466,8 @@ static inline uint8_t mavlink_msg_mag_cal_report_get_compass_id(const mavlink_me
  *
  * @return  Bitmask of compasses being calibrated.
  */
-static inline uint8_t mavlink_msg_mag_cal_report_get_cal_mask(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  41);
+static inline uint8_t mavlink_msg_mag_cal_report_get_cal_mask(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 41);
 }
 
 /**
@@ -434,9 +475,8 @@ static inline uint8_t mavlink_msg_mag_cal_report_get_cal_mask(const mavlink_mess
  *
  * @return  Calibration Status.
  */
-static inline uint8_t mavlink_msg_mag_cal_report_get_cal_status(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  42);
+static inline uint8_t mavlink_msg_mag_cal_report_get_cal_status(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 42);
 }
 
 /**
@@ -444,9 +484,8 @@ static inline uint8_t mavlink_msg_mag_cal_report_get_cal_status(const mavlink_me
  *
  * @return  0=requires a MAV_CMD_DO_ACCEPT_MAG_CAL, 1=saved to parameters.
  */
-static inline uint8_t mavlink_msg_mag_cal_report_get_autosaved(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  43);
+static inline uint8_t mavlink_msg_mag_cal_report_get_autosaved(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 43);
 }
 
 /**
@@ -454,9 +493,8 @@ static inline uint8_t mavlink_msg_mag_cal_report_get_autosaved(const mavlink_mes
  *
  * @return [mgauss] RMS milligauss residuals.
  */
-static inline float mavlink_msg_mag_cal_report_get_fitness(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  0);
+static inline float mavlink_msg_mag_cal_report_get_fitness(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 0);
 }
 
 /**
@@ -464,9 +502,8 @@ static inline float mavlink_msg_mag_cal_report_get_fitness(const mavlink_message
  *
  * @return  X offset.
  */
-static inline float mavlink_msg_mag_cal_report_get_ofs_x(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  4);
+static inline float mavlink_msg_mag_cal_report_get_ofs_x(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 4);
 }
 
 /**
@@ -474,9 +511,8 @@ static inline float mavlink_msg_mag_cal_report_get_ofs_x(const mavlink_message_t
  *
  * @return  Y offset.
  */
-static inline float mavlink_msg_mag_cal_report_get_ofs_y(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  8);
+static inline float mavlink_msg_mag_cal_report_get_ofs_y(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 8);
 }
 
 /**
@@ -484,9 +520,8 @@ static inline float mavlink_msg_mag_cal_report_get_ofs_y(const mavlink_message_t
  *
  * @return  Z offset.
  */
-static inline float mavlink_msg_mag_cal_report_get_ofs_z(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  12);
+static inline float mavlink_msg_mag_cal_report_get_ofs_z(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 12);
 }
 
 /**
@@ -494,9 +529,8 @@ static inline float mavlink_msg_mag_cal_report_get_ofs_z(const mavlink_message_t
  *
  * @return  X diagonal (matrix 11).
  */
-static inline float mavlink_msg_mag_cal_report_get_diag_x(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  16);
+static inline float mavlink_msg_mag_cal_report_get_diag_x(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 16);
 }
 
 /**
@@ -504,9 +538,8 @@ static inline float mavlink_msg_mag_cal_report_get_diag_x(const mavlink_message_
  *
  * @return  Y diagonal (matrix 22).
  */
-static inline float mavlink_msg_mag_cal_report_get_diag_y(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  20);
+static inline float mavlink_msg_mag_cal_report_get_diag_y(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 20);
 }
 
 /**
@@ -514,9 +547,8 @@ static inline float mavlink_msg_mag_cal_report_get_diag_y(const mavlink_message_
  *
  * @return  Z diagonal (matrix 33).
  */
-static inline float mavlink_msg_mag_cal_report_get_diag_z(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  24);
+static inline float mavlink_msg_mag_cal_report_get_diag_z(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 24);
 }
 
 /**
@@ -524,9 +556,8 @@ static inline float mavlink_msg_mag_cal_report_get_diag_z(const mavlink_message_
  *
  * @return  X off-diagonal (matrix 12 and 21).
  */
-static inline float mavlink_msg_mag_cal_report_get_offdiag_x(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  28);
+static inline float mavlink_msg_mag_cal_report_get_offdiag_x(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 28);
 }
 
 /**
@@ -534,9 +565,8 @@ static inline float mavlink_msg_mag_cal_report_get_offdiag_x(const mavlink_messa
  *
  * @return  Y off-diagonal (matrix 13 and 31).
  */
-static inline float mavlink_msg_mag_cal_report_get_offdiag_y(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  32);
+static inline float mavlink_msg_mag_cal_report_get_offdiag_y(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 32);
 }
 
 /**
@@ -544,9 +574,8 @@ static inline float mavlink_msg_mag_cal_report_get_offdiag_y(const mavlink_messa
  *
  * @return  Z off-diagonal (matrix 32 and 23).
  */
-static inline float mavlink_msg_mag_cal_report_get_offdiag_z(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  36);
+static inline float mavlink_msg_mag_cal_report_get_offdiag_z(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 36);
 }
 
 /**
@@ -554,9 +583,9 @@ static inline float mavlink_msg_mag_cal_report_get_offdiag_z(const mavlink_messa
  *
  * @return  Confidence in orientation (higher is better).
  */
-static inline float mavlink_msg_mag_cal_report_get_orientation_confidence(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_float(msg,  44);
+static inline float
+mavlink_msg_mag_cal_report_get_orientation_confidence(const mavlink_message_t *msg) {
+    return _MAV_RETURN_float(msg, 44);
 }
 
 /**
@@ -564,9 +593,8 @@ static inline float mavlink_msg_mag_cal_report_get_orientation_confidence(const 
  *
  * @return  orientation before calibration.
  */
-static inline uint8_t mavlink_msg_mag_cal_report_get_old_orientation(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  48);
+static inline uint8_t mavlink_msg_mag_cal_report_get_old_orientation(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 48);
 }
 
 /**
@@ -574,9 +602,8 @@ static inline uint8_t mavlink_msg_mag_cal_report_get_old_orientation(const mavli
  *
  * @return  orientation after calibration.
  */
-static inline uint8_t mavlink_msg_mag_cal_report_get_new_orientation(const mavlink_message_t* msg)
-{
-    return _MAV_RETURN_uint8_t(msg,  49);
+static inline uint8_t mavlink_msg_mag_cal_report_get_new_orientation(const mavlink_message_t *msg) {
+    return _MAV_RETURN_uint8_t(msg, 49);
 }
 
 /**
@@ -585,8 +612,8 @@ static inline uint8_t mavlink_msg_mag_cal_report_get_new_orientation(const mavli
  * @param msg The message to decode
  * @param mag_cal_report C-struct to decode the message contents into
  */
-static inline void mavlink_msg_mag_cal_report_decode(const mavlink_message_t* msg, mavlink_mag_cal_report_t* mag_cal_report)
-{
+static inline void mavlink_msg_mag_cal_report_decode(const mavlink_message_t *msg,
+                                                     mavlink_mag_cal_report_t *mag_cal_report) {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     mag_cal_report->fitness = mavlink_msg_mag_cal_report_get_fitness(msg);
     mag_cal_report->ofs_x = mavlink_msg_mag_cal_report_get_ofs_x(msg);
@@ -602,12 +629,13 @@ static inline void mavlink_msg_mag_cal_report_decode(const mavlink_message_t* ms
     mag_cal_report->cal_mask = mavlink_msg_mag_cal_report_get_cal_mask(msg);
     mag_cal_report->cal_status = mavlink_msg_mag_cal_report_get_cal_status(msg);
     mag_cal_report->autosaved = mavlink_msg_mag_cal_report_get_autosaved(msg);
-    mag_cal_report->orientation_confidence = mavlink_msg_mag_cal_report_get_orientation_confidence(msg);
+    mag_cal_report->orientation_confidence = mavlink_msg_mag_cal_report_get_orientation_confidence(
+            msg);
     mag_cal_report->old_orientation = mavlink_msg_mag_cal_report_get_old_orientation(msg);
     mag_cal_report->new_orientation = mavlink_msg_mag_cal_report_get_new_orientation(msg);
 #else
-        uint8_t len = msg->len < MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN? msg->len : MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN;
-        memset(mag_cal_report, 0, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
-    memcpy(mag_cal_report, _MAV_PAYLOAD(msg), len);
+    uint8_t len = msg->len < MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN? msg->len : MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN;
+    memset(mag_cal_report, 0, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
+memcpy(mag_cal_report, _MAV_PAYLOAD(msg), len);
 #endif
 }

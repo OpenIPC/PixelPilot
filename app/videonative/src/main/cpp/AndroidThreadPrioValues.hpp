@@ -8,9 +8,9 @@
 // The values for android thread priorities and
 // the values used by my FPV_VR app (2 different namespaces though)
 
-namespace AndroidThreadPriorityValues{
+namespace AndroidThreadPriorityValues {
     //This one was taken from https://android.googlesource.com/platform/system/core/+/jb-dev/include/system/graphics.h
-    constexpr auto HAL_PRIORITY_URGENT_DISPLAY=-8;
+    constexpr auto HAL_PRIORITY_URGENT_DISPLAY = -8;
     // values taken from https://android.googlesource.com/platform/frameworks/native/+/android-4.2.2_r1/include/utils/ThreadDefs.h
 #ifdef __cplusplus
     extern "C" {
@@ -30,30 +30,30 @@ namespace AndroidThreadPriorityValues{
          * Use the levels below when appropriate. Intermediate values are
          * acceptable, preferably use the {MORE|LESS}_FAVORABLE constants below.
          */
-        ANDROID_PRIORITY_LOWEST         =  19,
+        ANDROID_PRIORITY_LOWEST = 19,
         /* use for background tasks */
-        ANDROID_PRIORITY_BACKGROUND     =  10,
+        ANDROID_PRIORITY_BACKGROUND = 10,
 
         /* most threads run at normal priority */
-        ANDROID_PRIORITY_NORMAL         =   0,
+        ANDROID_PRIORITY_NORMAL = 0,
 
         /* threads currently running a UI that the user is interacting with */
-        ANDROID_PRIORITY_FOREGROUND     =  -2,
+        ANDROID_PRIORITY_FOREGROUND = -2,
         /* the main UI thread has a slightly more favorable priority */
-        ANDROID_PRIORITY_DISPLAY        =  -4,
+        ANDROID_PRIORITY_DISPLAY = -4,
 
         /* ui service treads might want to run at a urgent display (uncommon) */
-        ANDROID_PRIORITY_URGENT_DISPLAY =  HAL_PRIORITY_URGENT_DISPLAY,
+        ANDROID_PRIORITY_URGENT_DISPLAY = HAL_PRIORITY_URGENT_DISPLAY,
 
         /* all normal audio threads */
-        ANDROID_PRIORITY_AUDIO          = -16,
+        ANDROID_PRIORITY_AUDIO = -16,
 
         /* service audio threads (uncommon) */
-        ANDROID_PRIORITY_URGENT_AUDIO   = -19,
+        ANDROID_PRIORITY_URGENT_AUDIO = -19,
         /* should never be used in practice. regular process might not
          * be allowed to use this level */
-        ANDROID_PRIORITY_HIGHEST        = -20,
-        ANDROID_PRIORITY_DEFAULT        = ANDROID_PRIORITY_NORMAL,
+        ANDROID_PRIORITY_HIGHEST = -20,
+        ANDROID_PRIORITY_DEFAULT = ANDROID_PRIORITY_NORMAL,
         ANDROID_PRIORITY_MORE_FAVORABLE = -1,
         ANDROID_PRIORITY_LESS_FAVORABLE = +1,
     };
