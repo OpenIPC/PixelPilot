@@ -47,6 +47,10 @@ public class OSDManager {
         return osdLocked;
     }
 
+    public String getTitle() {
+        return isOSDLocked() ? "Unlock OSD" : "Lock OSD";
+    }
+
     public void onOSDItemCheckChanged(OSDElement element, boolean isChecked) {
         // Show or hide the ImageView corresponding to the checkbox position
         element.layout.setVisibility(isChecked ? View.VISIBLE : View.GONE);

@@ -30,13 +30,7 @@ class H26XParser {
 public:
     H26XParser(NALU_DATA_CALLBACK onNewNALU);
 
-    void parse_raw_h264_stream(const uint8_t *data, const size_t data_length);
-
-    void parse_raw_h265_stream(const uint8_t *data, const size_t data_length);
-
-    void parse_rtp_h264_stream(const uint8_t *rtp_data, const size_t data_len);
-
-    void parse_rtp_h265_stream(const uint8_t *rtp_data, const size_t data_len);
+    void parse_rtp_stream(const uint8_t *rtp_data, const size_t data_len);
 
     void reset();
 

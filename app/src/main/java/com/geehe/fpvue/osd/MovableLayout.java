@@ -14,7 +14,6 @@ public class MovableLayout extends LinearLayout {
     private SharedPreferences preferences;
     private boolean isMovable = false;
     private float defaultX, defaultY;
-
     private String prefName;
 
     public MovableLayout(Context context) {
@@ -34,7 +33,6 @@ public class MovableLayout extends LinearLayout {
 
     private void init(Context context) {
         preferences = context.getSharedPreferences("movable_layout_prefs", Context.MODE_PRIVATE);
-
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
         Point displaySize = new Point();
@@ -46,7 +44,9 @@ public class MovableLayout extends LinearLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!isMovable) return false;
+        if (!isMovable) {
+            return false;
+        }
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:

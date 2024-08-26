@@ -80,18 +80,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     int lastVideoW = 0, lastVideoH = 0;
     WfbLinkManager wfbLinkManager;
     BroadcastReceiver batteryReceiver;
-    VideoPlayer videoPlayerH264;
-    VideoPlayer videoPlayerH265;
+    VideoPlayer videoPlayer;
     private ActivityVideoBinding binding;
     private OSDManager osdManager;
-    private String activeCodec;
     private ParcelFileDescriptor dvrFd = null;
     private Timer dvrIconTimer = null;
-
-    public static String getCodec(Context context) {
-        return context.getSharedPreferences("general",
-                Context.MODE_PRIVATE).getString("codec", "h265");
-    }
 
     public static int getChannel(Context context) {
         return context.getSharedPreferences("general",
@@ -141,13 +134,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         // Setup video players
         setContentView(binding.getRoot());
-        videoPlayerH264 = new VideoPlayer(this);
-        videoPlayerH264.setIVideoParamsChanged(this);
-        binding.svH264.getHolder().addCallback(videoPlayerH264.configure1());
-
-        videoPlayerH265 = new VideoPlayer(this);
-        videoPlayerH265.setIVideoParamsChanged(this);
-        binding.svH265.getHolder().addCallback(videoPlayerH265.configure1());
+        videoPlayer = new VideoPlayer(this);
+        videoPlayer.setIVideoParamsChanged(this);
+        binding.mainVideo.getHolder().addCallback(videoPlayer.configure1());
 
         osdManager = new OSDManager(this, binding);
         osdManager.setUp();
@@ -181,28 +170,12 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 });
             }
 
-            // Codecs
-            String codecPref = getCodec(this);
-            SubMenu codecMenu = popup.getMenu().addSubMenu("Codec");
-            codecMenu.setHeaderTitle("Current: " + codecPref);
-
-            String[] codecs = getResources().getStringArray(R.array.codecs);
-            for (String codecStr : codecs) {
-                if (codecPref.equals(codecStr)) {
-                    continue;
-                }
-                codecMenu.add(codecStr).setOnMenuItemClickListener(item -> {
-                    onCodecSettingChanged(codecStr);
-                    return true;
-                });
-            }
-
             // OSD
             SubMenu osd = popup.getMenu().addSubMenu("OSD");
-            MenuItem lock = osd.add(osdManager.isOSDLocked() ? "Unlock OSD" : "Lock OSD");
+            MenuItem lock = osd.add(osdManager.getTitle());
             lock.setOnMenuItemClickListener(item -> {
                 osdManager.lockOSD(!osdManager.isOSDLocked());
-                lock.setTitle(osdManager.isOSDLocked() ? "Unlock OSD" : "Lock OSD");
+                lock.setTitle(osdManager.getTitle());
                 item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
                 item.setActionView(new View(this));
                 return false;
@@ -249,7 +222,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 }
                 return true;
             });
-
             MenuItem fmp4 = recording.add("fMP4");
             fmp4.setCheckable(true);
             fmp4.setChecked(getDvrMP4());
@@ -333,7 +305,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         }
         try {
             dvrFd = getContentResolver().openFileDescriptor(dvrUri, "rw");
-            currentPlayer().startDvr(dvrFd.getFd(), getDvrMP4());
+            videoPlayer.startDvr(dvrFd.getFd(), getDvrMP4());
         } catch (IOException e) {
             Log.e(TAG, "Failed to open dvr file ", e);
             dvrFd = null;
@@ -353,7 +325,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             return;
         }
         binding.imgRecIndicator.setVisibility(View.INVISIBLE);
-        currentPlayer().stopDvr();
+        videoPlayer.stopDvr();
         dvrIconTimer.cancel();
         dvrIconTimer.purge();
         dvrIconTimer = null;
@@ -484,7 +456,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         handler.removeCallbacks(runnable);
         unregisterReceivers();
         wfbLinkManager.stopAdapters();
-        stopVideoPlayer();
+        videoPlayer.stop();
         super.onStop();
     }
 
@@ -493,7 +465,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         registerReceivers();
 
         // On resume is called when the app is reopened, a device might have been plugged since the last time it started.
-        startVideoPlayer();
+        videoPlayer.start();
 
         wfbLinkManager.setChannel(getChannel(this));
         wfbLinkManager.refreshAdapters();
@@ -501,31 +473,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         registerReceivers();
         super.onResume();
-    }
-
-    protected VideoPlayer currentPlayer() {
-        return getCodec(this).equals("h265") ? videoPlayerH265 : videoPlayerH264;
-    }
-
-    public synchronized void startVideoPlayer() {
-        String codec = getCodec(this);
-        if (codec.equals("h265")) {
-            videoPlayerH264.stop();
-            videoPlayerH265.start(codec);
-            binding.svH264.setVisibility(View.INVISIBLE);
-            binding.svH265.setVisibility(View.VISIBLE);
-        } else {
-            videoPlayerH265.stop();
-            videoPlayerH264.start(codec);
-            binding.svH265.setVisibility(View.INVISIBLE);
-            binding.svH264.setVisibility(View.VISIBLE);
-        }
-        activeCodec = codec;
-    }
-
-    public synchronized void stopVideoPlayer() {
-        videoPlayerH264.stop();
-        videoPlayerH265.stop();
     }
 
     @Override
@@ -540,19 +487,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         editor.apply();
         wfbLinkManager.stopAdapters();
         wfbLinkManager.startAdapters(channel);
-    }
-
-    @Override
-    public void onCodecSettingChanged(String codec) {
-        if (codec.equals(activeCodec)) {
-            return;
-        }
-        SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("codec", codec);
-        editor.apply();
-        stopVideoPlayer();
-        startVideoPlayer();
     }
 
     @Override

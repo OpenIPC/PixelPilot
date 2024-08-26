@@ -1,9 +1,5 @@
 <resources>
     <string name="app_name">PixelPilot</string>
-    <string-array name="codecs">
-        <item>h265</item>
-        <item>h264</item>
-    </string-array>
     <string-array name="channels">
         <item>1</item>
         <item>2</item>

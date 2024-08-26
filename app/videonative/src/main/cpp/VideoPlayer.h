@@ -21,12 +21,7 @@ class VideoPlayer {
 public:
     VideoPlayer(JNIEnv *env, jobject context);
 
-    enum VIDEO_DATA_TYPE {
-        RTP_H264, RAW_H264, RTP_H265, RAW_H265
-    };
-
-    void onNewVideoData(const uint8_t *data, const std::size_t data_length,
-                        const VIDEO_DATA_TYPE videoDataType);
+    void onNewVideoData(const uint8_t *data, const std::size_t data_length);
 
     /*
      * Set the surface the decoder can be configured with. When @param surface==nullptr
@@ -37,7 +32,7 @@ public:
     /*
      * Start the receiver and ground recorder if enabled
      */
-    void start(JNIEnv *env, jobject androidContext, jstring codec);
+    void start(JNIEnv *env, jobject androidContext);
 
     /**
      * Stop the receiver and ground recorder if enabled

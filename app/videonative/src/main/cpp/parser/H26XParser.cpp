@@ -20,21 +20,14 @@ void H26XParser::reset() {
     nParsedKonfigurationFrames = 0;
 }
 
-void H26XParser::parse_raw_h264_stream(const uint8_t *data, const size_t data_length) {
-    //mParseRAW.parseData(data,data_length);
-}
-
-void H26XParser::parse_raw_h265_stream(const uint8_t *data, const size_t data_length) {
-    //mParseRAW.parseData(data,data_length,true);
-}
-
-void H26XParser::parse_rtp_h264_stream(const uint8_t *rtp_data, const size_t data_length) {
-    mDecodeRTP.parseRTPH264toNALU(rtp_data, data_length);
-}
-
-void H26XParser::parse_rtp_h265_stream(const uint8_t *rtp_data, const size_t data_length) {
-    IS_H265 = true;
-    mDecodeRTP.parseRTPH265toNALU(rtp_data, data_length);
+void H26XParser::parse_rtp_stream(const uint8_t *rtp_data, const size_t data_length) {
+    const RTP::RTPPacket rtpPacket(rtp_data, data_length);
+    if (rtpPacket.header.payload == RTP_PAYLOAD_TYPE_H264) {
+        mDecodeRTP.parseRTPH264toNALU(rtp_data, data_length);
+    } else if (rtpPacket.header.payload == RTP_PAYLOAD_TYPE_H265) {
+        IS_H265 = true;
+        mDecodeRTP.parseRTPH265toNALU(rtp_data, data_length);
+    }
 }
 
 void H26XParser::onNewNaluDataExtracted(const std::chrono::steady_clock::time_point creation_time,
@@ -53,7 +46,3 @@ void H26XParser::newNaluExtracted(const NALU &nalu) {
         nParsedKonfigurationFrames++;
     }
 }
-
-
-
-

@@ -180,8 +180,8 @@ struct jpeg_quant_table_header_t {
 
 // Unfortunately the payload header is the same for h264 and h265 (they don't have a type for it and catch
 // them both with a "generic" type.
-static constexpr auto RTP_PAYLOAD_TYPE_GENERIC = 96;
-static constexpr auto RTP_PAYLOAD_TYPE_H264_H265 = RTP_PAYLOAD_TYPE_GENERIC;
+static constexpr auto RTP_PAYLOAD_TYPE_H264 = 96;
+static constexpr auto RTP_PAYLOAD_TYPE_H265 = 97;
 static constexpr auto MY_SSRC_NUM = 10;
 
 namespace RTP {

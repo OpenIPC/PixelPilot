@@ -2,7 +2,6 @@ package com.geehe.videonative;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
-import android.media.MediaCodec;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
@@ -11,7 +10,6 @@ import android.view.SurfaceHolder;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -45,7 +43,7 @@ public class VideoPlayer implements IVideoParamsChanged {
 
     public static native void nativeFinalize(long nativeVideoPlayer);
 
-    public static native void nativeStart(long nativeInstance, Context context, String codec);
+    public static native void nativeStart(long nativeInstance, Context context);
 
     public static native void nativeStop(long nativeInstance, Context context);
 
@@ -76,19 +74,6 @@ public class VideoPlayer implements IVideoParamsChanged {
         }
     }
 
-    public static boolean supportsH265HW() {
-        try {
-            MediaCodec codec = MediaCodec.createDecoderByType("video/hevc");
-            if (codec != null) {
-                return true;
-            }
-        } catch (IOException e) {
-            //e.printStackTrace();
-            return false;
-        }
-        return false;
-    }
-
     public void setIVideoParamsChanged(final IVideoParamsChanged iVideoParamsChanged) {
         mVideoParamsChanged = iVideoParamsChanged;
     }
@@ -98,9 +83,9 @@ public class VideoPlayer implements IVideoParamsChanged {
         nativeSetVideoSurface(nativeVideoPlayer, surface);
     }
 
-    public synchronized void start(String codec) {
+    public synchronized void start() {
         verifyApplicationThread();
-        nativeStart(nativeVideoPlayer, context, codec);
+        nativeStart(nativeVideoPlayer, context);
         //The timer initiates the callback(s), but if no data has changed they are not called (and the timer does almost no work)
         //TODO: proper queue, but how to do synchronization in java ndk ?!
         timer = new Timer();

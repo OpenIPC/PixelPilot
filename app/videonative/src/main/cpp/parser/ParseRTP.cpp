@@ -37,16 +37,6 @@ void RTPDecoder::reset() {
 }
 
 bool RTPDecoder::validateRTPPacket(const rtp_header_t &rtp_header) {
-    if (rtp_header.payload != RTP_PAYLOAD_TYPE_GENERIC) {
-        if (std::chrono::steady_clock::now() - m_last_log_wrong_rtp_payload_time >
-            std::chrono::seconds(3)) {
-            // For some reason uvgRtp uses 106 for h264
-            // accept it anways, some rtp impl are a bit weird in this regard. Limit logging to not flood the log completely
-            MLOGD << "Unsupported payload type " << (int) rtp_header.payload;
-            m_last_log_wrong_rtp_payload_time = std::chrono::steady_clock::now();
-        }
-        //return false;
-    }
     // Testing regarding sequence numbers.This stuff can be removed without issues
     const int seqNr = rtp_header.getSequence();
     //MLOGD<<"Sequence:"<<seqNr<<" gaps:"<<m_n_gaps;
@@ -113,7 +103,7 @@ void RTPDecoder::parseRTPH264toNALU(const uint8_t *rtp_data, const size_t data_l
         MLOGD << "Not enough rtp data";
         return;
     }
-//    MLOGD<<"Got h264 rtp data";
+    //MLOGD<<"Got h264 rtp data";
     const RTP::RTPPacketH264 rtpPacket(rtp_data, data_length);
     //MLOGD<<"RTP Header: "<<rtp_header->asString();
     if (!validateRTPPacket(rtpPacket.header)) {
@@ -395,6 +385,3 @@ bool RTPDecoder::check_curr_nalu_has_valid_prefix(bool use_4_bytes_start_code) {
     uint8_t *p = &m_curr_nalu.at(0);
     return check_has_valid_prefix(p, m_nalu_data_length, use_4_bytes_start_code);
 }
-
-
-
