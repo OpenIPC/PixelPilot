@@ -1,6 +1,5 @@
 package com.geehe.videonative;
 
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -15,6 +14,7 @@ public class DecodingInfo {
     public final int nNALU;
     public final int nNALUSFeeded;
     public final int nDecodedFrames;
+    public final int nCodec;
 
     public DecodingInfo() {
         currentFPS = 0;
@@ -26,11 +26,12 @@ public class DecodingInfo {
         nNALUSFeeded = 0;
         avgTotalDecodingTime_ms = 0;
         nDecodedFrames = 0;
+        nCodec = 0;
     }
 
     public DecodingInfo(float currentFPS, float currentKiloBitsPerSecond, float avgParsingTime_ms,
                         float avgWaitForInputBTime_ms, float avgHWDecodingTime_ms,
-                        int nNALU, int nNALUSFeeded, int nDecodedFrames) {
+                        int nNALU, int nNALUSFeeded, int nDecodedFrames, int nCodec) {
         this.currentFPS = currentFPS;
         this.currentKiloBitsPerSecond = currentKiloBitsPerSecond;
         this.avgParsingTime_ms = avgParsingTime_ms;
@@ -40,6 +41,7 @@ public class DecodingInfo {
         this.nNALU = nNALU;
         this.nNALUSFeeded = nNALUSFeeded;
         this.nDecodedFrames = nDecodedFrames;
+        this.nCodec = nCodec;
     }
 
     public LinkedHashMap<String, Object> toMap() {
@@ -53,6 +55,7 @@ public class DecodingInfo {
         decodingInfo.put("nNALU", nNALU);
         decodingInfo.put("nNALUSFeeded", nNALUSFeeded);
         decodingInfo.put("nDecodedFrames", nDecodedFrames);
+        decodingInfo.put("nCodec", nCodec);
         return decodingInfo;
     }
 

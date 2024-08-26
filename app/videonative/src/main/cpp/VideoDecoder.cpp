@@ -66,11 +66,8 @@ void VideoDecoder::registerOnDecodingInfoChangedCallback(
 
 void VideoDecoder::interpretNALU(const NALU &nalu) {
     // TODO: RN switching between h264 / h265 requires re-setting the surface
-    if (decoder.configured) {
-        assert(nalu.IS_H265_PACKET == IS_H265);
-        //decoder.configured = nalu.IS_H265_PACKET==IS_H265;
-    }
     IS_H265 = nalu.IS_H265_PACKET;
+    decodingInfo.nCodec = IS_H265;
     //we need this lock, since the receiving/parsing/feeding does not run on the same thread who sets the input surface
     std::lock_guard<std::mutex> lock(mMutexInputPipe);
     decodingInfo.nNALU++;
@@ -311,7 +308,8 @@ void VideoDecoder::printAvgLog() {
                      "\nN NALUS:" << decodingInfo.nNALU
                      << " | N NALUES feeded:" << decodingInfo.nNALUSFeeded << " | N Decoded Frames:"
                      << nDecodedFrames.getAbsolute() <<
-                     "\nFPS:" << decodingInfo.currentFPS;
+                     "\nFPS:" << decodingInfo.currentFPS
+                     << " | Codec: " << (decodingInfo.nCodec ? "H265" : "H264");
             MLOGD << frameLog.str();
         }
     }

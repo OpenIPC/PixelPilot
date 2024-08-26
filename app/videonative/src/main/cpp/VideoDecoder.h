@@ -21,6 +21,7 @@ struct DecodingInfo {
     long nNALU = 0;
     long nNALUSFeeded = 0;
     long nDecodedFrames = 0;
+    long nCodec = 0;
     float currentFPS = 0;
     float currentKiloBitsPerSecond = 0;
     float avgParsingTime_ms = 0;

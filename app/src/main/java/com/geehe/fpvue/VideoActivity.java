@@ -58,6 +58,7 @@ import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -77,7 +78,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         }
     };
     protected DecodingInfo mDecodingInfo;
-    int lastVideoW = 0, lastVideoH = 0;
+    int lastVideoW = 0, lastVideoH = 0, lastCodec = 1;
     WfbLinkManager wfbLinkManager;
     BroadcastReceiver batteryReceiver;
     VideoPlayer videoPlayer;
@@ -499,18 +500,22 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     public void onDecodingInfoChanged(final DecodingInfo decodingInfo) {
         mDecodingInfo = decodingInfo;
         runOnUiThread(() -> {
+            if (lastCodec != decodingInfo.nCodec) {
+                lastCodec = decodingInfo.nCodec;
+                videoPlayer.stopAndRemoveReceiverDecoder();
+                videoPlayer.addAndStartDecoderReceiver(binding.mainVideo.getHolder().getSurface());
+                videoPlayer.start();
+            }
             if (decodingInfo.currentFPS > 0) {
                 binding.tvMessage.setVisibility(View.INVISIBLE);
             }
-            if (decodingInfo.currentKiloBitsPerSecond > 1000) {
-                binding.tvVideoStats.setText(String.format("%dx%d@%.0f   %.1f Mbps   %.1f ms",
-                        lastVideoW, lastVideoH, decodingInfo.currentFPS,
-                        decodingInfo.currentKiloBitsPerSecond / 1000, decodingInfo.avgTotalDecodingTime_ms));
-            } else {
-                binding.tvVideoStats.setText(String.format("%dx%d@%.0f   %.1f Kpbs   %.1f ms",
-                        lastVideoW, lastVideoH, decodingInfo.currentFPS,
-                        decodingInfo.currentKiloBitsPerSecond, decodingInfo.avgTotalDecodingTime_ms));
-            }
+            String info = "%dx%d@%.0f " + (decodingInfo.nCodec == 1 ? " H265 " : " H264 ")
+                    + (decodingInfo.currentKiloBitsPerSecond > 1000 ? " %.1fMbps " : " %.1fKpbs ")
+                    + " %.1fms";
+            binding.tvVideoStats.setText(String.format(Locale.US, info,
+                    lastVideoW, lastVideoH, decodingInfo.currentFPS,
+                    decodingInfo.currentKiloBitsPerSecond / 1000,
+                    decodingInfo.avgTotalDecodingTime_ms));
         });
     }
 

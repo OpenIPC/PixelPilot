@@ -259,7 +259,7 @@ JNI_METHOD(void, nativeCallBack)
             jclass jcDecodingInfo = env->FindClass("com/geehe/videonative/DecodingInfo");
             assert(jcDecodingInfo != nullptr);
             jmethodID jcDecodingInfoConstructor = env->GetMethodID(jcDecodingInfo, "<init>",
-                                                                   "(FFFFFIII)V");
+                                                                   "(FFFFFIIII)V");
             assert(jcDecodingInfoConstructor != nullptr);
             const auto info = p->latestDecodingInfo;
             auto decodingInfo = env->NewObject(jcDecodingInfo, jcDecodingInfoConstructor,
@@ -269,7 +269,8 @@ JNI_METHOD(void, nativeCallBack)
                                                (jfloat) info.avgWaitForInputBTime_ms,
                                                (jfloat) info.avgDecodingTime_ms, (jint) info.nNALU,
                                                (jint) info.nNALUSFeeded,
-                                               (jint) info.nDecodedFrames);
+                                               (jint) info.nDecodedFrames,
+                                               (jint) info.nCodec);
             assert(decodingInfo != nullptr);
             jmethodID onDecodingInfoChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged,
                                                                    "onDecodingInfoChanged",

@@ -23,6 +23,7 @@ void H26XParser::reset() {
 void H26XParser::parse_rtp_stream(const uint8_t *rtp_data, const size_t data_length) {
     const RTP::RTPPacket rtpPacket(rtp_data, data_length);
     if (rtpPacket.header.payload == RTP_PAYLOAD_TYPE_H264) {
+        IS_H265 = false;
         mDecodeRTP.parseRTPH264toNALU(rtp_data, data_length);
     } else if (rtpPacket.header.payload == RTP_PAYLOAD_TYPE_H265) {
         IS_H265 = true;
