@@ -1,6 +1,8 @@
 package com.geehe.videonative;
 
-// Also called by native code
+import androidx.annotation.Keep;
+
+@Keep
 public interface IVideoParamsChanged {
     void onVideoRatioChanged(int videoW, int videoH);
 

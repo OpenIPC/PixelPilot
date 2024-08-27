@@ -1,9 +1,11 @@
 package com.geehe.videonative;
 
+import androidx.annotation.Keep;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@SuppressWarnings("WeakerAccess")
+@Keep
 public class DecodingInfo {
     public final float currentFPS;
     public final float currentKiloBitsPerSecond;

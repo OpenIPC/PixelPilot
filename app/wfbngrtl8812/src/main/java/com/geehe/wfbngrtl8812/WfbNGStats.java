@@ -1,5 +1,8 @@
 package com.geehe.wfbngrtl8812;
 
+import androidx.annotation.Keep;
+
+@Keep
 public class WfbNGStats {
     public final int count_p_all;
     public final int count_p_dec_err;

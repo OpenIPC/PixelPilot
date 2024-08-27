@@ -1,12 +1,12 @@
 package com.geehe.wfbngrtl8812;
 
-
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
+import androidx.annotation.Keep;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashMap;
@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+@Keep
 public class WfbNgLink implements WfbNGStatsChanged {
     public static String TAG = "com.geehe.fpvue";
 
