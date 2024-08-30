@@ -1,4 +1,4 @@
-package com.geehe.fpvue.osd;
+package com.openipc.pixelpilot.osd;
 
 import android.content.Context;
 import android.content.SharedPreferences;

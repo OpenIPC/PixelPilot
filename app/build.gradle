@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.geehe.fpvue"
+    namespace = "com.openipc.pixelpilot"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.geehe.fpvue"
+        applicationId = "com.openipc.pixelpilot"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

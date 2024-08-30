@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.geehe.wfbngrtl8812"
+    namespace = "com.openipc.wfbngrtl8812"
     compileSdk = 34
 
     defaultConfig {

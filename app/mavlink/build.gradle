@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.geehe.mavlink"
+    namespace = "com.openipc.mavlink"
     compileSdk = 34
 
     defaultConfig {

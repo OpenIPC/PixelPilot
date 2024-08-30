@@ -23,7 +23,7 @@ public:
     std::unique_ptr<Aggregator> mavlink_aggregator;
 
 private:
-    const char *keyPath = "/data/user/0/com.geehe.fpvue/files/gs.key";
+    const char *keyPath = "/data/user/0/com.openipc.pixelpilot/files/gs.key";
     std::unique_ptr<WiFiDriver> wifi_driver;
     uint32_t video_channel_id_be;
     uint32_t mavlink_channel_id_be;

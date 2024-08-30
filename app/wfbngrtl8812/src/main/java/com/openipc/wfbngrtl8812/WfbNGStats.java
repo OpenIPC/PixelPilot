@@ -1,4 +1,4 @@
-package com.geehe.wfbngrtl8812;
+package com.openipc.wfbngrtl8812;
 
 import androidx.annotation.Keep;
 

@@ -314,13 +314,13 @@ void *listen(int mavlink_port) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_geehe_mavlink_MavlinkNative_nativeCallBack(JNIEnv *env, jclass clazz,
-                                                    jobject mavlinkChangeI) {
+Java_com_openipc_mavlink_MavlinkNative_nativeCallBack(JNIEnv *env, jclass clazz,
+                                                      jobject mavlinkChangeI) {
 //    g_context = mavlinkChangeI;
     //Update all java stuff
     if (latestMavlinkDataChange) {
         jclass jClassExtendsMavlinkChangeI = env->GetObjectClass(mavlinkChangeI);
-        jclass jcMavlinkData = env->FindClass("com/geehe/mavlink/MavlinkData");
+        jclass jcMavlinkData = env->FindClass("com/openipc/mavlink/MavlinkData");
         assert(jcMavlinkData != nullptr);
         jmethodID jcMavlinkDataConstructor = env->GetMethodID(jcMavlinkData, "<init>",
                                                               "(FFFFFFFDDDDDDFFFFBBBBBBLjava/lang/String;)V");
@@ -354,7 +354,7 @@ Java_com_geehe_mavlink_MavlinkNative_nativeCallBack(JNIEnv *env, jclass clazz,
         assert(mavlinkData != nullptr);
         jmethodID onNewMavlinkDataJAVA = env->GetMethodID(jClassExtendsMavlinkChangeI,
                                                           "onNewMavlinkData",
-                                                          "(Lcom/geehe/mavlink/MavlinkData;)V");
+                                                          "(Lcom/openipc/mavlink/MavlinkData;)V");
         assert(onNewMavlinkDataJAVA != nullptr);
         env->CallVoidMethod(mavlinkChangeI, onNewMavlinkDataJAVA, mavlinkData);
         latestMavlinkDataChange = false;
@@ -367,7 +367,7 @@ Java_com_geehe_mavlink_MavlinkNative_nativeCallBack(JNIEnv *env, jclass clazz,
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_geehe_mavlink_MavlinkNative_nativeStart(JNIEnv *env, jclass clazz, jobject context) {
+Java_com_openipc_mavlink_MavlinkNative_nativeStart(JNIEnv *env, jclass clazz, jobject context) {
     auto threadFunction = []() {
         listen(14550);
     };
@@ -376,6 +376,6 @@ Java_com_geehe_mavlink_MavlinkNative_nativeStart(JNIEnv *env, jclass clazz, jobj
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_geehe_mavlink_MavlinkNative_nativeStop(JNIEnv *env, jclass clazz, jobject context) {
+Java_com_openipc_mavlink_MavlinkNative_nativeStop(JNIEnv *env, jclass clazz, jobject context) {
     mavlink_thread_signal++;
 }

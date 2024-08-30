@@ -1,4 +1,4 @@
-package com.geehe.videonative;
+package com.openipc.videonative;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -20,7 +20,7 @@ import java.util.TimerTask;
  * And the native functions talk to the native instance
  */
 public class VideoPlayer implements IVideoParamsChanged {
-    private static final String TAG = "com.geehe.fpvue";
+    private static final String TAG = "pixelpilot";
 
     //All the native binding(s)
     static {

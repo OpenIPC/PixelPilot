@@ -1,4 +1,4 @@
-package com.geehe.fpvue.osd;
+package com.openipc.pixelpilot.osd;
 
 import static android.content.Context.MODE_PRIVATE;
 import static java.lang.Math.atan2;
@@ -12,16 +12,16 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.View;
 
-import com.geehe.fpvue.R;
-import com.geehe.fpvue.databinding.ActivityVideoBinding;
-import com.geehe.mavlink.MavlinkData;
+import com.openipc.mavlink.MavlinkData;
+import com.openipc.pixelpilot.R;
+import com.openipc.pixelpilot.databinding.ActivityVideoBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class OSDManager {
-    private static final String TAG = "com.geehe.fpvue.osd";
+    private static final String TAG = "pixelpilot";
     private final ActivityVideoBinding binding;
     private final Context context;
     private final Handler handler = new Handler();

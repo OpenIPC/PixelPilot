@@ -309,7 +309,7 @@ void VideoDecoder::printAvgLog() {
                      << " | N NALUES feeded:" << decodingInfo.nNALUSFeeded << " | N Decoded Frames:"
                      << nDecodedFrames.getAbsolute() <<
                      "\nFPS:" << decodingInfo.currentFPS
-                     << " | Codec: " << (decodingInfo.nCodec ? "H265" : "H264");
+                     << " | Codec:" << (decodingInfo.nCodec ? "H265" : "H264");
             MLOGD << frameLog.str();
         }
     }

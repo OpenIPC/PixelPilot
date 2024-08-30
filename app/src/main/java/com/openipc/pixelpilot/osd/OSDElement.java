@@ -1,4 +1,4 @@
-package com.geehe.fpvue.osd;
+package com.openipc.pixelpilot.osd;
 
 public class OSDElement {
     public String name;

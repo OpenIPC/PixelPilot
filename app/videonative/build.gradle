@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.geehe.videonative"
+    namespace = "com.openipc.videonative"
     compileSdk = 34
 
     defaultConfig {

@@ -1,4 +1,4 @@
-package com.geehe.mavlink;
+package com.openipc.mavlink;
 
 import android.content.Context;
 

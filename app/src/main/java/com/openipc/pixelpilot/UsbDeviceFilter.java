@@ -1,4 +1,4 @@
-package com.geehe.fpvue;
+package com.openipc.pixelpilot;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;

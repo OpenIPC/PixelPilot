@@ -1,4 +1,4 @@
-package com.geehe.videonative;
+package com.openipc.videonative;
 
 import androidx.annotation.Keep;
 

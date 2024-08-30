@@ -1,4 +1,4 @@
-package com.geehe.wfbngrtl8812;
+package com.openipc.wfbngrtl8812;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
@@ -16,7 +16,7 @@ import java.util.TimerTask;
 
 @Keep
 public class WfbNgLink implements WfbNGStatsChanged {
-    public static String TAG = "com.geehe.fpvue";
+    public static String TAG = "pixelpilot";
 
     // Load the 'Rtl8812au_Wfbng' library on application startup.
     static {

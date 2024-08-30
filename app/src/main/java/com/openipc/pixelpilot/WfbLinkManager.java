@@ -1,4 +1,4 @@
-package com.geehe.fpvue;
+package com.openipc.pixelpilot;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,8 +9,8 @@ import android.hardware.usb.UsbManager;
 import android.util.Log;
 import android.view.View;
 
-import com.geehe.fpvue.databinding.ActivityVideoBinding;
-import com.geehe.wfbngrtl8812.WfbNgLink;
+import com.openipc.pixelpilot.databinding.ActivityVideoBinding;
+import com.openipc.wfbngrtl8812.WfbNgLink;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 public class WfbLinkManager extends BroadcastReceiver {
-    public static final String ACTION_USB_PERMISSION = "com.geehe.fpvue.USB_PERMISSION";
-    private static final String TAG = "UsbManager";
+    public static final String ACTION_USB_PERMISSION = "com.openipc.pixelpilot.USB_PERMISSION";
+    private static final String TAG = "pixelpilot";
     static Map<String, UsbDevice> activeWifiAdapters = new HashMap<>();
     private final WfbNgLink wfbLink;
     private final ActivityVideoBinding binding;

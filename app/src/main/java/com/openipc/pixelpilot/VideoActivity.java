@@ -1,4 +1,4 @@
-package com.geehe.fpvue;
+package com.openipc.pixelpilot;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -31,23 +31,23 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.documentfile.provider.DocumentFile;
 
-import com.geehe.fpvue.databinding.ActivityVideoBinding;
-import com.geehe.fpvue.osd.OSDElement;
-import com.geehe.fpvue.osd.OSDManager;
-import com.geehe.mavlink.MavlinkData;
-import com.geehe.mavlink.MavlinkNative;
-import com.geehe.mavlink.MavlinkUpdate;
-import com.geehe.videonative.DecodingInfo;
-import com.geehe.videonative.IVideoParamsChanged;
-import com.geehe.videonative.VideoPlayer;
-import com.geehe.wfbngrtl8812.WfbNGStats;
-import com.geehe.wfbngrtl8812.WfbNGStatsChanged;
-import com.geehe.wfbngrtl8812.WfbNgLink;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.openipc.mavlink.MavlinkData;
+import com.openipc.mavlink.MavlinkNative;
+import com.openipc.mavlink.MavlinkUpdate;
+import com.openipc.pixelpilot.databinding.ActivityVideoBinding;
+import com.openipc.pixelpilot.osd.OSDElement;
+import com.openipc.pixelpilot.osd.OSDManager;
+import com.openipc.videonative.DecodingInfo;
+import com.openipc.videonative.IVideoParamsChanged;
+import com.openipc.videonative.VideoPlayer;
+import com.openipc.wfbngrtl8812.WfbNGStats;
+import com.openipc.wfbngrtl8812.WfbNGStatsChanged;
+import com.openipc.wfbngrtl8812.WfbNgLink;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

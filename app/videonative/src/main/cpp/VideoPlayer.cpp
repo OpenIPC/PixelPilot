@@ -9,6 +9,8 @@
 #include <android/log.h>
 #include <fstream>
 
+#define TAG "pixelpilot"
+
 VideoPlayer::VideoPlayer(JNIEnv *env, jobject context) :
         mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)},
         videoDecoder(env) {
@@ -53,11 +55,11 @@ void VideoPlayer::processQueue() {
                 if (MP4E_STATUS_OK != mp4_h26x_write_init(&mp4wr, mux, latestVideoRatio.width,
                                                           latestVideoRatio.height,
                                                           nalu.IS_H265_PACKET)) {
-                    __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue",
+                    __android_log_print(ANDROID_LOG_DEBUG, TAG,
                                         "error: mp4_h26x_write_init failed");
                 }
                 framerate = latestDecodingInfo.currentFPS;
-                __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue",
+                __android_log_print(ANDROID_LOG_DEBUG, TAG,
                                     "mp4 init with fps=%.2f, res=%dx%d, hevc=%d", framerate,
                                     latestVideoRatio.width, latestVideoRatio.height,
                                     nalu.IS_H265_PACKET);
@@ -68,7 +70,7 @@ void VideoPlayer::processQueue() {
             auto res = mp4_h26x_write_nal(&mp4wr, nalu.getData(), nalu.getSize(),
                                           90000 / framerate);
             if (MP4E_STATUS_OK != res) {
-                __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue",
+                __android_log_print(ANDROID_LOG_DEBUG, TAG,
                                     "mp4_h26x_write_nal failed with %d", res);
             }
         }
@@ -81,7 +83,7 @@ void VideoPlayer::processQueue() {
         fout = NULL;
     }
     dvr_fd = -1;
-    __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue", "dvr thread done");
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "dvr thread done");
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
@@ -147,9 +149,9 @@ std::string VideoPlayer::getInfoString() const {
 void VideoPlayer::startDvr(JNIEnv *env, jint fd, jint dvr_fmp4_enabled) {
     dvr_fd = dup(fd);
     dvr_mp4_fragmentation = dvr_fmp4_enabled;
-    __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue", "dvr_fd=%d", dvr_fd);
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "dvr_fd=%d", dvr_fd);
     if (dvr_fd == -1) {
-        __android_log_print(ANDROID_LOG_DEBUG, "com.geehe.fpvue",
+        __android_log_print(ANDROID_LOG_DEBUG, TAG,
                             "Failed to duplicate dvr file descriptor");
         return;
     }
@@ -163,7 +165,7 @@ void VideoPlayer::stopDvr() {
 //----------------------------------------------------JAVA bindings---------------------------------------------------------------
 #define JNI_METHOD(return_type, method_name) \
   JNIEXPORT return_type JNICALL              \
-      Java_com_geehe_videonative_VideoPlayer_##method_name
+      Java_com_openipc_videonative_VideoPlayer_##method_name
 
 inline jlong jptr(VideoPlayer *videoPlayerN) {
     return reinterpret_cast<intptr_t>(videoPlayerN);
@@ -179,8 +181,8 @@ extern "C" {
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_geehe_videonative_VideoPlayer_nativeInitialize(JNIEnv *env, jclass clazz,
-                                                        jobject context) {
+Java_com_openipc_videonative_VideoPlayer_nativeInitialize(JNIEnv *env, jclass clazz,
+                                                          jobject context) {
     auto *p = new VideoPlayer(env, context);
     return jptr(p);
 }
@@ -256,7 +258,7 @@ JNI_METHOD(void, nativeCallBack)
             p->latestVideoRatioChanged = false;
         }
         if (p->latestDecodingInfoChanged) {
-            jclass jcDecodingInfo = env->FindClass("com/geehe/videonative/DecodingInfo");
+            jclass jcDecodingInfo = env->FindClass("com/openipc/videonative/DecodingInfo");
             assert(jcDecodingInfo != nullptr);
             jmethodID jcDecodingInfoConstructor = env->GetMethodID(jcDecodingInfo, "<init>",
                                                                    "(FFFFFIIII)V");
@@ -274,7 +276,7 @@ JNI_METHOD(void, nativeCallBack)
             assert(decodingInfo != nullptr);
             jmethodID onDecodingInfoChangedJAVA = env->GetMethodID(jClassExtendsIVideoParamsChanged,
                                                                    "onDecodingInfoChanged",
-                                                                   "(Lcom/geehe/videonative/DecodingInfo;)V");
+                                                                   "(Lcom/openipc/videonative/DecodingInfo;)V");
             assert(onDecodingInfoChangedJAVA != nullptr);
             env->CallVoidMethod(videoParamsChangedI, onDecodingInfoChangedJAVA, decodingInfo);
             p->latestDecodingInfoChanged = false;
@@ -287,22 +289,22 @@ JNI_METHOD(void, nativeCallBack)
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_geehe_videonative_VideoPlayer_nativeStartDvr(JNIEnv *env, jclass clazz,
-                                                      jlong native_instance,
-                                                      jint fd, jint fmp4_enabled) {
+Java_com_openipc_videonative_VideoPlayer_nativeStartDvr(JNIEnv *env, jclass clazz,
+                                                        jlong native_instance,
+                                                        jint fd, jint fmp4_enabled) {
     native(native_instance)->startDvr(env, fd, fmp4_enabled);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_geehe_videonative_VideoPlayer_nativeStopDvr(JNIEnv *env, jclass clazz,
-                                                     jlong native_instance) {
+Java_com_openipc_videonative_VideoPlayer_nativeStopDvr(JNIEnv *env, jclass clazz,
+                                                       jlong native_instance) {
     native(native_instance)->stopDvr();
 }
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_geehe_videonative_VideoPlayer_nativeIsRecording(JNIEnv *env, jclass clazz,
-                                                         jlong native_instance) {
+Java_com_openipc_videonative_VideoPlayer_nativeIsRecording(JNIEnv *env, jclass clazz,
+                                                           jlong native_instance) {
     return native(native_instance)->isRecording();
 }
