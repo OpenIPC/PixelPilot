@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -124,6 +125,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         super.onCreate(savedInstanceState);
         binding = ActivityVideoBinding.inflate(getLayoutInflater());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
 
         // Init wfb ng.
@@ -494,6 +496,13 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     public void onVideoRatioChanged(final int videoW, final int videoH) {
         lastVideoW = videoW;
         lastVideoH = videoH;
+
+        Log.d(TAG, "Set resolution: " + videoW + "x" + videoH);
+        View mSurface = findViewById(R.id.mainVideo);
+        ConstraintLayout.LayoutParams params =
+                (ConstraintLayout.LayoutParams) mSurface.getLayoutParams();
+        params.dimensionRatio = videoW + ":" + videoH;
+        runOnUiThread(() -> mSurface.setLayoutParams(params));
     }
 
     @Override

@@ -227,8 +227,6 @@ void VideoDecoder::checkOutputLoop() {
                                                               BUFFER_TIMEOUT_US);
         if (index >= 0) {
             const auto now = steady_clock::now();
-            const int64_t nowNS = (int64_t) duration_cast<nanoseconds>(
-                    now.time_since_epoch()).count();
             const int64_t nowUS = (int64_t) duration_cast<microseconds>(
                     now.time_since_epoch()).count();
             //the timestamp for releasing the buffer is in NS, just release as fast as possible (e.g. now)
@@ -236,7 +234,7 @@ void VideoDecoder::checkOutputLoop() {
             //-> renderOutputBufferAndRelease which is in https://android.googlesource.com/platform/frameworks/av/+/3fdb405/media/libstagefright/MediaCodec.cpp
             //-> Message kWhatReleaseOutputBuffer -> onReleaseOutputBuffer
             // also https://android.googlesource.com/platform/frameworks/native/+/5c1139f/libs/gui/SurfaceTexture.cpp
-            AMediaCodec_releaseOutputBufferAtTime(decoder.codec, (size_t) index, nowNS);
+            AMediaCodec_releaseOutputBuffer(decoder.codec, (size_t) index, true);
             //but the presentationTime is in US
             decodingTime.add(std::chrono::microseconds(nowUS - info.presentationTimeUs));
             nDecodedFrames.add(1);
