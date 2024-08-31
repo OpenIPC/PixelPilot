@@ -24,4 +24,7 @@
     <usb-device
         product-id="17D2"
         vendor-id="0B05" /> <!-- Asus AC56 -->
+    <usb-device
+        product-id="0012"
+        vendor-id="2604" /> <!-- Tenda U12 -->
 </resources>
