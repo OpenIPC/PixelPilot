@@ -28,6 +28,8 @@
 #include "mavlink/common/mavlink.h"
 #include "mavlink.h"
 
+#define TAG "pixelpilot"
+
 long distance_meters_between(double lat1, double lon1, double lat2, double lon2) {
     double delta = (lon1 - lon2) * 0.017453292519;
     double sdlong = sin(delta);
@@ -55,20 +57,18 @@ long distance_meters_between(double lat1, double lon1, double lat2, double lon2)
 int mavlink_thread_signal = 0;
 std::atomic<bool> latestMavlinkDataChange = false;
 
-void onMavlinkChanged();
-
 void *listen(int mavlink_port) {
-    __android_log_print(ANDROID_LOG_DEBUG, "mavlink.cpp", "Starting mavlink thread...");
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "Starting mavlink thread...");
     // Create socket
     int fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0) {
-        __android_log_print(ANDROID_LOG_DEBUG, "mavlink.cpp",
+        __android_log_print(ANDROID_LOG_DEBUG, TAG,
                             "ERROR: Unable to create MavLink socket:  %s", strerror(errno));
         return 0;
     }
 
     // Bind port
-    __android_log_print(ANDROID_LOG_DEBUG, "mavlink.cpp", "Mavlink listening on %d", mavlink_port);
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "Mavlink listening on %d", mavlink_port);
     struct sockaddr_in addr = {};
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
@@ -76,7 +76,7 @@ void *listen(int mavlink_port) {
     addr.sin_port = htons(mavlink_port);
 
     if (bind(fd, (struct sockaddr *) (&addr), sizeof(addr)) != 0) {
-        __android_log_print(ANDROID_LOG_ERROR, "mavlink.cpp", "Unable to bind MavLink port %d: %s",
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "Unable to bind MavLink port %d: %s",
                             mavlink_port, strerror(errno));
         return 0;
     }
@@ -86,7 +86,7 @@ void *listen(int mavlink_port) {
     tv.tv_sec = 0;
     tv.tv_usec = 100000;
     if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-        __android_log_print(ANDROID_LOG_ERROR, "mavlink.cpp",
+        __android_log_print(ANDROID_LOG_ERROR, TAG,
                             "Unable to bind MavLink rx timeout:  %s", strerror(errno));
         return 0;
     }
@@ -99,7 +99,7 @@ void *listen(int mavlink_port) {
             continue;
         } else if (ret == 0) {
             // peer has done an orderly shutdown
-            __android_log_print(ANDROID_LOG_ERROR, "mavlink.cpp", "Shutting down mavlink: ret=0");
+            __android_log_print(ANDROID_LOG_ERROR, TAG, "Shutting down mavlink: ret=0");
             return 0;
         }
 
@@ -299,8 +299,8 @@ void *listen(int mavlink_port) {
                         break;
 
                     default:
-                        // printf("> MavLink msgMav %d from %d/%d\n",
-                        //   msgMav.msgid, msgMav.sysid, msgMav.compid);
+                        //printf("mavlink msg %d from %d/%d\n",
+                               //msgMav.msgid, msgMav.sysid, msgMav.compid);
                         break;
                 }
             }
@@ -308,7 +308,7 @@ void *listen(int mavlink_port) {
         usleep(1);
     }
 
-    __android_log_print(ANDROID_LOG_DEBUG, "mavlink.cpp", "Mavlink thread done.");
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "Mavlink thread done.");
     return 0;
 }
 

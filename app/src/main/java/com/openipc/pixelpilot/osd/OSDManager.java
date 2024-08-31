@@ -159,10 +159,10 @@ public class OSDManager {
             }
 
             binding.tvGndSpeed.setText(formatFloat((float)
-                    ((data.telemetryGspeed / 100.0f - 1000.0) * 3.6f), "Km/h", ""));
+                    ((data.telemetryGSpeed / 100.0f - 1000.0) * 3.6f), "Km/h", ""));
             binding.tvAirSpeed.setText(formatFloat((float)
-                    (data.telemetryVspeed / 100.0f - 1000.0), "m/s", ""));
-            binding.tvSat.setText(formatFloat(data.telemetrySats, "", ""));
+                    (data.telemetryVSpeed / 100.0f - 1000.0), "m/s", ""));
+            binding.tvSat.setText(formatFloat(data.telemetrySat, "", ""));
             binding.tvLat.setText(String.format("%.7f", (float) (data.telemetryLat / 10000000.0f)));
             binding.tvLon.setText(String.format("%.7f", (float) (data.telemetryLon / 10000000.0f)));
 

@@ -67,9 +67,9 @@ import java.util.TimerTask;
 // Into an Android Surface View
 public class VideoActivity extends AppCompatActivity implements IVideoParamsChanged,
         WfbNGStatsChanged, MavlinkUpdate, SettingsChanged {
+    private static final String TAG = "pixelpilot";
     private static final int PICK_KEY_REQUEST_CODE = 1;
     private static final int PICK_DVR_REQUEST_CODE = 2;
-    private static final String TAG = "VideoActivity";
     private static WifiManager wifiManager;
     final Handler handler = new Handler(Looper.getMainLooper());
     final Runnable runnable = new Runnable() {
@@ -516,7 +516,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 videoPlayer.start();
             }
             if (decodingInfo.currentFPS > 0) {
-                binding.tvMessage.setVisibility(View.INVISIBLE);
+                binding.tvMessage.setVisibility(View.GONE);
+                binding.wifiMessage.setVisibility(View.GONE);
             }
             String info = "%dx%d@%.0f " + (decodingInfo.nCodec == 1 ? " H265 " : " H264 ")
                     + (decodingInfo.currentKiloBitsPerSecond > 1000 ? " %.1fMbps " : " %.1fKpbs ")
@@ -594,7 +595,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             out = new FileOutputStream(file);
             out.write(keyBytes, 0, keyBytes.length);
         } catch (IOException e) {
-            Log.e("tag", "Failed to copy asset", e);
+            Log.e(TAG, "Failed to copy asset", e);
         } finally {
             if (out != null) {
                 try {

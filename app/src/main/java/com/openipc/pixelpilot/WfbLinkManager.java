@@ -105,10 +105,10 @@ public class WfbLinkManager extends BroadcastReceiver {
                 missingPermissions = true;
             }
         }
+
         if (missingPermissions) {
             return;
         }
-
 
         // Stops newly detached adapters.
         Iterator<Map.Entry<String, UsbDevice>> iterator = activeWifiAdapters.entrySet().iterator();
@@ -132,12 +132,15 @@ public class WfbLinkManager extends BroadcastReceiver {
 
         if (activeWifiAdapters.isEmpty()) {
             String text = "No compatible wifi adapter found.";
+            binding.tvMessage.setText(text);
+            binding.tvMessage.setVisibility(View.VISIBLE);
+
             String wifi = VideoActivity.wirelessInfo();
             if (wifi != null) {
-                text += "\n(udp://" + wifi + ":5600)";
+                String local = "udp://" + wifi + ":5600";
+                binding.wifiMessage.setText(local);
+                binding.wifiMessage.setVisibility(View.VISIBLE);
             }
-            binding.tvMessage.setVisibility(View.VISIBLE);
-            binding.tvMessage.setText(text);
         }
     }
 
@@ -171,13 +174,9 @@ public class WfbLinkManager extends BroadcastReceiver {
 
     public synchronized boolean startAdapter(UsbDevice dev) {
         binding.tvMessage.setVisibility(View.VISIBLE);
-        String name = String.format("%04X", dev.getVendorId()) + ":" + String.format("%04X", dev.getProductId());
-        if (binding.tvMessage.getText().toString().startsWith("Starting")
-                && !binding.tvMessage.getText().toString().endsWith(name)) {
-            binding.tvMessage.setText(binding.tvMessage.getText() + ", " + name);
-        } else {
-            binding.tvMessage.setText("Starting wfb-ng on channel " + wifiChannel + " with " + name);
-        }
+        String text = "Starting wfb-ng channel " + wifiChannel + " with " + String.format(
+                "[%04X", dev.getVendorId()) + ":" + String.format("%04X]", dev.getProductId());
+        binding.tvMessage.setText(text);
         wfbLink.start(wifiChannel, dev);
         return true;
     }
