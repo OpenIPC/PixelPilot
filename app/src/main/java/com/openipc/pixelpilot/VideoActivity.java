@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.hardware.usb.UsbManager;
@@ -30,6 +32,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -50,15 +53,20 @@ import com.openipc.wfbngrtl8812.WfbNGStats;
 import com.openipc.wfbngrtl8812.WfbNGStatsChanged;
 import com.openipc.wfbngrtl8812.WfbNgLink;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -235,6 +243,60 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
                 item.setActionView(new View(this));
                 return false;
+            });
+
+            SubMenu help = popup.getMenu().addSubMenu("Help");
+            MenuItem logs = help.add("Send Logs");
+            logs.setOnMenuItemClickListener(item -> {
+                try {
+                    Process process = Runtime.getRuntime().exec("logcat -d");
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    File logFile = new File(getExternalFilesDir(null), "pixelpilot_log_" + timeStamp + ".txt");
+                    FileWriter fileWriter = new FileWriter(logFile);
+
+                    String versionName = "";
+                    long versionCode = 0;
+
+                    try {
+                        PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                        versionName = packageInfo.versionName;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            versionCode = packageInfo.getLongVersionCode();
+                        } else {
+                            versionCode = packageInfo.versionCode;
+                        }
+                    } catch (PackageManager.NameNotFoundException e) {
+                    }
+
+                    fileWriter.append("Device Model: " + Build.MODEL + "\n" +
+                            "Manufacturer: " + Build.MANUFACTURER + "\n" +
+                            "OS Version: " + Build.VERSION.RELEASE + "\n" +
+                            "SDK Version: " + Build.VERSION.SDK_INT + "\n" +
+                            "App Version Name: " + versionName + "\n" +
+                            "App Version Code: " + versionCode + "\n");
+
+                    String line;
+
+                    while ((line = bufferedReader.readLine()) != null) {
+                        fileWriter.append(line).append("\n");
+                    }
+                    fileWriter.flush();
+                    fileWriter.close();
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    Uri fileUri = FileProvider.getUriForFile(this, getPackageName() + ".provider", logFile);
+                    sendIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                    sendIntent.setType("text/plain");
+                    sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    Intent shareIntent = Intent.createChooser(sendIntent, null);
+                    startActivity(shareIntent);
+
+                } catch (IOException e) {
+                    Log.e(TAG, "ShareLog: ", e);
+                }
+                return true;
             });
 
             popup.show();
