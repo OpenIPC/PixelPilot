@@ -30,4 +30,7 @@
     <usb-device
         product-id="0408"
         vendor-id="0409" /> <!-- NEC AtermWL900U -->
+    <usb-device
+        product-id="3426"
+        vendor-id="0586" /> <!-- ZyXel 6605 -->
 </resources>
