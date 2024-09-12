@@ -35,3 +35,7 @@ The project can then be opened in android studio and built from there.
 
 ## Installation
 - Download and install PixelPilot.apk from https://github.com/OpenIPC/PixelPilot/releases
+
+## Tested devices based on real user reviews
+
+* Samsung Galaxy A54 (Exynos 1380 processor)
