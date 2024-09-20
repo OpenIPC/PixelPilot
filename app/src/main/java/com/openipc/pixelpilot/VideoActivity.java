@@ -21,15 +21,19 @@ import android.text.format.Formatter;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.PopupMenu;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -87,6 +91,24 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private OSDManager osdManager;
     private ParcelFileDescriptor dvrFd = null;
     private Timer dvrIconTimer = null;
+    private Timer recordTimer = null;
+    private int seconds = 0;
+    private boolean isVRMode = false;
+    private boolean isStreaming = false;
+    private ConstraintLayout constraintLayout;
+    private ConstraintSet constraintSet;
+
+    public boolean getVRSetting() {
+        return getSharedPreferences("general", Context.MODE_PRIVATE).getBoolean("vr-mode", false);
+    }
+
+    public void setVRSetting(boolean v)
+    {
+        SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("vr-mode", v);
+        editor.apply();
+    }
 
     public static int getChannel(Context context) {
         return context.getSharedPreferences("general",
@@ -119,6 +141,19 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         return hexString.toString();
     }
 
+    private void resetApp()
+    {
+        // Restart the app
+        Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            System.exit(0); // Ensure the app is fully restarted
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "lifecycle onCreate");
@@ -139,7 +174,84 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         setContentView(binding.getRoot());
         videoPlayer = new VideoPlayer(this);
         videoPlayer.setIVideoParamsChanged(this);
-        binding.mainVideo.getHolder().addCallback(videoPlayer.configure1());
+        isVRMode = getVRSetting();
+        if(isVRMode) {
+            binding.mainVideo.setVisibility(View.GONE);
+            binding.surfaceViewLeft.getHolder().addCallback(videoPlayer.configure1(0));
+            binding.surfaceViewRight.getHolder().addCallback(videoPlayer.configure1(1));
+
+            SeekBar seekBar = binding.seekBar;
+            // Retrieve saved progress value
+            SharedPreferences sharedPreferences = getSharedPreferences("SeekBarPrefs", MODE_PRIVATE);
+            int savedProgress = sharedPreferences.getInt("seekBarProgress", 0); // Default to 0 if no value is found
+            seekBar.setProgress(savedProgress);
+            seekBar.setVisibility(View.VISIBLE);
+            constraintLayout = binding.frameLayout;
+            constraintSet = new ConstraintSet();
+            constraintSet.clone(constraintLayout);
+
+            // Apply the saved margin
+            int margin = savedProgress * 10; // Adjust the multiplier as needed
+            constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, margin);
+            constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, margin);
+            constraintSet.applyTo(constraintLayout);
+
+            // Hide SeekBar after 3 seconds
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    seekBar.setVisibility(View.GONE);
+                }
+            }, 3000);
+
+            // Show SeekBar when touched
+            constraintLayout.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        seekBar.setVisibility(View.VISIBLE);
+                        // Hide SeekBar again after 3 seconds of inactivity
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                seekBar.setVisibility(View.GONE);
+                            }
+                        }, 3000);
+                    }
+                    return false;
+                }
+            });
+
+            seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    int margin = progress * 10; // Adjust the multiplier as needed
+                    constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, margin);
+                    constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, margin);
+                    constraintSet.applyTo(constraintLayout);
+                    // Save progress value
+                    SharedPreferences sharedPreferences = getSharedPreferences("SeekBarPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt("seekBarProgress", progress);
+                    editor.apply();
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+        }
+        else {
+            binding.surfaceViewRight.setVisibility(View.GONE);
+            binding.surfaceViewLeft.setVisibility(View.GONE);
+            binding.mainVideo.getHolder().addCallback(videoPlayer.configure1(0));
+        }
 
         osdManager = new OSDManager(this, binding);
         osdManager.setUp();
@@ -160,8 +272,37 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         PieData noData = new PieData(new PieDataSet(new ArrayList<>(), ""));
         chart.setData(noData);
 
+        binding.imgBtnRecord.setOnClickListener(item -> {
+            if(!isStreaming) return;
+
+            if (dvrFd == null) {
+                Uri dvrUri = openDvrFile();
+                if (dvrUri != null) {
+                    startDvr(dvrUri);
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                    intent.addCategory(Intent.CATEGORY_DEFAULT);
+                    startActivityForResult(intent, PICK_DVR_REQUEST_CODE);
+                }
+            } else {
+                stopDvr();
+            }
+        });
+
         binding.btnSettings.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(this, v);
+            SubMenu vrMenu = popup.getMenu().addSubMenu("VR mode");
+            MenuItem vrItem = vrMenu.add(getVRSetting() ? "On" : "Off");
+            vrItem.setOnMenuItemClickListener(item -> {
+                isVRMode = !getVRSetting();
+                setVRSetting(isVRMode);
+                vrItem.setTitle(isVRMode ? "On" : "Off");
+                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+                item.setActionView(new View(this));
+                resetApp();
+                return false;
+            });
+
             SubMenu chnMenu = popup.getMenu().addSubMenu("Channel");
             int channelPref = getChannel(this);
             chnMenu.setHeaderTitle("Current: " + channelPref);
@@ -211,6 +352,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             SubMenu recording = popup.getMenu().addSubMenu("Recording");
             MenuItem dvrBtn = recording.add(dvrFd == null ? "Start" : "Stop");
             dvrBtn.setOnMenuItemClickListener(item -> {
+                if(!isStreaming) return false;
                 if (dvrFd == null) {
                     Uri dvrUri = openDvrFile();
                     if (dvrUri != null) {
@@ -285,6 +427,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         String dvrFolder = getSharedPreferences("general",
                 Context.MODE_PRIVATE).getString("dvr_folder_", "");
         if (dvrFolder.isEmpty()) {
+            Log.e(TAG, "dvrFolder is empty");
             return null;
         }
         Uri uri = Uri.parse(dvrFolder);
@@ -297,6 +440,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             String filename = "pixelpilot_" + formattedNow + ".mp4";
             DocumentFile newFile = pickedDir.createFile("video/mp4", filename);
             Toast.makeText(this, "Recording to " + filename, Toast.LENGTH_SHORT).show();
+            if(newFile == null)
+                Log.e(TAG, "dvr newFile null");
             return newFile != null ? newFile.getUri() : null;
         }
         return null;
@@ -309,10 +454,26 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         try {
             dvrFd = getContentResolver().openFileDescriptor(dvrUri, "rw");
             videoPlayer.startDvr(dvrFd.getFd(), getDvrMP4());
+            binding.imgBtnRecord.setImageResource(R.drawable.recording);
         } catch (IOException e) {
             Log.e(TAG, "Failed to open dvr file ", e);
             dvrFd = null;
         }
+
+        binding.txtRecordLabel.setVisibility(View.VISIBLE);
+        recordTimer = new Timer();
+        recordTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                int minutes = seconds / 60;
+                int secs = seconds % 60;
+
+                String timeFormatted = String.format("%02d:%02d", minutes, secs);
+                runOnUiThread(() -> binding.txtRecordLabel.setText(timeFormatted));
+                seconds++;
+            }
+        }, 0, 1000);
+
         dvrIconTimer = new Timer();
         dvrIconTimer.schedule(new TimerTask() {
             @Override
@@ -328,10 +489,20 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             return;
         }
         binding.imgRecIndicator.setVisibility(View.INVISIBLE);
+        binding.imgBtnRecord.setImageResource(R.drawable.record);
         videoPlayer.stopDvr();
-        dvrIconTimer.cancel();
-        dvrIconTimer.purge();
-        dvrIconTimer = null;
+        if(recordTimer != null) {
+            recordTimer.cancel();
+            recordTimer.purge();
+            recordTimer = null;
+            seconds = 0;
+            binding.txtRecordLabel.setVisibility(View.GONE);
+        }
+        if(dvrIconTimer != null) {
+            dvrIconTimer.cancel();
+            dvrIconTimer.purge();
+            dvrIconTimer = null;
+        }
         try {
             dvrFd.close();
         } catch (IOException e) {
@@ -511,9 +682,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         runOnUiThread(() -> {
             if (lastCodec != decodingInfo.nCodec) {
                 lastCodec = decodingInfo.nCodec;
-                videoPlayer.stopAndRemoveReceiverDecoder();
-                videoPlayer.addAndStartDecoderReceiver(binding.mainVideo.getHolder().getSurface());
-                videoPlayer.start();
             }
             if (decodingInfo.currentFPS > 0) {
                 binding.tvMessage.setVisibility(View.GONE);
@@ -574,9 +742,13 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                             paddedDigits(data.count_p_dec_ok, 6),
                             paddedDigits(data.count_p_fec_recovered, 6),
                             paddedDigits(data.count_p_lost, 6)));
+                    isStreaming = true;
                 }
             } else {
                 binding.tvLinkStatus.setText("No wfb-ng data.");
+                isStreaming = false;
+                binding.imgBtnRecord.setImageResource(R.drawable.record);
+                stopDvr();
             }
         });
     }

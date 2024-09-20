@@ -43,6 +43,15 @@ public class MovableLayout extends LinearLayout {
     }
 
     @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        // Intercept touch events and pass them to onTouchEvent
+        if (isMovable) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (!isMovable) {
             return false;
