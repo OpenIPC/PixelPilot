@@ -87,6 +87,19 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private OSDManager osdManager;
     private ParcelFileDescriptor dvrFd = null;
     private Timer dvrIconTimer = null;
+    private boolean isVRMode = false;
+
+    public boolean getVRSetting() {
+        return getSharedPreferences("general", Context.MODE_PRIVATE).getBoolean("vr-mode", false);
+    }
+
+    public void setVRSetting(boolean v)
+    {
+        SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("vr-mode", v);
+        editor.apply();
+    }
 
     public static int getChannel(Context context) {
         return context.getSharedPreferences("general",
@@ -119,6 +132,18 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         return hexString.toString();
     }
 
+    private void resetApp()
+    {
+        // Restart the app
+        Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            System.exit(0); // Ensure the app is fully restarted
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "lifecycle onCreate");
@@ -139,7 +164,17 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         setContentView(binding.getRoot());
         videoPlayer = new VideoPlayer(this);
         videoPlayer.setIVideoParamsChanged(this);
-        binding.mainVideo.getHolder().addCallback(videoPlayer.configure1());
+        isVRMode = getVRSetting();
+        if(isVRMode) {
+            binding.mainVideo.setVisibility(View.GONE);
+            binding.surfaceViewLeft.getHolder().addCallback(videoPlayer.configure1(0));
+            binding.surfaceViewRight.getHolder().addCallback(videoPlayer.configure1(1));
+        }
+        else {
+            binding.surfaceViewRight.setVisibility(View.GONE);
+            binding.surfaceViewLeft.setVisibility(View.GONE);
+            binding.mainVideo.getHolder().addCallback(videoPlayer.configure1(0));
+        }
 
         osdManager = new OSDManager(this, binding);
         osdManager.setUp();
@@ -162,6 +197,18 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         binding.btnSettings.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(this, v);
+            SubMenu vrMenu = popup.getMenu().addSubMenu("VR mode");
+            MenuItem vrItem = vrMenu.add(getVRSetting() ? "On" : "Off");
+            vrItem.setOnMenuItemClickListener(item -> {
+                isVRMode = !getVRSetting();
+                setVRSetting(isVRMode);
+                vrItem.setTitle(isVRMode ? "On" : "Off");
+                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+                item.setActionView(new View(this));
+                resetApp();
+                return false;
+            });
+
             SubMenu chnMenu = popup.getMenu().addSubMenu("Channel");
             int channelPref = getChannel(this);
             chnMenu.setHeaderTitle("Current: " + channelPref);
@@ -208,35 +255,38 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             });
 
             // Recording
-            SubMenu recording = popup.getMenu().addSubMenu("Recording");
-            MenuItem dvrBtn = recording.add(dvrFd == null ? "Start" : "Stop");
-            dvrBtn.setOnMenuItemClickListener(item -> {
-                if (dvrFd == null) {
-                    Uri dvrUri = openDvrFile();
-                    if (dvrUri != null) {
-                        startDvr(dvrUri);
+            //Todo: Recoding in VR mode is not working, it causes crash app.
+            //Need to fix when having time
+            if(!isVRMode) {
+                SubMenu recording = popup.getMenu().addSubMenu("Recording");
+                MenuItem dvrBtn = recording.add(dvrFd == null ? "Start" : "Stop");
+                dvrBtn.setOnMenuItemClickListener(item -> {
+                    if (dvrFd == null) {
+                        Uri dvrUri = openDvrFile();
+                        if (dvrUri != null) {
+                            startDvr(dvrUri);
+                        } else {
+                            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                            intent.addCategory(Intent.CATEGORY_DEFAULT);
+                            startActivityForResult(intent, PICK_DVR_REQUEST_CODE);
+                        }
                     } else {
-                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                        intent.addCategory(Intent.CATEGORY_DEFAULT);
-                        startActivityForResult(intent, PICK_DVR_REQUEST_CODE);
+                        stopDvr();
                     }
-                } else {
-                    stopDvr();
-                }
-                return true;
-            });
-            MenuItem fmp4 = recording.add("fMP4");
-            fmp4.setCheckable(true);
-            fmp4.setChecked(getDvrMP4());
-            fmp4.setOnMenuItemClickListener(item -> {
-                boolean enabled = getDvrMP4();
-                item.setChecked(!enabled);
-                setDvrMP4(!enabled);
-                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-                item.setActionView(new View(this));
-                return false;
-            });
-
+                    return true;
+                });
+                MenuItem fmp4 = recording.add("fMP4");
+                fmp4.setCheckable(true);
+                fmp4.setChecked(getDvrMP4());
+                fmp4.setOnMenuItemClickListener(item -> {
+                    boolean enabled = getDvrMP4();
+                    item.setChecked(!enabled);
+                    setDvrMP4(!enabled);
+                    item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+                    item.setActionView(new View(this));
+                    return false;
+                });
+            }
             popup.show();
         });
 
@@ -511,9 +561,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         runOnUiThread(() -> {
             if (lastCodec != decodingInfo.nCodec) {
                 lastCodec = decodingInfo.nCodec;
-                videoPlayer.stopAndRemoveReceiverDecoder();
-                videoPlayer.addAndStartDecoderReceiver(binding.mainVideo.getHolder().getSurface());
-                videoPlayer.start();
             }
             if (decodingInfo.currentFPS > 0) {
                 binding.tvMessage.setVisibility(View.GONE);

@@ -104,11 +104,11 @@ void VideoPlayer::onNewNALU(const NALU &nalu) {
     enqueueNALU(nalu_);
 }
 
-void VideoPlayer::setVideoSurface(JNIEnv *env, jobject surface) {
+void VideoPlayer::setVideoSurface(JNIEnv *env, jobject surface, jint i) {
     //reset the parser so the statistics start again from 0
     // mParser.reset();
     //set the jni object for settings
-    videoDecoder.setOutputSurface(env, surface);
+    videoDecoder.setOutputSurface(env, surface, i);
 }
 
 
@@ -204,8 +204,8 @@ JNI_METHOD(void, nativeStop)
 }
 
 JNI_METHOD(void, nativeSetVideoSurface)
-(JNIEnv *env, jclass jclass1, jlong videoPlayerN, jobject surface) {
-    native(videoPlayerN)->setVideoSurface(env, surface);
+(JNIEnv *env, jclass jclass1, jlong videoPlayerN, jobject surface, jint index) {
+    native(videoPlayerN)->setVideoSurface(env, surface, index);
 }
 
 JNI_METHOD(jstring, getVideoInfoString)
