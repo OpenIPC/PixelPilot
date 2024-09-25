@@ -47,7 +47,7 @@ public class VideoPlayer implements IVideoParamsChanged {
 
     public static native void nativeStop(long nativeInstance, Context context);
 
-    public static native void nativeSetVideoSurface(long nativeInstance, Surface surface);
+    public static native void nativeSetVideoSurface(long nativeInstance, Surface surface, int index);
 
     public static native void nativeStartDvr(long nativeInstance, int fd, int fmp4_enabled);
 
@@ -78,9 +78,9 @@ public class VideoPlayer implements IVideoParamsChanged {
         mVideoParamsChanged = iVideoParamsChanged;
     }
 
-    private void setVideoSurface(final @Nullable Surface surface) {
+    private void setVideoSurface(final @Nullable Surface surface, int index) {
         verifyApplicationThread();
-        nativeSetVideoSurface(nativeVideoPlayer, surface);
+        nativeSetVideoSurface(nativeVideoPlayer, surface, index);
     }
 
     public synchronized void start() {
@@ -128,8 +128,8 @@ public class VideoPlayer implements IVideoParamsChanged {
      * d) Receiving Data from a file in the phone file system
      * e) and more
      */
-    public void addAndStartDecoderReceiver(Surface surface) {
-        setVideoSurface(surface);
+    public void addAndStartDecoderReceiver(Surface surface, int index) {
+        setVideoSurface(surface, index);
     }
 
     /**
@@ -137,9 +137,9 @@ public class VideoPlayer implements IVideoParamsChanged {
      * Stop the Decoder
      * Free resources
      */
-    public void stopAndRemoveReceiverDecoder() {
+    public void stopAndRemoveReceiverDecoder(int index) {
         stop();
-        setVideoSurface(null);
+        setVideoSurface(null, index);
     }
 
     /**
@@ -148,11 +148,11 @@ public class VideoPlayer implements IVideoParamsChanged {
      *
      * @return Callback that should be added to SurfaceView.Holder
      */
-    public SurfaceHolder.Callback configure1() {
+    public SurfaceHolder.Callback configure1(int index) {
         return new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                addAndStartDecoderReceiver(holder.getSurface());
+                addAndStartDecoderReceiver(holder.getSurface(), index);
             }
 
             @Override
@@ -162,30 +162,30 @@ public class VideoPlayer implements IVideoParamsChanged {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                stopAndRemoveReceiverDecoder();
+                stopAndRemoveReceiverDecoder(index);
             }
         };
     }
 
-    /**
-     * Configure for use with VideoSurfaceHolder (OpenGL)
-     * The callback will handle the lifecycle of the video player
-     *
-     * @return Callback that should be added to VideoSurfaceHolder
-     */
-    public ISurfaceTextureAvailable configure2() {
-        return new ISurfaceTextureAvailable() {
-            @Override
-            public void surfaceTextureCreated(SurfaceTexture surfaceTexture, Surface surface) {
-                addAndStartDecoderReceiver(surface);
-            }
-
-            @Override
-            public void surfaceTextureDestroyed() {
-                stopAndRemoveReceiverDecoder();
-            }
-        };
-    }
+//    /**
+//     * Configure for use with VideoSurfaceHolder (OpenGL)
+//     * The callback will handle the lifecycle of the video player
+//     *
+//     * @return Callback that should be added to VideoSurfaceHolder
+//     */
+//    public ISurfaceTextureAvailable configure2() {
+//        return new ISurfaceTextureAvailable() {
+//            @Override
+//            public void surfaceTextureCreated(SurfaceTexture surfaceTexture, Surface surface) {
+//                addAndStartDecoderReceiver(surface, index);
+//            }
+//
+//            @Override
+//            public void surfaceTextureDestroyed() {
+//                stopAndRemoveReceiverDecoder(index);
+//            }
+//        };
+//    }
 
     public long getNativeInstance() {
         return nativeVideoPlayer;

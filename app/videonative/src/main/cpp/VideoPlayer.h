@@ -27,7 +27,7 @@ public:
      * Set the surface the decoder can be configured with. When @param surface==nullptr
      * It is guaranteed that the surface is not used by the decoder anymore when this call returns
      */
-    void setVideoSurface(JNIEnv *env, jobject surface);
+    void setVideoSurface(JNIEnv *env, jobject surface, jint i);
 
     /*
      * Start the receiver and ground recorder if enabled

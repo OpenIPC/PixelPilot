@@ -15,6 +15,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <SurfaceView
+        android:id="@+id/surfaceViewLeft"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/surfaceViewRight"/>
+
+    <SurfaceView
+        android:id="@+id/surfaceViewRight"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/surfaceViewLeft"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/surfaceViewLeft"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="300dp"
+        android:layout_marginEnd="300dp"
+        android:visibility="gone"
+        android:max="20" />
+
     <Button
         android:id="@+id/btnSettings"
         style="@style/Widget.Material3.Button.IconButton"
@@ -635,6 +667,31 @@
                 android:text="100%"
                 android:textColor="@color/colorWhite"
                 android:textSize="14sp" />
+        </com.openipc.pixelpilot.osd.MovableLayout>
+
+        <com.openipc.pixelpilot.osd.MovableLayout
+            android:id="@+id/btnRecord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/imgBtnRecord"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/record" />
+
+            <TextView
+                android:id="@+id/txtRecordLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text=""
+                android:textSize="14sp"
+                android:visibility="gone"
+                android:textColor="@android:color/white" />
         </com.openipc.pixelpilot.osd.MovableLayout>
     </FrameLayout>
 
