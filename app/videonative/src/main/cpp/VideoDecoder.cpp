@@ -21,34 +21,35 @@ VideoDecoder::VideoDecoder(JNIEnv *env) {
     resetStatistics();
 }
 
-void VideoDecoder::setOutputSurface(JNIEnv *env, jobject surface) {
+void VideoDecoder::setOutputSurface(JNIEnv *env, jobject surface, jint idx) {
     if (surface == nullptr) {
         MLOGD << "Set output null surface";
         //assert(decoder.window!=nullptr);
-        if (decoder.window == nullptr) {
+        if (decoder.window[idx] == nullptr || decoder.codec[idx] == nullptr) {
             //MLOGD<<"Decoder window is already null";
             return;
         }
         std::lock_guard<std::mutex> lock(mMutexInputPipe);
         inputPipeClosed = true;
-        if (decoder.configured) {
-            AMediaCodec_stop(decoder.codec);
-            AMediaCodec_delete(decoder.codec);
+        if (decoder.configured[idx]) {
+            AMediaCodec_stop(decoder.codec[idx]);
+            AMediaCodec_delete(decoder.codec[idx]);
+            decoder.codec[idx] = nullptr;
             mKeyFrameFinder.reset();
-            decoder.configured = false;
-            if (mCheckOutputThread->joinable()) {
-                mCheckOutputThread->join();
-                mCheckOutputThread.reset();
+            decoder.configured[idx] = false;
+            if (mCheckOutputThread[idx]->joinable()) {
+                mCheckOutputThread[idx]->join();
+                mCheckOutputThread[idx].reset();
             }
         }
-        ANativeWindow_release(decoder.window);
-        decoder.window = nullptr;
+        ANativeWindow_release(decoder.window[idx]);
+        decoder.window[idx] = nullptr;
         resetStatistics();
     } else {
         MLOGD << "Set output non-null surface";
         // Throw warning if the surface is set without clearing it first
-        assert(decoder.window == nullptr);
-        decoder.window = ANativeWindow_fromSurface(env, surface);
+        assert(decoder.window[idx] == nullptr);
+        decoder.window[idx] = ANativeWindow_fromSurface(env, surface);
         // open the input pipe - now the decoder will start as soon as enough data is available
         inputPipeClosed = false;
     }
@@ -83,8 +84,9 @@ void VideoDecoder::interpretNALU(const NALU &nalu) {
         mKeyFrameFinder.saveIfKeyFrame(nalu);
         return;
     }
-    if (decoder.configured) {
-        feedDecoder(nalu);
+    if (decoder.configured[0] || decoder.configured[1]) {
+        feedDecoder(nalu, 0);
+        feedDecoder(nalu, 1);
         decodingInfo.nNALUSFeeded++;
         // manually feeding AUDs doesn't seem to change anything for high latency streams
         // Only for the x264 sw encoded example stream it might improve latency slightly
@@ -98,14 +100,17 @@ void VideoDecoder::interpretNALU(const NALU &nalu) {
         mKeyFrameFinder.saveIfKeyFrame(nalu);
         if (mKeyFrameFinder.allKeyFramesAvailable(IS_H265)) {
             MLOGD << "Configuring decoder...";
-            configureStartDecoder();
+            configureStartDecoder(0);
+            configureStartDecoder(1);
         }
     }
 }
 
-void VideoDecoder::configureStartDecoder() {
+void VideoDecoder::configureStartDecoder(int idx) {
+    if(decoder.window[idx] == nullptr)
+        return;
     const std::string MIME = IS_H265 ? "video/hevc" : "video/avc";
-    decoder.codec = AMediaCodec_createDecoderByType(MIME.c_str());
+    decoder.codec[idx] = AMediaCodec_createDecoderByType(MIME.c_str());
 
     AMediaFormat *format = AMediaFormat_new();
     AMediaFormat_setString(format, AMEDIAFORMAT_KEY_MIME, MIME.c_str());
@@ -127,7 +132,7 @@ void VideoDecoder::configureStartDecoder() {
 
     MLOGD << "Configuring decoder:" << AMediaFormat_toString(format);
 
-    auto status = AMediaCodec_configure(decoder.codec, format, decoder.window, nullptr, 0);
+    auto status = AMediaCodec_configure(decoder.codec[idx], format, decoder.window[idx], nullptr, 0);
     AMediaFormat_delete(format);
 
     switch (status) {
@@ -161,26 +166,28 @@ void VideoDecoder::configureStartDecoder() {
     }
 
 
-    if (decoder.codec == nullptr) {
+    if (decoder.codec[idx] == nullptr) {
         MLOGD << "Cannot configure decoder";
         //set csd-0 and csd-1 back to 0, maybe they were just faulty but we have better luck with the next ones
         //mKeyFrameFinder.reset();
         return;
     }
-    AMediaCodec_start(decoder.codec);
-    mCheckOutputThread = std::make_unique<std::thread>(&VideoDecoder::checkOutputLoop, this);
-    NDKThreadHelper::setName(mCheckOutputThread->native_handle(), "LLDCheckOutput");
-    decoder.configured = true;
+    AMediaCodec_start(decoder.codec[idx]);
+    mCheckOutputThread[idx] = std::make_unique<std::thread>(&VideoDecoder::checkOutputLoop, this, idx);
+    NDKThreadHelper::setName(mCheckOutputThread[idx]->native_handle(), "LLDCheckOutput");
+    decoder.configured[idx] = true;
 }
 
-void VideoDecoder::feedDecoder(const NALU &nalu) {
+void VideoDecoder::feedDecoder(const NALU &nalu, int idx) {
+    if(!decoder.codec[idx])
+        return;
     const auto now = std::chrono::steady_clock::now();
     const auto deltaParsing = now - nalu.creationTime;
     while (true) {
-        const auto index = AMediaCodec_dequeueInputBuffer(decoder.codec, BUFFER_TIMEOUT_US);
+        const auto index = AMediaCodec_dequeueInputBuffer(decoder.codec[idx], BUFFER_TIMEOUT_US);
         if (index >= 0) {
             size_t inputBufferSize;
-            uint8_t *buf = AMediaCodec_getInputBuffer(decoder.codec, (size_t) index,
+            uint8_t *buf = AMediaCodec_getInputBuffer(decoder.codec[idx], (size_t) index,
                                                       &inputBufferSize);
             // I have not seen any case where the input buffer returned by MediaCodec is too small to hold the NALU
             // But better be safe than crashing with a memory exception
@@ -194,7 +201,7 @@ void VideoDecoder::feedDecoder(const NALU &nalu) {
             std::memcpy(buf, nalu.getData(), (size_t) nalu.getSize());
             const uint64_t presentationTimeUS = (uint64_t) duration_cast<microseconds>(
                     steady_clock::now().time_since_epoch()).count();
-            AMediaCodec_queueInputBuffer(decoder.codec, (size_t) index, 0, (size_t) nalu.getSize(),
+            AMediaCodec_queueInputBuffer(decoder.codec[idx], (size_t) index, 0, (size_t) nalu.getSize(),
                                          presentationTimeUS, flag);
             waitForInputB.add(steady_clock::now() - now);
             parsingTime.add(deltaParsing);
@@ -217,13 +224,15 @@ void VideoDecoder::feedDecoder(const NALU &nalu) {
     }
 }
 
-void VideoDecoder::checkOutputLoop() {
+void VideoDecoder::checkOutputLoop(int idx) {
     NDKThreadHelper::setProcessThreadPriorityAttachDetach(javaVm, -16, "DecoderCheckOutput");
     AMediaCodecBufferInfo info;
     bool decoderSawEOS = false;
     bool decoderProducedUnknown = false;
     while (!decoderSawEOS && !decoderProducedUnknown) {
-        const ssize_t index = AMediaCodec_dequeueOutputBuffer(decoder.codec, &info,
+        if(!decoder.codec[idx])
+            break;
+        const ssize_t index = AMediaCodec_dequeueOutputBuffer(decoder.codec[idx], &info,
                                                               BUFFER_TIMEOUT_US);
         if (index >= 0) {
             const auto now = steady_clock::now();
@@ -234,22 +243,27 @@ void VideoDecoder::checkOutputLoop() {
             //-> renderOutputBufferAndRelease which is in https://android.googlesource.com/platform/frameworks/av/+/3fdb405/media/libstagefright/MediaCodec.cpp
             //-> Message kWhatReleaseOutputBuffer -> onReleaseOutputBuffer
             // also https://android.googlesource.com/platform/frameworks/native/+/5c1139f/libs/gui/SurfaceTexture.cpp
-            AMediaCodec_releaseOutputBuffer(decoder.codec, (size_t) index, true);
+            if(!decoder.codec[idx])
+                break;
+            AMediaCodec_releaseOutputBuffer(decoder.codec[idx], (size_t) index, true);
             //but the presentationTime is in US
-            decodingTime.add(std::chrono::microseconds(nowUS - info.presentationTimeUs));
-            nDecodedFrames.add(1);
+            if(idx == 0)
+            {
+                decodingTime.add(std::chrono::microseconds(nowUS - info.presentationTimeUs));
+                nDecodedFrames.add(1);
+            }
             if (info.flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
                 MLOGD << "Decoder saw EOS";
                 decoderSawEOS = true;
                 continue;
             }
         } else if (index == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED) {
-            auto format = AMediaCodec_getOutputFormat(decoder.codec);
+            auto format = AMediaCodec_getOutputFormat(decoder.codec[idx]);
             int width = 0, height = 0;
             AMediaFormat_getInt32(format, AMEDIAFORMAT_KEY_WIDTH, &width);
             AMediaFormat_getInt32(format, AMEDIAFORMAT_KEY_HEIGHT, &height);
             MLOGD << "Actual Width and Height in output " << width << "," << height;
-            if (onDecoderRatioChangedCallback != nullptr && width != 0 && height != 0) {
+            if (idx == 0 && onDecoderRatioChangedCallback != nullptr && width != 0 && height != 0) {
                 onDecoderRatioChangedCallback({width, height});
             }
             MLOGD << "AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED " << width << " " << height << " "
@@ -267,7 +281,7 @@ void VideoDecoder::checkOutputLoop() {
         //every 2 seconds recalculate the current fps and bitrate
         const auto now = steady_clock::now();
         const auto delta = now - decodingInfo.lastCalculation;
-        if (delta > DECODING_INFO_RECALCULATION_INTERVAL) {
+        if (idx == 0 && delta > DECODING_INFO_RECALCULATION_INTERVAL) {
             decodingInfo.lastCalculation = steady_clock::now();
             decodingInfo.currentFPS = (float) nDecodedFrames.getDeltaSinceLastCall() /
                                       (float) duration_cast<seconds>(delta).count();

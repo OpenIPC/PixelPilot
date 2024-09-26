@@ -60,9 +60,9 @@ struct VideoRatio {
 class VideoDecoder {
 private:
     struct Decoder {
-        bool configured = false;
-        AMediaCodec *codec = nullptr;
-        ANativeWindow *window = nullptr;
+        bool configured[2] = {false, false};
+        AMediaCodec *codec[2] = {nullptr, nullptr};
+        ANativeWindow *window[2] = {nullptr, nullptr};
     };
 public:
     //Make sure to do no heavy lifting on this callback, since it is called from the low-latency mCheckOutputThread thread (best to copy values and leave processing to another thread)
@@ -80,7 +80,7 @@ public:
     // After acquiring the surface, the decoder will be started as soon as enough configuration data was passed to it
     // When releasing the surface, the decoder will be stopped if running and any resources will be freed
     // After releasing the surface it is safe for the android os to delete it
-    void setOutputSurface(JNIEnv *env, jobject surface);
+    void setOutputSurface(JNIEnv *env, jobject surface, jint idx);
 
     //register the specified callbacks. Only one can be registered at a time
     void registerOnDecoderRatioChangedCallback(DECODER_RATIO_CHANGED decoderRatioChangedC);
@@ -96,20 +96,20 @@ public:
 private:
     //Initialize decoder with SPS / PPS data from KeyFrameFinder
     //Set Decoder.configured to true on success
-    void configureStartDecoder();
+    void configureStartDecoder(int idx);
 
     //Wait for input buffer to become available before feeding NALU
-    void feedDecoder(const NALU &nalu);
+    void feedDecoder(const NALU &nalu, int idx);
 
     //Runs until EOS arrives at output buffer or decoder is stopped
-    void checkOutputLoop();
+    void checkOutputLoop(int idx);
 
     //Debug log
     void printAvgLog();
 
     void resetStatistics();
 
-    std::unique_ptr<std::thread> mCheckOutputThread = nullptr;
+    std::unique_ptr<std::thread> mCheckOutputThread[2] = {nullptr, nullptr};
     bool USE_SW_DECODER_INSTEAD = false;
     //Holds the AMediaCodec instance, as well as the state (configured or not configured)
     Decoder decoder{};
