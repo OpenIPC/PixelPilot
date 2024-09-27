@@ -20,11 +20,11 @@ jobs:
           sudo apt-get install openjdk-17-jdk
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
           keytool -genkeypair -dname CN=OpenIPC -keyalg RSA -validity 8000 -alias fpv -keystore fpv.jks -storepass release -noprompt
-          ./gradlew assembleRelease
+          ./gradlew assembleDebug
           mv app/build/outputs/apk/debug/app-debug.apk PixelPilot.apk
 
       - name: Upload
-        uses: softprops/action-gh-release@v2
+        uses: actions/upload-artifact@v3
         with:
           tag_name: latest
           files: PixelPilot.apk
