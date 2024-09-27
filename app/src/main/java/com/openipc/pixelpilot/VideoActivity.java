@@ -107,7 +107,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("vr-mode", v);
-        editor.apply();
+        editor.commit();
     }
 
     public static int getChannel(Context context) {
