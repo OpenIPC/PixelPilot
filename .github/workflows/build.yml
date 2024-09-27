@@ -21,7 +21,7 @@ jobs:
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
           keytool -genkeypair -dname CN=OpenIPC -keyalg RSA -validity 8000 -alias fpv -keystore fpv.jks -storepass release -noprompt
           ./gradlew assembleRelease
-          mv app/build/outputs/apk/release/app-release.apk PixelPilot.apk
+          mv app/build/outputs/apk/debug/app-debug.apk PixelPilot.apk
 
       - name: Upload
         uses: softprops/action-gh-release@v2
