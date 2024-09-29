@@ -94,7 +94,7 @@ void UDPReceiver::receiveFromUDPLoop() {
     //wrap into unique pointer to avoid running out of stack
     const auto buff = std::make_unique<std::array<uint8_t, UDP_PACKET_MAX_SIZE>>();
 
-    MLOGE << "Listening on " << INADDR_ANY << ":" << mPort;
+    MLOGD << "Listening on " << INADDR_ANY << ":" << mPort;
 
     sockaddr_in source;
     socklen_t sourceLen = sizeof(sockaddr_in);

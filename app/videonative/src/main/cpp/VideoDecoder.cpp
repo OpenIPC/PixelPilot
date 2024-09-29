@@ -23,9 +23,9 @@ VideoDecoder::VideoDecoder(JNIEnv *env) {
 
 void VideoDecoder::setOutputSurface(JNIEnv *env, jobject surface, jint idx) {
     if (surface == nullptr) {
-        MLOGD << "Set output null surface";
+        MLOGD << "Set output null surface idx: " << idx;
         //assert(decoder.window!=nullptr);
-        if (decoder.window[idx] == nullptr || decoder.codec[idx] == nullptr) {
+        if (decoder.window[idx] == nullptr && decoder.codec[idx] == nullptr) {
             //MLOGD<<"Decoder window is already null";
             return;
         }
@@ -35,6 +35,7 @@ void VideoDecoder::setOutputSurface(JNIEnv *env, jobject surface, jint idx) {
             AMediaCodec_stop(decoder.codec[idx]);
             AMediaCodec_delete(decoder.codec[idx]);
             decoder.codec[idx] = nullptr;
+            MLOGD << "Set decoder.codec null idx: " << idx;
             mKeyFrameFinder.reset();
             decoder.configured[idx] = false;
             if (mCheckOutputThread[idx]->joinable()) {
@@ -42,11 +43,14 @@ void VideoDecoder::setOutputSurface(JNIEnv *env, jobject surface, jint idx) {
                 mCheckOutputThread[idx].reset();
             }
         }
-        ANativeWindow_release(decoder.window[idx]);
-        decoder.window[idx] = nullptr;
+        if (decoder.window[idx]) {
+            ANativeWindow_release(decoder.window[idx]);
+            decoder.window[idx] = nullptr;
+            MLOGD << "Set decoder.window null idx: " << idx;
+        }
         resetStatistics();
     } else {
-        MLOGD << "Set output non-null surface";
+        MLOGD << "Set output non-null surface idx :" << idx;
         // Throw warning if the surface is set without clearing it first
         assert(decoder.window[idx] == nullptr);
         decoder.window[idx] = ANativeWindow_fromSurface(env, surface);

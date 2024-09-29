@@ -35,7 +35,17 @@ The project can then be opened in android studio and built from there.
 
 ## Installation
 - Download and install PixelPilot.apk from https://github.com/OpenIPC/PixelPilot/releases
-
+- Audio feature: Now PixelPilot app had ability to play opus stream from majestic on camera. In order to enable this feature, pls enable on camera side:
++ Audio settings in (/etc/majestic.yaml):
+```
+audio:
+  enabled: true
+  volume: 30
+  srate: 8000
+  codec: opus
+  outputEnabled: false
+  outputVolume: 30
+```
 ## Tested devices based on real user reviews
 
 * Samsung Galaxy A54 (Exynos 1380 processor)

@@ -4,9 +4,9 @@
 
 #ifndef FPV_VR_VIDEOPLAYERN_H
 #define FPV_VR_VIDEOPLAYERN_H
-
 #include <jni.h>
 #include "VideoDecoder.h"
+#include "AudioDecoder.h"
 #include "UdpReceiver.h"
 #include "parser/H26XParser.h"
 #include "minimp4.h"
@@ -21,7 +21,7 @@ class VideoPlayer {
 public:
     VideoPlayer(JNIEnv *env, jobject context);
 
-    void onNewVideoData(const uint8_t *data, const std::size_t data_length);
+    void onNewRTPData(const uint8_t *data, const std::size_t data_length);
 
     /*
      * Set the surface the decoder can be configured with. When @param surface==nullptr
@@ -103,6 +103,7 @@ private:
     void processQueue();
 
 public:
+    AudioDecoder audioDecoder;
     VideoDecoder videoDecoder;
     std::unique_ptr<UDPReceiver> mUDPReceiver;
     long nNALUsAtLastCall = 0;

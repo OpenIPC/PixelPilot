@@ -80,7 +80,7 @@ void RTPDecoder::h264_reconstruct_and_forward_one_nalu(const uint8_t *data, cons
     timePointStartOfReceivingNALU = std::chrono::steady_clock::now();
     // Full NALU - we can remove the 'drop packet' flag
     if (flagPacketHasGoneMissing) {
-        MLOGD << "Got full NALU - clearing missing packet flag";
+//        MLOGD << "Got full NALU - clearing missing packet flag";
         flagPacketHasGoneMissing = false;
     }
     write_h264_h265_nalu_start();
@@ -260,7 +260,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t *rtp_data, const size_t data_l
             //MLOGD<<"Bytes "<<StringHelper::vectorAsString(std::vector<uint8_t>(rtp_data,rtp_data+data_length));
             timePointStartOfReceivingNALU = std::chrono::steady_clock::now();
             if (flagPacketHasGoneMissing) {
-                MLOGD << "Got fu-a start - clearing missing packet flag";
+//                MLOGD << "Got fu-a start - clearing missing packet flag";
                 flagPacketHasGoneMissing = false;
             }
             write_h264_h265_nalu_start();
