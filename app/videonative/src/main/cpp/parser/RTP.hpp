@@ -182,6 +182,7 @@ struct jpeg_quant_table_header_t {
 // them both with a "generic" type.
 static constexpr auto RTP_PAYLOAD_TYPE_H264 = 96;
 static constexpr auto RTP_PAYLOAD_TYPE_H265 = 97;
+static constexpr auto RTP_PAYLOAD_TYPE_AUDIO = 98;
 static constexpr auto MY_SSRC_NUM = 10;
 
 namespace RTP {

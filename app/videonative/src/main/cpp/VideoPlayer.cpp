@@ -93,9 +93,15 @@ void VideoPlayer::processQueue() {
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
-void VideoPlayer::onNewVideoData(const uint8_t *data, const std::size_t data_length) {
-    //MLOGD << "onNewVideoData " << data_length;
-    mParser.parse_rtp_stream(data, data_length);
+void VideoPlayer::onNewRTPData(const uint8_t *data, const std::size_t data_length) {
+    const RTP::RTPPacket rtpPacket(data, data_length);
+    if (rtpPacket.header.payload == RTP_PAYLOAD_TYPE_AUDIO) {
+        audioDecoder.enqueueAudio(data, data_length);
+    }
+    else
+    {
+        mParser.parse_rtp_stream(data, data_length);
+    }
 }
 
 void VideoPlayer::onNewNALU(const NALU &nalu) {
@@ -126,7 +132,7 @@ void VideoPlayer::start(JNIEnv *env, jobject androidContext) {
     mUDPReceiver = std::make_unique<UDPReceiver>(javaVm, VS_PORT, "UdpReceiver", -16,
                                                  [this](const uint8_t *data,
                                                         size_t data_length) {
-                                                     onNewVideoData(data, data_length);
+                                                     onNewRTPData(data, data_length);
                                                  }, WANTED_UDP_RCVBUF_SIZE);
     mUDPReceiver->startReceiving();
 }
@@ -136,6 +142,8 @@ void VideoPlayer::stop(JNIEnv *env, jobject androidContext) {
         mUDPReceiver->stopReceiving();
         mUDPReceiver.reset();
     }
+
+    audioDecoder.stopAudio();
 }
 
 std::string VideoPlayer::getInfoString() const {
@@ -314,4 +322,21 @@ JNIEXPORT jboolean JNICALL
 Java_com_openipc_videonative_VideoPlayer_nativeIsRecording(JNIEnv *env, jclass clazz,
                                                            jlong native_instance) {
     return native(native_instance)->isRecording();
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_openipc_videonative_VideoPlayer_nativeStartAudio(JNIEnv *env, jclass clazz,
+                                                          jlong native_instance) {
+    if(!native(native_instance)->audioDecoder.isInit)
+    {
+        native(native_instance)->audioDecoder.initAudio();
+    }
+    native(native_instance)->audioDecoder.stopAudioProcessing();
+    native(native_instance)->audioDecoder.startAudioProcessing();
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_openipc_videonative_VideoPlayer_nativeStopAudio(JNIEnv *env, jclass clazz,
+                                                         jlong native_instance) {
+    native(native_instance)->audioDecoder.stopAudioProcessing();
 }

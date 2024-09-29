@@ -1,6 +1,7 @@
 package com.openipc.videonative;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.SurfaceTexture;
 import android.os.Looper;
 import android.util.Log;
@@ -54,6 +55,8 @@ public class VideoPlayer implements IVideoParamsChanged {
     public static native void nativeStopDvr(long nativeInstance);
 
     public static native boolean nativeIsRecording(long nativeInstance);
+    public static native void nativeStartAudio(long nativeInstance);
+    public static native void nativeStopAudio(long nativeInstance);
 
     //get members or other information. Some might be only usable in between (nativeStart <-> nativeStop)
     public static native String getVideoInfoString(long nativeInstance);
@@ -63,7 +66,6 @@ public class VideoPlayer implements IVideoParamsChanged {
     public static native boolean anyVideoBytesParsedSinceLastCall(long nativeInstance);
 
     public static native boolean receivingVideoButCannotParse(long nativeInstance);
-
     // TODO: Use message queue from cpp for performance#
     // This initiates a 'call back' for the IVideoParams
     public static native <T extends IVideoParamsChanged> void nativeCallBack(T t, long nativeInstance);
@@ -106,6 +108,16 @@ public class VideoPlayer implements IVideoParamsChanged {
         timer.purge();
         nativeStop(nativeVideoPlayer, context);
         timer = null;
+    }
+
+    public void startAudio()
+    {
+        nativeStartAudio(nativeVideoPlayer);
+    }
+
+    public void stopAudio()
+    {
+        nativeStopAudio(nativeVideoPlayer);
     }
 
     public boolean isRunning() {
@@ -162,6 +174,7 @@ public class VideoPlayer implements IVideoParamsChanged {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
+                Log.d(TAG, "surfaceDestroyed idx: " + index);
                 stopAndRemoveReceiverDecoder(index);
             }
         };

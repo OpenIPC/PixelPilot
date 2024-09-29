@@ -631,6 +631,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         unregisterReceivers();
         wfbLinkManager.stopAdapters();
         videoPlayer.stop();
+        videoPlayer.stopAudio();
         super.onStop();
     }
 
@@ -640,6 +641,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         // On resume is called when the app is reopened, a device might have been plugged since the last time it started.
         videoPlayer.start();
+        videoPlayer.startAudio();
 
         wfbLinkManager.setChannel(getChannel(this));
         wfbLinkManager.refreshAdapters();
