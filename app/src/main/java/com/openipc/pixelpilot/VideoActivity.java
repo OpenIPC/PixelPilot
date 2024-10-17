@@ -94,7 +94,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private Timer recordTimer = null;
     private int seconds = 0;
     private boolean isVRMode = false;
-    private boolean isStreaming = false;
     private ConstraintLayout constraintLayout;
     private ConstraintSet constraintSet;
 
@@ -273,8 +272,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         chart.setData(noData);
 
         binding.imgBtnRecord.setOnClickListener(item -> {
-            if(!isStreaming) return;
-
             if (dvrFd == null) {
                 Uri dvrUri = openDvrFile();
                 if (dvrUri != null) {
@@ -352,7 +349,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             SubMenu recording = popup.getMenu().addSubMenu("Recording");
             MenuItem dvrBtn = recording.add(dvrFd == null ? "Start" : "Stop");
             dvrBtn.setOnMenuItemClickListener(item -> {
-                if(!isStreaming) return false;
                 if (dvrFd == null) {
                     Uri dvrUri = openDvrFile();
                     if (dvrUri != null) {
@@ -744,13 +740,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                             paddedDigits(data.count_p_dec_ok, 6),
                             paddedDigits(data.count_p_fec_recovered, 6),
                             paddedDigits(data.count_p_lost, 6)));
-                    isStreaming = true;
                 }
             } else {
                 binding.tvLinkStatus.setText("No wfb-ng data.");
-                isStreaming = false;
-                binding.imgBtnRecord.setImageResource(R.drawable.record);
-                stopDvr();
             }
         });
     }
