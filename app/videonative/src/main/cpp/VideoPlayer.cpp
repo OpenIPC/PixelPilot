@@ -93,15 +93,23 @@ void VideoPlayer::processQueue() {
 }
 
 //Not yet parsed bit stream (e.g. raw h264 or rtp data)
-void VideoPlayer::onNewRTPData(const uint8_t *data, const std::size_t data_length) {
+void VideoPlayer::onNewRTPData(const uint8_t* data, const std::size_t data_length) {
+    // Parse the RTP packet
     const RTP::RTPPacket rtpPacket(data, data_length);
-    if (rtpPacket.header.payload == RTP_PAYLOAD_TYPE_AUDIO) {
-        audioDecoder.enqueueAudio(data, data_length);
-    }
-    else
-    {
-        mParser.parse_rtp_stream(data, data_length);
-    }
+    uint16_t idx = rtpPacket.header.getSequence();
+
+    // Define the callback based on payload type
+    auto callback = [&](const uint8_t* packet_data, std::size_t packet_length) {
+        if (rtpPacket.header.payload == RTP_PAYLOAD_TYPE_AUDIO) {
+            audioDecoder.enqueueAudio(packet_data, packet_length);
+        }
+        else {
+            mParser.parse_rtp_stream(packet_data, packet_length);
+        }
+    };
+
+    // Process the packet using the queue
+    mBufferedPacketQueue.processPacket(idx, data, data_length, callback);
 }
 
 void VideoPlayer::onNewNALU(const NALU &nalu) {
