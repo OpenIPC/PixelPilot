@@ -7,6 +7,7 @@
 #include <jni.h>
 #include "VideoDecoder.h"
 #include "AudioDecoder.h"
+#include "BufferedPacketQueue.h"
 #include "UdpReceiver.h"
 #include "parser/H26XParser.h"
 #include "minimp4.h"
@@ -65,6 +66,8 @@ private:
     const std::string GROUND_RECORDING_DIRECTORY;
     JavaVM *javaVm = nullptr;
     H26XParser mParser;
+    BufferedPacketQueue mBufferedPacketQueue;
+
 
     // DVR attributes
     int dvr_fd;
