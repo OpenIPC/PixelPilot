@@ -49,3 +49,7 @@ audio:
 ## Tested devices based on real user reviews
 
 * Samsung Galaxy A54 (Exynos 1380 processor)
+* Google Pixel 7 Pro
+* Poco x6 Pro
+* Meta Quest 2
+* Meta Quest 3
