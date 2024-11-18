@@ -42,5 +42,5 @@ jobs:
       - name: Upload Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name == 'master' ? 'latest' : github.ref_name }}
+          tag_name: ${{ github.ref_name == 'master' && 'latest' || github.ref_name }}
           files: PixelPilot.apk
