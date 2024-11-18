@@ -32,8 +32,9 @@ jobs:
       - name: Build APK
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_PATH: ${{ github.workspace }}/pixelpilot.jks
         run: |
-          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=pixelpilot.jks \
+          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=$KEYSTORE_PATH \
           -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
           -Pandroid.injected.signing.key.alias=pixelpilot \
           -Pandroid.injected.signing.key.password=$KEYSTORE_PASSWORD
