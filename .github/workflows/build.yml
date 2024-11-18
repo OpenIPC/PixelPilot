@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   build:
+    environment: ANDROID_KEYSTORE
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
