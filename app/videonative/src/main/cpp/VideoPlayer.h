@@ -56,9 +56,9 @@ public:
 private:
     void onNewNALU(const NALU &nalu);
 
-    //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 100ms
-    //5 MB should be plenty !
-    static constexpr const size_t WANTED_UDP_RCVBUF_SIZE = 1024 * 1024 * 5;
+    //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 500ms
+    //25 MB should be plenty !
+    static constexpr const size_t WANTED_UDP_RCVBUF_SIZE = 1024 * 1024 * 25;
     // Retrieve settings from shared preferences
     enum SOURCE_TYPE_OPTIONS {
         UDP, FILE, ASSETS, VIA_FFMPEG_URL, EXTERNAL
