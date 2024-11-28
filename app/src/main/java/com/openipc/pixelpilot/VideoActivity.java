@@ -188,19 +188,35 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             binding.surfaceViewRight.getHolder().addCallback(videoPlayer.configure1(1));
 
             SeekBar seekBar = binding.seekBar;
+            SeekBar distanceSeekBar = binding.distanceSeekBar;
+            seekBar.setRotation(180);
+
             // Retrieve saved progress value
             SharedPreferences sharedPreferences = getSharedPreferences("SeekBarPrefs", MODE_PRIVATE);
-            int savedProgress = sharedPreferences.getInt("seekBarProgress", 0); // Default to 0 if no value is found
+            SharedPreferences sharedPreferencesd = getSharedPreferences("SeekBarPrefsD", MODE_PRIVATE);
+            int savedProgress = sharedPreferences.getInt("seekBarProgress", 1); // Default to 0 if no value is found
+            int savedDistanceProgress = sharedPreferencesd.getInt("distanceSeekBarProgress", 1);
             seekBar.setProgress(savedProgress);
             seekBar.setVisibility(View.VISIBLE);
+
+            distanceSeekBar.setProgress(savedDistanceProgress);
+            distanceSeekBar.setVisibility(View.VISIBLE);
+
             constraintLayout = binding.frameLayout;
+
             constraintSet = new ConstraintSet();
             constraintSet.clone(constraintLayout);
 
             // Apply the saved margin
-            int margin = savedProgress * 10; // Adjust the multiplier as needed
-            constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, margin);
-            constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, margin);
+            int margin = savedProgress * 20; // Adjust the multiplier as needed
+            int size = savedDistanceProgress * 20; // Adjust the multiplier as needed
+            constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.START, margin);
+            constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.END, margin);
+            constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, size);
+            constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, size);
+
+            //constraintSet.constrainWidth(R.id.surfaceViewLeft, size);
+            //constraintSet.constrainWidth(R.id.surfaceViewRight, size);
             constraintSet.applyTo(constraintLayout);
 
             // Hide SeekBar after 3 seconds
@@ -208,20 +224,23 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 @Override
                 public void run() {
                     seekBar.setVisibility(View.GONE);
+                    distanceSeekBar.setVisibility(View.GONE);
                 }
             }, 3000);
 
-            // Show SeekBar when touched
+            // Show SeekBars when touched
             constraintLayout.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
                         seekBar.setVisibility(View.VISIBLE);
-                        // Hide SeekBar again after 3 seconds of inactivity
+                        distanceSeekBar.setVisibility(View.VISIBLE);
+                        // Hide seekBar after 3 seconds of inactivity
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 seekBar.setVisibility(View.GONE);
+                                distanceSeekBar.setVisibility(View.GONE);
                             }
                         }, 3000);
                     }
@@ -232,27 +251,46 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    int margin = progress * 10; // Adjust the multiplier as needed
-                    constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, margin);
-                    constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, margin);
+                    int margin = progress * 20; // Adjust the multiplier as needed
+                    constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.START, margin);
+                    constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.END, margin);
                     constraintSet.applyTo(constraintLayout);
                     // Save progress value
                     SharedPreferences sharedPreferences = getSharedPreferences("SeekBarPrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putInt("seekBarProgress", progress);
-                    editor.apply();
+                    editor.commit();
                 }
 
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
+                public void onStartTrackingTouch(SeekBar seekBar) { }
 
                 @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
+                public void onStopTrackingTouch(SeekBar seekBar) { }
             });
+
+            distanceSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar distanceSeekBar, int progressD, boolean fromUser) {
+                    int size = progressD * 20; // Adjust the multiplier as needed
+
+                    constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, size);
+                    constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, size);
+                    constraintSet.applyTo(constraintLayout);
+                    // Save progress value
+                    SharedPreferences sharedPreferencesd = getSharedPreferences("SeekBarPrefsD", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferencesd.edit();
+                    editor.putInt("distanceSeekBarProgress", progressD);
+                    editor.commit();
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar distanceSeekBar) { }
+                @Override
+                public void onStopTrackingTouch(SeekBar distanceSeekBar) { }
+            });
+
+
         }
         else {
             binding.surfaceViewRight.setVisibility(View.GONE);
