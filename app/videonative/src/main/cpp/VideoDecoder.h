@@ -133,7 +133,7 @@ private:
     static constexpr const bool PRINT_DEBUG_INFO = true;
     static constexpr auto TIME_BETWEEN_LOGS = std::chrono::seconds(5);
     static constexpr int64_t BUFFER_TIMEOUT_US =
-            35 * 1000; //40ms (a little bit more than 32 ms (==30 fps))
+            17 * 1000; // 17ms (a little bit more than 17 ms (==60 fps))
 private:
     KeyFrameFinder mKeyFrameFinder;
     bool IS_H265 = false;
