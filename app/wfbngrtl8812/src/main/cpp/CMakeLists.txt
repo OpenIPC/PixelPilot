@@ -16,7 +16,10 @@ add_library(wfb-ng STATIC
         ${CMAKE_SOURCE_DIR}/wfb-ng/src/wifibroadcast.cpp)
 set_target_properties(wfb-ng PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/wfb-ng)
 target_include_directories(wfb-ng PUBLIC ${CMAKE_SOURCE_DIR}/wfb-ng)
-target_compile_definitions(wfb-ng PRIVATE __WFB_RX_SHARED_LIBRARY__)
+target_compile_definitions(wfb-ng PRIVATE
+        __WFB_RX_SHARED_LIBRARY__
+        PREINCLUDE_FILE=<${CMAKE_SOURCE_DIR}/wfb_log.h>
+)
 
 add_library(devourer STATIC
         ${CMAKE_SOURCE_DIR}/devourer/hal/Hal8812PhyReg.h
