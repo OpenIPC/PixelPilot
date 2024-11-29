@@ -166,7 +166,8 @@ void RTPDecoder::parseRTPH264toNALU(const uint8_t *rtp_data, const size_t data_l
         while (true) {
             // the size of the (n-th) nalu starts at offset+1 (1 byte STAP-A NAL HDR )
             const uint16_t *nalu_size_network = (const uint16_t *) &rtp_payload[offset + 1];
-            const uint16_t nalu_size = htons(*nalu_size_network);
+            // replaced htons to htohs -- seemingly there was a bug in the original code, but I can't test it to make sure.
+            const uint16_t nalu_size = ntohs(*nalu_size_network);
             // While the NALU HDR of the (n-th) nalu starts at offset+3 (1 byte STAP-A NAL HDR, 2 bytes nalu size)
             const uint8_t *actual_nalu_data_p = &rtp_payload[offset + 1 + 2];
             const auto actual_nalu_size = nalu_size;
@@ -232,7 +233,8 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t *rtp_data, const size_t data_l
             const int don_offset = 1;
             const uint16_t *nalu_size_network = (const uint16_t *) &rtp_payload[offset +
                                                                                 don_offset + 1];
-            const uint16_t nalu_size = htons(*nalu_size_network);
+            // replaced htons to htohs -- seemingly there was a bug in the original code, but I can't test it to make sure.
+            const uint16_t nalu_size = ntohs(*nalu_size_network);
             // While the NALU HDR of the (n-th) nalu starts at offset+3 (1 byte STAP-A NAL HDR, 2 bytes nalu size)
             const uint8_t *actual_nalu_data_p = &rtp_payload[offset + don_offset + 1 + 2];
             const auto actual_nalu_size = nalu_size;
