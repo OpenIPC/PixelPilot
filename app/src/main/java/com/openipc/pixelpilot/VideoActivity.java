@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.UriPermission;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -159,6 +160,68 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             System.exit(0); // Ensure the app is fully restarted
         }
     }
+
+    private boolean hasUriPermission(Uri uri) {
+        for (UriPermission perm : getContentResolver().getPersistedUriPermissions()) {
+            if (perm.getUri().equals(uri) && perm.isWritePermission()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void resetFolderPermissions() {
+        // Retrieve the stored DVR folder URI
+        SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
+        String dvrFolderUriString = prefs.getString("dvr_folder_", null);
+        if (dvrFolderUriString == null) {
+            Toast.makeText(this, "No folder permissions to reset.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Uri dvrUri = Uri.parse(dvrFolderUriString);
+
+        // Revoke persisted URI permissions
+        for (UriPermission perm : getContentResolver().getPersistedUriPermissions()) {
+            if (perm.getUri().equals(dvrUri)) {
+                getContentResolver().releasePersistableUriPermission(perm.getUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION );
+                Log.d(TAG, "Released URI permission for: " + perm.getUri());
+            }
+        }
+
+        // Clear the stored URI from SharedPreferences
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove("dvr_folder_");
+        editor.apply();
+
+        // Stop any ongoing DVR recording
+        if (dvrFd != null) {
+            stopDvr();
+        }
+
+        // Update the record button icon to default
+        binding.imgBtnRecord.setImageResource(R.drawable.record);
+
+        // Reset any related UI elements
+        binding.txtRecordLabel.setVisibility(View.GONE);
+        binding.imgRecIndicator.setVisibility(View.INVISIBLE);
+
+        // Inform the user
+        Toast.makeText(this, "Folder permissions have been reset.", Toast.LENGTH_LONG).show();
+
+        // Optionally, prompt the user to select a new folder immediately
+        // Uncomment the following lines if you want to prompt immediately
+        /*
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
+                        Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        startActivityForResult(intent, PICK_DVR_REQUEST_CODE);
+        */
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -318,18 +381,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         chart.setData(noData);
 
         binding.imgBtnRecord.setOnClickListener(item -> {
-            if (dvrFd == null) {
-                Uri dvrUri = openDvrFile();
-                if (dvrUri != null) {
-                    startDvr(dvrUri);
-                } else {
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                    intent.addCategory(Intent.CATEGORY_DEFAULT);
-                    startActivityForResult(intent, PICK_DVR_REQUEST_CODE);
-                }
-            } else {
-                stopDvr();
-            }
+            startStopDvr();
         });
 
         binding.btnSettings.setOnClickListener(v -> {
@@ -395,18 +447,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             SubMenu recording = popup.getMenu().addSubMenu("Recording");
             MenuItem dvrBtn = recording.add(dvrFd == null ? "Start" : "Stop");
             dvrBtn.setOnMenuItemClickListener(item -> {
-                if (dvrFd == null) {
-                    Uri dvrUri = openDvrFile();
-                    if (dvrUri != null) {
-                        startDvr(dvrUri);
-                    } else {
-                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                        intent.addCategory(Intent.CATEGORY_DEFAULT);
-                        startActivityForResult(intent, PICK_DVR_REQUEST_CODE);
-                    }
-                } else {
-                    stopDvr();
-                }
+                startStopDvr();
                 return true;
             });
             MenuItem fmp4 = recording.add("fMP4");
@@ -419,6 +460,12 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
                 item.setActionView(new View(this));
                 return false;
+            });
+
+            MenuItem resetPermissions = recording.add("Reset DVR folder");
+            resetPermissions.setOnMenuItemClickListener(item -> {
+                resetFolderPermissions();
+                return true;
             });
 
             SubMenu help = popup.getMenu().addSubMenu("Help");
@@ -543,6 +590,24 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         return null;
     }
 
+    private void startStopDvr() {
+        if (dvrFd == null) {
+            Uri dvrUri = openDvrFile();
+            if (dvrUri != null) {
+                startDvr(dvrUri);
+            } else {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
+                        Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                startActivityForResult(intent, PICK_DVR_REQUEST_CODE);
+            }
+        } else {
+            stopDvr();
+        }
+    }
+
     private void startDvr(Uri dvrUri) {
         if (dvrFd != null) {
             stopDvr();
@@ -630,6 +695,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             Uri uri;
             if (data != null && data.getData() != null) {
                 uri = data.getData();
+                final int takeFlags = data.getFlags() &
+                                    (Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION );
+                getContentResolver().takePersistableUriPermission(uri, takeFlags);
+
                 // Perform operations on the document using its URI.
                 SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = prefs.edit();
@@ -743,7 +813,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         wfbLinkManager.refreshAdapters();
         osdManager.restoreOSDConfig();
 
-        registerReceivers();
         super.onResume();
     }
 
