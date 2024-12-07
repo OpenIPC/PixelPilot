@@ -4,82 +4,85 @@
 
 #ifndef FPV_VR_VIDEOPLAYERN_H
 #define FPV_VR_VIDEOPLAYERN_H
+#include <fcntl.h>
 #include <jni.h>
-#include "VideoDecoder.h"
+#include <stdio.h>
+#include <fstream>
+#include <queue>
 #include "AudioDecoder.h"
 #include "BufferedPacketQueue.h"
 #include "UdpReceiver.h"
-#include "parser/H26XParser.h"
+#include "VideoDecoder.h"
 #include "minimp4.h"
-#include <stdio.h>
-#include <fcntl.h>
-#include <fstream>
-#include <queue>
+#include "parser/H26XParser.h"
 #include "time_util.h"
 
-class VideoPlayer {
+class VideoPlayer
+{
+  public:
+    VideoPlayer(JNIEnv* env, jobject context);
 
-public:
-    VideoPlayer(JNIEnv *env, jobject context);
-
-    void onNewRTPData(const uint8_t *data, const std::size_t data_length);
+    void onNewRTPData(const uint8_t* data, const std::size_t data_length);
 
     /*
      * Set the surface the decoder can be configured with. When @param surface==nullptr
      * It is guaranteed that the surface is not used by the decoder anymore when this call returns
      */
-    void setVideoSurface(JNIEnv *env, jobject surface, jint i);
+    void setVideoSurface(JNIEnv* env, jobject surface, jint i);
 
     /*
      * Start the receiver and ground recorder if enabled
      */
-    void start(JNIEnv *env, jobject androidContext);
+    void start(JNIEnv* env, jobject androidContext);
 
     /**
      * Stop the receiver and ground recorder if enabled
      */
-    void stop(JNIEnv *env, jobject androidContext);
+    void stop(JNIEnv* env, jobject androidContext);
 
     /*
      * Returns a string with the current configuration for debugging
      */
     std::string getInfoString() const;
 
-    void startDvr(JNIEnv *env, jint fd, jint fmp4_enabled);
+    void startDvr(JNIEnv* env, jint fd, jint fmp4_enabled);
 
     void stopDvr();
 
-    bool isRecording() {
-        return (get_time_ms() - last_dvr_write) <= 500;
-    }
+    bool isRecording() { return (get_time_ms() - last_dvr_write) <= 500; }
 
-private:
-    void onNewNALU(const NALU &nalu);
+  private:
+    void onNewNALU(const NALU& nalu);
 
-    //Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 500ms
-    //25 MB should be plenty !
+    // Assumptions: Max bitrate: 40 MBit/s, Max time to buffer: 500ms
+    // 25 MB should be plenty !
     static constexpr const size_t WANTED_UDP_RCVBUF_SIZE = 1024 * 1024 * 25;
     // Retrieve settings from shared preferences
-    enum SOURCE_TYPE_OPTIONS {
-        UDP, FILE, ASSETS, VIA_FFMPEG_URL, EXTERNAL
+    enum SOURCE_TYPE_OPTIONS
+    {
+        UDP,
+        FILE,
+        ASSETS,
+        VIA_FFMPEG_URL,
+        EXTERNAL
     };
-    const std::string GROUND_RECORDING_DIRECTORY;
-    JavaVM *javaVm = nullptr;
-    H26XParser mParser;
+    const std::string   GROUND_RECORDING_DIRECTORY;
+    JavaVM*             javaVm = nullptr;
+    H26XParser          mParser;
     BufferedPacketQueue mBufferedPacketQueue;
 
-
     // DVR attributes
-    int dvr_fd;
-    std::queue<NALU> naluQueue;
-    std::mutex mtx;
+    int                     dvr_fd;
+    std::queue<NALU>        naluQueue;
+    std::mutex              mtx;
     std::condition_variable cv;
-    bool stopFlag = false;
-    std::thread processingThread;
-    int dvr_mp4_fragmentation = 0;
-    uint64_t last_dvr_write = 0;
+    bool                    stopFlag = false;
+    std::thread             processingThread;
+    int                     dvr_mp4_fragmentation = 0;
+    uint64_t                last_dvr_write        = 0;
 
-    void enqueueNALU(const NALU &nalu) {
+    void enqueueNALU(const NALU& nalu)
+    {
         {
             std::lock_guard<std::mutex> lock(mtx);
             naluQueue.push(nalu);
@@ -87,37 +90,40 @@ private:
         cv.notify_one();
     }
 
-    void startProcessing() {
-        stopFlag = false;
+    void startProcessing()
+    {
+        stopFlag         = false;
         processingThread = std::thread(&VideoPlayer::processQueue, this);
     }
 
-    void stopProcessing() {
+    void stopProcessing()
+    {
         {
             std::lock_guard<std::mutex> lock(mtx);
             stopFlag = true;
         }
         cv.notify_all();
-        if (processingThread.joinable()) {
+        if (processingThread.joinable())
+        {
             processingThread.join();
         }
     }
 
     void processQueue();
 
-public:
-    AudioDecoder audioDecoder;
-    VideoDecoder videoDecoder;
+  public:
+    AudioDecoder                 audioDecoder;
+    VideoDecoder                 videoDecoder;
     std::unique_ptr<UDPReceiver> mUDPReceiver;
-    long nNALUsAtLastCall = 0;
+    long                         nNALUsAtLastCall = 0;
 
-public:
-    DecodingInfo latestDecodingInfo{};
+  public:
+    DecodingInfo      latestDecodingInfo{};
     std::atomic<bool> latestDecodingInfoChanged = false;
-    VideoRatio latestVideoRatio{};
+    VideoRatio        latestVideoRatio{};
     std::atomic<bool> latestVideoRatioChanged = false;
 
     bool lastFrameWasAUD = false;
 };
 
-#endif //FPV_VR_VIDEOPLAYERN_H
+#endif  // FPV_VR_VIDEOPLAYERN_H
