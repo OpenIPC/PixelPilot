@@ -1,0 +1,45 @@
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4 
+UseTab: Never
+AlignAfterOpenBracket: AlwaysBreak
+BreakBeforeBraces: Custom
+BraceWrapping:
+  BeforeElse: true
+  AfterFunction: true
+  AfterEnum: true
+  AfterControlStatement: Always
+  AfterClass: true
+  AfterCaseLabel: true
+  AfterNamespace: true
+  AfterObjCDeclaration: true
+  AfterStruct: true
+  AfterUnion: true
+  AfterExternBlock: true
+  BeforeCatch: true
+  BeforeLambdaBody: true
+  BeforeWhile: true
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: true
+AllowShortFunctionsOnASingleLine: Inline
+ColumnLimit: 120
+NamespaceIndentation: None
+AccessModifierOffset: -2
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignOperands: true
+AlignTrailingComments: true
+BinPackArguments: false
+BinPackParameters: false
+PointerAlignment: Left
+DerivePointerAlignment: false
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: true
+SpacesInAngles: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SortIncludes: true
+IncludeBlocks: Preserve
+IndentCaseLabels: true
