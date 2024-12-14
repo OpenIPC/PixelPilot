@@ -391,7 +391,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             vrItem.setOnMenuItemClickListener(item -> {
                 isVRMode = !getVRSetting();
                 setVRSetting(isVRMode);
-                vrItem.setTitle(isVRMode ? "On" : "Off");
+                vrItem.setTitle(isVRMode ? "Off" : "On");
                 item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
                 item.setActionView(new View(this));
                 resetApp();
@@ -836,11 +836,22 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         lastVideoH = videoH;
 
         Log.d(TAG, "Set resolution: " + videoW + "x" + videoH);
-        View mSurface = findViewById(R.id.mainVideo);
-        ConstraintLayout.LayoutParams params =
-                (ConstraintLayout.LayoutParams) mSurface.getLayoutParams();
-        params.dimensionRatio = videoW + ":" + videoH;
-        runOnUiThread(() -> mSurface.setLayoutParams(params));
+
+        updateViewRatio(R.id.mainVideo, videoW, videoH);
+        updateViewRatio(R.id.surfaceViewLeft, videoW, videoH);
+        updateViewRatio(R.id.surfaceViewRight, videoW, videoH);
+    }
+
+    private void updateViewRatio(int viewId, int videoW, int videoH) {
+        View view = findViewById(viewId);
+        if (view != null) {
+            ConstraintLayout.LayoutParams params =
+                    (ConstraintLayout.LayoutParams) view.getLayoutParams();
+            params.dimensionRatio = videoW + ":" + videoH;
+            runOnUiThread(() -> view.setLayoutParams(params));
+        } else {
+            Log.w(TAG, "View with ID " + viewId + " not found.");
+        }
     }
 
     @Override
