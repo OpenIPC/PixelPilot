@@ -318,6 +318,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                     constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.START, margin);
                     constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.END, margin);
                     constraintSet.applyTo(constraintLayout);
+                    updateViewRatio(R.id.surfaceViewLeft, lastVideoW, lastVideoH);
+                    updateViewRatio(R.id.surfaceViewRight, lastVideoW, lastVideoH);
+
                     // Save progress value
                     SharedPreferences sharedPreferences = getSharedPreferences("SeekBarPrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -340,6 +343,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                     constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, size);
                     constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, size);
                     constraintSet.applyTo(constraintLayout);
+                    updateViewRatio(R.id.surfaceViewLeft, lastVideoW, lastVideoH);
+                    updateViewRatio(R.id.surfaceViewRight, lastVideoW, lastVideoH);
                     // Save progress value
                     SharedPreferences sharedPreferencesd = getSharedPreferences("SeekBarPrefsD", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferencesd.edit();
@@ -837,9 +842,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         Log.d(TAG, "Set resolution: " + videoW + "x" + videoH);
 
-        updateViewRatio(R.id.mainVideo, videoW, videoH);
-        updateViewRatio(R.id.surfaceViewLeft, videoW, videoH);
-        updateViewRatio(R.id.surfaceViewRight, videoW, videoH);
+        updateViewRatio(R.id.mainVideo, lastVideoW, lastVideoH);
+        updateViewRatio(R.id.surfaceViewLeft, lastVideoW, lastVideoH);
+        updateViewRatio(R.id.surfaceViewRight, lastVideoW, lastVideoH);
     }
 
     private void updateViewRatio(int viewId, int videoW, int videoH) {
