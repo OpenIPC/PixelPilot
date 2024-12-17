@@ -278,8 +278,6 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, size);
             constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, size);
 
-            //constraintSet.constrainWidth(R.id.surfaceViewLeft, size);
-            //constraintSet.constrainWidth(R.id.surfaceViewRight, size);
             constraintSet.applyTo(constraintLayout);
 
             // Hide SeekBar after 3 seconds
@@ -288,6 +286,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 public void run() {
                     seekBar.setVisibility(View.GONE);
                     distanceSeekBar.setVisibility(View.GONE);
+                    updateViewRatio(R.id.surfaceViewLeft, lastVideoW, lastVideoH);
+                    updateViewRatio(R.id.surfaceViewRight, lastVideoW, lastVideoH);
                 }
             }, 3000);
 
@@ -304,6 +304,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                             public void run() {
                                 seekBar.setVisibility(View.GONE);
                                 distanceSeekBar.setVisibility(View.GONE);
+                                updateViewRatio(R.id.surfaceViewLeft, lastVideoW, lastVideoH);
+                                updateViewRatio(R.id.surfaceViewRight, lastVideoW, lastVideoH);
                             }
                         }, 3000);
                     }
@@ -845,6 +847,10 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     private void updateViewRatio(int viewId, int videoW, int videoH) {
+        if (videoW == 0 || videoH == 0) {
+            return;
+        }
+
         View view = findViewById(viewId);
         if (view != null) {
             ConstraintLayout.LayoutParams params =
