@@ -222,152 +222,263 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         */
     }
 
+    // Lifecycle - onCreate
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "lifecycle onCreate");
         super.onCreate(savedInstanceState);
+
+        // UI Setup
+        initializeUI();
+
+        // WFB-NG Setup
+        initializeWfbNg();
+
+        // Video Player(s) Setup
+        initializeVideoPlayers();
+
+        // VR-specific SeekBars (only if VR mode)
+        setupVRSeekBarsIfNeeded();
+
+        // OSD Manager Setup
+        setupOSDManager();
+
+        // PieChart Setup
+        setupPieChart();
+
+        // Button Handlers
+        setupButtonHandlers();
+
+        // Mavlink Setup
+        setupMavlink();
+
+        // Battery Receiver
+        setupBatteryReceiver();
+    }
+
+    // ----------------------------------------------------------------------------
+    // UI SETUP
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Initializes basic UI components, including window flags and layout binding.
+     */
+    private void initializeUI() {
         binding = ActivityVideoBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
 
-        // Init wfb ng.
+        wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+    }
+
+    // ----------------------------------------------------------------------------
+    // WFB-NG SETUP
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Initializes WFB-NG related logic such as setting default gs.key and linking
+     * to WFB-NG stats changes.
+     */
+    private void initializeWfbNg() {
         setDefaultGsKey();
         copyGSKey();
         WfbNgLink wfbLink = new WfbNgLink(this);
         wfbLink.SetWfbNGStatsChanged(this);
         wfbLinkManager = new WfbLinkManager(this, binding, wfbLink);
+    }
 
-        // Setup video players
-        setContentView(binding.getRoot());
+    // ----------------------------------------------------------------------------
+    // VIDEO PLAYER SETUP
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Initializes VideoPlayer and configures surfaces for VR or standard mode.
+     */
+    private void initializeVideoPlayers() {
         videoPlayer = new VideoPlayer(this);
         videoPlayer.setIVideoParamsChanged(this);
+
         isVRMode = getVRSetting();
-        if(isVRMode) {
-            binding.mainVideo.setVisibility(View.GONE);
-            binding.surfaceViewLeft.getHolder().addCallback(videoPlayer.configure1(0));
-            binding.surfaceViewRight.getHolder().addCallback(videoPlayer.configure1(1));
 
-            SeekBar seekBar = binding.seekBar;
-            SeekBar distanceSeekBar = binding.distanceSeekBar;
-            seekBar.setRotation(180);
+        if (isVRMode) {
+            setupVRVideoPlayers();
+        } else {
+            setupStandardVideoPlayer();
+        }
+    }
 
-            // Retrieve saved progress value
-            SharedPreferences sharedPreferences = getSharedPreferences("SeekBarPrefs", MODE_PRIVATE);
-            SharedPreferences sharedPreferencesd = getSharedPreferences("SeekBarPrefsD", MODE_PRIVATE);
-            int savedProgress = sharedPreferences.getInt("seekBarProgress", 1); // Default to 0 if no value is found
-            int savedDistanceProgress = sharedPreferencesd.getInt("distanceSeekBarProgress", 1);
-            seekBar.setProgress(savedProgress);
-            seekBar.setVisibility(View.VISIBLE);
+    /**
+     * Configures the UI for VR mode by attaching callbacks to the left and right SurfaceViews.
+     */
+    private void setupVRVideoPlayers() {
+        binding.mainVideo.setVisibility(View.GONE);
+        binding.surfaceViewLeft.getHolder().addCallback(videoPlayer.configure1(0));
+        binding.surfaceViewRight.getHolder().addCallback(videoPlayer.configure1(1));
+    }
 
-            distanceSeekBar.setProgress(savedDistanceProgress);
-            distanceSeekBar.setVisibility(View.VISIBLE);
+    /**
+     * Configures the UI for standard, single-surface video playback.
+     */
+    private void setupStandardVideoPlayer() {
+        binding.surfaceViewRight.setVisibility(View.GONE);
+        binding.surfaceViewLeft.setVisibility(View.GONE);
+        binding.mainVideo.getHolder().addCallback(videoPlayer.configure1(0));
+    }
 
-            constraintLayout = binding.frameLayout;
+    // ----------------------------------------------------------------------------
+    // VR SEEK BARS (only in VR mode)
+    // ----------------------------------------------------------------------------
 
-            constraintSet = new ConstraintSet();
-            constraintSet.clone(constraintLayout);
+    /**
+     * Initializes and configures SeekBars for VR mode to adjust the margin and size of surfaces.
+     * If not in VR mode, this method does nothing.
+     */
+    private void setupVRSeekBarsIfNeeded() {
+        if (!isVRMode) return;
 
-            // Apply the saved margin
-            int margin = savedProgress * 20; // Adjust the multiplier as needed
-            int size = savedDistanceProgress * 20; // Adjust the multiplier as needed
-            constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.START, margin);
-            constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.END, margin);
-            constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, size);
-            constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, size);
+        constraintLayout = binding.frameLayout;
+        constraintSet = new ConstraintSet();
+        constraintSet.clone(constraintLayout);
 
-            constraintSet.applyTo(constraintLayout);
+        configureVRSeekBars();
+        configureVRSeekBarVisibility();
+        configureVRSeekBarListeners();
+    }
 
-            // Hide SeekBar after 3 seconds
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    seekBar.setVisibility(View.GONE);
-                    distanceSeekBar.setVisibility(View.GONE);
+    /**
+     * Configures both the margin (binding.seekBar) and distance (binding.distanceSeekBar) SeekBars.
+     */
+    private void configureVRSeekBars() {
+        // Rotate the first seekBar 180 degrees
+        binding.seekBar.setRotation(180);
+
+        // Retrieve saved progress for both seekBars
+        SharedPreferences sharedPreferences = getSharedPreferences("SeekBarPrefs", MODE_PRIVATE);
+        SharedPreferences sharedPreferencesd = getSharedPreferences("SeekBarPrefsD", MODE_PRIVATE);
+
+        int savedProgress = sharedPreferences.getInt("seekBarProgress", 1);
+        int savedDistanceProgress = sharedPreferencesd.getInt("distanceSeekBarProgress", 1);
+
+        // Apply saved progress values
+        binding.seekBar.setProgress(savedProgress);
+        binding.distanceSeekBar.setProgress(savedDistanceProgress);
+
+        // Make them visible initially
+        binding.seekBar.setVisibility(View.VISIBLE);
+        binding.distanceSeekBar.setVisibility(View.VISIBLE);
+
+        // Apply initial constraints
+        applyVRMargins(savedProgress);
+        applyVRDistance(savedDistanceProgress);
+    }
+
+    /**
+     * Manages hiding and showing the SeekBars after some delay or upon user touch.
+     */
+    private void configureVRSeekBarVisibility() {
+        // Hide SeekBars after 3 seconds
+        handler.postDelayed(() -> {
+            binding.seekBar.setVisibility(View.GONE);
+            binding.distanceSeekBar.setVisibility(View.GONE);
+            updateViewRatio(R.id.surfaceViewLeft, lastVideoW, lastVideoH);
+            updateViewRatio(R.id.surfaceViewRight, lastVideoW, lastVideoH);
+        }, 3000);
+
+        // Show SeekBars when the layout is touched
+        binding.frameLayout.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                binding.seekBar.setVisibility(View.VISIBLE);
+                binding.distanceSeekBar.setVisibility(View.VISIBLE);
+                handler.postDelayed(() -> {
+                    binding.seekBar.setVisibility(View.GONE);
+                    binding.distanceSeekBar.setVisibility(View.GONE);
                     updateViewRatio(R.id.surfaceViewLeft, lastVideoW, lastVideoH);
                     updateViewRatio(R.id.surfaceViewRight, lastVideoW, lastVideoH);
-                }
-            }, 3000);
+                }, 3000);
+            }
+            return false;
+        });
+    }
 
-            // Show SeekBars when touched
-            constraintLayout.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        seekBar.setVisibility(View.VISIBLE);
-                        distanceSeekBar.setVisibility(View.VISIBLE);
-                        // Hide seekBar after 3 seconds of inactivity
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                seekBar.setVisibility(View.GONE);
-                                distanceSeekBar.setVisibility(View.GONE);
-                                updateViewRatio(R.id.surfaceViewLeft, lastVideoW, lastVideoH);
-                                updateViewRatio(R.id.surfaceViewRight, lastVideoW, lastVideoH);
-                            }
-                        }, 3000);
-                    }
-                    return false;
-                }
-            });
+    /**
+     * Sets listeners on the SeekBars to adjust margins and distances in real time.
+     */
+    private void configureVRSeekBarListeners() {
+        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                applyVRMargins(progress);
+                saveSeekBarValue("SeekBarPrefs", "seekBarProgress", progress);
+            }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
+            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+        });
 
-            seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    int margin = progress * 20; // Adjust the multiplier as needed
-                    constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.START, margin);
-                    constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.END, margin);
-                    constraintSet.applyTo(constraintLayout);
+        binding.distanceSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar distanceSeekBar, int progress, boolean fromUser) {
+                applyVRDistance(progress);
+                saveSeekBarValue("SeekBarPrefsD", "distanceSeekBarProgress", progress);
+            }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
+            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+        });
+    }
 
-                    // Save progress value
-                    SharedPreferences sharedPreferences = getSharedPreferences("SeekBarPrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putInt("seekBarProgress", progress);
-                    editor.commit();
-                }
+    /**
+     * Adjusts margins for left/right SurfaceViews based on progress.
+     */
+    private void applyVRMargins(int progress) {
+        int margin = progress * 20; // Adjust multiplier as needed
+        constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.START, margin);
+        constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.END, margin);
+        constraintSet.applyTo(constraintLayout);
+    }
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) { }
+    /**
+     * Adjusts size for left/right SurfaceViews based on progress.
+     */
+    private void applyVRDistance(int progress) {
+        int size = progress * 20; // Adjust multiplier as needed
+        constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, size);
+        constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, size);
+        constraintSet.applyTo(constraintLayout);
+    }
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) { }
-            });
+    /**
+     * Saves the SeekBar progress value to SharedPreferences.
+     */
+    private void saveSeekBarValue(String prefsName, String key, int progress) {
+        SharedPreferences sp = getSharedPreferences(prefsName, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(key, progress);
+        editor.apply();
+    }
 
-            distanceSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar distanceSeekBar, int progressD, boolean fromUser) {
-                    int size = progressD * 20; // Adjust the multiplier as needed
+    // ----------------------------------------------------------------------------
+    // OSD MANAGER
+    // ----------------------------------------------------------------------------
 
-                    constraintSet.setMargin(R.id.surfaceViewLeft, ConstraintSet.END, size);
-                    constraintSet.setMargin(R.id.surfaceViewRight, ConstraintSet.START, size);
-                    constraintSet.applyTo(constraintLayout);
-
-                    // Save progress value
-                    SharedPreferences sharedPreferencesd = getSharedPreferences("SeekBarPrefsD", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferencesd.edit();
-                    editor.putInt("distanceSeekBarProgress", progressD);
-                    editor.commit();
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar distanceSeekBar) { }
-                @Override
-                public void onStopTrackingTouch(SeekBar distanceSeekBar) { }
-            });
-
-
-        }
-        else {
-            binding.surfaceViewRight.setVisibility(View.GONE);
-            binding.surfaceViewLeft.setVisibility(View.GONE);
-            binding.mainVideo.getHolder().addCallback(videoPlayer.configure1(0));
-        }
-
+    /**
+     * Sets up the On-Screen Display (OSD) manager for telemetry or other overlays.
+     */
+    private void setupOSDManager() {
         osdManager = new OSDManager(this, binding);
         osdManager.setUp();
+    }
 
+    // ----------------------------------------------------------------------------
+    // PIECHART SETUP
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Initializes and configures the PieChart to show link statistics (initially empty).
+     */
+    private void setupPieChart() {
         PieChart chart = binding.pcLinkStat;
         chart.getLegend().setEnabled(false);
         chart.getDescription().setEnabled(false);
@@ -381,193 +492,304 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         chart.setRotationEnabled(false);
         chart.setClickable(false);
         chart.setTouchEnabled(false);
-        PieData noData = new PieData(new PieDataSet(new ArrayList<>(), ""));
-        chart.setData(noData);
 
-        binding.imgBtnRecord.setOnClickListener(item -> {
+        PieData emptyData = new PieData(new PieDataSet(new ArrayList<>(), ""));
+        chart.setData(emptyData);
+    }
+
+    // ----------------------------------------------------------------------------
+    // BUTTON HANDLERS
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Sets up the main button click listeners: Record and Settings.
+     */
+    private void setupButtonHandlers() {
+        binding.imgBtnRecord.setOnClickListener(item -> startStopDvr());
+        binding.btnSettings.setOnClickListener(this::showSettingsMenu);
+    }
+
+    /**
+     * Shows the main settings popup menu and configures its items.
+     */
+    private void showSettingsMenu(View anchor) {
+        PopupMenu popup = new PopupMenu(this, anchor);
+
+        // VR submenu
+        setupVRSubMenu(popup);
+
+        // Channel submenu
+        setupChannelSubMenu(popup);
+
+        // OSD submenu
+        setupOSDSubMenu(popup);
+
+        // WFB submenu
+        setupWFBSubMenu(popup);
+
+        // Recording submenu
+        setupRecordingSubMenu(popup);
+
+        // Help submenu
+        setupHelpSubMenu(popup);
+
+        popup.show();
+    }
+
+    /**
+     * Submenu that toggles VR mode.
+     */
+    private void setupVRSubMenu(PopupMenu popup) {
+        SubMenu vrMenu = popup.getMenu().addSubMenu("VR mode");
+        MenuItem vrItem = vrMenu.add(getVRSetting() ? "On" : "Off");
+        vrItem.setOnMenuItemClickListener(item -> {
+            isVRMode = !getVRSetting();
+            setVRSetting(isVRMode);
+            vrItem.setTitle(isVRMode ? "Off" : "On");
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+            item.setActionView(new View(this));
+            resetApp();
+            return false;
+        });
+    }
+
+    /**
+     * Submenu that lists available channels and allows the user to select one.
+     */
+    private void setupChannelSubMenu(PopupMenu popup) {
+        SubMenu chnMenu = popup.getMenu().addSubMenu("Channel");
+        int channelPref = getChannel(this);
+        chnMenu.setHeaderTitle("Current: " + channelPref);
+
+        String[] channels = getResources().getStringArray(R.array.channels);
+        for (String chnStr : channels) {
+            chnMenu.add(chnStr).setOnMenuItemClickListener(item -> {
+                onChannelSettingChanged(Integer.parseInt(chnStr));
+                return true;
+            });
+        }
+    }
+
+    /**
+     * Submenu handling OSD toggles and locks.
+     */
+    private void setupOSDSubMenu(PopupMenu popup) {
+        SubMenu osd = popup.getMenu().addSubMenu("OSD");
+        MenuItem lock = osd.add(osdManager.getTitle());
+        lock.setOnMenuItemClickListener(item -> {
+            osdManager.lockOSD(!osdManager.isOSDLocked());
+            lock.setTitle(osdManager.getTitle());
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+            item.setActionView(new View(this));
+            return false;
+        });
+
+        for (OSDElement element : osdManager.listOSDItems) {
+            MenuItem itm = osd.add(element.name);
+            itm.setCheckable(true);
+            itm.setChecked(osdManager.isElementEnabled(element));
+            itm.setOnMenuItemClickListener(menuItem -> {
+                menuItem.setChecked(!menuItem.isChecked());
+                osdManager.onOSDItemCheckChanged(element, menuItem.isChecked());
+                menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+                menuItem.setActionView(new View(this));
+                return false;
+            });
+        }
+    }
+
+    /**
+     * Submenu handling WFB-NG logic (e.g. selecting gs.key from storage).
+     */
+    private void setupWFBSubMenu(PopupMenu popup) {
+        SubMenu wfb = popup.getMenu().addSubMenu("WFB-NG");
+        MenuItem keyBtn = wfb.add("gs.key");
+        keyBtn.setOnMenuItemClickListener(item -> {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+            startActivityForResult(intent, PICK_KEY_REQUEST_CODE);
+            return true;
+        });
+    }
+
+    /**
+     * Submenu for recording options, including start/stop DVR and toggling fMP4.
+     */
+    private void setupRecordingSubMenu(PopupMenu popup) {
+        SubMenu recording = popup.getMenu().addSubMenu("Recording");
+
+        MenuItem dvrBtn = recording.add(dvrFd == null ? "Start" : "Stop");
+        dvrBtn.setOnMenuItemClickListener(item -> {
             startStopDvr();
+            return true;
         });
 
-        binding.btnSettings.setOnClickListener(v -> {
-            PopupMenu popup = new PopupMenu(this, v);
-            SubMenu vrMenu = popup.getMenu().addSubMenu("VR mode");
-            MenuItem vrItem = vrMenu.add(getVRSetting() ? "On" : "Off");
-            vrItem.setOnMenuItemClickListener(item -> {
-                isVRMode = !getVRSetting();
-                setVRSetting(isVRMode);
-                vrItem.setTitle(isVRMode ? "Off" : "On");
-                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-                item.setActionView(new View(this));
-                resetApp();
-                return false;
-            });
-
-            SubMenu chnMenu = popup.getMenu().addSubMenu("Channel");
-            int channelPref = getChannel(this);
-            chnMenu.setHeaderTitle("Current: " + channelPref);
-            String[] channels = getResources().getStringArray(R.array.channels);
-            for (String chnStr : channels) {
-                chnMenu.add(chnStr).setOnMenuItemClickListener(item -> {
-                    onChannelSettingChanged(Integer.parseInt(chnStr));
-                    return true;
-                });
-            }
-
-            // OSD
-            SubMenu osd = popup.getMenu().addSubMenu("OSD");
-            MenuItem lock = osd.add(osdManager.getTitle());
-            lock.setOnMenuItemClickListener(item -> {
-                osdManager.lockOSD(!osdManager.isOSDLocked());
-                lock.setTitle(osdManager.getTitle());
-                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-                item.setActionView(new View(this));
-                return false;
-            });
-            for (OSDElement element : osdManager.listOSDItems) {
-                MenuItem itm = osd.add(element.name);
-                itm.setCheckable(true);
-                itm.setChecked(osdManager.isElementEnabled(element));
-                itm.setOnMenuItemClickListener(item -> {
-                    item.setChecked(!item.isChecked());
-                    osdManager.onOSDItemCheckChanged(element, item.isChecked());
-                    item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-                    item.setActionView(new View(this));
-                    return false;
-                });
-            }
-
-            // WFB
-            SubMenu wfb = popup.getMenu().addSubMenu("WFB-NG");
-            MenuItem keyBtn = wfb.add("gs.key");
-            keyBtn.setOnMenuItemClickListener(item -> {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
-                startActivityForResult(intent, PICK_KEY_REQUEST_CODE);
-                return true;
-            });
-
-            // Recording
-            SubMenu recording = popup.getMenu().addSubMenu("Recording");
-            MenuItem dvrBtn = recording.add(dvrFd == null ? "Start" : "Stop");
-            dvrBtn.setOnMenuItemClickListener(item -> {
-                startStopDvr();
-                return true;
-            });
-            MenuItem fmp4 = recording.add("fMP4");
-            fmp4.setCheckable(true);
-            fmp4.setChecked(getDvrMP4());
-            fmp4.setOnMenuItemClickListener(item -> {
-                boolean enabled = getDvrMP4();
-                item.setChecked(!enabled);
-                setDvrMP4(!enabled);
-                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-                item.setActionView(new View(this));
-                return false;
-            });
-
-            MenuItem resetPermissions = recording.add("Reset DVR folder");
-            resetPermissions.setOnMenuItemClickListener(item -> {
-                resetFolderPermissions();
-                return true;
-            });
-
-            SubMenu help = popup.getMenu().addSubMenu("Help");
-            MenuItem logs = help.add("Send Logs");
-            logs.setOnMenuItemClickListener(item -> {
-                try {
-                    Process process = Runtime.getRuntime().exec("logcat -d");
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                    File logFile = new File(getExternalFilesDir(null), "pixelpilot_log_" + timeStamp + ".txt");
-                    FileWriter fileWriter = new FileWriter(logFile);
-
-                    String versionName = "";
-                    long versionCode = 0;
-
-                    try {
-                        PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-                        versionName = packageInfo.versionName;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            versionCode = packageInfo.getLongVersionCode();
-                        } else {
-                            versionCode = packageInfo.versionCode;
-                        }
-                    } catch (PackageManager.NameNotFoundException e) {
-                    }
-
-                    fileWriter.append("Device Model: " + Build.MODEL + "\n" +
-                            "Manufacturer: " + Build.MANUFACTURER + "\n" +
-                            "OS Version: " + Build.VERSION.RELEASE + "\n" +
-                            "SDK Version: " + Build.VERSION.SDK_INT + "\n" +
-                            "App Version Name: " + versionName + "\n" +
-                            "App Version Code: " + versionCode + "\n");
-
-                    String line;
-
-                    while ((line = bufferedReader.readLine()) != null) {
-                        fileWriter.append(line).append("\n");
-                    }
-                    fileWriter.flush();
-                    fileWriter.close();
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    Uri fileUri = FileProvider.getUriForFile(this, getPackageName() + ".provider", logFile);
-                    sendIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                    sendIntent.setType("text/plain");
-                    sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    Intent shareIntent = Intent.createChooser(sendIntent, null);
-                    startActivity(shareIntent);
-
-                } catch (IOException e) {
-                    Log.e(TAG, "ShareLog: ", e);
-                }
-                return true;
-            });
-
-            popup.show();
+        MenuItem fmp4 = recording.add("fMP4");
+        fmp4.setCheckable(true);
+        fmp4.setChecked(getDvrMP4());
+        fmp4.setOnMenuItemClickListener(item -> {
+            boolean enabled = getDvrMP4();
+            item.setChecked(!enabled);
+            setDvrMP4(!enabled);
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+            item.setActionView(new View(this));
+            return false;
         });
 
-        // Setup mavlink
+        MenuItem resetPermissions = recording.add("Reset DVR folder");
+        resetPermissions.setOnMenuItemClickListener(item -> {
+            resetFolderPermissions();
+            return true;
+        });
+    }
+
+    /**
+     * Submenu for help items, such as sending logs.
+     */
+    private void setupHelpSubMenu(PopupMenu popup) {
+        SubMenu help = popup.getMenu().addSubMenu("Help");
+        MenuItem logs = help.add("Send Logs");
+
+        // Increase logcat buffer to 10MB if possible
+        try {
+            Runtime.getRuntime().exec("logcat -G 10M");
+        } catch (IOException e) {
+            Log.e(TAG, "ShareLog: ", e);
+        }
+
+        logs.setOnMenuItemClickListener(item -> {
+            shareLogs();
+            return true;
+        });
+    }
+
+    // ----------------------------------------------------------------------------
+    // MAVLINK SETUP
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Starts the native Mavlink service and posts an initial Runnable to the Handler.
+     */
+    private void setupMavlink() {
         MavlinkNative.nativeStart(this);
         handler.post(runnable);
+    }
 
+    // ----------------------------------------------------------------------------
+    // BATTERY RECEIVER
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Registers a receiver that listens for battery status changes and updates the UI accordingly.
+     */
+    private void setupBatteryReceiver() {
         batteryReceiver = new BroadcastReceiver() {
+            @Override
             public void onReceive(Context context, Intent batteryStatus) {
-                int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-                boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                        status == BatteryManager.BATTERY_STATUS_FULL;
-                int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-                float batteryPct = level * 100 / (float) scale;
-                binding.tvGSBattery.setText((int) batteryPct + "%");
-
-                int icon;
-                if (isCharging) {
-                    icon = R.drawable.baseline_battery_charging_full_24;
-                } else {
-                    if (batteryPct <= 0) {
-                        icon = R.drawable.baseline_battery_0_bar_24;
-                    } else if (batteryPct <= 1 / 7.0 * 100) {
-                        icon = R.drawable.baseline_battery_1_bar_24;
-                    } else if (batteryPct <= 2 / 7.0 * 100) {
-                        icon = R.drawable.baseline_battery_2_bar_24;
-                    } else if (batteryPct <= 3 / 7.0 * 100) {
-                        icon = R.drawable.baseline_battery_3_bar_24;
-                    } else if (batteryPct <= 4 / 7.0 * 100) {
-                        icon = R.drawable.baseline_battery_4_bar_24;
-                    } else if (batteryPct <= 5 / 7.0 * 100) {
-                        icon = R.drawable.baseline_battery_5_bar_24;
-                    } else if (batteryPct <= 6 / 7.0 * 100) {
-                        icon = R.drawable.baseline_battery_6_bar_24;
-                    } else {
-                        icon = R.drawable.baseline_battery_full_24;
-                    }
-                }
-                binding.imgGSBattery.setImageResource(icon);
+                updateBatteryStatus(batteryStatus);
             }
         };
+    }
+
+    /**
+     * Updates the battery icon and percentage based on the current battery state.
+     */
+    private void updateBatteryStatus(Intent batteryStatus) {
+        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                status == BatteryManager.BATTERY_STATUS_FULL;
+
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        float batteryPct = level * 100 / (float) scale;
+        binding.tvGSBattery.setText((int) batteryPct + "%");
+
+        int icon;
+        if (isCharging) {
+            icon = R.drawable.baseline_battery_charging_full_24;
+        } else {
+            // Adjust these thresholds as needed
+            if (batteryPct <= 0) {
+                icon = R.drawable.baseline_battery_0_bar_24;
+            } else if (batteryPct <= (1f / 7f) * 100) {
+                icon = R.drawable.baseline_battery_1_bar_24;
+            } else if (batteryPct <= (2f / 7f) * 100) {
+                icon = R.drawable.baseline_battery_2_bar_24;
+            } else if (batteryPct <= (3f / 7f) * 100) {
+                icon = R.drawable.baseline_battery_3_bar_24;
+            } else if (batteryPct <= (4f / 7f) * 100) {
+                icon = R.drawable.baseline_battery_4_bar_24;
+            } else if (batteryPct <= (5f / 7f) * 100) {
+                icon = R.drawable.baseline_battery_5_bar_24;
+            } else if (batteryPct <= (6f / 7f) * 100) {
+                icon = R.drawable.baseline_battery_6_bar_24;
+            } else {
+                icon = R.drawable.baseline_battery_full_24;
+            }
+        }
+        binding.imgGSBattery.setImageResource(icon);
+    }
+
+    // ----------------------------------------------------------------------------
+    // LOG SHARING
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Shares the device logs by writing them to a file and prompting the user to choose a share target.
+     */
+    private void shareLogs() {
+        try {
+            Process process = Runtime.getRuntime().exec("logcat -d");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+            File logFile = new File(getExternalFilesDir(null), "pixelpilot_log_" + timeStamp + ".txt");
+            FileWriter fileWriter = new FileWriter(logFile);
+
+            // Fetch app version info
+            String versionName = "";
+            long versionCode = 0;
+            try {
+                PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                versionName = packageInfo.versionName;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    versionCode = packageInfo.getLongVersionCode();
+                } else {
+                    versionCode = packageInfo.versionCode;
+                }
+            } catch (PackageManager.NameNotFoundException ignored) {
+            }
+
+            // Write device/app info
+            fileWriter.append("Device Model: ").append(Build.MODEL).append("\n")
+                    .append("Manufacturer: ").append(Build.MANUFACTURER).append("\n")
+                    .append("OS Version: ").append(Build.VERSION.RELEASE).append("\n")
+                    .append("SDK Version: ").append(String.valueOf(Build.VERSION.SDK_INT)).append("\n")
+                    .append("App Version Name: ").append(versionName).append("\n")
+                    .append("App Version Code: ").append(String.valueOf(versionCode)).append("\n");
+
+            // Write actual logs
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                fileWriter.append(line).append("\n");
+            }
+            fileWriter.flush();
+            fileWriter.close();
+
+            // Share the log file
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            Uri fileUri = FileProvider.getUriForFile(this, getPackageName() + ".provider", logFile);
+            sendIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+            sendIntent.setType("text/plain");
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Intent shareIntent = Intent.createChooser(sendIntent, null);
+            startActivity(shareIntent);
+
+        } catch (IOException e) {
+            Log.e(TAG, "ShareLog: ", e);
+        }
     }
 
     private Uri openDvrFile() {
