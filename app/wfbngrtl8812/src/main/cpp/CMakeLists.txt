@@ -33,6 +33,8 @@ add_library(devourer STATIC
         ${CMAKE_SOURCE_DIR}/devourer/hal/rtl8812a_recv.h
         ${CMAKE_SOURCE_DIR}/devourer/hal/rtl8812a_spec.h
 
+        ${CMAKE_SOURCE_DIR}/devourer/src/Radiotap.c
+
         ${CMAKE_SOURCE_DIR}/devourer/src/EepromManager.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/EepromManager.h
         ${CMAKE_SOURCE_DIR}/devourer/src/Firmware.h
