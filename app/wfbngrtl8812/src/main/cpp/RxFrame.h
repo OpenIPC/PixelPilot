@@ -9,6 +9,8 @@
 #include <array>
 #include <span>
 #include <vector>
+#include <iostream>
+#include <iomanip>
 
 enum class RadioPort { /* define your RadioPort enum */ };
 
@@ -73,6 +75,13 @@ public:
 
     uint8_t GetValidAirGndId() const {
         return _data[10];
+    }
+
+    void printChannelId (std::ostream &ss) const {
+        ss << "Channel ID: ";
+        for (int i = 10; i < 22; i++) {
+            ss << std::hex << std::setw(2) << std::setfill('0') << (int)_data[i];
+        }
     }
 
     bool MatchesChannelID(const uint8_t *channel_id) const {

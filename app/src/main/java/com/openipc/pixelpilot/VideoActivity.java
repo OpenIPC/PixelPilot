@@ -13,6 +13,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.hardware.usb.UsbManager;
 import android.net.Uri;
+import android.net.VpnService;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -256,6 +257,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         // Battery Receiver
         setupBatteryReceiver();
+
+        // wfbNg VPN Service
+        startVpnService();
     }
 
     // ----------------------------------------------------------------------------
@@ -790,6 +794,22 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         } catch (IOException e) {
             Log.e(TAG, "ShareLog: ", e);
         }
+    }
+
+    // ----------------------------------------------------------------------------
+    // VPN Service
+    // ----------------------------------------------------------------------------
+    private void startVpnService() {
+        int VPN_REQUEST_CODE = 100;
+
+        Intent intent = VpnService.prepare(this);
+        if (intent != null) {
+            startActivityForResult(intent, VPN_REQUEST_CODE);
+        } else {
+            Intent serviceIntent = new Intent(this, WfbNgVpnService.class);
+            startService(serviceIntent);
+        }
+
     }
 
     private Uri openDvrFile() {

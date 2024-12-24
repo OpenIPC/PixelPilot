@@ -34,6 +34,8 @@ add_library(devourer STATIC
         ${CMAKE_SOURCE_DIR}/devourer/hal/rtl8812a_spec.h
 
         ${CMAKE_SOURCE_DIR}/devourer/src/Radiotap.c
+        ${CMAKE_SOURCE_DIR}/devourer/src/registry_priv.h
+        ${CMAKE_SOURCE_DIR}/devourer/src/ieee80211_radiotap.h
 
         ${CMAKE_SOURCE_DIR}/devourer/src/EepromManager.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/EepromManager.h
@@ -64,7 +66,11 @@ set_property(TARGET devourer PROPERTY CXX_STANDARD 20)
 add_library(${CMAKE_PROJECT_NAME} SHARED
         RxFrame.h
         RxFrame.cpp
-        WfbngLink.cpp)
+        WfbngLink.cpp
+        TxFrame.h
+        TxFrame.cpp
+        WfbngLink.cpp
+        )
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
         devourer
