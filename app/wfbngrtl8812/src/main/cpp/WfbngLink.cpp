@@ -26,7 +26,6 @@
 #undef TAG
 #define TAG "pixelpilot"
 
-
 std::string uint8_to_hex_string(const uint8_t* v, const size_t s)
 {
     std::stringstream ss;
@@ -208,12 +207,14 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
             args->udp_port = 8001;
             args->link_id = link_id;
             args->keypair = keyPath;
-            args->stbc = false;
-            args->ldpc = false;
+            args->stbc = true;
+            args->ldpc = true;
             args->mcs_index = 1;
             args->vht_mode = false;
             args->short_gi = true;
             args->bandwidth = 20;
+            args->k = 8;
+            args->n = 40;
             args->radio_port = wfb_tx_port;
 
             __android_log_print(
@@ -307,7 +308,7 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
                             __android_log_print(ANDROID_LOG_ERROR, TAG, "Failed to send message");
                             break;
                         }
-                        __android_log_print(ANDROID_LOG_ERROR, TAG, "Sent %lu bytes", sent);
+                        __android_log_print(ANDROID_LOG_DEBUG, TAG, "Sent %lu bytes", sent);
                         std::this_thread::sleep_for(std::chrono::milliseconds(100));
                     }
 
@@ -315,6 +316,7 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
                 });
 
             rtl_devices.at(fd)->SetTxPower(30);
+            rtl_devices.at(fd)->SetTxPower(10);
         }
 
         rtl_devices.at(fd)->Init(packetProcessor,
@@ -479,7 +481,8 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     native(wfbngLinkN)->initAgg();
 }
 
-float RssiCalculator::get_avg_rssi() {
+float RssiCalculator::get_avg_rssi()
+{
     std::lock_guard<std::mutex> lock(rssis_mutex);
 
     float avg_rssi1 = 0;
@@ -509,9 +512,10 @@ float RssiCalculator::get_avg_rssi() {
     rssis.resize(0);
     return avg_rssi;
 }
-void RssiCalculator::add_rssi(uint8_t ant1, uint8_t ant2) {
-  // __android_log_print(ANDROID_LOG_WARN, TAG, "rssi1 %d, rssi2 %d", (int)ant1,
-  // (int)ant2);
-  std::lock_guard<std::mutex> lock(rssis_mutex);
-  rssis.push_back({ant1, ant2});
+void RssiCalculator::add_rssi(uint8_t ant1, uint8_t ant2)
+{
+    // __android_log_print(ANDROID_LOG_WARN, TAG, "rssi1 %d, rssi2 %d", (int)ant1,
+    // (int)ant2);
+    std::lock_guard<std::mutex> lock(rssis_mutex);
+    rssis.push_back({ant1, ant2});
 }

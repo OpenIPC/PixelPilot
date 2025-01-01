@@ -508,7 +508,7 @@ void UsbTransmitter::injectPacket(const uint8_t* buf, size_t size)
     bool result = static_cast<bool>(rtlDevice_->send_packet(buffer.get(), totalSize));
 
 #ifdef __ANDROID__
-    __android_log_print(ANDROID_LOG_DEBUG, TAG, "send_packet res:%d", result);
+//    __android_log_print(ANDROID_LOG_DEBUG, TAG, "send_packet res:%d", result);
 #endif
 
     uint64_t key = (static_cast<uint64_t>(currentOutput_) << 8) | 0xff;

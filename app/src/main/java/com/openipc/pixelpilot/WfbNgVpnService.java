@@ -117,9 +117,8 @@ public class WfbNgVpnService extends VpnService {
                         if (packet.getLength() < 1)
                             continue;
 
-                        Log.i(TAG, "UDP → VPN: " + packet.getData() + " " + packet.getLength());
-
-                        IPv4Parser.parseIPv4Header(packet.getData(), packet.getLength());
+//                        Log.i(TAG, "UDP → VPN: " + packet.getData() + " " + packet.getLength());
+//                        IPv4Parser.parseIPv4Header(packet.getData(), packet.getLength());
 
                         // Write to the VPN interface (TUN)
                         try{
@@ -155,7 +154,7 @@ public class WfbNgVpnService extends VpnService {
 
                         if (length == 0)
                             continue;
-                        Log.i(TAG, "VPN → UDP:  length: " + length);
+//                        Log.i(TAG, "VPN → UDP:  length: " + length);
 
                         // Prepend the packet size in network byte order
                         byte[] sizeBytes = new byte[2];
