@@ -8,8 +8,22 @@ extern "C" {
 #include <jni.h>
 #include <list>
 #include <map>
+#include <mutex>
 #include "wfb-ng/src/rx.hpp"
 #include "devourer/src/WiFiDriver.h"
+
+class RssiCalculator{
+public:
+    void add_rssi(uint8_t ant1, uint8_t ant2);
+    float get_avg_rssi();
+
+private:
+    std::mutex rssis_mutex;
+    std::vector<std::pair<uint8_t, uint8_t>> rssis;
+};
+
+const u8 wfb_tx_port = 160;
+const u8 wfb_rx_port = 32;
 
 class WfbngLink {
 public:
@@ -38,7 +52,7 @@ private:
     std::unique_ptr<std::thread> usb_tx_thread{nullptr};
     std::unique_ptr<std::thread> link_quality_thread{nullptr};
     uint32_t link_id{7669206};
-
+    RssiCalculator rssi_calculator;
 };
 
 #endif //FPV_VR_WFBNG_LINK_H

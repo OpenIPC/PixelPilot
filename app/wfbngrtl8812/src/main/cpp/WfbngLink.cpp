@@ -1,6 +1,7 @@
 #include "WfbngLink.hpp"
 #include <android/log.h>
 #include <jni.h>
+#include <mutex>
 #include <string>
 
 #include <cstdint>
@@ -25,16 +26,6 @@
 #undef TAG
 #define TAG "pixelpilot"
 
-std::vector<std::pair<uint8_t, uint8_t>> rssis;
-
-void add_rssi(uint8_t ant1, uint8_t ant2)
-{
-    // __android_log_print(ANDROID_LOG_WARN, TAG, "rssi1 %d, rssi2 %d", (int)ant1, (int)ant2);
-    rssis.push_back({ant1, ant2});
-}
-
-const u8 wfb_tx_port = 160;
-const u8 wfb_rx_port = 32;
 
 std::string uint8_to_hex_string(const uint8_t* v, const size_t s)
 {
@@ -146,7 +137,7 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
             std::lock_guard<std::mutex> lock(agg_mutex);
             if (frame.MatchesChannelID(video_channel_id_be8))
             {
-                add_rssi(packet.RxAtrib.rssi[0], packet.RxAtrib.rssi[1]);
+                rssi_calculator.add_rssi(packet.RxAtrib.rssi[0], packet.RxAtrib.rssi[1]);
                 video_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
                                                  packet.Data.size() - sizeof(ieee80211_header) - 4,
                                                  0,
@@ -221,7 +212,7 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
             args->ldpc = false;
             args->mcs_index = 1;
             args->vht_mode = false;
-            args->short_gi = false;
+            args->short_gi = true;
             args->bandwidth = 20;
             args->radio_port = wfb_tx_port;
 
@@ -273,43 +264,22 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
                     // Send message repeatedly every 0.1 seconds
                     while (true)
                     {
-
-                        float avg_rssi1 = 0;
-                        float avg_rssi2 = 0;
-                        int count = rssis.size();
-
-                        if (count > 0)
-                        {
-                            for (auto& rssi : rssis)
-                            {
-                                avg_rssi1 += rssi.first;
-                                avg_rssi2 += rssi.second;
-                            }
-
-                            avg_rssi1 /= count;
-                            avg_rssi2 /= count;
-                        }
-                        else
-                        {
-                            avg_rssi1 = avg_rssi2 = 0;
-                        }
-
-                        rssis.resize(0);
-
-                        float avg_rssi = std::max(avg_rssi1, avg_rssi2);
+                        float avg_rssi = rssi_calculator.get_avg_rssi();
                         auto mapRange =
                             [](double value, double inputMin, double inputMax, double outputMin, double outputMax)
                         { return outputMin + ((value - inputMin) * (outputMax - outputMin) / (inputMax - inputMin)); };
 
-                        // 50...100 maps to 1000..2000:
+                        // 30...90 maps to 1000..2000:
                         int quality = mapRange(avg_rssi, 30, 90, 1000, 2000);
 
+#if defined(ANDROID_DEBUG_RSSI)
                         __android_log_print(ANDROID_LOG_WARN,
                                             TAG,
                                             "avg_rssi1 %f, avg_rssi2 %f, quality %d",
                                             avg_rssi1,
                                             avg_rssi2,
                                             quality);
+#endif
 
                         char message[100]; // = "10000000:2000:2000:5:10:-70:25:23:20\n";
 
@@ -344,7 +314,7 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
                     close(sockfd);
                 });
 
-            rtl_devices.at(fd)->SetTxPower(10);
+            rtl_devices.at(fd)->SetTxPower(30);
         }
 
         rtl_devices.at(fd)->Init(packetProcessor,
@@ -507,4 +477,41 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
                                                                                            jlong wfbngLinkN)
 {
     native(wfbngLinkN)->initAgg();
+}
+
+float RssiCalculator::get_avg_rssi() {
+    std::lock_guard<std::mutex> lock(rssis_mutex);
+
+    float avg_rssi1 = 0;
+    float avg_rssi2 = 0;
+    int count = rssis.size();
+
+    if (count > 0)
+    {
+        for (auto& rssi : rssis)
+        {
+            avg_rssi1 += rssi.first;
+            avg_rssi2 += rssi.second;
+        }
+
+        avg_rssi1 /= count;
+        avg_rssi2 /= count;
+    }
+    else
+    {
+        avg_rssi1 = avg_rssi2 = 0;
+    }
+
+    rssis.resize(0);
+
+    float avg_rssi = std::max(avg_rssi1, avg_rssi2);
+
+    rssis.resize(0);
+    return avg_rssi;
+}
+void RssiCalculator::add_rssi(uint8_t ant1, uint8_t ant2) {
+  // __android_log_print(ANDROID_LOG_WARN, TAG, "rssi1 %d, rssi2 %d", (int)ant1,
+  // (int)ant2);
+  std::lock_guard<std::mutex> lock(rssis_mutex);
+  rssis.push_back({ant1, ant2});
 }
