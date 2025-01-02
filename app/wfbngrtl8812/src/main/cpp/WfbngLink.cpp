@@ -207,9 +207,9 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
             args->udp_port = 8001;
             args->link_id = link_id;
             args->keypair = keyPath;
-            args->stbc = true;
-            args->ldpc = true;
-            args->mcs_index = 1;
+            args->stbc = false;
+            args->ldpc = false;
+            args->mcs_index = 0;
             args->vht_mode = false;
             args->short_gi = true;
             args->bandwidth = 20;
@@ -273,13 +273,8 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
                         // 30...90 maps to 1000..2000:
                         int quality = mapRange(avg_rssi, 30, 90, 1000, 2000);
 
-#if defined(ANDROID_DEBUG_RSSI)
-                        __android_log_print(ANDROID_LOG_WARN,
-                                            TAG,
-                                            "avg_rssi1 %f, avg_rssi2 %f, quality %d",
-                                            avg_rssi1,
-                                            avg_rssi2,
-                                            quality);
+#if defined(ANDROID_DEBUG_RSSI) || true
+                        __android_log_print(ANDROID_LOG_WARN, TAG, "avg_rssi %f, quality %d", avg_rssi, quality);
 #endif
 
                         char message[100]; // = "10000000:2000:2000:5:10:-70:25:23:20\n";
@@ -287,10 +282,10 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
                         auto p_recovered = video_aggregator->count_p_fec_recovered;
                         auto p_lost = video_aggregator->count_p_lost;
 
-                        if (p_lost)
-                        {
-                            quality = 999;
-                        }
+                        //                        if (p_lost)
+                        //                        {
+                        //                            quality = 999;
+                        //                        }
 
                         snprintf(message,
                                  sizeof(message),
@@ -316,7 +311,7 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint fd)
                 });
 
             rtl_devices.at(fd)->SetTxPower(30);
-            rtl_devices.at(fd)->SetTxPower(10);
+            // rtl_devices.at(fd)->SetTxPower(10);
         }
 
         rtl_devices.at(fd)->Init(packetProcessor,
