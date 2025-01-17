@@ -46,6 +46,11 @@ audio:
   outputEnabled: false
   outputVolume: 30
 ```
+## List of potential improvements:
+ * 40 MHz bandwidth
+ * support stream over ipv6
+ * adaptive link
+
 ## Tested devices based on real user reviews
 
 * Samsung Galaxy A54 (Exynos 1380 processor)
