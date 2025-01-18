@@ -25,6 +25,22 @@ public class WfbLinkManager extends BroadcastReceiver {
     private final ActivityVideoBinding binding;
     private final Context context;
     private int wifiChannel;
+    private Bandwidth bandWidth;
+
+    public enum Bandwidth {
+        BANDWIDTH_20(20),
+        BANDWIDTH_40(40);
+
+        private final int value;
+
+        Bandwidth(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
 
     public WfbLinkManager(Context context, ActivityVideoBinding binding, WfbNgLink wfbNgLink) {
         this.binding = binding;
@@ -38,6 +54,19 @@ public class WfbLinkManager extends BroadcastReceiver {
 
     public void setChannel(int channel) {
         wifiChannel = channel;
+    }
+    public void setBandwidth(int bw) {
+        switch(bw)
+        {
+            case 20:
+                bandWidth = Bandwidth.BANDWIDTH_20;
+                break;
+            case 40:
+                bandWidth = Bandwidth.BANDWIDTH_40;
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -160,8 +189,7 @@ public class WfbLinkManager extends BroadcastReceiver {
         }
     }
 
-    public synchronized void startAdapters(int channel) {
-        wifiChannel = channel;
+    public synchronized void startAdapters() {
         if (wfbLink.isRunning()) {
             return;
         }
@@ -177,7 +205,7 @@ public class WfbLinkManager extends BroadcastReceiver {
         String text = "Starting wfb-ng channel " + wifiChannel + " with " + String.format(
                 "[%04X", dev.getVendorId()) + ":" + String.format("%04X]", dev.getProductId());
         binding.tvMessage.setText(text);
-        wfbLink.start(wifiChannel, dev);
+        wfbLink.start(wifiChannel, bandWidth.getValue(), dev);
         return true;
     }
 }

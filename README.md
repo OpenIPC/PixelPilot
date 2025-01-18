@@ -47,7 +47,7 @@ audio:
   outputVolume: 30
 ```
 ## List of potential improvements:
- * 40 MHz bandwidth
+ * 40 MHz bandwidth [x]
  * support stream over ipv6
  * adaptive link
 

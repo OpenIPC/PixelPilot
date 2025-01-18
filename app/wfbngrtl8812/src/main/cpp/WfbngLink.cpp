@@ -60,7 +60,7 @@ void WfbngLink::initAgg() {
                                                       epoch, mavlink_channel_id_f);
 }
 
-int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint fd) {
+int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint bw, jint fd) {
     int r;
     libusb_context *ctx = NULL;
 
@@ -121,11 +121,15 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint fd) {
                                                    4, 0, antenna, rssi, noise, freq, 0, 0, NULL);
             }
         };
-        rtl_devices.at(fd)->Init(packetProcessor, SelectedChannel{
-                .Channel = static_cast<uint8_t>(wifiChannel),
-                .ChannelOffset = 0,
-                .ChannelWidth = CHANNEL_WIDTH_20,
-        });
+
+        auto bandWidth = (bw == 20 ? CHANNEL_WIDTH_20 : CHANNEL_WIDTH_40);
+        rtl_devices.at(fd)->Init(packetProcessor,
+                                 SelectedChannel{
+                                     .Channel = static_cast<uint8_t>(wifiChannel),
+                                     .ChannelOffset = 0,
+                                     .ChannelWidth = bandWidth,
+                                 });
+
     } catch (const std::runtime_error &error) {
         __android_log_print(ANDROID_LOG_ERROR, TAG,
                             "runtime_error: %s", error.what());
@@ -193,11 +197,9 @@ Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeInitialize(JNIEnv *env, jclass cla
     return jptr(p);
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeRun(JNIEnv *env, jclass clazz, jlong wfbngLinkN,
-                                                  jobject androidContext, jint wifiChannel,
-                                                  jint fd) {
-    native(wfbngLinkN)->run(env, androidContext, wifiChannel, fd);
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeRun(
+    JNIEnv* env, jclass clazz, jlong wfbngLinkN, jobject androidContext, jint wifiChannel, jint bw, jint fd) {
+    native(wfbngLinkN)->run(env, androidContext, wifiChannel, bw, fd);
 }
 
 extern "C" JNIEXPORT void JNICALL
