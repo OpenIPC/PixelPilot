@@ -123,6 +123,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 Context.MODE_PRIVATE).getInt("wifi-channel", 161);
     }
 
+    public static int getBandwidth(Context context) {
+        return context.getSharedPreferences("general",
+                Context.MODE_PRIVATE).getInt("bandwidth", 20);
+    }
+
     public static String wirelessInfo() {
         int address = wifiManager.getConnectionInfo().getIpAddress();
         return (address == 0) ? null : Formatter.formatIpAddress(address);
@@ -521,6 +526,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         // Channel submenu
         setupChannelSubMenu(popup);
 
+        // Bandwidth submenu
+        setupBandwidthSubMenu(popup);
+
         // OSD submenu
         setupOSDSubMenu(popup);
 
@@ -565,6 +573,23 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         for (String chnStr : channels) {
             chnMenu.add(chnStr).setOnMenuItemClickListener(item -> {
                 onChannelSettingChanged(Integer.parseInt(chnStr));
+                return true;
+            });
+        }
+    }
+
+    /**
+     * Submenu that allows the user to select 20 or 40 MHz bandwidth.
+     */
+    private void setupBandwidthSubMenu(PopupMenu popup) {
+        SubMenu bwMenu = popup.getMenu().addSubMenu("Bandwidth");
+        int bandwidthPref = getBandwidth(this);
+        bwMenu.setHeaderTitle("Current: " + bandwidthPref);
+
+        String[] bws = getResources().getStringArray(R.array.bandwidths);
+        for (String bwStr : bws) {
+            bwMenu.add(bwStr).setOnMenuItemClickListener(item -> {
+                onBandwidthSettingChanged(Integer.parseInt(bwStr));
                 return true;
             });
         }
@@ -1036,6 +1061,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         videoPlayer.startAudio();
 
         wfbLinkManager.setChannel(getChannel(this));
+        wfbLinkManager.setBandwidth(getBandwidth(this));
         wfbLinkManager.refreshAdapters();
         osdManager.restoreOSDConfig();
 
@@ -1053,7 +1079,23 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         editor.putInt("wifi-channel", channel);
         editor.apply();
         wfbLinkManager.stopAdapters();
-        wfbLinkManager.startAdapters(channel);
+        wfbLinkManager.setChannel(channel);
+        wfbLinkManager.startAdapters();
+    }
+
+    @Override
+    public void onBandwidthSettingChanged(int bandwidth) {
+        int currentBandwidth = getBandwidth(this);
+        if (currentBandwidth == bandwidth) {
+            return;
+        }
+        SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("bandwidth", bandwidth);
+        editor.apply();
+        wfbLinkManager.stopAdapters();
+        wfbLinkManager.setBandwidth(bandwidth);
+        wfbLinkManager.startAdapters();
     }
 
     @Override

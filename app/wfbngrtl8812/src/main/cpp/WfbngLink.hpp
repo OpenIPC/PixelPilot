@@ -12,7 +12,7 @@ class WfbngLink {
 public:
     WfbngLink(JNIEnv *env, jobject context);
 
-    int run(JNIEnv *env, jobject androidContext, jint wifiChannel, jint fd);
+    int run(JNIEnv* env, jobject androidContext, jint wifiChannel, jint bw, jint fd);
 
     void initAgg();
 

@@ -45,7 +45,7 @@ public class WfbNgLink implements WfbNGStatsChanged {
     // Native cpp methods.
     public static native long nativeInitialize(Context context);
 
-    public static native void nativeRun(long nativeInstance, Context context, int wifiChannel, int fd);
+    public static native void nativeRun(long nativeInstance, Context context, int wifiChannel, int bandWidth, int fd);
 
     public static native void nativeStop(long nativeInstance, Context context, int fd);
 
@@ -61,12 +61,12 @@ public class WfbNgLink implements WfbNGStatsChanged {
         nativeRefreshKey(nativeWfbngLink);
     }
 
-    public synchronized void start(int wifiChannel, UsbDevice usbDevice) {
+    public synchronized void start(int wifiChannel, int bandWidth, UsbDevice usbDevice) {
         Log.d(TAG, "wfb-ng monitoring on " + usbDevice.getDeviceName() + " using wifi channel " + wifiChannel);
         UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         UsbDeviceConnection usbDeviceConnection = usbManager.openDevice(usbDevice);
         int fd = usbDeviceConnection.getFileDescriptor();
-        Thread t = new Thread(() -> nativeRun(nativeWfbngLink, context, wifiChannel, fd));
+        Thread t = new Thread(() -> nativeRun(nativeWfbngLink, context, wifiChannel, bandWidth, fd));
         t.setName("wfb-" + usbDevice.getDeviceName().split("/dev/bus/usb/")[1]);
         linkThreads.put(usbDevice, t);
         linkConns.put(usbDevice, usbDeviceConnection);
