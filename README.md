@@ -51,6 +51,9 @@ audio:
  * support stream over ipv6
  * adaptive link
 
+## Known issues:
+ * Audio stream is not working
+
 ## Tested devices based on real user reviews
 
 * Samsung Galaxy A54 (Exynos 1380 processor)
