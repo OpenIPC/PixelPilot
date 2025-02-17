@@ -6,6 +6,8 @@
 #define LIBUSBDEMO_RXFRAME_H
 
 #include <array>
+#include <iomanip>
+#include <iostream>
 #include <span>
 #include <vector>
 
@@ -63,6 +65,13 @@ class RxFrame {
     }
 
     uint8_t GetValidAirGndId() const { return _data[10]; }
+
+    void printChannelId(std::ostream &ss) const {
+        ss << "Channel ID: ";
+        for (int i = 10; i < 22; i++) {
+            ss << std::hex << std::setw(2) << std::setfill('0') << (int)_data[i];
+        }
+    }
 
     bool MatchesChannelID(const uint8_t *channel_id) const {
         //        0x57, 0x42, 0xaa, 0xbb, 0xcc, 0xdd,   // last four bytes are replaced by channel_id (x2)
