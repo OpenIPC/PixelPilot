@@ -35,11 +35,11 @@ enum
     NAL_UNIT_TYPE_PREFIX_NAL                   = 14,  // Prefix NAL unit
     NAL_UNIT_TYPE_SUBSET_SPS                   = 15,  // Subset Sequence parameter set
     NAL_UNIT_TYPE_DPS                          = 16,  // Depth Parameter Set
-    // 17..18    // Reserved
-    NAL_UNIT_TYPE_CODED_SLICE_AUX           = 19,  // Coded slice of an auxiliary coded picture without partitioning
-    NAL_UNIT_TYPE_CODED_SLICE_SVC_EXTENSION = 20,  // Coded slice of SVC extension
-    // 20..23    // Reserved
-    // 24..31    // Unspecified
+                                                      // 17..18    // Reserved
+    NAL_UNIT_TYPE_CODED_SLICE_AUX           = 19,     // Coded slice of an auxiliary coded picture without partitioning
+    NAL_UNIT_TYPE_CODED_SLICE_SVC_EXTENSION = 20,     // Coded slice of SVC extension
+                                                      // 20..23    // Reserved
+                                                      // 24..31    // Unspecified
 };
 
 static std::string unit_type_to_string(const int nal_unit_type)

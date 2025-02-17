@@ -1,24 +1,24 @@
-#include <jni.h>
 #include "WfbngLink.hpp"
-#include <string>
 #include <android/log.h>
+#include <jni.h>
+#include <string>
 
-#include <iostream>
-#include <span>
-#include <list>
 #include <cstdint>
 #include <initializer_list>
+#include <iostream>
+#include <list>
+#include <span>
 
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
+#include "RxFrame.h"
 #include "libusb.h"
 #include "wfb-ng/src/wifibroadcast.hpp"
-#include "RxFrame.h"
 
-#include <sstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <thread>
 
 #undef TAG
@@ -54,13 +54,12 @@ void WfbngLink::initAgg() {
     uint32_t mavlink_channel_id_f = (link_id << 8) + mavlink_radio_port;
     mavlink_channel_id_be = htobe32(mavlink_channel_id_f);
 
-    video_aggregator = std::make_unique<Aggregator>(client_addr, video_client_port, keyPath, epoch,
-                                                    video_channel_id_f);
-    mavlink_aggregator = std::make_unique<Aggregator>(client_addr, mavlink_client_port, keyPath,
-                                                      epoch, mavlink_channel_id_f);
+    video_aggregator = std::make_unique<Aggregator>(client_addr, video_client_port, keyPath, epoch, video_channel_id_f);
+    mavlink_aggregator =
+        std::make_unique<Aggregator>(client_addr, mavlink_client_port, keyPath, epoch, mavlink_channel_id_f);
 }
 
-int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint bw, jint fd) {
+int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint fd) {
     int r;
     libusb_context *ctx = NULL;
 
@@ -74,7 +73,7 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint bw, jint
 
     // Open adapters
     struct libusb_device_handle *dev_handle;
-    r = libusb_wrap_sys_device(ctx, (intptr_t) fd, &dev_handle);
+    r = libusb_wrap_sys_device(ctx, (intptr_t)fd, &dev_handle);
     if (r < 0) {
         libusb_exit(ctx);
         return r;
@@ -98,8 +97,7 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint bw, jint
     uint8_t *mavlink_channel_id_be8 = reinterpret_cast<uint8_t *>(&mavlink_channel_id_be);
 
     try {
-        auto packetProcessor = [this, video_channel_id_be8, mavlink_channel_id_be8](
-                const Packet &packet) {
+        auto packetProcessor = [this, video_channel_id_be8, mavlink_channel_id_be8](const Packet &packet) {
             RxFrame frame(packet.Data);
             if (!frame.IsValidWfbFrame()) {
                 return;
@@ -114,11 +112,25 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint bw, jint
             if (frame.MatchesChannelID(video_channel_id_be8)) {
                 video_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
                                                  packet.Data.size() - sizeof(ieee80211_header) - 4,
-                                                 0, antenna, rssi, noise, freq, 0, 0, NULL);
+                                                 0,
+                                                 antenna,
+                                                 rssi,
+                                                 noise,
+                                                 freq,
+                                                 0,
+                                                 0,
+                                                 NULL);
             } else if (frame.MatchesChannelID(mavlink_channel_id_be8)) {
                 mavlink_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
-                                                   packet.Data.size() - sizeof(ieee80211_header) -
-                                                   4, 0, antenna, rssi, noise, freq, 0, 0, NULL);
+                                                   packet.Data.size() - sizeof(ieee80211_header) - 4,
+                                                   0,
+                                                   antenna,
+                                                   rssi,
+                                                   noise,
+                                                   freq,
+                                                   0,
+                                                   0,
+                                                   NULL);
             }
         };
 
@@ -131,8 +143,7 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint bw, jint
                                  });
 
     } catch (const std::runtime_error &error) {
-        __android_log_print(ANDROID_LOG_ERROR, TAG,
-                            "runtime_error: %s", error.what());
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "runtime_error: %s", error.what());
         return -1;
     }
 
@@ -145,21 +156,18 @@ int WfbngLink::run(JNIEnv* env, jobject context, jint wifiChannel, jint bw, jint
     return 0;
 }
 
-
 void WfbngLink::stop(JNIEnv *env, jobject context, jint fd) {
     auto dev = rtl_devices.at(fd).get();
-    if (dev) { dev->should_stop = true; }
+    if (dev) {
+        dev->should_stop = true;
+    }
 }
 
+//----------------------------------------------------JAVA
+// bindings---------------------------------------------------------------
+inline jlong jptr(WfbngLink *wfbngLinkN) { return reinterpret_cast<intptr_t>(wfbngLinkN); }
 
-//----------------------------------------------------JAVA bindings---------------------------------------------------------------
-inline jlong jptr(WfbngLink *wfbngLinkN) {
-    return reinterpret_cast<intptr_t>(wfbngLinkN);
-}
-
-inline WfbngLink *native(jlong ptr) {
-    return reinterpret_cast<WfbngLink *>(ptr);
-}
+inline WfbngLink *native(jlong ptr) { return reinterpret_cast<WfbngLink *>(ptr); }
 
 inline std::list<int> toList(JNIEnv *env, jobject list) {
     // Get the class and method IDs for java.util.List and its methods
@@ -189,28 +197,27 @@ inline std::list<int> toList(JNIEnv *env, jobject list) {
     return res;
 }
 
-
-extern "C" JNIEXPORT jlong JNICALL
-Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeInitialize(JNIEnv *env, jclass clazz,
-                                                         jobject context) {
+extern "C" JNIEXPORT jlong JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeInitialize(JNIEnv *env,
+                                                                                            jclass clazz,
+                                                                                            jobject context) {
     auto *p = new WfbngLink(env, context);
     return jptr(p);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeRun(
-    JNIEnv* env, jclass clazz, jlong wfbngLinkN, jobject androidContext, jint wifiChannel, jint bw, jint fd) {
+    JNIEnv *env, jclass clazz, jlong wfbngLinkN, jobject androidContext, jint wifiChannel, jint bw, jint fd) {
     native(wfbngLinkN)->run(env, androidContext, wifiChannel, bw, fd);
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeStop(JNIEnv *env, jclass clazz, jlong wfbngLinkN,
-                                                   jobject androidContext, jint fd) {
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeStop(
+    JNIEnv *env, jclass clazz, jlong wfbngLinkN, jobject androidContext, jint fd) {
     native(wfbngLinkN)->stop(env, androidContext, fd);
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeCallBack(JNIEnv *env, jclass clazz,
-                                                       jobject wfbStatChangedI, jlong wfbngLinkN) {
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeCallBack(JNIEnv *env,
+                                                                                         jclass clazz,
+                                                                                         jobject wfbStatChangedI,
+                                                                                         jlong wfbngLinkN) {
     if (native(wfbngLinkN)->video_aggregator == nullptr) {
         return;
     }
@@ -225,21 +232,21 @@ Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeCallBack(JNIEnv *env, jclass clazz
     if (jcStatsConstructor == nullptr) {
         return;
     }
-    auto stats = env->NewObject(jcStats, jcStatsConstructor,
-                                (jint) aggregator->count_p_all,
-                                (jint) aggregator->count_p_dec_err,
-                                (jint) aggregator->count_p_dec_ok,
-                                (jint) aggregator->count_p_fec_recovered,
-                                (jint) aggregator->count_p_lost,
-                                (jint) aggregator->count_p_bad,
-                                (jint) aggregator->count_p_override,
-                                (jint) aggregator->count_p_outgoing);
+    auto stats = env->NewObject(jcStats,
+                                jcStatsConstructor,
+                                (jint)aggregator->count_p_all,
+                                (jint)aggregator->count_p_dec_err,
+                                (jint)aggregator->count_p_dec_ok,
+                                (jint)aggregator->count_p_fec_recovered,
+                                (jint)aggregator->count_p_lost,
+                                (jint)aggregator->count_p_bad,
+                                (jint)aggregator->count_p_override,
+                                (jint)aggregator->count_p_outgoing);
     if (stats == nullptr) {
         return;
     }
-    jmethodID onStatsChanged = env->GetMethodID(jClassExtendsIWfbStatChangedI,
-                                                "onWfbNgStatsChanged",
-                                                "(Lcom/openipc/wfbngrtl8812/WfbNGStats;)V");
+    jmethodID onStatsChanged = env->GetMethodID(
+        jClassExtendsIWfbStatChangedI, "onWfbNgStatsChanged", "(Lcom/openipc/wfbngrtl8812/WfbNGStats;)V");
     if (onStatsChanged == nullptr) {
         return;
     }
@@ -247,9 +254,8 @@ Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeCallBack(JNIEnv *env, jclass clazz
     aggregator->clear_stats();
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeRefreshKey(JNIEnv *env, jclass clazz,
-                                                         jlong wfbngLinkN) {
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeRefreshKey(JNIEnv *env,
+                                                                                           jclass clazz,
+                                                                                           jlong wfbngLinkN) {
     native(wfbngLinkN)->initAgg();
 }
