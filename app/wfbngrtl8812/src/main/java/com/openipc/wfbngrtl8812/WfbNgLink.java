@@ -39,7 +39,7 @@ public class WfbNgLink implements WfbNGStatsChanged {
             public void run() {
                 nativeCallBack(WfbNgLink.this, nativeWfbngLink);
             }
-        }, 0, 500);
+        }, 0, 300);
     }
 
     // Native cpp methods.
@@ -52,6 +52,8 @@ public class WfbNgLink implements WfbNGStatsChanged {
     public static native void nativeRefreshKey(long nativeInstance);
 
     public static native <T extends WfbNGStatsChanged> void nativeCallBack(T t, long nativeInstance);
+
+    public static native void nativeStartAdaptivelink(long nativeInstance);
 
     public boolean isRunning() {
         return !linkThreads.isEmpty();
