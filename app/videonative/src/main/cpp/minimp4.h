@@ -1152,8 +1152,9 @@ int MP4E_put_sample(MP4E_mux_t* mux, int track_num, const void* data, int data_b
         // NOTE: assume a constant `duration` to calculate current timestamp
         uint64_t timestamp = (uint64_t) mux->fragments_count * duration;
 #endif
-        if (!mux->fragments_count++) ERR(mp4e_flush_index(mux));  // write file headers before 1st sample
-                                                                  // write MOOF + MDAT + sample data
+        if (!mux->fragments_count++)
+            ERR(mp4e_flush_index(mux));  // write file headers before 1st sample
+                                         // write MOOF + MDAT + sample data
 #if MP4D_TFDT_SUPPORT
         ERR(mp4e_write_fragment_header(mux, track_num, data_bytes, duration, kind, timestamp));
 #else

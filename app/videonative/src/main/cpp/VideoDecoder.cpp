@@ -280,7 +280,7 @@ void VideoDecoder::checkOutputLoop(int idx)
             // the timestamp for releasing the buffer is in NS, just release as fast as possible (e.g. now)
             // https://android.googlesource.com/platform/frameworks/av/+/master/media/ndk/NdkMediaCodec.cpp
             //-> renderOutputBufferAndRelease which is in
-            //https://android.googlesource.com/platform/frameworks/av/+/3fdb405/media/libstagefright/MediaCodec.cpp
+            // https://android.googlesource.com/platform/frameworks/av/+/3fdb405/media/libstagefright/MediaCodec.cpp
             //-> Message kWhatReleaseOutputBuffer -> onReleaseOutputBuffer
             //  also https://android.googlesource.com/platform/frameworks/native/+/5c1139f/libs/gui/SurfaceTexture.cpp
             if (!decoder.codec[idx]) break;

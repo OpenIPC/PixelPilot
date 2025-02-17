@@ -216,7 +216,7 @@ void VideoPlayer::stopDvr()
 }
 
 //----------------------------------------------------JAVA
-//bindings---------------------------------------------------------------
+// bindings---------------------------------------------------------------
 #define JNI_METHOD(return_type, method_name) \
     JNIEXPORT return_type JNICALL Java_com_openipc_videonative_VideoPlayer_##method_name
 
