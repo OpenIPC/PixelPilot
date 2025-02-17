@@ -1,0 +1,15 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never
+BreakBeforeBraces: Attach
+ColumnLimit: 120
+PointerAlignment: Right
+ReferenceAlignment: Right
+ConstructorInitializerIndentWidth: 8
+BinPackArguments: false
+BinPackParameters: false
+SpacesInParentheses: false
+SpaceBeforeParens: ControlStatements
+AlignTrailingComments: true
+SortIncludes: true
+AllowShortIfStatementsOnASingleLine: true
