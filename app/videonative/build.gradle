@@ -7,7 +7,13 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 31
+        externalNativeBuild {
+            cmake {
+                arguments.add("-DCMAKE_EXPORT_COMPILE_COMMANDS=ON")
+            }
+        }
+
     }
 
     buildTypes {
@@ -28,6 +34,7 @@ android {
     externalNativeBuild {
         cmake {
             path("src/main/cpp/CMakeLists.txt")
+
             version = "3.22.1"
         }
     }

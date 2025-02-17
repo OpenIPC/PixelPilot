@@ -4,11 +4,11 @@ plugins {
 
 android {
     namespace = "com.openipc.pixelpilot"
-    compileSdk = 34
+    compileSdk 34
 
     defaultConfig {
         applicationId = "com.openipc.pixelpilot"
-        minSdk = 26
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "0.20"
@@ -16,9 +16,15 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("../fpv.jks")
+            storeFile = file("../pixelpilot1.jks")
             storePassword = "release"
-            keyAlias = "fpv"
+            keyAlias = "pixelpilot"
+            keyPassword = "release"
+        }
+        debug {
+            storeFile = file("../pixelpilot1.jks")
+            storePassword = "release"
+            keyAlias = "pixelpilot"
             keyPassword = "release"
         }
     }
@@ -28,6 +34,11 @@ android {
             minifyEnabled = true
             shrinkResources = true
             signingConfig = signingConfigs.release
+        }        
+        debug {
+            minifyEnabled = false
+            shrinkResources = false
+            signingConfig = signingConfigs.debug
         }
     }
 
