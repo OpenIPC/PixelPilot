@@ -1,6 +1,7 @@
 package com.openipc.pixelpilot;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,22 +24,25 @@ import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.text.format.Formatter;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.HttpAuthHandler;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.FileProvider;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -111,8 +115,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         return getSharedPreferences("general", Context.MODE_PRIVATE).getBoolean("vr-mode", false);
     }
 
-    public void setVRSetting(boolean v)
-    {
+    public void setVRSetting(boolean v) {
         SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("vr-mode", v);
@@ -155,8 +158,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         return hexString.toString();
     }
 
-    private void resetApp()
-    {
+    private void resetApp() {
         // Restart the app
         Intent intent = getPackageManager().getLaunchIntentForPackage(getPackageName());
         if (intent != null) {
@@ -191,7 +193,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         for (UriPermission perm : getContentResolver().getPersistedUriPermissions()) {
             if (perm.getUri().equals(dvrUri)) {
                 getContentResolver().releasePersistableUriPermission(perm.getUri(), Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION );
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 Log.d(TAG, "Released URI permission for: " + perm.getUri());
             }
         }
@@ -423,8 +425,14 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 applyVRMargins(progress);
                 saveSeekBarValue("SeekBarPrefs", "seekBarProgress", progress);
             }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         binding.distanceSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -433,8 +441,14 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 applyVRDistance(progress);
                 saveSeekBarValue("SeekBarPrefsD", "distanceSeekBarProgress", progress);
             }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
     }
 
@@ -541,6 +555,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         // Recording submenu
         setupRecordingSubMenu(popup);
+
+        // Drone submenu
+        setupDroneSubMenu(popup);
 
         // Help submenu
         setupHelpSubMenu(popup);
@@ -669,6 +686,18 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         MenuItem resetPermissions = recording.add("Reset DVR folder");
         resetPermissions.setOnMenuItemClickListener(item -> {
             resetFolderPermissions();
+            return true;
+        });
+    }
+
+    /**
+     * Submenu for drone settings.
+     */
+    private void setupDroneSubMenu(PopupMenu popup) {
+        SubMenu drone = popup.getMenu().addSubMenu("Drone");
+        MenuItem settings = drone.add("Settings");
+        settings.setOnMenuItemClickListener(item -> {
+            startBrowser();
             return true;
         });
     }
@@ -854,7 +883,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             String filename = "pixelpilot_" + formattedNow + ".mp4";
             DocumentFile newFile = pickedDir.createFile("video/mp4", filename);
             Toast.makeText(this, "Recording to " + filename, Toast.LENGTH_SHORT).show();
-            if(newFile == null)
+            if (newFile == null)
                 Log.e(TAG, "dvr newFile null");
             return newFile != null ? newFile.getUri() : null;
         }
@@ -923,14 +952,14 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         binding.imgRecIndicator.setVisibility(View.INVISIBLE);
         binding.imgBtnRecord.setImageResource(R.drawable.record);
         videoPlayer.stopDvr();
-        if(recordTimer != null) {
+        if (recordTimer != null) {
             recordTimer.cancel();
             recordTimer.purge();
             recordTimer = null;
             seconds = 0;
             binding.txtRecordLabel.setVisibility(View.GONE);
         }
-        if(dvrIconTimer != null) {
+        if (dvrIconTimer != null) {
             dvrIconTimer.cancel();
             dvrIconTimer.purge();
             dvrIconTimer = null;
@@ -967,8 +996,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             if (data != null && data.getData() != null) {
                 uri = data.getData();
                 final int takeFlags = data.getFlags() &
-                                    (Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION );
+                        (Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 getContentResolver().takePersistableUriPermission(uri, takeFlags);
 
                 // Perform operations on the document using its URI.
@@ -1243,5 +1272,33 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 }
             }
         }
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    public void startBrowser() {
+        WebView view = new WebView(this);
+        view.setWebViewClient(new WebViewClient());
+        view.getSettings().setJavaScriptEnabled(true);
+        view.loadUrl("10.5.0.10");
+
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(view);
+        dialog.setCanceledOnTouchOutside(true);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenWidth = (int) (displayMetrics.widthPixels * 0.6);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setLayout(screenWidth, WindowManager.LayoutParams.MATCH_PARENT);
+        }
+        dialog.show();
+
+        view.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onReceivedHttpAuthRequest(
+                    WebView view, HttpAuthHandler handler, String host, String realm) {
+                handler.proceed("root", "12345");
+            }
+        });
     }
 }
