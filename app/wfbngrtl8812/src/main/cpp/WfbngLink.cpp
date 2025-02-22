@@ -11,31 +11,36 @@
 #include "libusb.h"
 #include "wfb-ng/src/wifibroadcast.hpp"
 
+#include <arpa/inet.h>
+#include <chrono>
 #include <cstdint>
+#include <cstring>
 #include <initializer_list>
 #include <iomanip>
 #include <iostream>
 #include <list>
+#include <map>
 #include <mutex>
+#include <netinet/in.h>
 #include <random>
 #include <span>
 #include <sstream>
 #include <string>
+#include <sys/socket.h>
 #include <thread>
+#include <unistd.h>
 
 std::string generate_random_string(size_t length) {
     const std::string characters = "abcdefghijklmnopqrstuvwxyz";
-    std::random_device rd;  // Obtain a random number from hardware
-    std::mt19937 gen(rd()); // Seed the generator
+    std::random_device rd;
+    std::mt19937 gen(rd());
     std::uniform_int_distribution<> distrib(0, characters.size() - 1);
 
     std::string result;
-    result.reserve(length); // Reserve space to avoid multiple allocations
-
+    result.reserve(length);
     for (size_t i = 0; i < length; ++i) {
         result += characters[distrib(gen)];
     }
-
     return result;
 }
 
@@ -51,11 +56,13 @@ std::string uint8_to_hex_string(const uint8_t *v, const size_t s) {
     return ss.str();
 }
 
-WfbngLink::WfbngLink(JNIEnv *env, jobject context) {
+WfbngLink::WfbngLink(JNIEnv *env, jobject context)
+        : current_fd(-1), adaptive_link_enabled(true), adaptive_tx_power(30) {
     initAgg();
     Logger_t log;
     wifi_driver = std::make_unique<WiFiDriver>(log);
 }
+
 void WfbngLink::initAgg() {
     std::string client_addr = "127.0.0.1";
     uint32_t link_id = 7669206; // sha1 hash of link_domain="default"
@@ -88,7 +95,6 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
     std::unique_ptr<TxFrame> txFrame = std::make_unique<TxFrame>();
 
     r = libusb_set_option(NULL, LIBUSB_OPTION_NO_DEVICE_DISCOVERY);
-
     r = libusb_init(&ctx);
     if (r < 0) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "Failed to init libusb.");
@@ -103,9 +109,8 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         return r;
     }
 
-    /*Check if kernel driver attached*/
     if (libusb_kernel_driver_active(dev_handle, 0)) {
-        r = libusb_detach_kernel_driver(dev_handle, 0); // detach driver
+        r = libusb_detach_kernel_driver(dev_handle, 0);
         __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_detach_kernel_driver: %d", r);
     }
     r = libusb_claim_interface(dev_handle, 0);
@@ -122,36 +127,43 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
     uint8_t *mavlink_channel_id_be8 = reinterpret_cast<uint8_t *>(&mavlink_channel_id_be);
 
     try {
-        auto packetProcessor = [this, video_channel_id_be8, mavlink_channel_id_be8, udp_channel_id_be8](
-                                   const Packet &packet) {
-            RxFrame frame(packet.Data);
-            if (!frame.IsValidWfbFrame()) {
-                return;
-            }
+        auto packetProcessor =
+            [this, video_channel_id_be8, mavlink_channel_id_be8, udp_channel_id_be8](const Packet &packet) {
+                RxFrame frame(packet.Data);
+                if (!frame.IsValidWfbFrame()) {
+                    return;
+                }
+                int8_t rssi[4] = {(int8_t)packet.RxAtrib.rssi[0], (int8_t)packet.RxAtrib.rssi[1], 1, 1};
+                uint32_t freq = 0;
+                int8_t noise[4] = {1, 1, 1, 1};
+                uint8_t antenna[4] = {1, 1, 1, 1};
 
-            int8_t rssi[4] = {(int8_t)packet.RxAtrib.rssi[0], (int8_t)packet.RxAtrib.rssi[1], 1, 1};
-
-            // __android_log_print(ANDROID_LOG_WARN, TAG, "rssi1 %d, rssi2 %d", (int)rssi[0], (int)rssi[1]);
-
-            uint32_t freq = 0;
-            int8_t noise[4] = {1, 1, 1, 1};
-            uint8_t antenna[4] = {1, 1, 1, 1};
-
-            std::lock_guard<std::mutex> lock(agg_mutex);
-            if (frame.MatchesChannelID(video_channel_id_be8)) {
-                SignalQualityCalculator::get_instance().add_rssi(packet.RxAtrib.rssi[0], packet.RxAtrib.rssi[1]);
-                video_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
-                                                 packet.Data.size() - sizeof(ieee80211_header) - 4,
-                                                 0,
-                                                 antenna,
-                                                 rssi,
-                                                 noise,
-                                                 freq,
-                                                 0,
-                                                 0,
-                                                 NULL);
-            } else if (frame.MatchesChannelID(mavlink_channel_id_be8)) {
-                mavlink_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
+                std::lock_guard<std::mutex> lock(agg_mutex);
+                if (frame.MatchesChannelID(video_channel_id_be8)) {
+                    SignalQualityCalculator::get_instance().add_rssi(packet.RxAtrib.rssi[0], packet.RxAtrib.rssi[1]);
+                    video_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
+                                                     packet.Data.size() - sizeof(ieee80211_header) - 4,
+                                                     0,
+                                                     antenna,
+                                                     rssi,
+                                                     noise,
+                                                     freq,
+                                                     0,
+                                                     0,
+                                                     NULL);
+                } else if (frame.MatchesChannelID(mavlink_channel_id_be8)) {
+                    mavlink_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
+                                                       packet.Data.size() - sizeof(ieee80211_header) - 4,
+                                                       0,
+                                                       antenna,
+                                                       rssi,
+                                                       noise,
+                                                       freq,
+                                                       0,
+                                                       0,
+                                                       NULL);
+                } else if (frame.MatchesChannelID(udp_channel_id_be8)) {
+                    udp_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
                                                    packet.Data.size() - sizeof(ieee80211_header) - 4,
                                                    0,
                                                    antenna,
@@ -161,32 +173,17 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
                                                    0,
                                                    0,
                                                    NULL);
-            } else if (frame.MatchesChannelID(udp_channel_id_be8)) {
-                __android_log_print(ANDROID_LOG_WARN, TAG, "Received UDP packet");
+                }
+            };
 
-                udp_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
-                                               packet.Data.size() - sizeof(ieee80211_header) - 4,
-                                               0,
-                                               antenna,
-                                               rssi,
-                                               noise,
-                                               freq,
-                                               0,
-                                               0,
-                                               NULL);
-            } else {
-                std::stringstream ss;
-                frame.printChannelId(ss);
-                __android_log_print(ANDROID_LOG_WARN, TAG, "Received unknown packet, channel ID: %s", ss.str().c_str());
-            }
-        };
+        // Store the current fd for later TX power updates.
+        current_fd = fd;
 
         if (!usb_event_thread) {
-            usb_event_thread = std::make_unique<std::thread>([ctx, this, &fd] {
-                while (true) {
+            usb_event_thread = std::make_unique<std::thread>([ctx, this, fd] {
+                while (this->adaptive_link_enabled) {
                     auto dev = this->rtl_devices.at(fd).get();
-                    if (dev == nullptr) break;
-                    if (dev->should_stop) break;
+                    if (dev == nullptr || dev->should_stop) break;
                     int r = libusb_handle_events(ctx);
                     if (r < 0) {
                         this->log->error("Error handling events: {}", r);
@@ -207,11 +204,10 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             args->bandwidth = 20; // TODOII: need to adjust according to bw??
             args->k = 1;
             args->n = 2;
-
             args->radio_port = wfb_tx_port;
 
             __android_log_print(
-                ANDROID_LOG_ERROR, TAG, "radio link ID %d,radio PORT %d", args->link_id, args->radio_port);
+                ANDROID_LOG_ERROR, TAG, "radio link ID %d, radio PORT %d", args->link_id, args->radio_port);
 
             Rtl8812aDevice *current_device = rtl_devices.at(fd).get();
             TxFrame *tx_frame = txFrame.get();
@@ -222,7 +218,9 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
                 });
             }
 
-            start_link_quality_thread(fd);
+            if (adaptive_link_enabled) {
+                start_link_quality_thread(fd);
+            }
         }
 
         auto bandWidth = (bw == 20 ? CHANNEL_WIDTH_20 : CHANNEL_WIDTH_40);
@@ -234,7 +232,6 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
                                  });
     } catch (const std::runtime_error &error) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "runtime_error: %s", error.what());
-
         auto dev = rtl_devices.at(fd).get();
         if (dev) {
             dev->should_stop = true;
@@ -242,15 +239,13 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         txFrame->stop();
         usb_tx_thread->join();
         usb_event_thread->join();
-
-        // Join the thread (optional if you want to wait for the thread to finish)
-        link_quality_thread->join();
-
+        if (link_quality_thread && link_quality_thread->joinable()) {
+            link_quality_thread->join();
+        }
         return -1;
     }
 
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "Init done, releasing...");
-
     auto dev = rtl_devices.at(fd).get();
     if (dev) {
         dev->should_stop = true;
@@ -261,7 +256,6 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
 
     r = libusb_release_interface(dev_handle, 0);
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_release_interface: %d", r);
-
     libusb_exit(ctx);
     return 0;
 }
@@ -273,8 +267,7 @@ void WfbngLink::stop(JNIEnv *env, jobject context, jint fd) {
     }
 }
 
-//----------------------------------------------------JAVA
-// bindings---------------------------------------------------------------
+//--------------------------------------JAVA bindings--------------------------------------
 inline jlong jptr(WfbngLink *wfbngLinkN) { return reinterpret_cast<intptr_t>(wfbngLinkN); }
 
 inline WfbngLink *native(jlong ptr) { return reinterpret_cast<WfbngLink *>(ptr); }
@@ -306,12 +299,9 @@ inline std::list<int> toList(JNIEnv *env, jobject list) {
 
     return res;
 }
-
 extern "C" JNIEXPORT jlong JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeInitialize(JNIEnv *env,
                                                                                             jclass clazz,
                                                                                             jobject context) {
-    // rmt_CreateGlobalInstance(&rmt);
-    // rmt_ScopedCPUSample(StartWfb, 0);
     auto *p = new WfbngLink(env, context);
     return jptr(p);
 }
@@ -327,7 +317,6 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     if (native(wfbngLinkN)->video_aggregator == nullptr) {
         return;
     }
-
     auto aggregator = native(wfbngLinkN)->video_aggregator.get();
 }
 
@@ -349,7 +338,6 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
         return;
     }
     auto aggregator = native(wfbngLinkN)->video_aggregator.get();
-
     jclass jClassExtendsIWfbStatChangedI = env->GetObjectClass(wfbStatChangedI);
     jclass jcStats = env->FindClass("com/openipc/wfbngrtl8812/WfbNGStats");
     if (jcStats == nullptr) {
@@ -359,10 +347,8 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     if (jcStatsConstructor == nullptr) {
         return;
     }
-
     SignalQualityCalculator::get_instance().add_fec_data(
         aggregator->count_p_all, aggregator->count_p_fec_recovered, aggregator->count_p_lost);
-
     auto stats = env->NewObject(jcStats,
                                 jcStatsConstructor,
                                 (jint)aggregator->count_p_all,
@@ -391,16 +377,15 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     native(wfbngLinkN)->initAgg();
 }
 
+// Modified start_link_quality_thread: use adaptive_link_enabled and adaptive_tx_power
 void WfbngLink::start_link_quality_thread(int fd) {
-    link_quality_thread = std::make_unique<std::thread>([this]() {
+    link_quality_thread = std::make_unique<std::thread>([this, fd]() {
         std::this_thread::sleep_for(std::chrono::seconds(10));
 
         const char *ip = "10.5.0.10";
         int port = 9999;
-
         int sockfd;
         struct sockaddr_in server_addr;
-
         // Create UDP socket
         if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
             __android_log_print(ANDROID_LOG_ERROR, TAG, "Socket creation failed");
@@ -408,7 +393,6 @@ void WfbngLink::start_link_quality_thread(int fd) {
         }
         int opt = 1;
         setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-
         memset(&server_addr, 0, sizeof(server_addr));
         server_addr.sin_family = AF_INET;
         server_addr.sin_port = htons(port);
@@ -417,10 +401,8 @@ void WfbngLink::start_link_quality_thread(int fd) {
             close(sockfd);
             return;
         }
-
         int sockfd2;
         struct sockaddr_in server_addr2;
-
         // Create UDP socket
         if ((sockfd2 = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
             __android_log_print(ANDROID_LOG_ERROR, TAG, "Socket creation failed");
@@ -428,7 +410,6 @@ void WfbngLink::start_link_quality_thread(int fd) {
         }
         int opt2 = 1;
         setsockopt(sockfd2, SOL_SOCKET, SO_REUSEADDR, &opt2, sizeof(opt2));
-
         memset(&server_addr2, 0, sizeof(server_addr2));
         server_addr2.sin_family = AF_INET;
         server_addr2.sin_port = htons(7755);
@@ -437,30 +418,21 @@ void WfbngLink::start_link_quality_thread(int fd) {
             close(sockfd);
             return;
         }
-
-        // Send message repeatedly every 0.1 seconds
-        while (true) {
-
+        while (this->adaptive_link_enabled) {
             auto quality = SignalQualityCalculator::get_instance().calculate_signal_quality();
-
 #if defined(ANDROID_DEBUG_RSSI) || true
             __android_log_print(ANDROID_LOG_WARN, TAG, "quality %d", quality.quality);
 #endif
-
             time_t currentEpoch = time(nullptr);
-
             const auto map_range =
                 [](double value, double inputMin, double inputMax, double outputMin, double outputMax) {
                     return outputMin + ((value - inputMin) * (outputMax - outputMin) / (inputMax - inputMin));
                 };
-
             // map to 1000..2000
             quality.quality = map_range(quality.quality, -1024, 1024, 1000, 2000);
             {
                 uint32_t len;
-
                 char message[100];
-
                 snprintf(message + sizeof(len),
                          sizeof(message) - sizeof(len),
                          "%ld:%d:%d:%d:%d:%d:%d:23:20\n",
@@ -474,33 +446,26 @@ void WfbngLink::start_link_quality_thread(int fd) {
                 len = strlen(message + sizeof(len));
                 len = htonl(len);
                 memcpy(message, &len, sizeof(len));
-
                 __android_log_print(ANDROID_LOG_ERROR, TAG, "message %s", message + 4);
-
                 ssize_t sent = sendto(sockfd,
                                       message,
                                       strlen(message + sizeof(len)) + sizeof(len),
                                       0,
                                       (struct sockaddr *)&server_addr,
                                       sizeof(server_addr));
-
                 if (sent < 0) {
                     __android_log_print(ANDROID_LOG_ERROR, TAG, "Failed to send message");
                     break;
                 }
             }
-
             static int idrCount = 0;
-            static char message[100]; // = "10000000:2000:2000:5:10:-70:25:23:20\n";
-
+            static char message[100];
             if (quality.lost_last_second) {
                 idrCount = 10;
             }
-
             if (idrCount > 0) {
                 --idrCount;
                 uint32_t len;
-
                 len = strlen("special:request_keyframe:aaaa");
                 len = htonl(len);
                 memcpy(message, &len, sizeof(len));
@@ -508,7 +473,6 @@ void WfbngLink::start_link_quality_thread(int fd) {
                          sizeof(message) - sizeof(uint32_t),
                          "special:request_keyframe:%s",
                          generate_random_string(4).c_str());
-
                 ssize_t sent = sendto(sockfd,
                                       message,
                                       strlen(message + sizeof(uint32_t)) + sizeof(uint32_t),
@@ -519,13 +483,53 @@ void WfbngLink::start_link_quality_thread(int fd) {
                     __android_log_print(ANDROID_LOG_ERROR, TAG, "Failed to send request_keyframe message");
                 }
             }
-
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-
         close(sockfd);
     });
 
-    rtl_devices.at(fd)->SetTxPower(30);
-    //             rtl_devices.at(fd)->SetTxPower(10);
+    rtl_devices.at(fd)->SetTxPower(adaptive_tx_power);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetAdaptiveLinkEnabled(
+    JNIEnv *env, jclass clazz, jlong wfbngLinkN, jboolean enabled) {
+    WfbngLink *link = native(wfbngLinkN);
+    bool wasEnabled = link->adaptive_link_enabled;
+    link->adaptive_link_enabled = enabled;
+    // If we are enabling adaptive mode (and it was previously disabled)
+    if (enabled && !wasEnabled) {
+        if (link->current_fd != -1) {
+            // If a previous adaptive thread exists, join it first.
+            if (link->link_quality_thread && link->link_quality_thread->joinable()) {
+                link->link_quality_thread->join();
+            }
+            // Restart the adaptive (link quality) thread.
+            link->start_link_quality_thread(link->current_fd);
+        }
+    }
+    // When disabling, wait for the thread to exit (if running).
+    if (!enabled && wasEnabled) {
+        if (link->link_quality_thread && link->link_quality_thread->joinable()) {
+            link->link_quality_thread->join();
+        }
+    }
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetTxPower(JNIEnv *env,
+                                                                                           jclass clazz,
+                                                                                           jlong wfbngLinkN,
+                                                                                           jint power) {
+    WfbngLink *link = native(wfbngLinkN);
+    link->adaptive_tx_power = power;
+    if (link->current_fd != -1 && link->rtl_devices.find(link->current_fd) != link->rtl_devices.end()) {
+        link->rtl_devices.at(link->current_fd)->SetTxPower(power);
+    }
+    // If adaptive mode is enabled and the adaptive thread is not running, restart it.
+    if (link->adaptive_link_enabled) {
+        if (!link->link_quality_thread || !link->link_quality_thread->joinable()) {
+            if (link->current_fd != -1) {
+                link->start_link_quality_thread(link->current_fd);
+            }
+        }
+    }
 }

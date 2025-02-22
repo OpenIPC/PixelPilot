@@ -297,7 +297,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private void initializeWfbNg() {
         setDefaultGsKey();
         copyGSKey();
-        WfbNgLink wfbLink = new WfbNgLink(this);
+        wfbLink = new WfbNgLink(this);
         wfbLink.SetWfbNGStatsChanged(this);
         wfbLinkManager = new WfbLinkManager(this, binding, wfbLink);
     }
@@ -553,6 +553,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         // WFB submenu
         setupWFBSubMenu(popup);
 
+        // Adaptive link submenu
+        setupAdaptiveLinkSubMenu(popup);
+
         // Recording submenu
         setupRecordingSubMenu(popup);
 
@@ -648,7 +651,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
      * Submenu handling WFB-NG logic (e.g. selecting gs.key from storage).
      */
     private void setupWFBSubMenu(PopupMenu popup) {
-        SubMenu wfb = popup.getMenu().addSubMenu("WFB-NG");
+        SubMenu wfb = popup.getMenu().addSubMenu("WFB-NG key");
         MenuItem keyBtn = wfb.add("gs.key");
         keyBtn.setOnMenuItemClickListener(item -> {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -657,6 +660,61 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             startActivityForResult(intent, PICK_KEY_REQUEST_CODE);
             return true;
         });
+    }
+
+    /**
+     * Submenu for Adaptive link functionality.
+     * It creates two options:
+     * - "Enable": toggles the adaptive link quality thread
+     * - "Power": a submenu that lets the user choose the TX power (1, 10, 20, 30, 40)
+     */
+    private void setupAdaptiveLinkSubMenu(PopupMenu popup) {
+        SubMenu adaptiveMenu = popup.getMenu().addSubMenu("Adaptive link");
+
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        boolean adaptiveEnabled = prefs.getBoolean("adaptive_link_enabled", true);
+        int adaptiveTxPower = prefs.getInt("adaptive_tx_power", 30);
+         wfbLink.nativeSetAdaptiveLinkEnabled(adaptiveEnabled);
+         wfbLink.nativeSetTxPower(adaptiveTxPower);
+
+        // Adaptive link Enable option
+        MenuItem adaptiveEnable = adaptiveMenu.add("Enable");
+        adaptiveEnable.setCheckable(true);
+        adaptiveEnable.setChecked(adaptiveEnabled);
+        adaptiveEnable.setOnMenuItemClickListener(item -> {
+            boolean newState = !item.isChecked();
+            item.setChecked(newState);
+            SharedPreferences.Editor editor = getSharedPreferences("general", MODE_PRIVATE).edit();
+            editor.putBoolean("adaptive_link_enabled", newState);
+            editor.apply();
+            // Call instance method on the WfbNgLink instance via the wfbLinkManager.
+            wfbLink.nativeSetAdaptiveLinkEnabled(newState);
+            return true;
+        });
+
+        // Adaptive link Power submenu
+        SubMenu powerSubMenu = adaptiveMenu.addSubMenu("Power");
+        int[] txOptions = {1, 10, 20, 30, 40};
+        for (int power : txOptions) {
+            MenuItem powerItem = powerSubMenu.add(String.valueOf(power));
+            powerItem.setCheckable(true);
+            if (power == adaptiveTxPower) {
+                powerItem.setChecked(true);
+            }
+            powerItem.setOnMenuItemClickListener(item -> {
+                // Uncheck all items in the submenu
+                for (int i = 0; i < powerSubMenu.size(); i++) {
+                    powerSubMenu.getItem(i).setChecked(false);
+                }
+                item.setChecked(true);
+                SharedPreferences.Editor editor = getSharedPreferences("general", MODE_PRIVATE).edit();
+                editor.putInt("adaptive_tx_power", power);
+                editor.apply();
+                // Call instance method on the WfbNgLink instance via the wfbLinkManager.
+                wfbLink.nativeSetTxPower(power);
+                return true;
+            });
+        }
     }
 
     /**
@@ -851,7 +909,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     // ----------------------------------------------------------------------------
-    // VPN Service
+    // VPN SERVICE
     // ----------------------------------------------------------------------------
     private void startVpnService() {
         int VPN_REQUEST_CODE = 100;

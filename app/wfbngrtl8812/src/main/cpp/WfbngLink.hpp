@@ -33,17 +33,24 @@ class WfbngLink {
 
     void start_link_quality_thread(int fd);
 
+    // adaptive link
+    // TODO: move this to private section
+    int current_fd;
+    bool adaptive_link_enabled;
+    int adaptive_tx_power;
+    std::map<int, std::unique_ptr<Rtl8812aDevice>> rtl_devices;
+    std::unique_ptr<std::thread> link_quality_thread{nullptr};
+
   private:
     const char *keyPath = "/data/user/0/com.openipc.pixelpilot/files/gs.key";
     std::unique_ptr<WiFiDriver> wifi_driver;
     uint32_t video_channel_id_be;
     uint32_t mavlink_channel_id_be;
     uint32_t udp_channel_id_be;
+
     Logger_t log;
-    std::map<int, std::unique_ptr<Rtl8812aDevice>> rtl_devices;
     std::unique_ptr<std::thread> usb_event_thread{nullptr};
     std::unique_ptr<std::thread> usb_tx_thread{nullptr};
-    std::unique_ptr<std::thread> link_quality_thread{nullptr};
     uint32_t link_id{7669206};
     SignalQualityCalculator rssi_calculator;
 };
