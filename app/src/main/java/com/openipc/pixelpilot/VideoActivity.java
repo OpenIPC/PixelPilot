@@ -1355,7 +1355,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int screenWidth = (int) (displayMetrics.widthPixels * 0.6);
+        int screenWidth = (int) (displayMetrics.widthPixels * 0.75);
         if (dialog.getWindow() != null) {
             dialog.getWindow().setLayout(screenWidth, WindowManager.LayoutParams.MATCH_PARENT);
         }
