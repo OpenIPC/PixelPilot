@@ -50,6 +50,7 @@ audio:
  * 40 MHz bandwidth [x]
  * support stream over ipv6
  * adaptive link
+ * Save audio stream with the video for recordings
 
 ## Known issues:
  * Audio stream is not working
