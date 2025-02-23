@@ -1069,6 +1069,15 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                     startDvr(dvrUri);
                 }
             }
+        } else if (requestCode == 100) {  // VPN_REQUEST_CODE is 100
+            if (resultCode == RESULT_OK) {
+                // VPN permission granted, start the VPN service
+                Intent serviceIntent = new Intent(this, WfbNgVpnService.class);
+                startService(serviceIntent);
+            } else {
+                // VPN permission not granted
+                Log.e(TAG, "VPN permission was not granted by the user.");
+            }
         }
     }
 
