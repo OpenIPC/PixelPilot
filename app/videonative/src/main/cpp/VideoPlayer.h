@@ -69,7 +69,7 @@ class VideoPlayer
     const std::string   GROUND_RECORDING_DIRECTORY;
     JavaVM*             javaVm = nullptr;
     H26XParser          mParser;
-    BufferedPacketQueue mBufferedPacketQueue;
+    BufferedPacketQueue mBufferedPacketQueueVideo, mBufferedPacketQueueAudio;
 
     // DVR attributes
     int                     dvr_fd;

@@ -58,7 +58,7 @@ class AudioDecoder
     void onNewAudioData(const uint8_t* data, const std::size_t data_length);
 
   private:
-    const int                  BUFFER_CAPACITY_IN_FRAMES = (1024 + 256);
+    const int                  BUFFER_CAPACITY_IN_FRAMES = 4096;
     std::queue<AudioUDPPacket> m_audioQueue;
     std::mutex                 m_mtxQueue;
     std::condition_variable    m_cvQueue;

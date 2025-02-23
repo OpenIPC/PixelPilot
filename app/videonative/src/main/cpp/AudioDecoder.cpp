@@ -7,7 +7,7 @@
 
 #define TAG "pixelpilot"
 
-#define SAMPLE_RATE 8000
+#define SAMPLE_RATE 48000
 #define CHANNELS 1
 
 AudioDecoder::AudioDecoder()

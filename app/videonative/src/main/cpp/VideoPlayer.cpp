@@ -127,7 +127,14 @@ void VideoPlayer::onNewRTPData(const uint8_t* data, const std::size_t data_lengt
     };
 
     // Process the packet using the queue
-    mBufferedPacketQueue.processPacket(idx, data, data_length, callback);
+    if (rtpPacket.header.payload == RTP_PAYLOAD_TYPE_AUDIO)
+    {
+        mBufferedPacketQueueAudio.processPacket(idx, data, data_length, callback);
+    }
+    else
+    {
+        mBufferedPacketQueueVideo.processPacket(idx, data, data_length, callback);
+    }
 }
 
 void VideoPlayer::onNewNALU(const NALU& nalu)
