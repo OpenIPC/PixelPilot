@@ -110,6 +110,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private boolean isVRMode = false;
     private ConstraintLayout constraintLayout;
     private ConstraintSet constraintSet;
+    private WfbNgLink wfbLink;
 
     public boolean getVRSetting() {
         return getSharedPreferences("general", Context.MODE_PRIVATE).getBoolean("vr-mode", false);
