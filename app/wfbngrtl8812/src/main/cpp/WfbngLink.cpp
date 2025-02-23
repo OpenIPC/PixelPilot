@@ -30,6 +30,9 @@
 #include <thread>
 #include <unistd.h>
 
+#undef TAG
+#define TAG "pixelpilot"
+
 std::string generate_random_string(size_t length) {
     const std::string characters = "abcdefghijklmnopqrstuvwxyz";
     std::random_device rd;
@@ -43,9 +46,6 @@ std::string generate_random_string(size_t length) {
     }
     return result;
 }
-
-#undef TAG
-#define TAG "pixelpilot"
 
 std::string uint8_to_hex_string(const uint8_t *v, const size_t s) {
     std::stringstream ss;
@@ -92,7 +92,7 @@ void WfbngLink::initAgg() {
 int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint fd) {
     int r;
     libusb_context *ctx = NULL;
-    std::unique_ptr<TxFrame> txFrame = std::make_unique<TxFrame>();
+    std::shared_ptr<TxFrame> txFrame = std::make_shared<TxFrame>();
 
     r = libusb_set_option(NULL, LIBUSB_OPTION_NO_DEVICE_DISCOVERY);
     r = libusb_init(&ctx);
@@ -201,7 +201,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             args->mcs_index = 2;
             args->vht_mode = false;
             args->short_gi = false;
-            args->bandwidth = 20; // TODOII: need to adjust according to bw??
+            args->bandwidth = 20;
             args->k = 1;
             args->n = 2;
             args->radio_port = wfb_tx_port;
@@ -210,10 +210,9 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
                 ANDROID_LOG_ERROR, TAG, "radio link ID %d, radio PORT %d", args->link_id, args->radio_port);
 
             Rtl8812aDevice *current_device = rtl_devices.at(fd).get();
-            TxFrame *tx_frame = txFrame.get();
             if (!usb_tx_thread) {
-                usb_tx_thread = std::make_unique<std::thread>([tx_frame, current_device, args] {
-                    tx_frame->run(current_device, args.get());
+                usb_tx_thread = std::make_unique<std::thread>([txFrame, current_device, args] {
+                    txFrame->run(current_device, args.get());
                     __android_log_print(ANDROID_LOG_DEBUG, TAG, "usb_transfer thread should terminate");
                 });
             }
