@@ -47,9 +47,9 @@ audio:
   outputVolume: 30
 ```
 ## List of potential improvements:
- * 40 MHz bandwidth [x]
+ * adaptive link [x]
+ * 40 MHz bandwidth [?] - works but buggy
  * support stream over ipv6
- * adaptive link
  * Save audio stream with the video for recordings
 
 ## Known issues:
