@@ -56,7 +56,6 @@ WfbngLink::WfbngLink(JNIEnv *env, jobject context)
 
 void WfbngLink::initAgg() {
     std::string client_addr = "127.0.0.1";
-    uint32_t link_id = 7669206; // sha1 hash of link_domain="default"
     uint64_t epoch = 0;
 
     int video_client_port = 5600;
