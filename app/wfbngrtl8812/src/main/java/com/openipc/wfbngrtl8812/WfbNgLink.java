@@ -18,7 +18,7 @@ import java.util.TimerTask;
 public class WfbNgLink implements WfbNGStatsChanged {
     public static String TAG = "pixelpilot";
 
-    // Load the 'Rtl8812au_Wfbng' library on application startup.
+    // Load the native library on application startup.
     static {
         System.loadLibrary("WfbngRtl8812");
     }
@@ -29,6 +29,16 @@ public class WfbNgLink implements WfbNGStatsChanged {
     Map<UsbDevice, Thread> linkThreads = new HashMap<>();
     Map<UsbDevice, UsbDeviceConnection> linkConns = new HashMap<>();
     private WfbNGStatsChanged statsChanged;
+
+    // Native method declarations.
+    public static native long nativeInitialize(Context context);
+    public static native void nativeRun(long nativeInstance, Context context, int wifiChannel, int bandWidth, int fd);
+    public static native void nativeStop(long nativeInstance, Context context, int fd);
+    public static native void nativeRefreshKey(long nativeInstance);
+    public static native <T extends WfbNGStatsChanged> void nativeCallBack(T t, long nativeInstance);
+    public static native void nativeStartAdaptivelink(long nativeInstance);
+    public static native void nativeSetAdaptiveLinkEnabled(long nativeInstance, boolean enabled);
+    public static native void nativeSetTxPower(long nativeInstance, int power);
 
     public WfbNgLink(final AppCompatActivity parent) {
         this.context = parent;
@@ -42,25 +52,22 @@ public class WfbNgLink implements WfbNGStatsChanged {
         }, 0, 300);
     }
 
-    // Native cpp methods.
-    public static native long nativeInitialize(Context context);
-
-    public static native void nativeRun(long nativeInstance, Context context, int wifiChannel, int bandWidth, int fd);
-
-    public static native void nativeStop(long nativeInstance, Context context, int fd);
-
-    public static native void nativeRefreshKey(long nativeInstance);
-
-    public static native <T extends WfbNGStatsChanged> void nativeCallBack(T t, long nativeInstance);
-
-    public static native void nativeStartAdaptivelink(long nativeInstance);
-
     public boolean isRunning() {
         return !linkThreads.isEmpty();
     }
 
     public void refreshKey() {
         nativeRefreshKey(nativeWfbngLink);
+    }
+
+    // Instance wrapper for nativeSetAdaptiveLinkEnabled.
+    public void nativeSetAdaptiveLinkEnabled(boolean state) {
+        nativeSetAdaptiveLinkEnabled(nativeWfbngLink, state);
+    }
+
+    // Instance wrapper for nativeSetTxPower.
+    public void nativeSetTxPower(int power) {
+        nativeSetTxPower(nativeWfbngLink, power);
     }
 
     public synchronized void start(int wifiChannel, int bandWidth, UsbDevice usbDevice) {
@@ -108,7 +115,7 @@ public class WfbNgLink implements WfbNGStatsChanged {
         statsChanged = callback;
     }
 
-    // called by native code via NDK
+    // Called by native code via NDK.
     @Override
     public void onWfbNgStatsChanged(WfbNGStats stats) {
         if (statsChanged != null) {
