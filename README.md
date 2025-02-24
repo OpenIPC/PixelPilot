@@ -51,6 +51,7 @@ audio:
  * 40 MHz bandwidth [?] - works but buggy
  * support stream over ipv6
  * Save audio stream with the video for recordings
+ * Possibility to forward undecoded wfb stream over the network
 
 ## Known issues:
  * Audio stream is not working
