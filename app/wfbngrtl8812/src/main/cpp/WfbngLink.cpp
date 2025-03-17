@@ -236,8 +236,12 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             dev->should_stop = true;
         }
         txFrame->stop();
-        usb_tx_thread->join();
-        usb_event_thread->join();
+        if (usb_tx_thread->joinable()) {
+            usb_tx_thread->join();
+        }
+        if (usb_event_thread->joinable()) {
+            usb_event_thread->join();
+        }
         if (link_quality_thread && link_quality_thread->joinable()) {
             link_quality_thread->join();
         }
@@ -250,8 +254,12 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         dev->should_stop = true;
     }
     txFrame->stop();
-    usb_tx_thread->join();
-    usb_event_thread->join();
+    if (usb_tx_thread->joinable()) {
+        usb_tx_thread->join();
+    }
+    if (usb_event_thread->joinable()) {
+        usb_event_thread->join();
+    }
 
     r = libusb_release_interface(dev_handle, 0);
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_release_interface: %d", r);
