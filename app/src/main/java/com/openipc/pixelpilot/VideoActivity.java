@@ -955,6 +955,10 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             if (dvrUri != null) {
                 startDvr(dvrUri);
             } else {
+                wfbLinkManager.stopAdapters();
+                videoPlayer.stop();
+                videoPlayer.stopAudio();
+
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
                 intent.addCategory(Intent.CATEGORY_DEFAULT);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
