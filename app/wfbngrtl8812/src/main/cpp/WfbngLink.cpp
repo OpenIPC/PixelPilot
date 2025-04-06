@@ -47,15 +47,6 @@ std::string generate_random_string(size_t length) {
     return result;
 }
 
-std::string uint8_to_hex_string(const uint8_t *v, const size_t s) {
-    std::stringstream ss;
-    ss << std::hex << std::setfill('0');
-    for (int i = 0; i < s; i++) {
-        ss << std::hex << std::setw(2) << static_cast<int>(v[i]);
-    }
-    return ss.str();
-}
-
 WfbngLink::WfbngLink(JNIEnv *env, jobject context)
         : current_fd(-1), adaptive_link_enabled(true), adaptive_tx_power(30) {
     initAgg();
@@ -141,6 +132,8 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
                 std::lock_guard<std::mutex> lock(agg_mutex);
                 if (frame.MatchesChannelID(video_channel_id_be8)) {
                     SignalQualityCalculator::get_instance().add_rssi(packet.RxAtrib.rssi[0], packet.RxAtrib.rssi[1]);
+                    SignalQualityCalculator::get_instance().add_snr(packet.RxAtrib.snr[0], packet.RxAtrib.snr[1]);
+
                     video_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
                                                      packet.Data.size() - sizeof(ieee80211_header) - 4,
                                                      0,
@@ -432,16 +425,37 @@ void WfbngLink::start_link_quality_thread(int fd) {
             {
                 uint32_t len;
                 char message[100];
+
+                /**
+                     1741491090:1602:1602:1:0:-70:24:num_ants:pnlt:fec_change:code
+
+                     <gs_time>:<link_score>:<link_score>:<fec>:<lost>:<rssi_dB>:<snr_dB>:<num_ants>:<noise_penalty>:<fec_change>:<idr_request_code>
+
+                    gs_time: gs clock
+                    link_score: 1000 - 2000 sent twice (already including any penalty)
+                    link_score: 1000 - 2000 sent twice (already including any penalty)
+                    fec: instantaneus fec_rec (only used by old fec_rec_pntly now disabled by default)
+                    lost: instantaneus lost (not used)
+                    rssi_dB:  best antenna rssi (for osd)
+                    snr_dB: best antenna snr_dB (for osd)
+                    num_ants: number of gs antennas (for osd)
+                    noise_penalty: penalty deducted from score due to noise (for osd)
+                    fec_change: int from 0 to 5 : how much to alter fec based on noise
+                    optional idr_request_code:  4 char unique code to request 1 keyframe (no need to send special extra
+                   packets)
+                 */
                 snprintf(message + sizeof(len),
                          sizeof(message) - sizeof(len),
-                         "%ld:%d:%d:%d:%d:%d:%d:23:20\n",
+                         "%ld:%d:%d:%d:%d:%d:%f:2:-1:0:%s\n",
                          static_cast<long>(currentEpoch),
                          quality.quality,
                          quality.quality,
                          quality.recovered_last_second,
                          quality.lost_last_second,
                          quality.quality,
-                         quality.quality);
+                         quality.snr,
+                         quality.idr_code.c_str());
+
                 len = strlen(message + sizeof(len));
                 len = htonl(len);
                 memcpy(message, &len, sizeof(len));
@@ -455,31 +469,6 @@ void WfbngLink::start_link_quality_thread(int fd) {
                 if (sent < 0) {
                     __android_log_print(ANDROID_LOG_ERROR, TAG, "Failed to send message");
                     break;
-                }
-            }
-            static int idrCount = 0;
-            static char message[100];
-            if (quality.lost_last_second) {
-                idrCount = 10;
-            }
-            if (idrCount > 0) {
-                --idrCount;
-                uint32_t len;
-                len = strlen("special:request_keyframe:aaaa");
-                len = htonl(len);
-                memcpy(message, &len, sizeof(len));
-                snprintf(message + sizeof(uint32_t),
-                         sizeof(message) - sizeof(uint32_t),
-                         "special:request_keyframe:%s",
-                         generate_random_string(4).c_str());
-                ssize_t sent = sendto(sockfd,
-                                      message,
-                                      strlen(message + sizeof(uint32_t)) + sizeof(uint32_t),
-                                      0,
-                                      (struct sockaddr *)&server_addr,
-                                      sizeof(server_addr));
-                if (sent < 0) {
-                    __android_log_print(ANDROID_LOG_ERROR, TAG, "Failed to send request_keyframe message");
                 }
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
