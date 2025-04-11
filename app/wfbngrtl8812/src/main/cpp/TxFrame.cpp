@@ -867,6 +867,5 @@ void TxFrame::run(Rtl8812aDevice *rtlDevice, TxArgs *arg) {
 #else
         std::fprintf(stderr, "Error in TxFrame::run: %s\n", ex.what());
 #endif
-        std::exit(1);
     }
 }
