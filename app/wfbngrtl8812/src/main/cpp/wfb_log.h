@@ -9,7 +9,7 @@
     } while (0)
 #define WFB_INFO(...)                                                                                                  \
     do {                                                                                                               \
-        __android_log_print(ANDROID_LOG_INFO, "wfb-ng", __VA_ARGS__);                                                  \
+        (void)0; /*__android_log_print(ANDROID_LOG_INFO, "wfb-ng", __VA_ARGS__);*/                                     \
     } while (0)
 
 #define WFB_DBG(...) (void(0))

@@ -191,12 +191,12 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             args->keypair = keyPath;
             args->stbc = true;
             args->ldpc = true;
-            args->mcs_index = 2;
+            args->mcs_index = 0;
             args->vht_mode = false;
             args->short_gi = false;
             args->bandwidth = 20;
             args->k = 1;
-            args->n = 2;
+            args->n = 3;
             args->radio_port = wfb_tx_port;
 
             __android_log_print(
@@ -454,7 +454,7 @@ void WfbngLink::start_link_quality_thread(int fd) {
                  */
                 snprintf(message + sizeof(len),
                          sizeof(message) - sizeof(len),
-                         "%ld:%d:%d:%d:%d:%d:%f:2:-1:0:%s\n",
+                         "%ld:%d:%d:%d:%d:%d:%f:0:-1:0:%s\n",
                          static_cast<long>(currentEpoch),
                          quality.quality,
                          quality.quality,
@@ -467,7 +467,7 @@ void WfbngLink::start_link_quality_thread(int fd) {
                 len = strlen(message + sizeof(len));
                 len = htonl(len);
                 memcpy(message, &len, sizeof(len));
-                __android_log_print(ANDROID_LOG_ERROR, TAG, "message %s", message + 4);
+                //__android_log_print(ANDROID_LOG_ERROR, TAG, "message %s", message + 4);
                 ssize_t sent = sendto(sockfd,
                                       message,
                                       strlen(message + sizeof(len)) + sizeof(len),
