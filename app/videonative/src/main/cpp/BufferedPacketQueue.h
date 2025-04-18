@@ -1,9 +1,15 @@
+#if defined(__ANDROID__) || defined(__ANDROID_API__)
 #include <android/log.h>
+#else
+#include <cassert>
+#include <cstdio>
+#endif
 #include <algorithm>
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+
 #include <unordered_map>
 #include <vector>
 
@@ -15,7 +21,8 @@ constexpr size_t MAX_BUFFER_SIZE = 50;
 constexpr size_t MONOTONIC_THRESHOLD = 40;
 
 // Type definition for sequence numbers
-using SeqType = uint16_t;
+using SeqType   = uint16_t;
+using SignedSeq = std::make_signed_t<SeqType>;
 
 /**
  * @brief BufferedPacketQueue class handles packet processing with sequence numbers,
@@ -104,7 +111,10 @@ class BufferedPacketQueue
      * @param currPacketIdx Sequence index of the incoming packet.
      * @return True if it's the next expected packet; otherwise, false.
      */
-    bool isNextExpectedPacket(SeqType currPacketIdx) const { return currPacketIdx == mLastPacketIdx + 1; }
+    bool isNextExpectedPacket(SeqType currPacketIdx) const
+    {
+        return currPacketIdx == static_cast<SeqType>(mLastPacketIdx + 1);
+    }
 
     /**
      * @brief Processes an in-order packet by invoking the callback and updating state.
@@ -312,11 +322,20 @@ class BufferedPacketQueue
      */
     void logDebug(const char* format, ...) const
     {
+#if defined(__ANDROID__) || defined(__ANDROID_API__)
         return;
         va_list args;
         va_start(args, format);
         __android_log_vprint(ANDROID_LOG_DEBUG, BUFFERED_QUEUE_LOG_TAG, format, args);
         va_end(args);
+#else
+        // Fallback to standard output for non-Android platforms
+        va_list args;
+        va_start(args, format);
+        vfprintf(stderr, format, args);
+        va_end(args);
+        fprintf(stderr, "\n");
+#endif
     }
 
     /**
@@ -326,9 +345,18 @@ class BufferedPacketQueue
      */
     void logWarning(const char* format, ...) const
     {
+#if defined(__ANDROID__) || defined(__ANDROID_API__)
         va_list args;
         va_start(args, format);
         __android_log_vprint(ANDROID_LOG_WARN, BUFFERED_QUEUE_LOG_TAG, format, args);
         va_end(args);
+#else
+        // Fallback to standard output for non-Android platforms
+        va_list args;
+        va_start(args, format);
+        vfprintf(stderr, format, args);
+        va_end(args);
+        fprintf(stderr, "\n");
+#endif
     }
 };
