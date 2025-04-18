@@ -176,7 +176,6 @@ public class WfbLinkManager extends BroadcastReceiver {
     public synchronized void stopAdapters() {
         try {
             wfbLink.stopAll();
-            activeWifiAdapters.clear();
         } catch (InterruptedException ignored) {
         }
     }
