@@ -708,7 +708,7 @@ void TxFrame::run(Rtl8812aDevice *rtlDevice, TxArgs *arg) {
     // Radiotap header preparation
     std::unique_ptr<uint8_t[]> rtHeader;
     size_t rtHeaderLen = 0;
-    uint8_t frameType = FRAME_TYPE_DATA;
+    uint8_t frameType = FRAME_TYPE_RTS;
 
     // Construct the appropriate radiotap header (HT vs. VHT)
     if (!arg->vht_mode) {
