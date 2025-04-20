@@ -40,6 +40,7 @@ class WfbngLink {
     int adaptive_tx_power;
     std::map<int, std::unique_ptr<Rtl8812aDevice>> rtl_devices;
     std::unique_ptr<std::thread> link_quality_thread{nullptr};
+    bool should_clear_stats{false};
 
   private:
     const char *keyPath = "/data/user/0/com.openipc.pixelpilot/files/gs.key";

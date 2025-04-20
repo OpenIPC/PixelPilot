@@ -144,6 +144,10 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
                                                      0,
                                                      0,
                                                      NULL);
+                    if (should_clear_stats) {
+                        video_aggregator->clear_stats();
+                        should_clear_stats = false;
+                    }
                 } else if (frame.MatchesChannelID(mavlink_channel_id_be8)) {
                     mavlink_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
                                                        packet.Data.size() - sizeof(ieee80211_header) - 4,
@@ -368,7 +372,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
         return;
     }
     env->CallVoidMethod(wfbStatChangedI, onStatsChanged, stats);
-    aggregator->clear_stats();
+    native(wfbngLinkN)->should_clear_stats = true;
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeRefreshKey(JNIEnv *env,
