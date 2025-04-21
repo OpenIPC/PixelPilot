@@ -1160,6 +1160,12 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     @Override
     protected void onPause() {
         super.onPause();
+
+        unregisterReceivers();
+
+        videoPlayer.stop();
+        videoPlayer.stopAudio();
+        wfbLinkManager.stopAdapters();
     }
 
     @Override
@@ -1177,14 +1183,18 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     protected void onResume() {
         registerReceivers();
 
-        // On resume is called when the app is reopened, a device might have been plugged since the last time it started.
-        videoPlayer.start();
-        videoPlayer.startAudio();
-
         wfbLinkManager.setChannel(getChannel(this));
         wfbLinkManager.setBandwidth(getBandwidth(this));
+
+        // On resume is called when the app is reopened, a device might have been plugged since the last time it started.
         wfbLinkManager.refreshAdapters();
+
+        wfbLinkManager.startAdapters();
+
         osdManager.restoreOSDConfig();
+
+        videoPlayer.start();
+        videoPlayer.startAudio();
 
         super.onResume();
     }
