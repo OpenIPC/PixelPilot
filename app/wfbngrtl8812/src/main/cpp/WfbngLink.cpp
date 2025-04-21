@@ -357,7 +357,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
                                 jcStatsConstructor,
                                 (jint)aggregator->count_p_all,
                                 (jint)aggregator->count_p_dec_err,
-                                (jint)aggregator->count_p_dec_ok,
+                                (jint)(aggregator->count_p_all - aggregator->count_p_dec_err),
                                 (jint)aggregator->count_p_fec_recovered,
                                 (jint)aggregator->count_p_lost,
                                 (jint)aggregator->count_p_bad,
