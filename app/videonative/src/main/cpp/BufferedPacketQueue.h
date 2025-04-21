@@ -180,8 +180,8 @@ class BufferedPacketQueue
 
         if (isDuplicatePacket(currPacketIdx))
         {
-            logWarning("Duplicate packet received with Sequence=%u. Ignoring.", currPacketIdx);
-            return;
+            logWarning("Duplicate packet received with Sequence=%u. ", currPacketIdx);
+            // return;
         }
 
         bufferPacket(currPacketIdx, data, data_length);

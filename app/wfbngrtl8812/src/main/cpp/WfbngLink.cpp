@@ -177,17 +177,20 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         current_fd = fd;
 
         if (!usb_event_thread) {
-            usb_event_thread = std::make_unique<std::thread>([ctx, this, fd] {
-                while (this->adaptive_link_enabled) {
+            auto usb_event_thread_func = [ctx, this, fd] {
+                while (true) {
                     auto dev = this->rtl_devices.at(fd).get();
                     if (dev == nullptr || dev->should_stop) break;
-                    int r = libusb_handle_events(ctx);
+                    struct timeval timeout = {0, 500000}; // 500ms timeout
+                    int r = libusb_handle_events_timeout(ctx, &timeout);
                     if (r < 0) {
                         this->log->error("Error handling events: {}", r);
-                        break;
+                        // break;
                     }
                 }
-            });
+            };
+
+            init_thread(usb_event_thread, [=]() { return std::make_unique<std::thread>(usb_event_thread_func); });
 
             std::shared_ptr<TxArgs> args = std::make_shared<TxArgs>();
             args->udp_port = 8001;
@@ -208,13 +211,16 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
 
             Rtl8812aDevice *current_device = rtl_devices.at(fd).get();
             if (!usb_tx_thread) {
-                usb_tx_thread = std::make_unique<std::thread>([txFrame, current_device, args] {
-                    txFrame->run(current_device, args.get());
-                    __android_log_print(ANDROID_LOG_DEBUG, TAG, "usb_transfer thread should terminate");
+                init_thread(usb_tx_thread, [&]() {
+                    return std::make_unique<std::thread>([txFrame, current_device, args] {
+                        txFrame->run(current_device, args.get());
+                        __android_log_print(ANDROID_LOG_DEBUG, TAG, "usb_transfer thread should terminate");
+                    });
                 });
             }
 
             if (adaptive_link_enabled) {
+                stop_adaptive_link();
                 start_link_quality_thread(fd);
             }
         }
@@ -233,15 +239,10 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             dev->should_stop = true;
         }
         txFrame->stop();
-        if (usb_tx_thread->joinable()) {
-            usb_tx_thread->join();
-        }
-        if (usb_event_thread->joinable()) {
-            usb_event_thread->join();
-        }
-        if (link_quality_thread && link_quality_thread->joinable()) {
-            link_quality_thread->join();
-        }
+
+        destroy_thread(usb_tx_thread);
+        destroy_thread(usb_event_thread);
+        stop_adaptive_link();
         return -1;
     }
 
@@ -251,12 +252,10 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         dev->should_stop = true;
     }
     txFrame->stop();
-    if (usb_tx_thread->joinable()) {
-        usb_tx_thread->join();
-    }
-    if (usb_event_thread->joinable()) {
-        usb_event_thread->join();
-    }
+
+    destroy_thread(usb_tx_thread);
+    destroy_thread(usb_event_thread);
+    stop_adaptive_link();
 
     r = libusb_release_interface(dev_handle, 0);
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_release_interface: %d", r);
@@ -265,10 +264,12 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
 }
 
 void WfbngLink::stop(JNIEnv *env, jobject context, jint fd) {
+    if (rtl_devices.find(fd) == rtl_devices.end()) return;
     auto dev = rtl_devices.at(fd).get();
     if (dev) {
         dev->should_stop = true;
     }
+    stop_adaptive_link();
 }
 
 //--------------------------------------JAVA bindings--------------------------------------
@@ -383,9 +384,8 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
 
 // Modified start_link_quality_thread: use adaptive_link_enabled and adaptive_tx_power
 void WfbngLink::start_link_quality_thread(int fd) {
-    link_quality_thread = std::make_unique<std::thread>([this, fd]() {
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-
+    auto thread_func = [this, fd]() {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         const char *ip = "10.5.0.10";
         int port = 9999;
         int sockfd;
@@ -422,7 +422,7 @@ void WfbngLink::start_link_quality_thread(int fd) {
             close(sockfd);
             return;
         }
-        while (this->adaptive_link_enabled) {
+        while (!this->adaptive_link_should_stop) {
             auto quality = SignalQualityCalculator::get_instance().calculate_signal_quality();
 #if defined(ANDROID_DEBUG_RSSI) || true
             __android_log_print(ANDROID_LOG_WARN, TAG, "quality %d", quality.quality);
@@ -486,8 +486,10 @@ void WfbngLink::start_link_quality_thread(int fd) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         close(sockfd);
-    });
+        this->adaptive_link_should_stop = false;
+    };
 
+    init_thread(link_quality_thread, [=]() { return std::make_unique<std::thread>(thread_func); });
     rtl_devices.at(fd)->SetTxPower(adaptive_tx_power);
 }
 
@@ -498,20 +500,16 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     link->adaptive_link_enabled = enabled;
     // If we are enabling adaptive mode (and it was previously disabled)
     if (enabled && !wasEnabled) {
+        link->stop_adaptive_link();
         if (link->current_fd != -1) {
             // If a previous adaptive thread exists, join it first.
-            if (link->link_quality_thread && link->link_quality_thread->joinable()) {
-                link->link_quality_thread->join();
-            }
             // Restart the adaptive (link quality) thread.
             link->start_link_quality_thread(link->current_fd);
         }
     }
     // When disabling, wait for the thread to exit (if running).
     if (!enabled && wasEnabled) {
-        if (link->link_quality_thread && link->link_quality_thread->joinable()) {
-            link->link_quality_thread->join();
-        }
+        link->stop_adaptive_link();
     }
 }
 
@@ -520,16 +518,17 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
                                                                                            jlong wfbngLinkN,
                                                                                            jint power) {
     WfbngLink *link = native(wfbngLinkN);
+    if (link->adaptive_tx_power == power) return;
+
     link->adaptive_tx_power = power;
     if (link->current_fd != -1 && link->rtl_devices.find(link->current_fd) != link->rtl_devices.end()) {
         link->rtl_devices.at(link->current_fd)->SetTxPower(power);
     }
     // If adaptive mode is enabled and the adaptive thread is not running, restart it.
     if (link->adaptive_link_enabled) {
-        if (!link->link_quality_thread || !link->link_quality_thread->joinable()) {
-            if (link->current_fd != -1) {
-                link->start_link_quality_thread(link->current_fd);
-            }
+        link->stop_adaptive_link();
+        if (link->current_fd != -1) {
+            link->start_link_quality_thread(link->current_fd);
         }
     }
 }

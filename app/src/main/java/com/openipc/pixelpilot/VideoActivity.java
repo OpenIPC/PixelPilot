@@ -245,6 +245,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         // WFB-NG Setup
         initializeWfbNg();
 
+        // Options like tx power must be initialized explicitly
+        initDefaultOptions();
+
         // Video Player(s) Setup
         initializeVideoPlayers();
 
@@ -674,9 +677,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
         boolean adaptiveEnabled = prefs.getBoolean("adaptive_link_enabled", true);
-        int adaptiveTxPower = prefs.getInt("adaptive_tx_power", 30);
-         wfbLink.nativeSetAdaptiveLinkEnabled(adaptiveEnabled);
-         wfbLink.nativeSetTxPower(adaptiveTxPower);
+        int adaptiveTxPower = prefs.getInt("adaptive_tx_power", 20);
 
         // Adaptive link Enable option
         MenuItem adaptiveEnable = adaptiveMenu.add("Enable");
@@ -716,6 +717,14 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 return true;
             });
         }
+    }
+
+    void initDefaultOptions(){
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        boolean adaptiveEnabled = prefs.getBoolean("adaptive_link_enabled", true);
+        int adaptiveTxPower = prefs.getInt("adaptive_tx_power", 20);
+        wfbLink.nativeSetAdaptiveLinkEnabled(adaptiveEnabled);
+        wfbLink.nativeSetTxPower(adaptiveTxPower);
     }
 
     /**
@@ -1190,11 +1199,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         wfbLinkManager.refreshAdapters();
 
         wfbLinkManager.startAdapters();
+        videoPlayer.start();
+        videoPlayer.startAudio();
 
         osdManager.restoreOSDConfig();
 
-        videoPlayer.start();
-        videoPlayer.startAudio();
 
         super.onResume();
     }

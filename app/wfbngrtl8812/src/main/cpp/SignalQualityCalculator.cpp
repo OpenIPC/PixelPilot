@@ -96,7 +96,7 @@ SignalQualityCalculator::SignalQuality SignalQualityCalculator::calculate_signal
 
     //    __android_log_print(ANDROID_LOG_ERROR, "DEBUG", "FEC RECOVERED %d, FEC_LOST %d", p_recovered, p_lost);
 
-    float quality = avg_rssi - static_cast<float>(p_recovered) * 12.f - static_cast<float>(p_lost) * 40.f;
+    float quality = avg_rssi; // - static_cast<float>(p_recovered) * 12.f - static_cast<float>(p_lost) * 40.f;
     quality = std::max(-1024.f, std::min(1024.f, quality));
 
     ret.quality = quality;
