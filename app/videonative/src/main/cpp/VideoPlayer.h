@@ -12,6 +12,7 @@
 #include "AudioDecoder.h"
 #include "BufferedPacketQueue.h"
 #include "UdpReceiver.h"
+#include "UdsReceiver.h"
 #include "VideoDecoder.h"
 #include "minimp4.h"
 #include "parser/H26XParser.h"
@@ -115,6 +116,7 @@ class VideoPlayer
     AudioDecoder                 audioDecoder;
     VideoDecoder                 videoDecoder;
     std::unique_ptr<UDPReceiver> mUDPReceiver;
+    std::unique_ptr<UDSReceiver> mUDSReceiver;
     long                         nNALUsAtLastCall = 0;
 
   public:
