@@ -37,13 +37,38 @@ class WfbngLink {
     // TODO: move this to private section
     int current_fd;
     bool adaptive_link_enabled;
+    bool adaptive_link_should_stop{false};
     int adaptive_tx_power;
     std::map<int, std::unique_ptr<Rtl8812aDevice>> rtl_devices;
     std::unique_ptr<std::thread> link_quality_thread{nullptr};
     bool should_clear_stats{false};
 
+    void init_thread(std::unique_ptr<std::thread> &thread,
+                     const std::function<std::unique_ptr<std::thread>()> &init_func) {
+        std::unique_lock<std::recursive_mutex> lock(thread_mutex);
+        destroy_thread(thread);
+        thread = init_func();
+    }
+
+    void destroy_thread(std::unique_ptr<std::thread> &thread) {
+        std::unique_lock<std::recursive_mutex> lock(thread_mutex);
+        if (thread && thread->joinable()) {
+            thread->join();
+            thread = nullptr;
+        }
+    }
+
+    void stop_adaptive_link() {
+        std::unique_lock<std::recursive_mutex> lock(thread_mutex);
+
+        if (!link_quality_thread) return;
+        this->adaptive_link_should_stop = true;
+        destroy_thread(link_quality_thread);
+    }
+
   private:
     const char *keyPath = "/data/user/0/com.openipc.pixelpilot/files/gs.key";
+    std::recursive_mutex thread_mutex;
     std::unique_ptr<WiFiDriver> wifi_driver;
     uint32_t video_channel_id_be;
     uint32_t mavlink_channel_id_be;
