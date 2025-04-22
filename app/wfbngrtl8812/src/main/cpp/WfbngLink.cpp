@@ -62,21 +62,24 @@ void WfbngLink::initAgg() {
     uint8_t video_radio_port = 0;
     uint32_t video_channel_id_f = (link_id << 8) + video_radio_port;
     video_channel_id_be = htobe32(video_channel_id_f);
-    video_aggregator = std::make_unique<Aggregator>(client_addr, video_client_port, keyPath, epoch, video_channel_id_f);
+    auto udsName = std::string("my_socket");
+
+    video_aggregator = std::make_unique<AggregatorUNIX>(udsName, keyPath, epoch, video_channel_id_f, 0);
 
     int mavlink_client_port = 14550;
     uint8_t mavlink_radio_port = 0x10;
     uint32_t mavlink_channel_id_f = (link_id << 8) + mavlink_radio_port;
     mavlink_channel_id_be = htobe32(mavlink_channel_id_f);
+
     mavlink_aggregator =
-        std::make_unique<Aggregator>(client_addr, mavlink_client_port, keyPath, epoch, mavlink_channel_id_f);
+        std::make_unique<AggregatorUDPv4>(client_addr, mavlink_client_port, keyPath, epoch, mavlink_channel_id_f, 0);
 
     int udp_client_port = 8000;
     uint8_t udp_radio_port = wfb_rx_port;
     uint32_t udp_channel_id_f = (link_id << 8) + udp_radio_port;
     udp_channel_id_be = htobe32(udp_channel_id_f);
 
-    udp_aggregator = std::make_unique<Aggregator>(client_addr, udp_client_port, keyPath, epoch, udp_channel_id_f);
+    udp_aggregator = std::make_unique<AggregatorUDPv4>(client_addr, udp_client_port, keyPath, epoch, udp_channel_id_f, 0);
 }
 
 int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint fd) {
