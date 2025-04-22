@@ -201,9 +201,14 @@ class RTPPacket
           rtpPayload(&rtp_data[sizeof(rtp_header_t)]),
           rtpPayloadSize(data_length - sizeof(rtp_header_t))
     {
-        assert(data_length >= sizeof(rtp_header_t));
-        // r.n we don't support padding
-        assert(header.padding == 0);
+        // assert(data_length >= sizeof(rtp_header_t));
+        //  r.n we don't support padding
+        // assert(header.padding == 0);
+
+        if(header.padding >0 )
+        {
+            rtpPayloadSize = 0;
+        }
     }
 
     // const reference to the rtp header
@@ -211,7 +216,7 @@ class RTPPacket
     // pointer to the rtp payload
     const uint8_t* const rtpPayload;
     // size of the rtp payload
-    const std::size_t rtpPayloadSize;
+    std::size_t rtpPayloadSize;
 };
 
 // The NALU header for h264 and h265 comes directly after the rtp header

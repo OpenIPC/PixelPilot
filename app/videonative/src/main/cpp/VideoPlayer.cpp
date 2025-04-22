@@ -173,6 +173,22 @@ void VideoPlayer::start(JNIEnv* env, jobject androidContext)
         [this](const uint8_t* data, size_t data_length) { onNewRTPData(data, data_length); },
         WANTED_UDP_RCVBUF_SIZE);
     mUDPReceiver->startReceiving();
+
+    mUDSReceiver.release();
+    // build the abstract socket name ("\0my_socket")
+    auto udsName = std::string("\0my_socket", sizeof("\0my_socket") - 1);
+
+    // now construct your receiver with that
+    mUDSReceiver = std::make_unique<UDSReceiver>(
+        javaVm,
+        udsName,   // abstract socket name
+        "UDS‑Rx",  // thread name
+        -16,       // Android priority
+        [this](const uint8_t* data, size_t data_length) { onNewRTPData(data, data_length); },
+        WANTED_UDP_RCVBUF_SIZE  // your desired recv‑buffer size
+    );
+
+    mUDSReceiver->startReceiving();
 }
 
 void VideoPlayer::stop(JNIEnv* env, jobject androidContext)
@@ -181,6 +197,11 @@ void VideoPlayer::stop(JNIEnv* env, jobject androidContext)
     {
         mUDPReceiver->stopReceiving();
         mUDPReceiver.reset();
+    }
+    if (mUDSReceiver)
+    {
+        mUDSReceiver->stopReceiving();
+        mUDSReceiver.reset();
     }
 
     audioDecoder.stopAudio();
@@ -193,6 +214,13 @@ std::string VideoPlayer::getInfoString() const
     {
         ss << "Listening for video on port " << mUDPReceiver->getPort();
         ss << "\nReceived: " << mUDPReceiver->getNReceivedBytes() << "B"
+           << " | parsed frames: ";
+        // << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKonfigurationFrames;
+    }
+    else if (mUDSReceiver)
+    {
+        ss << "Listening for video on socket " << mUDSReceiver->getSourcePath();
+        ss << "\nReceived: " << mUDSReceiver->getNReceivedBytes() << "B"
            << " | parsed frames: ";
         // << mParser.nParsedNALUs << " | key frames: " << mParser.nParsedKonfigurationFrames;
     }
@@ -283,11 +311,18 @@ extern "C"
     (JNIEnv* env, jclass jclass1, jlong testReceiverN)
     {
         VideoPlayer* p = native(testReceiverN);
-        if (p->mUDPReceiver == nullptr)
+
+        bool ret{false};
+
+        if (p->mUDPReceiver != nullptr)
         {
-            return (jboolean) false;
+            ret |= (p->mUDPReceiver->getNReceivedBytes() > 0);
         }
-        bool ret = (p->mUDPReceiver->getNReceivedBytes() > 0);
+        if (p->mUDSReceiver != nullptr)
+        {
+            ret |= (p->mUDSReceiver->getNReceivedBytes() > 0);
+        }
+
         return (jboolean) ret;
     }
 

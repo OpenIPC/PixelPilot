@@ -10,6 +10,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         parser/ParseRTP.cpp
         AudioDecoder.cpp
         UdpReceiver.cpp
+        UdsReceiver.cpp
         VideoDecoder.cpp
         VideoPlayer.cpp)
 

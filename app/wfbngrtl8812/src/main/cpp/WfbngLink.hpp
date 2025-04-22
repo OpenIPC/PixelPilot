@@ -27,9 +27,9 @@ class WfbngLink {
     void stop(JNIEnv *env, jobject androidContext, jint fd);
 
     std::mutex agg_mutex;
-    std::unique_ptr<Aggregator> video_aggregator;
-    std::unique_ptr<Aggregator> mavlink_aggregator;
-    std::unique_ptr<Aggregator> udp_aggregator;
+    std::unique_ptr<AggregatorUNIX> video_aggregator;
+    std::unique_ptr<AggregatorUDPv4> mavlink_aggregator;
+    std::unique_ptr<AggregatorUDPv4> udp_aggregator;
 
     void start_link_quality_thread(int fd);
 
