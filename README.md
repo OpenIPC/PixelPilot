@@ -5,7 +5,11 @@
 > Use this app at your own risk.
 
 ## Introduction
-PixelPilot is an Android app packaging multiple pieces together to decode an H264/H265 video feed broadcast by wfb-ng over the air.
+```
+PixelPilot – the Android FPV app that leaves “loading…” screens in the dust.
+Plug in, fly live with sub‑atomic latency, flex real‑time signal stats, and marvel at the open‑source unicorn
+where (brace yourself) most things actually work.
+```
 
 - [FPVue_android](https://github.com/gehee/FPVue_android): basic and unique work to combine all components into a single application by [Gee He](https://github.com/gehee).
 - [devourer](https://github.com/openipc/devourer): userspace rtl8812au driver initially created by [buldo](https://github.com/buldo) and converted to C by [josephnef](https://github.com/josephnef).
