@@ -16,9 +16,9 @@
 // Define logging tag and maximum buffer size
 #define BUFFERED_QUEUE_LOG_TAG "BufferedPacketQueue"
 // Considering the packet rate about 100 packets per second, 10 packets should be enough
-constexpr size_t MAX_BUFFER_SIZE = 5;
+constexpr size_t MAX_BUFFER_SIZE = 15;
 // Number of monotonically increasing packets
-constexpr size_t MONOTONIC_THRESHOLD = 3;
+constexpr size_t MONOTONIC_THRESHOLD = 5;
 
 // Type definition for sequence numbers
 using SeqType   = uint16_t;

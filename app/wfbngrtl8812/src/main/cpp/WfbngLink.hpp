@@ -1,6 +1,7 @@
 #ifndef FPV_VR_WFBNG_LINK_H
 #define FPV_VR_WFBNG_LINK_H
 
+#include "TxFrame.h"
 extern "C" {
 #include "wfb-ng/src/fec.h"
 }
@@ -67,9 +68,18 @@ class WfbngLink {
     }
 
   private:
+    void stopDevice() {
+        if (rtl_devices.find(current_fd) == rtl_devices.end()) return;
+        auto dev = rtl_devices.at(current_fd).get();
+        if (dev) {
+            dev->should_stop = true;
+        }
+    }
+
     const char *keyPath = "/data/user/0/com.openipc.pixelpilot/files/gs.key";
     std::recursive_mutex thread_mutex;
     std::unique_ptr<WiFiDriver> wifi_driver;
+    std::shared_ptr<TxFrame> txFrame;
     uint32_t video_channel_id_be;
     uint32_t mavlink_channel_id_be;
     uint32_t udp_channel_id_be;
