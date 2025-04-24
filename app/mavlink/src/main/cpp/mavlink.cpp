@@ -96,7 +96,14 @@ void *listen(int mavlink_port) {
         memset(buffer, 0x00, sizeof(buffer));
         int ret = recv(fd, buffer, sizeof(buffer), 0);
         if (ret < 0) {
-            continue;
+            // Check for timeout vs real error
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                __android_log_print(ANDROID_LOG_DEBUG, TAG, "Mavlink recv timeout");
+                continue;
+            } else {
+                __android_log_print(ANDROID_LOG_ERROR, TAG, "Error receiving mavlink: %s", strerror(errno));
+                return 0;
+            }
         } else if (ret == 0) {
             // peer has done an orderly shutdown
             __android_log_print(ANDROID_LOG_ERROR, TAG, "Shutting down mavlink: ret=0");

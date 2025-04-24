@@ -102,7 +102,7 @@ class Transmitter {
 
     /**
      * @brief Choose which output interface (antenna / socket / etc.) to use.
-     * @param idx The interface index, or -1 for “mirror” mode.
+     * @param idx The interface index, or -1 for "mirror" mode.
      */
     virtual void selectOutput(int idx) = 0;
 
@@ -206,7 +206,7 @@ using TxAntennaStat = std::unordered_map<uint64_t, TxAntennaItem>;
  * @class RawSocketTransmitter
  * @brief Transmitter that sends packets over raw AF_PACKET sockets.
  *
- * This transmitter can operate in single-output or “mirror” mode. In mirror mode,
+ * This transmitter can operate in single-output or "mirror" mode. In mirror mode,
  * it sends each packet through all raw sockets. In single-output mode, only one is selected.
  */
 class RawSocketTransmitter : public Transmitter {
@@ -391,4 +391,12 @@ class TxFrame {
 
   private:
     bool shouldStop_ = false;
+
+    /**
+     * @brief Create a UDP socket for receiving data
+     * @param port UDP port to bind to
+     * @param buf_size Receive buffer size
+     * @return Socket file descriptor
+     */
+    static int open_udp_socket_for_rx(int port, int buf_size);
 };

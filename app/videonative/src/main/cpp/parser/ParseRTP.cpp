@@ -123,6 +123,13 @@ void RTPDecoder::parseRTPH264toNALU(const uint8_t* rtp_data, const size_t data_l
     }
     // MLOGD<<"Got h264 rtp data";
     const RTP::RTPPacketH264 rtpPacket(rtp_data, data_length);
+
+    if (rtpPacket.rtpPayloadSize == 0)
+    {
+        MLOGD << "RTP packet is empty";
+        return;
+    }
+
     // MLOGD<<"RTP Header: "<<rtp_header->asString();
     if (!validateRTPPacket(rtpPacket.header))
     {

@@ -58,7 +58,6 @@ void WfbngLink::initAgg() {
     std::string client_addr = "127.0.0.1";
     uint64_t epoch = 0;
 
-    int video_client_port = 5600;
     uint8_t video_radio_port = 0;
     uint32_t video_channel_id_f = (link_id << 8) + video_radio_port;
     video_channel_id_be = htobe32(video_channel_id_f);
@@ -79,13 +78,14 @@ void WfbngLink::initAgg() {
     uint32_t udp_channel_id_f = (link_id << 8) + udp_radio_port;
     udp_channel_id_be = htobe32(udp_channel_id_f);
 
-    udp_aggregator = std::make_unique<AggregatorUDPv4>(client_addr, udp_client_port, keyPath, epoch, udp_channel_id_f, 0);
+    udp_aggregator =
+        std::make_unique<AggregatorUDPv4>(client_addr, udp_client_port, keyPath, epoch, udp_channel_id_f, 0);
 }
 
 int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint fd) {
     int r;
     libusb_context *ctx = NULL;
-    std::shared_ptr<TxFrame> txFrame = std::make_shared<TxFrame>();
+    txFrame = std::make_shared<TxFrame>();
 
     r = libusb_set_option(NULL, LIBUSB_OPTION_NO_DEVICE_DISCOVERY);
     r = libusb_init(&ctx);
@@ -214,7 +214,8 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             Rtl8812aDevice *current_device = rtl_devices.at(fd).get();
             if (!usb_tx_thread) {
                 init_thread(usb_tx_thread, [&]() {
-                    return std::make_unique<std::thread>([txFrame, current_device, args] {
+                    return std::make_unique<std::thread>([this, current_device, args] {
+                        setName(pthread_self(), "usb_transfer");
                         txFrame->run(current_device, args.get());
                         __android_log_print(ANDROID_LOG_DEBUG, TAG, "usb_transfer thread should terminate");
                     });

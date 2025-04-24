@@ -492,11 +492,67 @@ uint32_t TxFrame::extractRxqOverflow(struct msghdr *msg) {
     return 0;
 }
 
+int TxFrame::open_udp_socket_for_rx(int port, int buf_size) {
+    int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
+    if (fd < 0) {
+        throw std::runtime_error(string_format("Unable to open socket: %s", std::strerror(errno)));
+    }
+
+    int optval = 1;
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+
+    // Set receive timeout to 500ms
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 500000; // 500ms
+    if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+        ::close(fd);
+        throw std::runtime_error(string_format("Unable to set socket timeout: %s", std::strerror(errno)));
+    }
+
+    if (buf_size) {
+        if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &buf_size, sizeof(buf_size)) < 0) {
+            ::close(fd);
+            throw std::runtime_error(string_format("Unable to set requested buffer size: %s", std::strerror(errno)));
+        }
+        int actual_buf_size = 0;
+        socklen_t optlen = sizeof(actual_buf_size);
+        getsockopt(fd, SOL_SOCKET, SO_RCVBUF, &actual_buf_size, &optlen);
+        if (actual_buf_size < buf_size * 2) {
+            // Linux doubles the value we set
+            fprintf(stderr, "Warning: requested rx buffer size %d but got %d\n", buf_size, actual_buf_size / 2);
+        }
+    }
+
+    struct sockaddr_in saddr;
+    std::memset(&saddr, 0, sizeof(saddr));
+    saddr.sin_family = AF_INET;
+    saddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    saddr.sin_port = htons(static_cast<uint16_t>(port));
+
+    if (::bind(fd, reinterpret_cast<struct sockaddr *>(&saddr), sizeof(saddr)) < 0) {
+        ::close(fd);
+        throw std::runtime_error(string_format("Unable to bind to port %d: %s", port, std::strerror(errno)));
+    }
+
+    return fd;
+}
+
 void TxFrame::dataSource(
     std::shared_ptr<Transmitter> &transmitter, std::vector<int> &rxFds, int fecTimeout, bool mirror, int logInterval) {
     int nfds = static_cast<int>(rxFds.size());
     if (nfds <= 0) {
         throw std::runtime_error("dataSource: no valid rx sockets");
+    }
+
+    // Set timeout on all sockets
+    for (int fd : rxFds) {
+        struct timeval tv;
+        tv.tv_sec = 0;
+        tv.tv_usec = 500000; // 500ms
+        if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+            throw std::runtime_error(string_format("Unable to set socket timeout: %s", std::strerror(errno)));
+        }
     }
 
     std::vector<pollfd> fds(nfds);
@@ -650,7 +706,8 @@ void TxFrame::dataSource(
 
                     ssize_t rsize = ::recvmsg(pfd.fd, &msg, 0);
                     if (rsize < 0) {
-                        if (errno != EWOULDBLOCK && errno != EAGAIN) {
+                        if (errno != EWOULDBLOCK && errno != EAGAIN && errno != ETIMEDOUT) {
+                            continue;
                             throw std::runtime_error(string_format("Error receiving packet: %s", std::strerror(errno)));
                         }
                         break;
@@ -809,7 +866,7 @@ void TxFrame::run(Rtl8812aDevice *rtlDevice, TxArgs *arg) {
     // Attempt to create a UDP listening socket
     std::vector<int> rxFds;
     int bindPort = arg->udp_port;
-    int udpFd = open_udp_socket_for_rx(bindPort, arg->rcv_buf);
+    int udpFd = TxFrame::open_udp_socket_for_rx(bindPort, arg->rcv_buf);
 
     if (arg->udp_port == 0) {
         // ephemeral port

@@ -205,7 +205,7 @@ class RTPPacket
         //  r.n we don't support padding
         // assert(header.padding == 0);
 
-        if(header.padding >0 )
+        if (header.padding > 0)
         {
             rtpPayloadSize = 0;
         }
