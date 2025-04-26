@@ -215,7 +215,6 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             if (!usb_tx_thread) {
                 init_thread(usb_tx_thread, [&]() {
                     return std::make_unique<std::thread>([this, current_device, args] {
-                        setName(pthread_self(), "usb_transfer");
                         txFrame->run(current_device, args.get());
                         __android_log_print(ANDROID_LOG_DEBUG, TAG, "usb_transfer thread should terminate");
                     });
