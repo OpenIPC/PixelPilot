@@ -33,6 +33,8 @@
 #undef TAG
 #define TAG "pixelpilot"
 
+#define CRASH() do{ int* i=0; *i = 42; }while(0)
+
 std::string generate_random_string(size_t length) {
     const std::string characters = "abcdefghijklmnopqrstuvwxyz";
     std::random_device rd;
@@ -266,10 +268,16 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
 }
 
 void WfbngLink::stop(JNIEnv *env, jobject context, jint fd) {
-    if (rtl_devices.find(fd) == rtl_devices.end()) return;
+    if (rtl_devices.find(fd) == rtl_devices.end()) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "rtl_devices.find(%d) == rtl_devices.end()", fd);
+        CRASH();
+        return;
+    }
     auto dev = rtl_devices.at(fd).get();
     if (dev) {
         dev->should_stop = true;
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "rtl_devices.at(%d) is nullptr", fd);
     }
     stop_adaptive_link();
 }
@@ -384,6 +392,76 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     native(wfbngLinkN)->initAgg();
 }
 
+
+class FecChangeController
+{
+public:
+    /// \brief Query the current (possibly decayed) fec_change value.
+    ///        Call this as often as you like; the class handles its own timing.
+    int value()
+    {
+        if (!mEnabled)
+            return 0;
+
+        std::lock_guard<std::mutex> lock(mx_);
+        decayLocked_();
+        return val_;
+    }
+
+    /// \brief Raise fec_change.  If newValue <= current, the call is ignored.
+    ///        A successful bump resets the 5-second “hold” timer.
+    void bump(int newValue)
+    {
+        std::lock_guard<std::mutex> lock(mx_);
+        if (newValue > val_) {
+            __android_log_print(ANDROID_LOG_ERROR, TAG, "bumping FEC: %d", newValue);
+
+            val_        = newValue;
+            lastChange_ = Clock::now();
+        }
+    }
+
+    void setEnabled(bool use){
+        mEnabled = use;
+    }
+
+private:
+    using Clock = std::chrono::steady_clock;
+    static constexpr std::chrono::seconds kTick{1};   // length of one hold/decay window
+
+    void decayLocked_()
+    {
+        if (val_ == 0) return;
+
+        auto now     = Clock::now();
+        auto elapsed = now - lastChange_;
+
+        // Still inside the mandatory 5-second hold?  Do nothing.
+        if (elapsed < kTick) return;
+
+        // How many *full* ticks have passed since lastChange_?
+        auto ticks = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count() / kTick.count();
+        if (ticks == 0) return;   // safety net (shouldn’t hit)
+
+        int decayed = val_ - static_cast<int>(ticks);
+        if (decayed < 0) decayed = 0;
+
+        // Commit the decay and anchor lastChange_ on the most recent tick boundary
+        if (decayed != val_) {
+            val_        = decayed;
+            lastChange_ += kTick * ticks;
+        }
+    }
+
+    int                   val_        {0};
+    Clock::time_point     lastChange_ {Clock::now()};
+    std::mutex            mx_;
+    bool mEnabled = true;
+};
+
+
+FecChangeController fec;
+
 // Modified start_link_quality_thread: use adaptive_link_enabled and adaptive_tx_power
 void WfbngLink::start_link_quality_thread(int fd) {
     auto thread_func = [this, fd]() {
@@ -458,9 +536,25 @@ void WfbngLink::start_link_quality_thread(int fd) {
                     optional idr_request_code:  4 char unique code to request 1 keyframe (no need to send special extra
                    packets)
                  */
+
+                if (quality.lost_last_second > 2)
+                    fec.bump(5);
+                else {
+                    if(quality.recovered_last_second > 30)
+                        fec.bump(5);
+                    if (quality.recovered_last_second > 24)
+                        fec.bump(3);
+                    if (quality.recovered_last_second > 22)
+                        fec.bump(2);
+                    if (quality.recovered_last_second > 18)
+                        fec.bump(1);
+                    if (quality.recovered_last_second < 18)
+                        fec.bump(0);
+                }
+
                 snprintf(message + sizeof(len),
                          sizeof(message) - sizeof(len),
-                         "%ld:%d:%d:%d:%d:%d:%f:0:-1:0:%s\n",
+                         "%ld:%d:%d:%d:%d:%d:%f:0:-1:%d:%s\n",
                          static_cast<long>(currentEpoch),
                          quality.quality,
                          quality.quality,
@@ -468,8 +562,8 @@ void WfbngLink::start_link_quality_thread(int fd) {
                          quality.lost_last_second,
                          quality.quality,
                          quality.snr,
+                         fec.value(),
                          quality.idr_code.c_str());
-
                 len = strlen(message + sizeof(len));
                 len = htonl(len);
                 memcpy(message, &len, sizeof(len));
@@ -533,4 +627,11 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
             link->start_link_quality_thread(link->current_fd);
         }
     }
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetUseFec(JNIEnv *env,
+                                                                                           jclass clazz,
+                                                                                          jlong wfbngLinkN,
+                                                                                          jint use) {
+    fec.setEnabled(use);
 }
