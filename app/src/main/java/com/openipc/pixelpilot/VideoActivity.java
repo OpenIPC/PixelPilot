@@ -580,7 +580,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
      */
     private void initializeSubMenu(PopupMenu popup) {
         SubMenu recording = popup.getMenu().addSubMenu("Initialize");
-        MenuItem syncTimeToRtx = recording.add("Sync time to RTX");
+        MenuItem syncTimeToRtx = recording.add("Sync time to VTX");
 
         syncTimeToRtx.setOnMenuItemClickListener(item -> {
             new Thread(() -> {
