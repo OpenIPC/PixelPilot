@@ -2,6 +2,7 @@
 agp = "8.5.2"
 coreKtx = "1.13.1"
 appcompat = "1.7.0"
+jsch = "0.1.55"
 material = "1.12.0"
 constraintlayout = "2.1.4"
 mpandroidchartVersion = "3.1.0"
@@ -9,6 +10,7 @@ mpandroidchartVersion = "3.1.0"
 [libraries]
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+jsch = { module = "com.jcraft:jsch", version.ref = "jsch" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 philjay-mpandroidchart = { module = "com.github.Philjay:mpandroidchart", version.ref = "mpandroidchartVersion" }

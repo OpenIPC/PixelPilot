@@ -542,6 +542,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private void showSettingsMenu(View anchor) {
         PopupMenu popup = new PopupMenu(this, anchor);
 
+        // initialize settings
+        initializeSubMenu(popup);
+
         // VR submenu
         setupVRSubMenu(popup);
 
@@ -570,6 +573,24 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         setupHelpSubMenu(popup);
 
         popup.show();
+    }
+
+    /**
+     * Submenu for initial settings
+     */
+    private void initializeSubMenu(PopupMenu popup) {
+        SubMenu recording = popup.getMenu().addSubMenu("Initialize");
+        MenuItem syncTimeToRtx = recording.add("Sync time to RTX");
+
+        syncTimeToRtx.setOnMenuItemClickListener(item -> {
+            new Thread(() -> {
+                boolean success = Uilities.syncTimeToRemote("10.5.0.10", 22, "root", "12345");
+                runOnUiThread(() -> {
+                    Toast.makeText(this, success ? "Sync succeeded" : "Sync failed", Toast.LENGTH_SHORT).show();
+                });
+            }).start();
+            return true;
+        });
     }
 
     /**
