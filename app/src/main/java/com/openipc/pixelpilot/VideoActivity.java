@@ -111,6 +111,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private ConstraintLayout constraintLayout;
     private ConstraintSet constraintSet;
     private WfbNgLink wfbLink;
+    private NtpServer ntpServer;
 
     public boolean getVRSetting() {
         return getSharedPreferences("general", Context.MODE_PRIVATE).getBoolean("vr-mode", false);
@@ -271,6 +272,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         // wfbNg VPN Service
         startVpnService();
+
+        // NTP Service
+        startNtpServer();
     }
 
     // ----------------------------------------------------------------------------
@@ -932,6 +936,15 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             startService(serviceIntent);
         }
 
+    }
+
+    // ----------------------------------------------------------------------------
+    // NTP SERVICE
+    // ----------------------------------------------------------------------------
+    private void startNtpServer() {
+        ntpServer = new NtpServer();
+        ntpServer.start();
+        Log.d(TAG, "NTP Server started.");
     }
 
     private Uri openDvrFile() {
