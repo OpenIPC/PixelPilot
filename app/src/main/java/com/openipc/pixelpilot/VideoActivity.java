@@ -2,6 +2,7 @@ package com.openipc.pixelpilot;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.text.format.Formatter;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -36,6 +40,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -780,6 +785,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private void setupHelpSubMenu(PopupMenu popup) {
         SubMenu help = popup.getMenu().addSubMenu("Help");
         MenuItem logs = help.add("Send Logs");
+        MenuItem about = help.add("About");
 
         // Increase logcat buffer to 10MB if possible
         try {
@@ -792,7 +798,13 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             shareLogs();
             return true;
         });
+
+        about.setOnMenuItemClickListener(item -> {
+            showAboutDialog();
+            return true;
+        });
     }
+
 
     // ----------------------------------------------------------------------------
     // MAVLINK SETUP
@@ -921,6 +933,47 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             Log.e(TAG, "ShareLog: ", e);
         }
     }
+
+    // ----------------------------------------------------------------------------
+    // SHOW ABOUT DIALOG
+    // ----------------------------------------------------------------------------
+
+    /**
+     *
+     */
+    private void showAboutDialog() {
+        String versionName = "unknown";
+        try {
+            versionName = getPackageManager()
+                    .getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        SpannableString message = new SpannableString(
+                "Version: " + versionName + "\n\n" +
+                        "Visit releases page:\nhttps://github.com/OpenIPC/PixelPilot/releases"
+        );
+
+        // Make the URL clickable
+        Linkify.addLinks(message, Linkify.WEB_URLS);
+
+        // Create a TextView to show the message
+        TextView textView = new TextView(this);
+        textView.setText(message);
+        textView.setMovementMethod(LinkMovementMethod.getInstance()); // Enable link clicking
+        textView.setPadding(50, 40, 50, 10); // Optional padding
+        textView.setTextSize(16); // Optional text size
+
+        new AlertDialog.Builder(this)
+                .setTitle("About PixelPilot")
+                .setView(textView)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+
+
 
     // ----------------------------------------------------------------------------
     // VPN SERVICE
