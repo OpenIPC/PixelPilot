@@ -1,12 +1,14 @@
 #ifndef FPV_VR_WFBNG_LINK_H
 #define FPV_VR_WFBNG_LINK_H
 
+#include "FecChangeController.h"
 #include "TxFrame.h"
+#include "SignalQualityCalculator.h"
+
 extern "C" {
 #include "wfb-ng/src/fec.h"
 }
 
-#include "SignalQualityCalculator.h"
 #include "devourer/src/WiFiDriver.h"
 #include "wfb-ng/src/rx.hpp"
 #include <jni.h>
@@ -28,7 +30,7 @@ class WfbngLink {
     void stop(JNIEnv *env, jobject androidContext, jint fd);
 
     std::mutex agg_mutex;
-    std::unique_ptr<AggregatorUNIX> video_aggregator;
+    std::unique_ptr<AggregatorUDPv4> video_aggregator;
     std::unique_ptr<AggregatorUDPv4> mavlink_aggregator;
     std::unique_ptr<AggregatorUDPv4> udp_aggregator;
 
@@ -43,6 +45,7 @@ class WfbngLink {
     std::map<int, std::unique_ptr<Rtl8812aDevice>> rtl_devices;
     std::unique_ptr<std::thread> link_quality_thread{nullptr};
     bool should_clear_stats{false};
+    FecChangeController fec;
 
     void init_thread(std::unique_ptr<std::thread> &thread,
                      const std::function<std::unique_ptr<std::thread>()> &init_func) {
