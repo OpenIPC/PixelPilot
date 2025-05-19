@@ -1110,6 +1110,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 Log.e(TAG, "VPN permission was not granted by the user.");
             }
         }
+        else {
+            Log.w(TAG, "onActivityResult: unknown request code " + requestCode);
+        }
     }
 
     public void setDefaultGsKey() {
@@ -1193,6 +1196,12 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         videoPlayer.stop();
         videoPlayer.stopAudio();
         wfbLinkManager.stopAdapters();
+
+        // Stop VPN service
+        Log.w(TAG, "onPause: stopping service");
+        Intent intent = new Intent(this, WfbNgVpnService.class);
+        intent.setAction("STOP_SERVICE");
+        startService(intent);
     }
 
     @Override
@@ -1222,6 +1231,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         osdManager.restoreOSDConfig();
 
+        startVpnService();
 
         super.onResume();
     }
