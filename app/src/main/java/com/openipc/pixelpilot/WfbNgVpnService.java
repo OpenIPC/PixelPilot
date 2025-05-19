@@ -34,6 +34,31 @@ public class WfbNgVpnService extends VpnService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null && "STOP_SERVICE".equals(intent.getAction())) {
+            Log.i(TAG, "VPN Service stopping");
+            // Stop threads
+            isRunning = false;
+
+            if (udpToVpnThread != null) {
+                udpToVpnThread.interrupt();
+            }
+            if (vpnToUdpThread != null) {
+                vpnToUdpThread.interrupt();
+            }
+
+            // Close the interface
+            if (vpnInterface != null) {
+                try {
+                    vpnInterface.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Failed to close VPN interface", e);
+                }
+                vpnInterface = null;
+            }
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+
         Log.i(TAG, "VPN Service started");
 
         // If already running, don't start again
@@ -98,13 +123,14 @@ public class WfbNgVpnService extends VpnService {
         udpToVpnThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.i(TAG, "UDP → VPN thread started");
+                Log.i(TAG, "UDP (WFB) → VPN thread started");
                 byte[] buffer = new byte[4024];
 
-                try (DatagramSocket socket = new DatagramSocket(new InetSocketAddress(8000))) {
-                    // Bind to local UDP port 8000 on all interfaces
+                try (DatagramSocket socket = new DatagramSocket(null)) {
+                    // Set reuse address before binding
                     socket.setReuseAddress(true);
-                    //socket.bind(new InetSocketAddress(8000));
+                    // Bind to local UDP port 8000 on all interfaces
+                    socket.bind(new InetSocketAddress(8000));
 
                     while (isRunning) {
                         // Read data from UDP into buffer
@@ -134,7 +160,7 @@ public class WfbNgVpnService extends VpnService {
         vpnToUdpThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.i(TAG, "VPN → UDP thread started");
+                Log.i(TAG, "VPN → UDP (WFB) thread started");
                 byte[] buffer = new byte[1024];
 
                 try (DatagramSocket socket = new DatagramSocket()) {
