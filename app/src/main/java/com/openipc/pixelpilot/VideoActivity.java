@@ -717,6 +717,24 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 return true;
             });
         }
+
+        // Adaptive use FEC submenu
+        boolean fecEnabled = prefs.getBoolean("custom_fec_enabled", true);
+
+        MenuItem fecEnable = adaptiveMenu.add("FEC");
+        fecEnable.setCheckable(true);
+        fecEnable.setChecked(fecEnabled);
+        fecEnable.setOnMenuItemClickListener(item -> {
+            boolean newState = !item.isChecked();
+            item.setChecked(newState);
+            SharedPreferences.Editor editor = getSharedPreferences("general", MODE_PRIVATE).edit();
+            editor.putBoolean("custom_fec_enabled", newState);
+            editor.apply();
+            // Call instance method on the WfbNgLink instance via the wfbLinkManager.
+            wfbLink.nativeSetUseFec(newState ? 1 : 0);
+            return true;
+        });
+
     }
 
     void initDefaultOptions(){
