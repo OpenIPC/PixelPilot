@@ -68,6 +68,6 @@ private:
     int                   val_        {0};
     Clock::time_point     lastChange_ {Clock::now()};
     std::mutex            mx_;
-    bool mEnabled = true;
+    bool mEnabled = false;
 };
 
