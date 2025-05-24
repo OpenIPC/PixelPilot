@@ -33,7 +33,11 @@
 #undef TAG
 #define TAG "pixelpilot"
 
-#define CRASH() do{ int* i=0; *i = 42; }while(0)
+#define CRASH()                                                                                                        \
+    do {                                                                                                               \
+        int *i = 0;                                                                                                    \
+        *i = 42;                                                                                                       \
+    } while (0)
 
 std::string generate_random_string(size_t length) {
     const std::string characters = "abcdefghijklmnopqrstuvwxyz";
@@ -470,16 +474,11 @@ void WfbngLink::start_link_quality_thread(int fd) {
                 if (quality.lost_last_second > 2)
                     fec.bump(5);
                 else {
-                    if(quality.recovered_last_second > 30)
-                        fec.bump(5);
-                    if (quality.recovered_last_second > 24)
-                        fec.bump(3);
-                    if (quality.recovered_last_second > 22)
-                        fec.bump(2);
-                    if (quality.recovered_last_second > 18)
-                        fec.bump(1);
-                    if (quality.recovered_last_second < 18)
-                        fec.bump(0);
+                    if (quality.recovered_last_second > 30) fec.bump(5);
+                    if (quality.recovered_last_second > 24) fec.bump(3);
+                    if (quality.recovered_last_second > 22) fec.bump(2);
+                    if (quality.recovered_last_second > 18) fec.bump(1);
+                    if (quality.recovered_last_second < 18) fec.bump(0);
                 }
 
                 snprintf(message + sizeof(len),
@@ -560,7 +559,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetUseFec(JNIEnv *env,
-                                                                                           jclass clazz,
+                                                                                          jclass clazz,
                                                                                           jlong wfbngLinkN,
                                                                                           jint use) {
     WfbngLink *link = native(wfbngLinkN);

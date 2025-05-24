@@ -2,8 +2,8 @@
 #define FPV_VR_WFBNG_LINK_H
 
 #include "FecChangeController.h"
-#include "TxFrame.h"
 #include "SignalQualityCalculator.h"
+#include "TxFrame.h"
 
 extern "C" {
 #include "wfb-ng/src/fec.h"
