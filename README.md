@@ -19,7 +19,7 @@ where (brace yourself) most things actually work.
 The wfb-ng [gs.key](https://github.com/OpenIPC/PixelPilot/raw/main/app/src/main/assets/gs.key) is embedded in the app.
 The settings menu allows selecting a different key from your phone.
 
-Supported rtl8812au wifi adapter are listed [here](https://github.com/OpenIPC/PixelPilot/blob/main/app/src/main/res/xml/usb_device_filter.xml).
+Supported rtl8812au wifi adapter are listed [here](https://github.com/OpenIPC/PixelPilot/blob/master/app/src/main/res/xml/usb_device_filter.xml).
 Feel free to send pull requests to add new supported wifi adapters hardware IDs.
 
 Now support saving a dvr of the video feed to `Files/Internal Storage/Movies/`
