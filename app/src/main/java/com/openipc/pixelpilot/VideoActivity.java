@@ -743,6 +743,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         int adaptiveTxPower = prefs.getInt("adaptive_tx_power", 20);
         wfbLink.nativeSetAdaptiveLinkEnabled(adaptiveEnabled);
         wfbLink.nativeSetTxPower(adaptiveTxPower);
+        boolean fecEnabled = prefs.getBoolean("custom_fec_enabled", true);
+        wfbLink.nativeSetUseFec(fecEnabled ? 1 : 0);
     }
 
     /**

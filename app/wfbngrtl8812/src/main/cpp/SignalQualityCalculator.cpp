@@ -126,6 +126,8 @@ std::pair<uint32_t, uint32_t> SignalQualityCalculator::get_accumulated_fec_data(
     // Make sure we clean up old FEC data first
     cleanup_old_fec_data();
 
+    if (m_fec_data.empty()) return {300, 300};
+
     //    __android_log_print(ANDROID_LOG_ERROR, "LOST size", "%zu", m_fec_data.size());
 
     uint32_t p_recovered = 0;
@@ -136,7 +138,6 @@ std::pair<uint32_t, uint32_t> SignalQualityCalculator::get_accumulated_fec_data(
         p_recovered += data.recovered;
         p_lost += data.lost;
     }
-    if (p_all == 0) return {300, 300};
     return {p_recovered, p_lost};
 }
 
