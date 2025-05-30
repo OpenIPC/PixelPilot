@@ -735,6 +735,55 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             return true;
         });
 
+
+        // --- FEC Thresholds menu (single dialog for all 5 settings) ---
+        adaptiveMenu.add("FEC thresholds...").setOnMenuItemClickListener(item -> {
+            showFecThresholdsDialog();
+            return true;
+        });
+    }
+
+    // Show dialog to configure FEC thresholds for all levels
+    private void showFecThresholdsDialog() {
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        int lostTo5 = prefs.getInt("fec_lost_to_5", 2);
+        int recTo4 = prefs.getInt("fec_recovered_to_4", 30);
+        int recTo3 = prefs.getInt("fec_recovered_to_3", 24);
+        int recTo2 = prefs.getInt("fec_recovered_to_2", 14);
+        int recTo1 = prefs.getInt("fec_recovered_to_1", 8);
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        final android.widget.EditText[] edits = new android.widget.EditText[5];
+        String[] labels = {
+                "Lost packets/sec for FEC 5", "Recovered/sec for FEC 4", "Recovered/sec for FEC 3",
+                "Recovered/sec for FEC 2", "Recovered/sec for FEC 1"
+        };
+        int[] values = {lostTo5, recTo4, recTo3, recTo2, recTo1};
+        for (int i = 0; i < 5; i++) {
+            android.widget.TextView tv = new android.widget.TextView(this);
+            tv.setText(labels[i]);
+            layout.addView(tv);
+            edits[i] = new android.widget.EditText(this);
+            edits[i].setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+            edits[i].setText(String.valueOf(values[i]));
+            layout.addView(edits[i]);
+        }
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("FEC thresholds")
+                .setView(layout)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    try { editor.putInt("fec_lost_to_5", Integer.parseInt(edits[0].getText().toString())); } catch (Exception ignored) {}
+                    try { editor.putInt("fec_recovered_to_4", Integer.parseInt(edits[1].getText().toString())); } catch (Exception ignored) {}
+                    try { editor.putInt("fec_recovered_to_3", Integer.parseInt(edits[2].getText().toString())); } catch (Exception ignored) {}
+                    try { editor.putInt("fec_recovered_to_2", Integer.parseInt(edits[3].getText().toString())); } catch (Exception ignored) {}
+                    try { editor.putInt("fec_recovered_to_1", Integer.parseInt(edits[4].getText().toString())); } catch (Exception ignored) {}
+                    editor.apply();
+                    setFecThresholdsFromPrefs();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     void initDefaultOptions(){
@@ -745,6 +794,20 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         wfbLink.nativeSetTxPower(adaptiveTxPower);
         boolean fecEnabled = prefs.getBoolean("custom_fec_enabled", true);
         wfbLink.nativeSetUseFec(fecEnabled ? 1 : 0);
+        setFecThresholdsFromPrefs();
+    }
+
+    // Read FEC thresholds from prefs and call native method to apply
+    private void setFecThresholdsFromPrefs() {
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        int lostTo5 = prefs.getInt("fec_lost_to_5", 2);
+        int recTo4 = prefs.getInt("fec_recovered_to_4", 30);
+        int recTo3 = prefs.getInt("fec_recovered_to_3", 24);
+        int recTo2 = prefs.getInt("fec_recovered_to_2", 14);
+        int recTo1 = prefs.getInt("fec_recovered_to_1", 8);
+        if (wfbLink != null) {
+            wfbLink.setFecThresholds(lostTo5, recTo4, recTo3, recTo2, recTo1);
+        }
     }
 
     /**
