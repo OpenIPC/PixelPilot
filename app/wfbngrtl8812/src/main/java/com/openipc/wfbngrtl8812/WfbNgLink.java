@@ -16,6 +16,13 @@ import java.util.TimerTask;
 
 @Keep
 public class WfbNgLink implements WfbNGStatsChanged {
+
+    // Set FEC thresholds for switching levels (Java wrapper and JNI)
+    public static native void nativeSetFecThresholds(long nativeInstance, int lostTo5, int recTo4, int recTo3, int recTo2, int recTo1);
+
+    public void setFecThresholds(int lostTo5, int recTo4, int recTo3, int recTo2, int recTo1) {
+        nativeSetFecThresholds(nativeWfbngLink, lostTo5, recTo4, recTo3, recTo2, recTo1);
+    }
     public static String TAG = "pixelpilot";
 
     // Load the native library on application startup.

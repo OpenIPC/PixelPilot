@@ -15,12 +15,19 @@ extern "C" {
 #include <list>
 #include <map>
 #include <mutex>
+#include <vector> // Added for std::vector
 
 const u8 wfb_tx_port = 160;
 const u8 wfb_rx_port = 32;
 
 class WfbngLink {
   public:
+    // FEC switching thresholds (for menu)
+    int fec_lost_to_5 = 2;
+    int fec_recovered_to_4 = 30;
+    int fec_recovered_to_3 = 24;
+    int fec_recovered_to_2 = 14;
+    int fec_recovered_to_1 = 8;
     WfbngLink(JNIEnv *env, jobject context);
 
     int run(JNIEnv *env, jobject androidContext, jint wifiChannel, jint bw, jint fd);

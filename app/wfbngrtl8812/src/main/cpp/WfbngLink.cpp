@@ -471,14 +471,18 @@ void WfbngLink::start_link_quality_thread(int fd) {
                    packets)
                  */
 
-                if (quality.lost_last_second > 2)
-                    fec.bump(5);
-                else {
-                    if (quality.recovered_last_second > 30) fec.bump(5);
-                    if (quality.recovered_last_second > 24) fec.bump(3);
-                    if (quality.recovered_last_second > 22) fec.bump(2);
-                    if (quality.recovered_last_second > 18) fec.bump(1);
-                    if (quality.recovered_last_second < 18) fec.bump(0);
+
+                // Use the new public FEC threshold values
+                if (quality.lost_last_second > fec_lost_to_5) {
+                    fec.bump(5); // Bump to FEC 5
+                } else if (quality.recovered_last_second > fec_recovered_to_4) {
+                    fec.bump(4); // Bump to FEC 4
+                } else if (quality.recovered_last_second > fec_recovered_to_3) {
+                    fec.bump(3); // Bump to FEC 3
+                } else if (quality.recovered_last_second > fec_recovered_to_2) {
+                    fec.bump(2); // Bump to FEC 2
+                } else if (quality.recovered_last_second > fec_recovered_to_1) {
+                    fec.bump(1); // Bump to FEC 1
                 }
 
                 snprintf(message + sizeof(len),
@@ -564,4 +568,15 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
                                                                                           jint use) {
     WfbngLink *link = native(wfbngLinkN);
     link->fec.setEnabled(use);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetFecThresholds(JNIEnv *env, jclass clazz, jlong nativeInstance, jint lostTo5, jint recTo4, jint recTo3, jint recTo2, jint recTo1) {
+    WfbngLink *link = reinterpret_cast<WfbngLink *>(nativeInstance);
+    if (!link) return;
+    link->fec_lost_to_5 = lostTo5;
+    link->fec_recovered_to_4 = recTo4;
+    link->fec_recovered_to_3 = recTo3;
+    link->fec_recovered_to_2 = recTo2;
+    link->fec_recovered_to_1 = recTo1;
 }
