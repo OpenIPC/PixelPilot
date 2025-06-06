@@ -117,6 +117,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
 
     rtl_devices.emplace(fd, wifi_driver->CreateRtlDevice(dev_handle));
     if (!rtl_devices.at(fd)) {
+        libusb_exit(ctx);
         __android_log_print(ANDROID_LOG_ERROR, TAG, "CreateRtlDevice error");
         return -1;
     }
@@ -419,23 +420,7 @@ void WfbngLink::start_link_quality_thread(int fd) {
             close(sockfd);
             return;
         }
-        int sockfd2;
-        struct sockaddr_in server_addr2;
-        // Create UDP socket
-        if ((sockfd2 = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-            __android_log_print(ANDROID_LOG_ERROR, TAG, "Socket creation failed");
-            return;
-        }
-        int opt2 = 1;
-        setsockopt(sockfd2, SOL_SOCKET, SO_REUSEADDR, &opt2, sizeof(opt2));
-        memset(&server_addr2, 0, sizeof(server_addr2));
-        server_addr2.sin_family = AF_INET;
-        server_addr2.sin_port = htons(7755);
-        if (inet_pton(AF_INET, ip, &server_addr2.sin_addr) <= 0) {
-            __android_log_print(ANDROID_LOG_ERROR, TAG, "Invalid IP address");
-            close(sockfd);
-            return;
-        }
+
         while (!this->adaptive_link_should_stop) {
             auto quality = SignalQualityCalculator::get_instance().calculate_signal_quality();
 #if defined(ANDROID_DEBUG_RSSI) || true
