@@ -735,6 +735,35 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             return true;
         });
 
+        // LDPC option
+        boolean ldpcEnabled = prefs.getBoolean("custom_ldpc_enabled", true);
+        MenuItem ldpcEnable = adaptiveMenu.add("LDPC");
+        ldpcEnable.setCheckable(true);
+        ldpcEnable.setChecked(ldpcEnabled);
+        ldpcEnable.setOnMenuItemClickListener(item -> {
+            boolean newState = !item.isChecked();
+            item.setChecked(newState);
+            SharedPreferences.Editor editor = getSharedPreferences("general", MODE_PRIVATE).edit();
+            editor.putBoolean("custom_ldpc_enabled", newState);
+            editor.apply();
+            wfbLink.nativeSetUseLdpc(newState ? 1 : 0);
+            return true;
+        });
+
+        // STBC option
+        boolean stbcEnabled = prefs.getBoolean("custom_stbc_enabled", true);
+        MenuItem stbcEnable = adaptiveMenu.add("STBC");
+        stbcEnable.setCheckable(true);
+        stbcEnable.setChecked(stbcEnabled);
+        stbcEnable.setOnMenuItemClickListener(item -> {
+            boolean newState = !item.isChecked();
+            item.setChecked(newState);
+            SharedPreferences.Editor editor = getSharedPreferences("general", MODE_PRIVATE).edit();
+            editor.putBoolean("custom_stbc_enabled", newState);
+            editor.apply();
+            wfbLink.nativeSetUseStbc(newState ? 1 : 0);
+            return true;
+        });
 
         // --- FEC Thresholds menu (single dialog for all 5 settings) ---
         adaptiveMenu.add("FEC thresholds...").setOnMenuItemClickListener(item -> {
@@ -794,6 +823,14 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         wfbLink.nativeSetTxPower(adaptiveTxPower);
         boolean fecEnabled = prefs.getBoolean("custom_fec_enabled", true);
         wfbLink.nativeSetUseFec(fecEnabled ? 1 : 0);
+
+        // LDPC and STBC default options
+        boolean ldpcEnabled = prefs.getBoolean("custom_ldpc_enabled", true);
+        wfbLink.nativeSetUseLdpc(ldpcEnabled ? 1 : 0);
+
+        boolean stbcEnabled = prefs.getBoolean("custom_stbc_enabled", true);
+        wfbLink.nativeSetUseStbc(stbcEnabled ? 1 : 0);
+
         setFecThresholdsFromPrefs();
     }
 
