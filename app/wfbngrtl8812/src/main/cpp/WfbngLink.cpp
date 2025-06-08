@@ -204,8 +204,8 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             args->udp_port = 8001;
             args->link_id = link_id;
             args->keypair = keyPath;
-            args->stbc = true;
-            args->ldpc = true;
+            args->stbc = stbc_enabled;
+            args->ldpc = ldpc_enabled;
             args->mcs_index = 0;
             args->vht_mode = false;
             args->short_gi = false;
@@ -570,8 +570,24 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     link->fec.setEnabled(use);
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetFecThresholds(JNIEnv *env, jclass clazz, jlong nativeInstance, jint lostTo5, jint recTo4, jint recTo3, jint recTo2, jint recTo1) {
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetUseLdpc(JNIEnv *env,
+                                                                                           jclass clazz,
+                                                                                           jlong wfbngLinkN,
+                                                                                           jint use) {
+    WfbngLink *link = native(wfbngLinkN);
+    link->ldpc_enabled = (use != 0);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetUseStbc(JNIEnv *env,
+                                                                                           jclass clazz,
+                                                                                           jlong wfbngLinkN,
+                                                                                           jint use) {
+    WfbngLink *link = native(wfbngLinkN);
+    link->stbc_enabled = (use != 0);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetFecThresholds(
+    JNIEnv *env, jclass clazz, jlong nativeInstance, jint lostTo5, jint recTo4, jint recTo3, jint recTo2, jint recTo1) {
     WfbngLink *link = reinterpret_cast<WfbngLink *>(nativeInstance);
     if (!link) return;
     link->fec_lost_to_5 = lostTo5;

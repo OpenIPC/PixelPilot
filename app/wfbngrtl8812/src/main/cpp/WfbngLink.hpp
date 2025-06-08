@@ -49,7 +49,12 @@ class WfbngLink {
     bool adaptive_link_enabled;
     bool adaptive_link_should_stop{false};
     int adaptive_tx_power;
-    std::map<int, std::unique_ptr<Rtl8812aDevice>> rtl_devices;
+
+    // Runtime configurable PHY parameters
+    bool ldpc_enabled{true};
+    bool stbc_enabled{true};
+
+    std::map<int, std::shared_ptr<Rtl8812aDevice>> rtl_devices;
     std::unique_ptr<std::thread> link_quality_thread{nullptr};
     bool should_clear_stats{false};
     FecChangeController fec;

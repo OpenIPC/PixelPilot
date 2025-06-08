@@ -47,6 +47,8 @@ public class WfbNgLink implements WfbNGStatsChanged {
     public static native void nativeSetAdaptiveLinkEnabled(long nativeInstance, boolean enabled);
     public static native void nativeSetTxPower(long nativeInstance, int power);
     public static native void nativeSetUseFec(long nativeInstance, int use);
+    public static native void nativeSetUseLdpc(long nativeInstance, int use);
+    public static native void nativeSetUseStbc(long nativeInstance, int use);
 
     public WfbNgLink(final AppCompatActivity parent) {
         this.context = parent;
@@ -80,6 +82,14 @@ public class WfbNgLink implements WfbNGStatsChanged {
 
     public void nativeSetUseFec(int use) {
         nativeSetUseFec(nativeWfbngLink, use);
+    }
+
+    public void nativeSetUseLdpc(int use) {
+        nativeSetUseLdpc(nativeWfbngLink, use);
+    }
+
+    public void nativeSetUseStbc(int use) {
+        nativeSetUseStbc(nativeWfbngLink, use);
     }
 
     public synchronized void start(int wifiChannel, int bandWidth, UsbDevice usbDevice) {
