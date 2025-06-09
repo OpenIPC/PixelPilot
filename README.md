@@ -50,6 +50,59 @@ audio:
   outputEnabled: false
   outputVolume: 30
 ```
+
+## Quick Reference: Auto-FEC Levels 0 – 5
+
+| Level | Denominator | Added Redundancy |
+|-------|-------------|------------------|
+| 0 | **1.00000** | 0 % |
+| 1 | **1.11111** | ≈ 11 % |
+| 2 | **1.25000** | 25 % |
+| 3 | **1.42000** | 42 % |
+| 4 | **1.66667** | 67 % |
+| 5 | **2.00000** | 100 % |
+
+> **How the denominator is used:**  
+> The selected denominator multiplies either **`FEC_k`** (source-packet count) *or* **`FEC_n`** (total packets after redundancy), increasing the actual amount of forward-error-correction data.
+
+
+### Threshold Fields (packets / second)
+
+| Field | Purpose |
+|-------|---------|
+| `LostThreshold` | If `lost_pkts ≥ LostThreshold`, jump straight to **FEC-5** |
+| `RecThr1 … RecThr4` | Number of *recovered* packets (`rec_pkts`) that triggers **FEC-1 … FEC-4** |
+
+**Ordering constraint — must hold:**  
+`RecThr1 < RecThr2 < RecThr3 < RecThr4 < LostThreshold`
+
+---
+
+### Decision Logic (executed once per second)
+
+```text
+if lost_pkts >= LostThreshold:
+    level = 5
+elif rec_pkts >= RecThr4:
+    level = 4
+elif rec_pkts >= RecThr3:
+    level = 3
+elif rec_pkts >= RecThr2:
+    level = 2
+elif rec_pkts >= RecThr1:
+    level = 1
+else:
+    level = 0
+
+apply_fec(level)  # multiply the level’s denominator by FEC_k or FEC_n
+```
+
+Set thresholds thoughtfully:
+Lower values → more aggressive protection (higher bandwidth / latency).
+Higher values → leaner bandwidth, less resilience.
+
+---
+
 ## List of potential improvements:
  * adaptive link [x]
  * 40 MHz bandwidth [?] - works but buggy
