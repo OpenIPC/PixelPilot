@@ -18,7 +18,7 @@ AudioDecoder::AudioDecoder()
 AudioDecoder::~AudioDecoder()
 {
     stopAudioProcessing();
-    delete pOpusDecoder;
+    opus_decoder_destroy(pOpusDecoder);
     AAudioStream_requestStop(m_stream);
     AAudioStream_close(m_stream);
 }

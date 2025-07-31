@@ -1,6 +1,6 @@
 #include "TxFrame.h"
 
-constexpr char *TAG = "TXFrame";
+constexpr char TAG[] = "TXFrame";
 
 //-------------------------------------------------------------
 // Implementation of Transmitter
