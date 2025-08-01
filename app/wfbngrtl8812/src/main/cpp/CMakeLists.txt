@@ -71,6 +71,21 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         TxFrame.cpp
         SignalQualityCalculator.h
         SignalQualityCalculator.cpp
+        DeviceManager.hpp
+        DeviceManager.cpp
+        AggregatorManager.hpp
+        AggregatorManager.cpp
+        ThreadManager.hpp
+        ThreadManager.cpp
+        WfbConfiguration.hpp
+        AdaptiveLinkController.hpp
+        AdaptiveLinkController.cpp
+        PacketProcessor.hpp
+        PacketProcessor.cpp
+        WfbngLinkJNI.hpp
+        WfbngLinkJNI.cpp
+        WfbLogger.hpp
+        WfbLogger.cpp
         )
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
@@ -84,3 +99,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 
 set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -fno-omit-frame-pointer)
+target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+        __WFB_RX_SHARED_LIBRARY__
+        PREINCLUDE_FILE=<${CMAKE_SOURCE_DIR}/wfb_log.h>
+)

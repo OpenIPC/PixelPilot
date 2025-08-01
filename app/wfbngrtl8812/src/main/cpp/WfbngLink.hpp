@@ -1,6 +1,7 @@
 #ifndef FPV_VR_WFBNG_LINK_H
 #define FPV_VR_WFBNG_LINK_H
 
+#include "WfbConfiguration.hpp"
 #include "FecChangeController.h"
 #include "SignalQualityCalculator.h"
 #include "TxFrame.h"
@@ -11,6 +12,13 @@ extern "C" {
 
 #include "devourer/src/WiFiDriver.h"
 #include "wfb-ng/src/rx.hpp"
+
+// Forward declarations
+class DeviceManager;
+class AggregatorManager;
+class ThreadManager;
+class AdaptiveLinkController;
+class PacketProcessor;
 #include <jni.h>
 #include <list>
 #include <map>
@@ -28,7 +36,7 @@ class WfbngLink {
     int fec_recovered_to_3 = 24;
     int fec_recovered_to_2 = 14;
     int fec_recovered_to_1 = 8;
-    WfbngLink(JNIEnv *env, jobject context);
+    WfbngLink(JNIEnv *env, jobject context, const WfbConfiguration& config = WfbConfiguration::createDefault());
 
     int run(JNIEnv *env, jobject androidContext, jint wifiChannel, jint bw, jint fd);
 
@@ -36,28 +44,27 @@ class WfbngLink {
 
     void stop(JNIEnv *env, jobject androidContext, jint fd);
 
-    std::mutex agg_mutex;
-    std::unique_ptr<AggregatorUDPv4> video_aggregator;
-    std::unique_ptr<AggregatorUDPv4> mavlink_aggregator;
-    std::unique_ptr<AggregatorUDPv4> udp_aggregator;
+    // Configuration methods
+    void setFecThresholds(int lostTo5, int recTo4, int recTo3, int recTo2, int recTo1);
 
-    void start_link_quality_thread(int fd);
+    // Adaptive link control methods
+    void setAdaptiveLinkEnabled(bool enabled);
+    void setAdaptiveTxPower(int power);
 
-    // adaptive link
-    // TODO: move this to private section
-    int current_fd;
-    bool adaptive_link_enabled;
-    bool adaptive_link_should_stop{false};
-    int adaptive_tx_power;
+    // Legacy public access for JNI compatibility
+    std::unique_ptr<AggregatorManager> aggregator_manager;
+    std::unique_ptr<DeviceManager> device_manager;
+    FecChangeController fec;
 
     // Runtime configurable PHY parameters
     bool ldpc_enabled{true};
     bool stbc_enabled{true};
 
-    std::map<int, std::shared_ptr<Rtl8812aDevice>> rtl_devices;
-    std::unique_ptr<std::thread> link_quality_thread{nullptr};
+    // For backward compatibility with JNI layer
+    int current_fd{-1};
+    bool adaptive_link_enabled{true};
+    int adaptive_tx_power{30};
     bool should_clear_stats{false};
-    FecChangeController fec;
 
     void init_thread(std::unique_ptr<std::thread> &thread,
                      const std::function<std::unique_ptr<std::thread>()> &init_func) {
@@ -74,26 +81,22 @@ class WfbngLink {
         }
     }
 
-    void stop_adaptive_link() {
-        std::unique_lock<std::recursive_mutex> lock(thread_mutex);
-
-        if (!link_quality_thread) return;
-        this->adaptive_link_should_stop = true;
-        destroy_thread(link_quality_thread);
-    }
+    void stop_adaptive_link();
 
   private:
-    void stopDevice() {
-        if (rtl_devices.find(current_fd) == rtl_devices.end()) return;
-        auto dev = rtl_devices.at(current_fd).get();
-        if (dev) {
-            dev->should_stop = true;
-        }
-    }
+    void stopDevice();
 
+    WfbConfiguration config_;
+
+    // Component managers
+    std::unique_ptr<ThreadManager> thread_manager_;
+    std::unique_ptr<AdaptiveLinkController> adaptive_controller_;
+    std::unique_ptr<PacketProcessor> packet_processor_;
+
+    // Legacy members (to be removed after full migration)
     const char *keyPath = "/data/user/0/com.openipc.pixelpilot/files/gs.key";
     std::recursive_mutex thread_mutex;
-    std::unique_ptr<WiFiDriver> wifi_driver;
+    std::shared_ptr<WiFiDriver> wifi_driver;
     std::shared_ptr<TxFrame> txFrame;
     uint32_t video_channel_id_be;
     uint32_t mavlink_channel_id_be;
