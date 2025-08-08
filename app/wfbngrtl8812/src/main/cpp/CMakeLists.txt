@@ -19,6 +19,11 @@ target_include_directories(wfb-ng PUBLIC ${CMAKE_SOURCE_DIR}/wfb-ng)
 target_compile_definitions(wfb-ng PRIVATE
         __WFB_RX_SHARED_LIBRARY__
         PREINCLUDE_FILE=<${CMAKE_SOURCE_DIR}/wfb_log.h>
+        ZFEX_UNROLL_ADDMUL_SIMD=8
+        ZFEX_USE_INTEL_SSSE3
+        ZFEX_USE_ARM_NEON
+        ZFEX_INLINE_ADDMUL
+        ZFEX_INLINE_ADDMUL_SIMD
 )
 
 add_library(devourer STATIC
@@ -58,6 +63,8 @@ add_library(devourer STATIC
         ${CMAKE_SOURCE_DIR}/devourer/src/WiFiDriver.h
         ${CMAKE_SOURCE_DIR}/devourer/src/registry_priv.h)
 set_target_properties(devourer PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/devourer)
+
+
 target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer)
 target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/hal)
 set_property(TARGET devourer PROPERTY CXX_STANDARD 20)
@@ -83,4 +90,4 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}/libpcap.a)
 
 set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 20)
-target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -fno-omit-frame-pointer)
+target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -fno-omit-frame-pointer )
