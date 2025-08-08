@@ -6,8 +6,8 @@ project("WfbngRtl8812")
 include_directories(include)
 
 add_library(wfb-ng STATIC
-        ${CMAKE_SOURCE_DIR}/wfb-ng/src/fec.c
-        ${CMAKE_SOURCE_DIR}/wfb-ng/src/fec.h
+        ${CMAKE_SOURCE_DIR}/wfb-ng/src/zfex.c
+        ${CMAKE_SOURCE_DIR}/wfb-ng/src/zfex.h
         ${CMAKE_SOURCE_DIR}/wfb-ng/src/ieee80211_radiotap.h
         ${CMAKE_SOURCE_DIR}/wfb-ng/src/radiotap.c
         ${CMAKE_SOURCE_DIR}/wfb-ng/src/rx.cpp

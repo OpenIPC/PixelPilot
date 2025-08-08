@@ -1,5 +1,43 @@
 #include "TxFrame.h"
 
+#include "sodium/crypto_aead_chacha20poly1305.h"
+#include "sodium/crypto_box.h"
+#include "sodium/randombytes.h"
+#include "src/Rtl8812aDevice.h"
+#include "src/wifibroadcast.hpp"
+#include "src/zfex.h"
+
+#include <algorithm>
+#include <android/log.h>
+#include <arpa/inet.h>
+#include <asm-generic/poll.h>
+#include <asm-generic/socket.h>
+#include <bits/ioctl.h>
+#include <cerrno>
+#include <cinttypes>
+#include <climits>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <linux/if.h>
+#include <linux/if_packet.h>
+#include <linux/in.h>
+#include <linux/random.h>
+#include <linux/sockios.h>
+#include <linux/time.h>
+#include <linux/uio.h>
+#include <memory>
+#include <poll.h>
+#include <stdexcept>
+#include <string>
+#include <sys/endian.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <utility>
+#include <vector>
+
 constexpr char *TAG = "TXFrame";
 
 //-------------------------------------------------------------
@@ -10,7 +48,8 @@ Transmitter::Transmitter(int k, int n, const std::string &keypair, uint64_t epoc
         : fecPtr_(nullptr, FecDeleter{}), fecK_(k), fecN_(n), blockIndex_(0), fragmentIndex_(0),
           block_(static_cast<size_t>(n)), maxPacketSize_(0), epoch_(epoch), channelId_(channelId) {
     // Create new fec object
-    fec_t *rawFec = fec_new(fecK_, fecN_);
+    fec_t *rawFec;
+    fec_new(fecK_, fecN_, &rawFec);
     if (!rawFec) {
         throw std::runtime_error("fec_new() failed");
     }
@@ -84,10 +123,10 @@ bool Transmitter::sendPacket(const uint8_t *buf, size_t size, uint8_t flags) {
     }
 
     // If we have k fragments, encode the parity
-    fec_encode(fecPtr_.get(),
-               const_cast<const uint8_t **>(reinterpret_cast<uint8_t **>(block_.data())),
-               reinterpret_cast<uint8_t **>(block_.data()) + fecK_,
-               maxPacketSize_);
+    fec_encode_simd(fecPtr_.get(),
+                    const_cast<const uint8_t **>(reinterpret_cast<uint8_t **>(block_.data())),
+                    reinterpret_cast<uint8_t **>(block_.data()) + fecK_,
+                    maxPacketSize_);
 
     // Send all FEC fragments
     while (fragmentIndex_ < static_cast<uint8_t>(fecN_)) {

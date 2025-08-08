@@ -3,7 +3,7 @@
 // -- External C Libraries --
 
 extern "C" {
-#include "wfb-ng/src/fec.h" // FEC library
+#include "wfb-ng/src/zfex.h" // FEC library
 }
 
 #include "devourer/src/Rtl8812aDevice.h" // Rtl8812aDevice definition
