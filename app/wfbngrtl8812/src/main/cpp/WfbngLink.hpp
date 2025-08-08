@@ -6,7 +6,7 @@
 #include "TxFrame.h"
 
 extern "C" {
-#include "wfb-ng/src/fec.h"
+#include "wfb-ng/src/zfex.h"
 }
 
 #include "devourer/src/WiFiDriver.h"

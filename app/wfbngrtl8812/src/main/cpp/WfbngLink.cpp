@@ -456,7 +456,6 @@ void WfbngLink::start_link_quality_thread(int fd) {
                    packets)
                  */
 
-
                 // Use the new public FEC threshold values
                 if (quality.lost_last_second > fec_lost_to_5) {
                     fec.bump(5); // Bump to FEC 5
