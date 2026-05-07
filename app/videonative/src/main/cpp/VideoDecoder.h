@@ -1,6 +1,9 @@
 //
 // Created by gaeta on 2024-04-01.
-//
+// Fixed by Claude - 2026-05-06
+// Fixes:
+//   [BUG 2] Added decoderError field to DecodingInfo so checkOutputLoop can
+//           notify upper layer when MTK codec enters unrecoverable error state
 
 #ifndef FPVUE_VIDEODECODER_H
 #define FPVUE_VIDEODECODER_H
@@ -28,12 +31,17 @@ struct DecodingInfo
     float                                 avgParsingTime_ms        = 0;
     float                                 avgWaitForInputBTime_ms  = 0;
     float                                 avgDecodingTime_ms       = 0;
+    // [BUG 2 FIX] Set to true when the codec enters an unrecoverable error state.
+    // Happens on MediaTek (MTK/Dimensity) devices when dequeueOutputBuffer returns
+    // an unknown negative index. Upper layer should reconfigure the decoder on seeing this.
+    bool                                  decoderError             = false;
 
     bool operator==(const DecodingInfo& d2) const
     {
         return nNALU == d2.nNALU && nNALUSFeeded == d2.nNALUSFeeded && currentFPS == d2.currentFPS &&
                currentKiloBitsPerSecond == d2.currentKiloBitsPerSecond && avgParsingTime_ms == d2.avgParsingTime_ms &&
-               avgWaitForInputBTime_ms == d2.avgWaitForInputBTime_ms && avgDecodingTime_ms == d2.avgDecodingTime_ms;
+               avgWaitForInputBTime_ms == d2.avgWaitForInputBTime_ms && avgDecodingTime_ms == d2.avgDecodingTime_ms &&
+               decoderError == d2.decoderError;
     }
 
     bool operator!=(const DecodingInfo& d2) const { return !(*this == d2); }

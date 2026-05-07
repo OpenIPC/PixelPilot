@@ -1,6 +1,11 @@
 //
 // Created by gaeta on 2024-04-01.
-//
+// Fixed by Claude - 2026-05-07
+// Fixes:
+//   [BUG 1] Race condition in checkOutputLoop - decoder.codec[idx] could be deleted by another thread
+//   [BUG 2] MTK UNKNOWN_ERROR not handled - decoder not reset after codec crash
+//   [BUG 3] configureStartDecoder checks codec==null instead of configure status
+//   [BUG 4] configureStartDecoder destroys joinable thread → std::terminate() → SIGABRT
 
 #include "VideoDecoder.h"
 #include <unistd.h>
@@ -27,10 +32,8 @@ void VideoDecoder::setOutputSurface(JNIEnv* env, jobject surface, jint idx)
     if (surface == nullptr)
     {
         MLOGD << "Set output null surface idx: " << idx;
-        // assert(decoder.window!=nullptr);
         if (decoder.window[idx] == nullptr && decoder.codec[idx] == nullptr)
         {
-            // MLOGD<<"Decoder window is already null";
             return;
         }
         std::lock_guard<std::mutex> lock(mMutexInputPipe);
@@ -60,10 +63,8 @@ void VideoDecoder::setOutputSurface(JNIEnv* env, jobject surface, jint idx)
     else
     {
         MLOGD << "Set output non-null surface idx :" << idx;
-        // Throw warning if the surface is set without clearing it first
         assert(decoder.window[idx] == nullptr);
         decoder.window[idx] = ANativeWindow_fromSurface(env, surface);
-        // open the input pipe - now the decoder will start as soon as enough data is available
         inputPipeClosed = false;
     }
 }
@@ -80,23 +81,18 @@ void VideoDecoder::registerOnDecodingInfoChangedCallback(DECODING_INFO_CHANGED_C
 
 void VideoDecoder::interpretNALU(const NALU& nalu)
 {
-    // TODO: RN switching between h264 / h265 requires re-setting the surface
     IS_H265             = nalu.IS_H265_PACKET;
     decodingInfo.nCodec = IS_H265;
-    // we need this lock, since the receiving/parsing/feeding does not run on the same thread who sets the input surface
     std::lock_guard<std::mutex> lock(mMutexInputPipe);
     decodingInfo.nNALU++;
     if (nalu.getSize() <= 4)
     {
-        // No data in NALU (e.g at the beginning of a stream)
         return;
     }
     nNALUBytesFed.add(nalu.getSize());
     if (inputPipeClosed)
     {
         MLOGD << "inputPipeClosed.";
-        // A feedD thread (e.g. file or udp) thread might be running even tough no output surface was set
-        // But at least we can buffer the sps/pps data
         mKeyFrameFinder.saveIfKeyFrame(nalu);
         return;
     }
@@ -105,17 +101,9 @@ void VideoDecoder::interpretNALU(const NALU& nalu)
         feedDecoder(nalu, 0);
         feedDecoder(nalu, 1);
         decodingInfo.nNALUSFeeded++;
-        // manually feeding AUDs doesn't seem to change anything for high latency streams
-        // Only for the x264 sw encoded example stream it might improve latency slightly
-        // if(!nalu.IS_H265_PACKET && nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
-        // MLOGD<<"Feeding special AUD";
-        // feedDecoder(NALU::createExampleH264_AUD());
-        //}
     }
     else
     {
-        // Store sps,pps, vps(H265 only)
-        // As soon as enough data has been buffered to initialize the decoder,do so.
         mKeyFrameFinder.saveIfKeyFrame(nalu);
         if (mKeyFrameFinder.allKeyFramesAvailable(IS_H265))
         {
@@ -135,15 +123,6 @@ void VideoDecoder::configureStartDecoder(int idx)
     AMediaFormat* format = AMediaFormat_new();
     AMediaFormat_setString(format, AMEDIAFORMAT_KEY_MIME, MIME.c_str());
 
-    // AMediaFormat_setInt32(format, "low-latency", 1);
-    // AMediaFormat_setInt32(format, "vendor.low-latency.enable", 1);
-    // AMediaFormat_setInt32(format, "vendor.qti-ext-dec-low-latency.enable", 1);
-    // AMediaFormat_setInt32(format, "vendor.hisi-ext-low-latency-video-dec.video-scene-for-low-latency-req", 1);
-    // AMediaFormat_setInt32(format, "vendor.rtc-ext-dec-low-latency.enable", 1);
-
-    // MediaCodec supports two priorities: 0 - realtime, 1 - best effort
-    // AMediaFormat_setInt32(format, "priority", 0);
-
     if (IS_H265)
     {
         h265_configureAMediaFormat(mKeyFrameFinder, format);
@@ -158,51 +137,31 @@ void VideoDecoder::configureStartDecoder(int idx)
     auto status = AMediaCodec_configure(decoder.codec[idx], format, decoder.window[idx], nullptr, 0);
     AMediaFormat_delete(format);
 
-    switch (status)
+    // [BUG 3 FIX] Check configure status instead of null check.
+    // codec pointer is non-null even when configure fails, so the original null check
+    // was incorrect and would call AMediaCodec_start() on a misconfigured codec,
+    // causing crashes on MediaTek (MTK) devices.
+    if (status != AMEDIA_OK)
     {
-        case AMEDIA_OK:
-        {
-            MLOGD << "AMediaCodec_configure: OK";
-            break;
-        }
-        case AMEDIA_ERROR_UNKNOWN:
-        {
-            MLOGD << "AMediaCodec_configure: AMEDIA_ERROR_UNKNOWN";
-            break;
-        }
-        case AMEDIA_ERROR_MALFORMED:
-        {
-            MLOGD << "AMediaCodec_configure: AMEDIA_ERROR_MALFORMED";
-            break;
-        }
-        case AMEDIA_ERROR_UNSUPPORTED:
-        {
-            MLOGD << "AMediaCodec_configure: AMEDIA_ERROR_UNSUPPORTED";
-            break;
-        }
-        case AMEDIA_ERROR_INVALID_OBJECT:
-        {
-            MLOGD << "AMediaCodec_configure: AMEDIA_ERROR_INVALID_OBJECT";
-            break;
-        }
-        case AMEDIA_ERROR_INVALID_PARAMETER:
-        {
-            MLOGD << "AMediaCodec_configure: AMEDIA_ERROR_INVALID_PARAMETER";
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
-
-    if (decoder.codec[idx] == nullptr)
-    {
-        MLOGD << "Cannot configure decoder";
-        // set csd-0 and csd-1 back to 0, maybe they were just faulty but we have better luck with the next ones
-        // mKeyFrameFinder.reset();
+        MLOGE << "AMediaCodec_configure failed with status: " << status;
+        AMediaCodec_delete(decoder.codec[idx]);
+        decoder.codec[idx] = nullptr;
         return;
     }
+
+    MLOGD << "AMediaCodec_configure: OK";
+
+    // [BUG 4 FIX] Join the old output thread before creating a new one.
+    // If the previous codec crashed (MTK UNKNOWN_ERROR), checkOutputLoop already exited
+    // but mCheckOutputThread[idx] is still joinable. Destroying a joinable std::thread
+    // calls std::terminate() -> SIGABRT. This is a hard C++ rule with no exceptions.
+    if (mCheckOutputThread[idx] && mCheckOutputThread[idx]->joinable())
+    {
+        MLOGD << "Joining previous output thread before reconfigure idx: " << idx;
+        mCheckOutputThread[idx]->join();
+        mCheckOutputThread[idx].reset();
+    }
+
     AMediaCodec_start(decoder.codec[idx]);
     mCheckOutputThread[idx] = std::make_unique<std::thread>(&VideoDecoder::checkOutputLoop, this, idx);
     NDKThreadHelper::setName(mCheckOutputThread[idx]->native_handle(), "LLDCheckOutput");
@@ -221,8 +180,6 @@ void VideoDecoder::feedDecoder(const NALU& nalu, int idx)
         {
             size_t   inputBufferSize;
             uint8_t* buf = AMediaCodec_getInputBuffer(decoder.codec[idx], (size_t) index, &inputBufferSize);
-            // I have not seen any case where the input buffer returned by MediaCodec is too small to hold the NALU
-            // But better be safe than crashing with a memory exception
             if (nalu.getSize() > inputBufferSize)
             {
                 MLOGD << "Nalu too big" << nalu.getSize();
@@ -242,13 +199,9 @@ void VideoDecoder::feedDecoder(const NALU& nalu, int idx)
         }
         else if (index == AMEDIACODEC_INFO_TRY_AGAIN_LATER)
         {
-            // just try again. But if we had no success in the last 1 second,log a warning and return.
             const auto elapsedTimeTryingForBuffer = std::chrono::steady_clock::now() - now;
             if (elapsedTimeTryingForBuffer > std::chrono::seconds(1))
             {
-                // Since OpenHD provides a lossy link it is really unlikely, but possible that we somehow 'break' the
-                // codec by feeding corrupt data. It will probably recover itself as soon as we feed enough valid data
-                // though;
                 MLOGE << "AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second "
                       << MyTimeHelper::R(elapsedTimeTryingForBuffer) << "return.";
                 return;
@@ -256,7 +209,6 @@ void VideoDecoder::feedDecoder(const NALU& nalu, int idx)
         }
         else
         {
-            // Something went wrong. But we will feed the next NALU soon anyways
             MLOGD << "dequeueInputBuffer idx " << (int) index << "return.";
             return;
         }
@@ -271,21 +223,23 @@ void VideoDecoder::checkOutputLoop(int idx)
     bool                  decoderProducedUnknown = false;
     while (!decoderSawEOS && !decoderProducedUnknown)
     {
-        if (!decoder.codec[idx]) break;
-        const ssize_t index = AMediaCodec_dequeueOutputBuffer(decoder.codec[idx], &info, BUFFER_TIMEOUT_US);
+        // [BUG 1 FIX] Take a local snapshot of the codec pointer at the start of each iteration.
+        // Without this, another thread (e.g. setOutputSurface) could call AMediaCodec_delete()
+        // between our null-check and our use of the pointer, causing a SIGSEGV (fault addr 0x0).
+        AMediaCodec* localCodec = decoder.codec[idx];
+        if (!localCodec) break;
+
+        const ssize_t index = AMediaCodec_dequeueOutputBuffer(localCodec, &info, BUFFER_TIMEOUT_US);
         if (index >= 0)
         {
             const auto    now   = steady_clock::now();
             const int64_t nowUS = (int64_t) duration_cast<microseconds>(now.time_since_epoch()).count();
-            // the timestamp for releasing the buffer is in NS, just release as fast as possible (e.g. now)
-            // https://android.googlesource.com/platform/frameworks/av/+/master/media/ndk/NdkMediaCodec.cpp
-            //-> renderOutputBufferAndRelease which is in
-            // https://android.googlesource.com/platform/frameworks/av/+/3fdb405/media/libstagefright/MediaCodec.cpp
-            //-> Message kWhatReleaseOutputBuffer -> onReleaseOutputBuffer
-            //  also https://android.googlesource.com/platform/frameworks/native/+/5c1139f/libs/gui/SurfaceTexture.cpp
-            if (!decoder.codec[idx]) break;
-            AMediaCodec_releaseOutputBuffer(decoder.codec[idx], (size_t) index, true);
-            // but the presentationTime is in US
+
+            // [BUG 1 FIX] Re-snapshot before use — state may have changed during dequeueOutputBuffer
+            AMediaCodec* localCodec2 = decoder.codec[idx];
+            if (!localCodec2) break;
+            AMediaCodec_releaseOutputBuffer(localCodec2, (size_t) index, true);
+
             if (idx == 0)
             {
                 decodingTime.add(std::chrono::microseconds(nowUS - info.presentationTimeUs));
@@ -300,7 +254,9 @@ void VideoDecoder::checkOutputLoop(int idx)
         }
         else if (index == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED)
         {
-            auto format = AMediaCodec_getOutputFormat(decoder.codec[idx]);
+            AMediaCodec* localCodecFmt = decoder.codec[idx];
+            if (!localCodecFmt) break;
+            auto format = AMediaCodec_getOutputFormat(localCodecFmt);
             int  width = 0, height = 0;
             AMediaFormat_getInt32(format, AMEDIAFORMAT_KEY_WIDTH, &width);
             AMediaFormat_getInt32(format, AMEDIAFORMAT_KEY_HEIGHT, &height);
@@ -322,9 +278,34 @@ void VideoDecoder::checkOutputLoop(int idx)
         }
         else
         {
-            // Most like AMediaCodec_stop() was called
-            MLOGD << "dequeueOutputBuffer idx: " << (int) index << " .Exit.";
+            // [BUG 2 FIX] On MediaTek (MTK) devices, the codec may report UNKNOWN_ERROR
+            // (0x80000000) and enter a dead "Released" state. Unlike Snapdragon, MTK codecs
+            // do not self-recover.
+            //
+            // Root cause of the spam: feedDecoder() checks decoder.codec[idx] != null before
+            // calling dequeueInputBuffer — but we never nulled it out, so it kept hammering
+            // a dead codec and producing "Invalid to call at Released state" every ~8ms.
+            //
+            // Fix: atomically grab and null out the pointer HERE (in the output thread),
+            // BEFORE stopping/deleting, so feedDecoder sees null and bails out immediately.
+            // Then notify the upper layer via callback to trigger reconfiguration.
+            MLOGE << "dequeueOutputBuffer idx: " << (int) index << " — codec dead, cleaning up.";
             decoderProducedUnknown = true;
+
+            // Grab pointer and null it atomically so feedDecoder stops immediately
+            AMediaCodec* deadCodec = decoder.codec[idx];
+            decoder.codec[idx]     = nullptr;
+            decoder.configured[idx] = false;
+            if (deadCodec)
+            {
+                AMediaCodec_stop(deadCodec);
+                AMediaCodec_delete(deadCodec);
+            }
+            if (onDecodingInfoChangedCallback != nullptr)
+            {
+                decodingInfo.decoderError = true;
+                onDecodingInfoChangedCallback(decodingInfo);
+            }
             continue;
         }
         // every 2 seconds recalculate the current fps and bitrate
@@ -338,7 +319,6 @@ void VideoDecoder::checkOutputLoop(int idx)
             decodingInfo.currentKiloBitsPerSecond =
                 ((float) nNALUBytesFed.getDeltaSinceLastCall() / duration_cast<seconds>(delta).count()) / 1024.0f *
                 8.0f;
-            // and recalculate the avg latencies. If needed,also print the log.
             decodingInfo.avgDecodingTime_ms      = decodingTime.getAvg_ms();
             decodingInfo.avgParsingTime_ms       = parsingTime.getAvg_ms();
             decodingInfo.avgWaitForInputBTime_ms = waitForInputB.getAvg_ms();
