@@ -56,7 +56,7 @@ std::string generate_random_string(size_t length) {
 WfbngLink::WfbngLink(JNIEnv *env, jobject context)
         : current_fd(-1), adaptive_link_enabled(true), adaptive_tx_power(30) {
     initAgg();
-    Logger_t log;
+    log = std::make_shared<Logger>();
     wifi_driver = std::make_unique<WiFiDriver>(log);
 }
 
@@ -218,7 +218,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             __android_log_print(
                 ANDROID_LOG_ERROR, TAG, "radio link ID %d, radio PORT %d", args->link_id, args->radio_port);
 
-            Rtl8812aDevice *current_device = rtl_devices.at(fd).get();
+            RtlJaguarDevice *current_device = rtl_devices.at(fd).get();
             if (!usb_tx_thread) {
                 init_thread(usb_tx_thread, [&]() {
                     return std::make_unique<std::thread>([this, current_device, args] {

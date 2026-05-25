@@ -54,7 +54,7 @@ class WfbngLink {
     bool ldpc_enabled{true};
     bool stbc_enabled{true};
 
-    std::map<int, std::shared_ptr<Rtl8812aDevice>> rtl_devices;
+    std::map<int, std::shared_ptr<RtlJaguarDevice>> rtl_devices;
     std::unique_ptr<std::thread> link_quality_thread{nullptr};
     bool should_clear_stats{false};
     FecChangeController fec;

@@ -6,7 +6,7 @@ extern "C" {
 #include "wfb-ng/src/zfex.h" // FEC library
 }
 
-#include "devourer/src/Rtl8812aDevice.h" // Rtl8812aDevice definition
+#include "devourer/src/RtlJaguarDevice.h" // RtlJaguarDevice definition
 #include "wfb-ng/src/wifibroadcast.hpp"  // Wifibroadcast definitions
 
 // -- System / C++ Includes --
@@ -294,7 +294,7 @@ class UsbTransmitter : public Transmitter {
                    uint8_t *radiotapHeader,
                    size_t radiotapHeaderLen,
                    uint8_t frameType,
-                   Rtl8812aDevice *device);
+                   RtlJaguarDevice *device);
 
     ~UsbTransmitter() override = default;
 
@@ -314,7 +314,7 @@ class UsbTransmitter : public Transmitter {
     uint8_t *radiotapHeader_;
     size_t radiotapHeaderLen_;
     uint8_t frameType_;
-    Rtl8812aDevice *rtlDevice_;
+    RtlJaguarDevice *rtlDevice_;
 };
 
 //-------------------------------------------------------------
@@ -379,10 +379,10 @@ class TxFrame {
 
     /**
      * @brief Configures and runs the transmitter with the given arguments.
-     * @param rtlDevice The Rtl8812aDevice pointer (if using USB).
+     * @param rtlDevice The RtlJaguarDevice pointer (if using USB).
      * @param arg TxArgs structure with user parameters.
      */
-    void run(Rtl8812aDevice *rtlDevice, TxArgs *arg);
+    void run(RtlJaguarDevice *rtlDevice, TxArgs *arg);
 
     /**
      * @brief Signals that the main loop should stop.
