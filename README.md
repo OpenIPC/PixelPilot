@@ -16,7 +16,7 @@ where (brace yourself) most things actually work.
 - [LiveVideo10ms](https://github.com/Consti10/LiveVideo10ms): excellent video decoder from [Consti10](https://github.com/Consti10) converted into a module.
 - [wfb-ng](https://github.com/svpcom/wfb-ng): library allowing the broadcast of the video feed over the air.
 
-The wfb-ng [gs.key](https://github.com/OpenIPC/PixelPilot/raw/main/app/src/main/assets/gs.key) is embedded in the app.
+The wfb-ng [gs.key](https://github.com/OpenIPC/PixelPilot/raw/master/app/src/main/assets/gs.key) is embedded in the app.
 The settings menu allows selecting a different key from your phone.
 
 Supported rtl8812au wifi adapter are listed [here](https://github.com/OpenIPC/PixelPilot/blob/master/app/src/main/res/xml/usb_device_filter.xml).
