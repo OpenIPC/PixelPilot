@@ -26,47 +26,73 @@ target_compile_definitions(wfb-ng PRIVATE
         ZFEX_INLINE_ADDMUL_SIMD
 )
 
+# devourer — userspace Realtek 11ac driver. Mirrors the source groups of
+# devourer's own CMakeLists.txt (which we can't add_subdirectory here because
+# it resolves libusb via pkg-config, unavailable in the NDK build).
+# Chip support compiled in:
+#   Jaguar1 (RTL8812AU / 8811AU / 8821AU) — the classic PixelPilot adapters
+#   Jaguar3 8822E (RTL8812EU / RTL8822EU) — e.g. LB-LINK BL-M8812EU2
 add_library(devourer STATIC
-        ${CMAKE_SOURCE_DIR}/devourer/hal/Hal8812PhyReg.h
-        ${CMAKE_SOURCE_DIR}/devourer/hal/Hal8812PwrSeq.c
-        ${CMAKE_SOURCE_DIR}/devourer/hal/Hal8812PwrSeq.h
-        ${CMAKE_SOURCE_DIR}/devourer/hal/basic_types.h
-        ${CMAKE_SOURCE_DIR}/devourer/hal/hal8812a_fw.c
-        ${CMAKE_SOURCE_DIR}/devourer/hal/hal8812a_fw.h
-        ${CMAKE_SOURCE_DIR}/devourer/hal/hal_com_reg.h
-        ${CMAKE_SOURCE_DIR}/devourer/hal/rtl8812a_hal.h
-        ${CMAKE_SOURCE_DIR}/devourer/hal/rtl8812a_recv.h
-        ${CMAKE_SOURCE_DIR}/devourer/hal/rtl8812a_spec.h
-
-        ${CMAKE_SOURCE_DIR}/devourer/src/Radiotap.c
-        ${CMAKE_SOURCE_DIR}/devourer/src/registry_priv.h
-        ${CMAKE_SOURCE_DIR}/devourer/src/ieee80211_radiotap.h
-
-        ${CMAKE_SOURCE_DIR}/devourer/src/EepromManager.cpp
-        ${CMAKE_SOURCE_DIR}/devourer/src/EepromManager.h
-        ${CMAKE_SOURCE_DIR}/devourer/src/Firmware.h
-        ${CMAKE_SOURCE_DIR}/devourer/src/FirmwareManager.cpp
-        ${CMAKE_SOURCE_DIR}/devourer/src/FirmwareManager.h
-        ${CMAKE_SOURCE_DIR}/devourer/src/FrameParser.cpp
-        ${CMAKE_SOURCE_DIR}/devourer/src/FrameParser.h
-        ${CMAKE_SOURCE_DIR}/devourer/src/HalModule.cpp
-        ${CMAKE_SOURCE_DIR}/devourer/src/HalModule.h
+        # --- generation-agnostic core ---
         ${CMAKE_SOURCE_DIR}/devourer/src/ParsedRadioPacket.cpp
-        ${CMAKE_SOURCE_DIR}/devourer/src/RadioManagementModule.cpp
-        ${CMAKE_SOURCE_DIR}/devourer/src/RadioManagementModule.h
-        ${CMAKE_SOURCE_DIR}/devourer/src/Rtl8812aDevice.cpp
-        ${CMAKE_SOURCE_DIR}/devourer/src/Rtl8812aDevice.h
-        ${CMAKE_SOURCE_DIR}/devourer/src/RtlUsbAdapter.cpp
-        ${CMAKE_SOURCE_DIR}/devourer/src/RtlUsbAdapter.h
-        ${CMAKE_SOURCE_DIR}/devourer/src/SelectedChannel.h
+        ${CMAKE_SOURCE_DIR}/devourer/src/Radiotap.c
+        ${CMAKE_SOURCE_DIR}/devourer/src/RadiotapBuilder.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/RtlAdapter.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/UsbTransport.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/UsbDeviceLock.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/UsbOpen.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/TxMode.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/TxPower.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/LinkHealth.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/SignalStop.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/WiFiDriver.cpp
-        ${CMAKE_SOURCE_DIR}/devourer/src/WiFiDriver.h
-        ${CMAKE_SOURCE_DIR}/devourer/src/registry_priv.h)
+        ${CMAKE_SOURCE_DIR}/devourer/src/PhyTableLoader.cpp
+
+        # --- Jaguar1 (RTL8812AU / 8811AU / 8821AU) ---
+        ${CMAKE_SOURCE_DIR}/devourer/hal/hal8812a_fw.c
+        ${CMAKE_SOURCE_DIR}/devourer/hal/hal8821a_fw.c
+        ${CMAKE_SOURCE_DIR}/devourer/hal/Hal8812PwrSeq.c
+        ${CMAKE_SOURCE_DIR}/devourer/hal/Hal8821APwrSeq.c
+        ${CMAKE_SOURCE_DIR}/devourer/hal/Hal8812a_TxPwrTrack.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/RtlJaguarDevice.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/HalModule.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/RadioManagementModule.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/EepromManager.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/FirmwareManager.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/Iqk8812a.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/PhydmWatchdog.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/PowerTracking8812a.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/FrameParser.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/BbDbgportReader.cpp
+
+        # --- Jaguar3 shared (dispatchers compiled for any Jaguar3 variant) ---
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/RtlJaguar3Device.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/HalJaguar3.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/HalmacJaguar3Fw.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/HalmacJaguar3MacInit.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/RadioManagementJaguar3.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/PhyTableLoaderJaguar3.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/Phy8822cTables.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/Halrf8822c.cpp
+
+        # --- Jaguar3 8822E variant (RTL8812EU / RTL8822EU) ---
+        ${CMAKE_SOURCE_DIR}/devourer/hal/hal8822e_fw.c
+        ${CMAKE_SOURCE_DIR}/devourer/hal/phydm/rtl8822e/Hal8822e_PhyTables.c
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/Phy8822eTables.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/Halrf8822e.cpp)
 set_target_properties(devourer PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/devourer)
 
+target_compile_definitions(devourer PUBLIC
+        DEVOURER_HAVE_JAGUAR1=1
+        DEVOURER_HAVE_JAGUAR3=1
+        DEVOURER_HAVE_JAGUAR3_8822E=1)
 
 target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer)
+target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/src)
 target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/hal)
+target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/hal/phydm/rtl8822c)
+target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/hal/phydm/rtl8822e)
+target_link_libraries(devourer PUBLIC log)
 set_property(TARGET devourer PROPERTY CXX_STANDARD 20)
 
 # WFB-NG RTL8812 library
