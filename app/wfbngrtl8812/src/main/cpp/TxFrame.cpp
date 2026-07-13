@@ -3,7 +3,7 @@
 #include "sodium/crypto_aead_chacha20poly1305.h"
 #include "sodium/crypto_box.h"
 #include "sodium/randombytes.h"
-#include "src/Rtl8812aDevice.h"
+#include "src/IRtlDevice.h"
 #include "src/wifibroadcast.hpp"
 #include "src/zfex.h"
 
@@ -422,7 +422,7 @@ UsbTransmitter::UsbTransmitter(int k,
                                uint8_t *radiotapHeader,
                                size_t radiotapHeaderLen,
                                uint8_t frameType,
-                               Rtl8812aDevice *device)
+                               IRtlDevice *device)
         : Transmitter(k, n, keypair, epoch, channelId), channelId_(channelId), currentOutput_(0), ieee80211Sequence_(0),
           radiotapHeader_(radiotapHeader), radiotapHeaderLen_(radiotapHeaderLen), frameType_(frameType),
           rtlDevice_(device) {
@@ -467,11 +467,11 @@ void UsbTransmitter::dumpStats(
 }
 
 void UsbTransmitter::injectPacket(const uint8_t *buf, size_t size) {
-    if (!rtlDevice_ || rtlDevice_->should_stop) {
+    if (!rtlDevice_) {
 #ifdef __ANDROID__
-        __android_log_print(ANDROID_LOG_DEBUG, TAG, "Main thread exited, cannot send packets");
+        __android_log_print(ANDROID_LOG_DEBUG, TAG, "No USB device, cannot send packets");
 #endif
-        throw std::runtime_error("USB Transmitter: main thread exit, should stop");
+        throw std::runtime_error("USB Transmitter: no device, should stop");
     }
 
     if (size > MAX_FORWARDER_PACKET_SIZE) {
@@ -795,7 +795,7 @@ void TxFrame::dataSource(
     }
 }
 
-void TxFrame::run(Rtl8812aDevice *rtlDevice, TxArgs *arg) {
+void TxFrame::run(IRtlDevice *rtlDevice, TxArgs *arg) {
     // Decide if using VHT
     if (arg->bandwidth >= 80) {
         arg->vht_mode = true;

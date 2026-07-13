@@ -33,4 +33,13 @@
     <usb-device
         product-id="3426"
         vendor-id="0586" /> <!-- ZyXel 6605 -->
+    <usb-device
+        product-id="A81A"
+        vendor-id="0BDA" /> <!-- RTL8812EU (e.g. LB-LINK BL-M8812EU2) -->
+    <usb-device
+        product-id="A82A"
+        vendor-id="0BDA" /> <!-- RTL8822EU -->
+    <usb-device
+        product-id="E822"
+        vendor-id="0BDA" /> <!-- RTL8822EU (multi-function) -->
 </resources>
