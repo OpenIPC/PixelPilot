@@ -568,6 +568,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         // Drone submenu
         setupDroneSubMenu(popup);
 
+        // UDP Forwarding submenu
+        setupUdpForwardingSubMenu(popup);
+
         // Help submenu
         setupHelpSubMenu(popup);
 
@@ -918,6 +921,88 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             showLoginCredentialsDialog();
             return true;
         });
+    }
+
+    private void setupUdpForwardingSubMenu(PopupMenu popup) {
+        SubMenu forwardMenu = popup.getMenu().addSubMenu("UDP Forwarding");
+
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        boolean enabled = prefs.getBoolean("forward_udp_enabled", false);
+        String ip = prefs.getString("forward_udp_ip", "192.168.1.100");
+        int port = prefs.getInt("forward_udp_port", 5600);
+
+        MenuItem enableItem = forwardMenu.add("Enable");
+        enableItem.setCheckable(true);
+        enableItem.setChecked(enabled);
+        enableItem.setOnMenuItemClickListener(item -> {
+            boolean newState = !item.isChecked();
+            item.setChecked(newState);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("forward_udp_enabled", newState);
+            editor.apply();
+            updateUdpForwardingState();
+            return true;
+        });
+
+        MenuItem configItem = forwardMenu.add("Config Target (" + ip + ":" + port + ")");
+        configItem.setOnMenuItemClickListener(item -> {
+            showUdpForwardingDialog();
+            return true;
+        });
+    }
+
+    private void showUdpForwardingDialog() {
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        String ip = prefs.getString("forward_udp_ip", "192.168.1.100");
+        int port = prefs.getInt("forward_udp_port", 5600);
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 30, 50, 30);
+
+        final android.widget.EditText ipEditText = new android.widget.EditText(this);
+        ipEditText.setHint("Destination IP Address");
+        ipEditText.setText(ip);
+        layout.addView(ipEditText);
+
+        final android.widget.EditText portEditText = new android.widget.EditText(this);
+        portEditText.setHint("Destination Port");
+        portEditText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        portEditText.setText(String.valueOf(port));
+        layout.addView(portEditText);
+
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("UDP Forwarding Config")
+                .setView(layout)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String newIp = ipEditText.getText().toString().trim();
+                    String newPortStr = portEditText.getText().toString().trim();
+                    int newPort = 5600;
+                    try {
+                        newPort = Integer.parseInt(newPortStr);
+                    } catch (NumberFormatException ignored) {}
+
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("forward_udp_ip", newIp);
+                    editor.putInt("forward_udp_port", newPort);
+                    editor.apply();
+
+                    Toast.makeText(this, "Forwarding settings saved: " + newIp + ":" + newPort, Toast.LENGTH_SHORT).show();
+                    updateUdpForwardingState();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void updateUdpForwardingState() {
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        boolean enabled = prefs.getBoolean("forward_udp_enabled", false);
+        String ip = prefs.getString("forward_udp_ip", "192.168.1.100");
+        int port = prefs.getInt("forward_udp_port", 5600);
+
+        if (videoPlayer != null) {
+            videoPlayer.setUdpForwarding(ip, port, enabled);
+        }
     }
 
     /**
@@ -1358,6 +1443,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         wfbLinkManager.startAdapters();
         videoPlayer.start();
+        updateUdpForwardingState();
         videoPlayer.startAudio();
 
         osdManager.restoreOSDConfig();

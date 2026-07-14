@@ -50,6 +50,8 @@ public class VideoPlayer implements IVideoParamsChanged {
 
     public static native void nativeSetVideoSurface(long nativeInstance, Surface surface, int index);
 
+    public static native void nativeSetUdpForwarding(long nativeInstance, String ip, int port, boolean enabled);
+
     public static native void nativeStartDvr(long nativeInstance, int fd, int fmp4_enabled);
 
     public static native void nativeStopDvr(long nativeInstance);
@@ -122,6 +124,11 @@ public class VideoPlayer implements IVideoParamsChanged {
 
     public boolean isRunning() {
         return timer != null;
+    }
+
+    public void setUdpForwarding(String ip, int port, boolean enabled) {
+        verifyApplicationThread();
+        nativeSetUdpForwarding(nativeVideoPlayer, ip, port, enabled);
     }
 
     public void startDvr(int fd, boolean enabled_fmp4) {

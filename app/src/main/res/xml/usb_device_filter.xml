@@ -1,121 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <usb-device
-        product-id="0x8812"
-        vendor-id="0x0BDA" /> <!-- RTL8812AU -->
+        product-id="8812"
+        vendor-id="0BDA" /> <!-- RTL8812AU -->
     <usb-device
-        product-id="0x881A"
-        vendor-id="0x0BDA" /> <!-- RTL8812AU-VS -->
+        product-id="881A"
+        vendor-id="0BDA" /> <!-- RTL8812AU-VS -->
     <usb-device
-        product-id="0x881B"
-        vendor-id="0x0BDA" /> <!-- RTL8812AU-VL -->
+        product-id="881B"
+        vendor-id="0BDA" /> <!-- RTL8812AU-VL -->
     <usb-device
-        product-id="0x0101"
-        vendor-id="0x2357" /> <!-- Archer T4U -->
+        product-id="0101"
+        vendor-id="2357" /> <!-- Archer T4U -->
     <usb-device
-        product-id="0x0103"
-        vendor-id="0x2357" /> <!-- Archer T4UH -->
+        product-id="0103"
+        vendor-id="2357" /> <!-- Archer T4UH -->
     <usb-device
-        product-id="0x010D"
-        vendor-id="0x2357" /> <!-- Archer T4U V2 -->
+        product-id="010D"
+        vendor-id="2357" /> <!-- Archer T4U V2 -->
     <usb-device
-        product-id="0x010E"
-        vendor-id="0x2357" /> <!-- Archer T4UH V2 -->
+        product-id="010E"
+        vendor-id="2357" /> <!-- Archer T4UH V2 -->
     <usb-device
-        product-id="0x17D2"
-        vendor-id="0x0B05" /> <!-- Asus AC56 -->
+        product-id="17D2"
+        vendor-id="0B05" /> <!-- Asus AC56 -->
     <usb-device
-        product-id="0x0012"
-        vendor-id="0x2604" /> <!-- Tenda U12 -->
+        product-id="0012"
+        vendor-id="2604" /> <!-- Tenda U12 -->
     <usb-device
-        product-id="0x0408"
-        vendor-id="0x0409" /> <!-- NEC AtermWL900U -->
+        product-id="0408"
+        vendor-id="0409" /> <!-- NEC AtermWL900U -->
     <usb-device
-        product-id="0x3426"
-        vendor-id="0x0586" /> <!-- ZyXel 6605 -->
-
-    <!-- RTL8811AU -->
+        product-id="3426"
+        vendor-id="0586" /> <!-- ZyXel 6605 -->
+    <!-- RTL8811AU / RTL8821AU -->
+    <usb-device product-id="0811" vendor-id="0BDA" />
+    <usb-device product-id="A811" vendor-id="0BDA" />
+    <usb-device product-id="B811" vendor-id="0BDA" />
+    <usb-device product-id="0820" vendor-id="0BDA" />
+    <usb-device product-id="0821" vendor-id="0BDA" />
+    <usb-device product-id="0823" vendor-id="0BDA" />
+    <usb-device product-id="8822" vendor-id="0BDA" />
+    <usb-device product-id="0242" vendor-id="0411" />
+    <usb-device product-id="029B" vendor-id="0411" />
+    <usb-device product-id="0953" vendor-id="04BB" />
+    <usb-device product-id="4007" vendor-id="056E" />
+    <usb-device product-id="400E" vendor-id="056E" />
+    <usb-device product-id="400F" vendor-id="056E" />
+    <usb-device product-id="9052" vendor-id="0846" />
+    <usb-device product-id="0023" vendor-id="0E66" />
+    <usb-device product-id="3314" vendor-id="2001" />
+    <usb-device product-id="3318" vendor-id="2001" />
+    <usb-device product-id="AB32" vendor-id="2019" />
+    <usb-device product-id="804B" vendor-id="20F4" />
+    <usb-device product-id="011E" vendor-id="2357" />
+    <usb-device product-id="0120" vendor-id="2357" />
+    <usb-device product-id="0122" vendor-id="2357" />
+    <usb-device product-id="6249" vendor-id="3823" />
+    <usb-device product-id="A811" vendor-id="7392" />
+    <usb-device product-id="A812" vendor-id="7392" />
+    <usb-device product-id="A813" vendor-id="7392" />
+    <usb-device product-id="B611" vendor-id="7392" />
     <usb-device
-        product-id="0x0811"
-        vendor-id="0x0BDA" /> <!-- 0BDA:0811 -->
+        product-id="A81A"
+        vendor-id="0BDA" /> <!-- RTL8812EU (e.g. LB-LINK BL-M8812EU2) -->
     <usb-device
-        product-id="0xA811"
-        vendor-id="0x0BDA" /> <!-- 0BDA:A811 -->
+        product-id="A82A"
+        vendor-id="0BDA" /> <!-- RTL8822EU -->
     <usb-device
-        product-id="0xB811"
-        vendor-id="0x0BDA" /> <!-- 0BDA:B811 -->
-
-    <!-- RTL8821AU -->
-    <usb-device
-        product-id="0x0820"
-        vendor-id="0x0BDA" /> <!-- 0BDA:0820 -->
-    <usb-device
-        product-id="0x0821"
-        vendor-id="0x0BDA" /> <!-- 0BDA:0821 -->
-    <usb-device
-        product-id="0x0823"
-        vendor-id="0x0BDA" /> <!-- 0BDA:0823 -->
-    <usb-device
-        product-id="0x8822"
-        vendor-id="0x0BDA" /> <!-- 0BDA:8822 -->
-    <usb-device
-        product-id="0x0242"
-        vendor-id="0x0411" /> <!-- 0411:0242 -->
-    <usb-device
-        product-id="0x029B"
-        vendor-id="0x0411" /> <!-- 0411:029B -->
-    <usb-device
-        product-id="0x0953"
-        vendor-id="0x04BB" /> <!-- 04BB:0953 -->
-    <usb-device
-        product-id="0x4007"
-        vendor-id="0x056E" /> <!-- 056E:4007 -->
-    <usb-device
-        product-id="0x400E"
-        vendor-id="0x056E" /> <!-- 056E:400E -->
-    <usb-device
-        product-id="0x400F"
-        vendor-id="0x056E" /> <!-- 056E:400F -->
-    <usb-device
-        product-id="0x9052"
-        vendor-id="0x0846" /> <!-- 0846:9052 -->
-    <usb-device
-        product-id="0x0023"
-        vendor-id="0x0E66" /> <!-- 0E66:0023 -->
-    <usb-device
-        product-id="0x3314"
-        vendor-id="0x2001" /> <!-- 2001:3314 -->
-    <usb-device
-        product-id="0x3318"
-        vendor-id="0x2001" /> <!-- 2001:3318 -->
-    <usb-device
-        product-id="0xAB32"
-        vendor-id="0x2019" /> <!-- 2019:AB32 -->
-    <usb-device
-        product-id="0x804B"
-        vendor-id="0x20F4" /> <!-- 20F4:804B -->
-    <usb-device
-        product-id="0x011E"
-        vendor-id="0x2357" /> <!-- 2357:011E -->
-    <usb-device
-        product-id="0x0120"
-        vendor-id="0x2357" /> <!-- 2357:0120 -->
-    <usb-device
-        product-id="0x0122"
-        vendor-id="0x2357" /> <!-- 2357:0122 -->
-    <usb-device
-        product-id="0x6249"
-        vendor-id="0x3823" /> <!-- 3823:6249 -->
-    <usb-device
-        product-id="0xA811"
-        vendor-id="0x7392" /> <!-- 7392:A811 -->
-    <usb-device
-        product-id="0xA812"
-        vendor-id="0x7392" /> <!-- 7392:A812 -->
-    <usb-device
-        product-id="0xA813"
-        vendor-id="0x7392" /> <!-- 7392:A813 -->
-    <usb-device
-        product-id="0xB611"
-        vendor-id="0x7392" /> <!-- 7392:B611 -->
+        product-id="E822"
+        vendor-id="0BDA" /> <!-- RTL8822EU (multi-function) -->
 </resources>

@@ -9,16 +9,20 @@ extern "C" {
 #include "wfb-ng/src/zfex.h"
 }
 
+#include "devourer/src/IRtlDevice.h"
 #include "devourer/src/WiFiDriver.h"
 #include "wfb-ng/src/rx.hpp"
+#include <cstdint>
+#include <functional>
 #include <jni.h>
 #include <list>
 #include <map>
 #include <mutex>
+#include <thread>
 #include <vector> // Added for std::vector
 
-const u8 wfb_tx_port = 160;
-const u8 wfb_rx_port = 32;
+const uint8_t wfb_tx_port = 160;
+const uint8_t wfb_rx_port = 32;
 
 class WfbngLink {
   public:
@@ -54,7 +58,7 @@ class WfbngLink {
     bool ldpc_enabled{true};
     bool stbc_enabled{true};
 
-    std::map<int, std::shared_ptr<RtlJaguarDevice>> rtl_devices;
+    std::map<int, std::shared_ptr<IRtlDevice>> rtl_devices;
     std::unique_ptr<std::thread> link_quality_thread{nullptr};
     bool should_clear_stats{false};
     FecChangeController fec;
@@ -87,7 +91,7 @@ class WfbngLink {
         if (rtl_devices.find(current_fd) == rtl_devices.end()) return;
         auto dev = rtl_devices.at(current_fd).get();
         if (dev) {
-            dev->should_stop = true;
+            dev->StopRxLoop();
         }
     }
 
@@ -100,7 +104,6 @@ class WfbngLink {
     uint32_t udp_channel_id_be;
 
     Logger_t log;
-    std::unique_ptr<std::thread> usb_event_thread{nullptr};
     std::unique_ptr<std::thread> usb_tx_thread{nullptr};
     uint32_t link_id{7669206};
     SignalQualityCalculator rssi_calculator;

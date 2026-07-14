@@ -8,6 +8,7 @@
 #include "RxFrame.h"
 #include "SignalQualityCalculator.h"
 #include "TxFrame.h"
+#include "devourer/src/RxPacket.h"
 #include "libusb.h"
 #include "wfb-ng/src/wifibroadcast.hpp"
 
@@ -56,7 +57,7 @@ std::string generate_random_string(size_t length) {
 WfbngLink::WfbngLink(JNIEnv *env, jobject context)
         : current_fd(-1), adaptive_link_enabled(true), adaptive_tx_power(30) {
     initAgg();
-    log = std::make_shared<Logger>();
+    log = std::make_shared<Logger>(); // routes to logcat under the "devourer" tag
     wifi_driver = std::make_unique<WiFiDriver>(log);
 }
 
@@ -115,7 +116,16 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
     r = libusb_claim_interface(dev_handle, 0);
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "Creating driver and device for fd=%d", fd);
 
-    rtl_devices.emplace(fd, wifi_driver->CreateRtlDevice(dev_handle));
+    devourer::DeviceConfig cfg;
+    // TX+RX on the one claimed handle. Jaguar3 (RTL8812EU/8822EU) must know
+    // this before InitWrite so the bring-up keeps the RX filters open;
+    // Jaguar1 (RTL8812AU) ignores it.
+    cfg.rx.enable_with_tx = true;
+    // The per-adapter advisory lock defaults to /tmp, which doesn't exist on
+    // Android — use the app's files dir (same location as gs.key).
+    cfg.usb.lock_dir = "/data/user/0/com.openipc.pixelpilot/files";
+
+    rtl_devices[fd] = wifi_driver->CreateRtlDevice(dev_handle, ctx, nullptr, cfg);
     if (!rtl_devices.at(fd)) {
         libusb_exit(ctx);
         __android_log_print(ANDROID_LOG_ERROR, TAG, "CreateRtlDevice error");
@@ -185,22 +195,19 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         // Store the current fd for later TX power updates.
         current_fd = fd;
 
-        if (!usb_event_thread) {
-            auto usb_event_thread_func = [ctx, this, fd] {
-                while (true) {
-                    auto dev = this->rtl_devices.at(fd).get();
-                    if (dev == nullptr || dev->should_stop) break;
-                    struct timeval timeout = {0, 500000}; // 500ms timeout
-                    int r = libusb_handle_events_timeout(ctx, &timeout);
-                    if (r < 0) {
-                        this->log->error("Error handling events: {}", r);
-                        // break;
-                    }
-                }
-            };
+        IRtlDevice *current_device = rtl_devices.at(fd).get();
 
-            init_thread(usb_event_thread, [=]() { return std::make_unique<std::thread>(usb_event_thread_func); });
+        // TX-capable bring-up with RX enabled (cfg.rx.enable_with_tx). On
+        // Jaguar3 (RTL8812EU/8822EU) this also starts the coex runtime thread
+        // that sustained TX needs.
+        auto bandWidth = (bw == 20 ? CHANNEL_WIDTH_20 : CHANNEL_WIDTH_40);
+        current_device->InitWrite(SelectedChannel{
+            .Channel = static_cast<uint8_t>(wifiChannel),
+            .ChannelOffset = 0,
+            .ChannelWidth = bandWidth,
+        });
 
+        if (!usb_tx_thread) {
             std::shared_ptr<TxArgs> args = std::make_shared<TxArgs>();
             args->udp_port = 8001;
             args->link_id = link_id;
@@ -218,15 +225,12 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             __android_log_print(
                 ANDROID_LOG_ERROR, TAG, "radio link ID %d, radio PORT %d", args->link_id, args->radio_port);
 
-            RtlJaguarDevice *current_device = rtl_devices.at(fd).get();
-            if (!usb_tx_thread) {
-                init_thread(usb_tx_thread, [&]() {
-                    return std::make_unique<std::thread>([this, current_device, args] {
-                        txFrame->run(current_device, args.get());
-                        __android_log_print(ANDROID_LOG_DEBUG, TAG, "usb_transfer thread should terminate");
-                    });
+            init_thread(usb_tx_thread, [&]() {
+                return std::make_unique<std::thread>([this, current_device, args] {
+                    txFrame->run(current_device, args.get());
+                    __android_log_print(ANDROID_LOG_DEBUG, TAG, "usb_transfer thread should terminate");
                 });
-            }
+            });
 
             if (adaptive_link_enabled) {
                 stop_adaptive_link();
@@ -234,37 +238,36 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             }
         }
 
-        auto bandWidth = (bw == 20 ? CHANNEL_WIDTH_20 : CHANNEL_WIDTH_40);
-        rtl_devices.at(fd)->Init(packetProcessor,
-                                 SelectedChannel{
-                                     .Channel = static_cast<uint8_t>(wifiChannel),
-                                     .ChannelOffset = 0,
-                                     .ChannelWidth = bandWidth,
-                                 });
+        // Blocking RX loop on this thread; devourer pumps the libusb events
+        // itself. Returns once StopRxLoop() is called.
+        current_device->StartRxLoop(packetProcessor);
     } catch (const std::runtime_error &error) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "runtime_error: %s", error.what());
-        auto dev = rtl_devices.at(fd).get();
-        if (dev) {
-            dev->should_stop = true;
-        }
         txFrame->stop();
 
         destroy_thread(usb_tx_thread);
-        destroy_thread(usb_event_thread);
         stop_adaptive_link();
+        auto dev = rtl_devices.at(fd).get();
+        if (dev) {
+            dev->Stop();
+        }
+        libusb_release_interface(dev_handle, 0);
+        libusb_exit(ctx);
         return -1;
     }
 
-    __android_log_print(ANDROID_LOG_DEBUG, TAG, "Init done, releasing...");
-    auto dev = rtl_devices.at(fd).get();
-    if (dev) {
-        dev->should_stop = true;
-    }
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "RX loop exited, releasing...");
     txFrame->stop();
 
     destroy_thread(usb_tx_thread);
-    destroy_thread(usb_event_thread);
     stop_adaptive_link();
+
+    // Clean shutdown: halt TRX DMA and power the chip down before releasing
+    // the USB interface.
+    auto dev = rtl_devices.at(fd).get();
+    if (dev) {
+        dev->Stop();
+    }
 
     r = libusb_release_interface(dev_handle, 0);
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_release_interface: %d", r);
@@ -280,7 +283,7 @@ void WfbngLink::stop(JNIEnv *env, jobject context, jint fd) {
     }
     auto dev = rtl_devices.at(fd).get();
     if (dev) {
-        dev->should_stop = true;
+        dev->StopRxLoop();
     } else {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "rtl_devices.at(%d) is nullptr", fd);
     }
