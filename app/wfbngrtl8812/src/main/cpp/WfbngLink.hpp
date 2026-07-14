@@ -18,6 +18,7 @@ extern "C" {
 #include <list>
 #include <map>
 #include <mutex>
+#include <set>
 #include <thread>
 #include <vector> // Added for std::vector
 
@@ -97,6 +98,8 @@ class WfbngLink {
 
     const char *keyPath = "/data/user/0/com.openipc.pixelpilot/files/gs.key";
     std::recursive_mutex thread_mutex;
+    std::mutex stop_request_mutex;
+    std::set<int> stop_requested_fds;
     std::unique_ptr<WiFiDriver> wifi_driver;
     std::shared_ptr<TxFrame> txFrame;
     uint32_t video_channel_id_be;
