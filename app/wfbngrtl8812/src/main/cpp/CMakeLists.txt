@@ -44,6 +44,7 @@ add_library(devourer STATIC
         ${CMAKE_SOURCE_DIR}/devourer/src/TxMode.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/TxPower.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/LinkHealth.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/LaCapture.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/SignalStop.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/WiFiDriver.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/PhyTableLoader.cpp
@@ -65,6 +66,20 @@ add_library(devourer STATIC
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/FrameParser.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar1/BbDbgportReader.cpp
 
+        # --- Jaguar2 (RTL8822BU / RTL8812BU) ---
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar2/RtlJaguar2Device.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar2/HalJaguar2.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar2/HalmacJaguar2Fw.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar2/HalmacJaguar2MacInit.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar2/Phy8822bTables.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar2/Halrf8822b.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/hal/hal8822b_fw.c
+        ${CMAKE_SOURCE_DIR}/devourer/hal/phydm/rtl8822b/Hal8822b_PhyTables.c
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar2/Phy8821cTables.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar2/Halrf8821c.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/hal/hal8821c_fw.c
+        ${CMAKE_SOURCE_DIR}/devourer/hal/phydm/rtl8821c/Hal8821c_PhyTables.c
+
         # --- Jaguar3 shared (dispatchers compiled for any Jaguar3 variant) ---
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/RtlJaguar3Device.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/HalJaguar3.cpp
@@ -72,6 +87,7 @@ add_library(devourer STATIC
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/HalmacJaguar3MacInit.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/RadioManagementJaguar3.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/PhyTableLoaderJaguar3.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/PhydmRuntimeJaguar3.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/Phy8822cTables.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/Halrf8822c.cpp
 
@@ -84,12 +100,17 @@ set_target_properties(devourer PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_
 
 target_compile_definitions(devourer PUBLIC
         DEVOURER_HAVE_JAGUAR1=1
+        DEVOURER_HAVE_JAGUAR2=1
+        DEVOURER_HAVE_JAGUAR2_8822B=1
+        DEVOURER_HAVE_JAGUAR2_8821C=1
         DEVOURER_HAVE_JAGUAR3=1
         DEVOURER_HAVE_JAGUAR3_8822E=1)
 
 target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer)
 target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/src)
 target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/hal)
+target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/hal/phydm/rtl8822b)
+target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/hal/phydm/rtl8821c)
 target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/hal/phydm/rtl8822c)
 target_include_directories(devourer PUBLIC ${CMAKE_SOURCE_DIR}/devourer/hal/phydm/rtl8822e)
 target_link_libraries(devourer PUBLIC log)
