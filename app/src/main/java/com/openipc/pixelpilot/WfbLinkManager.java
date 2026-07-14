@@ -97,8 +97,8 @@ public class WfbLinkManager extends BroadcastReceiver {
         try {
             filters = UsbDeviceFilter.parseXml(context, R.xml.usb_device_filter);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            Log.e(TAG, "Unable to parse USB device filter", e);
+            return new HashMap<>();
         }
 
         Map<String, UsbDevice> res = new HashMap<>();
