@@ -22,6 +22,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.Formatter;
 import android.util.Base64;
 import android.util.DisplayMetrics;
@@ -80,6 +82,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // Most basic implementation of an activity that uses VideoNative to stream a video
 // Into an Android Surface View
@@ -114,6 +118,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
     private static final String PREF_DRONE_USERNAME = "drone_username";
     private static final String PREF_DRONE_PASSWORD = "drone_password";
+    private static final String PREF_DVR_FILENAME = "dvr_filename";
 
     public boolean getVRSetting() {
         return getSharedPreferences("general", Context.MODE_PRIVATE).getBoolean("vr-mode", false);
@@ -902,6 +907,12 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             resetFolderPermissions();
             return true;
         });
+
+        MenuItem editFileNameTemplate = recording.add("File Name Template");
+        editFileNameTemplate.setOnMenuItemClickListener(item -> {
+            showEditFileNameTemplateDialog();
+            return true;
+        });
     }
 
     /**
@@ -1180,10 +1191,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         DocumentFile pickedDir = DocumentFile.fromTreeUri(this, uri);
         if (pickedDir != null && pickedDir.canWrite()) {
             LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
-            // Format the current date and time
-            String formattedNow = now.format(formatter);
-            String filename = "pixelpilot_" + formattedNow + ".mp4";
+            String filename = getDvrFileName(getDvrFileNameTemplate(), now) + ".mp4";
             DocumentFile newFile = pickedDir.createFile("video/mp4", filename);
             Toast.makeText(this, "Recording to " + filename, Toast.LENGTH_SHORT).show();
             if (newFile == null)
@@ -1679,10 +1687,81 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 .show();
     }
 
+    private void showEditFileNameTemplateDialog() {
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 30, 50, 30); // Add some padding around the content
+
+        // EditText for filename
+        final android.widget.EditText fileNameEditText = new android.widget.EditText(this);
+        fileNameEditText.setHint("pixelpilot_[yyyyMMdd-HHmmss]");
+        fileNameEditText.setText(getDvrFileNameTemplate()); // Pre-fill with current saved filename template
+        layout.addView(fileNameEditText);
+
+        // TextView for preview filename
+        final android.widget.TextView previewTextView = new android.widget.TextView(this);
+        previewTextView.setText(getDvrFileName(getDvrFileNameTemplate(), LocalDateTime.now()) + ".mp4");
+        layout.addView(previewTextView);
+
+        // Set a listener for EditText
+        fileNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                previewTextView.setText(getDvrFileName(fileNameEditText.getText().toString(), LocalDateTime.now()) + ".mp4");
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        // Build and show the AlertDialog
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("DVR File Name Template")
+                .setView(layout) // Set our custom layout
+                .setPositiveButton("Save", (dialog, which) -> {
+                    // Save the new values to SharedPreferences
+                    setDvrFileName(fileNameEditText.getText().toString());
+                    Toast.makeText(this, "DVR file name template saved.", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.cancel(); // Dismiss the dialog
+                })
+                .show();
+    }
+
+    // pixelpilot_[yyyyMMdd-HHmmss]
+    // ".mp4" will append later
+    private String getDvrFileName(String template, LocalDateTime time) {
+        Matcher matcher = Pattern.compile("\\[([^\\]]*)\\]").matcher(template);
+        String fallbackTime = time.format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+
+        if (matcher.find()) {
+            String prefix = template.substring(0, matcher.start());
+            String pattern = matcher.group(1);
+            String suffix = template.substring(matcher.end());
+
+            try {
+                String timePart = time.format(DateTimeFormatter.ofPattern(pattern));
+                return prefix + timePart + suffix;
+            } catch (IllegalArgumentException e) {
+                return prefix + fallbackTime + suffix;
+            }
+        }
+        return "pixelpilot_" + fallbackTime;
+    }
+
     // Helper method to retrieve the drone username
     // Provides a default "root" if not yet set, for initial compatibility.
     private String getDroneUsername() {
         return getSharedPreferences("general", Context.MODE_PRIVATE).getString(PREF_DRONE_USERNAME, "root");
+    }
+
+    private String getDvrFileNameTemplate()
+    {
+        return getSharedPreferences("general", Context.MODE_PRIVATE).getString(PREF_DVR_FILENAME, "pixelpilot_[yyyyMMdd-HHmmss]");
     }
 
     // Helper method to save the drone username
@@ -1690,6 +1769,13 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(PREF_DRONE_USERNAME, username);
+        editor.apply();
+    }
+
+    private void setDvrFileName(String fileName) {
+        SharedPreferences prefs = getSharedPreferences("general", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(PREF_DVR_FILENAME, fileName);
         editor.apply();
     }
 
