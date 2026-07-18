@@ -1180,7 +1180,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         DocumentFile pickedDir = DocumentFile.fromTreeUri(this, uri);
         if (pickedDir != null && pickedDir.canWrite()) {
             LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmm");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
             // Format the current date and time
             String formattedNow = now.format(formatter);
             String filename = "pixelpilot_" + formattedNow + ".mp4";
