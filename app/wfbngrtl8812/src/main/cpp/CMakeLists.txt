@@ -47,6 +47,7 @@ add_library(devourer STATIC
         ${CMAKE_SOURCE_DIR}/devourer/src/SignalStop.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/WiFiDriver.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/PhyTableLoader.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/LaCapture.cpp
 
         # --- Jaguar1 (RTL8812AU / 8811AU / 8821AU) ---
         ${CMAKE_SOURCE_DIR}/devourer/hal/hal8812a_fw.c
@@ -71,6 +72,7 @@ add_library(devourer STATIC
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/HalmacJaguar3Fw.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/HalmacJaguar3MacInit.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/RadioManagementJaguar3.cpp
+        ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/PhydmRuntimeJaguar3.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/PhyTableLoaderJaguar3.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/Phy8822cTables.cpp
         ${CMAKE_SOURCE_DIR}/devourer/src/jaguar3/Halrf8822c.cpp
