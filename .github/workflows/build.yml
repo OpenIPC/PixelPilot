@@ -18,7 +18,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          # Init the direct submodules (devourer + wfb-ng) but NOT recursively:
+          # devourer's reference/* vendor-kernel submodules are only used by its
+          # extraction tooling / hardware tests, never compiled into the APK, and
+          # one of them currently pins an unpushed commit that breaks a recursive
+          # clone. wfb-ng has no nested submodules.
+          submodules: true
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
