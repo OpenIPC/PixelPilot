@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
+    alias(libs.plugins.gradleDownload)
 }
 
 android {
@@ -40,9 +41,28 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    androidResources {
+        noCompress 'tflite'
+    }
     buildToolsVersion '35.0.0'
     ndkVersion '26.1.10909125'
 }
+
+project.ext.ASSET_DIR = projectDir.toString() + '/src/main/assets'
+
+task downloadModelFile0(type: de.undercouch.gradle.tasks.download.Download) {
+    src 'https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float32/1/efficientdet_lite0.tflite'
+    dest project.ext.ASSET_DIR + '/efficientdet-lite0.tflite'
+    overwrite false
+}
+
+task downloadModelFile1(type: de.undercouch.gradle.tasks.download.Download) {
+    src 'https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite2/float32/1/efficientdet_lite2.tflite'
+    dest project.ext.ASSET_DIR + '/efficientdet-lite2.tflite'
+    overwrite false
+}
+
+preBuild.dependsOn downloadModelFile0, downloadModelFile1
 
 dependencies {
     implementation(project(":app:mavlink"))
@@ -52,4 +72,5 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.philjay.mpandroidchart)
+    implementation(libs.mediapipe.tasks.vision)
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <SurfaceView
+    <TextureView
         android:id="@+id/mainVideo"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -14,6 +14,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.openipc.pixelpilot.OverlayView
+        android:id="@+id/detectionOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/mainVideo"
+        app:layout_constraintEnd_toEndOf="@id/mainVideo"
+        app:layout_constraintStart_toStartOf="@id/mainVideo"
+        app:layout_constraintTop_toTopOf="@id/mainVideo" />
 
     <SurfaceView
         android:id="@+id/surfaceViewLeft"

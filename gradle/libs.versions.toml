@@ -5,6 +5,8 @@ appcompat = "1.7.0"
 material = "1.12.0"
 constraintlayout = "2.1.4"
 mpandroidchartVersion = "3.1.0"
+mediapipe = "0.10.29"
+gradleDownload = "5.5.0"
 
 [libraries]
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
@@ -12,7 +14,9 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 philjay-mpandroidchart = { module = "com.github.Philjay:mpandroidchart", version.ref = "mpandroidchartVersion" }
+mediapipe-tasks-vision = { module = "com.google.mediapipe:tasks-vision", version.ref = "mediapipe" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+gradleDownload = { id = "de.undercouch.download", version.ref = "gradleDownload" }
