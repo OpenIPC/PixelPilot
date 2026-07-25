@@ -80,6 +80,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import android.graphics.Bitmap;
+import android.os.SystemClock;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import android.view.TextureView;
+import android.graphics.SurfaceTexture;
+import android.view.Surface;
 
 // Most basic implementation of an activity that uses VideoNative to stream a video
 // Into an Android Surface View
@@ -111,6 +118,12 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private ConstraintLayout constraintLayout;
     private ConstraintSet constraintSet;
     private WfbNgLink wfbLink;
+
+    private ObjectDetectorHelper objectDetectorHelper;
+    private ExecutorService objectDetectionExecutor;
+    private volatile boolean isObjectDetectionEnabled = false;
+    private volatile boolean isDetecting = false;
+    private final Object detectorLock = new Object();
 
     private static final String PREF_DRONE_USERNAME = "drone_username";
     private static final String PREF_DRONE_PASSWORD = "drone_password";
@@ -344,7 +357,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private void setupStandardVideoPlayer() {
         binding.surfaceViewRight.setVisibility(View.GONE);
         binding.surfaceViewLeft.setVisibility(View.GONE);
-        binding.mainVideo.getHolder().addCallback(videoPlayer.configure1(0));
+        binding.mainVideo.setSurfaceTextureListener(videoPlayer.configureTextureView(0));
     }
 
     // ----------------------------------------------------------------------------
@@ -573,6 +586,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         // Help submenu
         setupHelpSubMenu(popup);
+
+        // Object Detection submenu
+        setupObjectDetectionSubMenu(popup);
 
         popup.show();
     }
@@ -1407,6 +1423,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     protected void onPause() {
         super.onPause();
 
+        stopObjectDetectionLoop();
+
         unregisterReceivers();
 
         videoPlayer.stop();
@@ -1445,6 +1463,10 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         videoPlayer.start();
         updateUdpForwardingState();
         videoPlayer.startAudio();
+
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        boolean odEnabled = prefs.getBoolean("od_enabled", false);
+        setObjectDetectionEnabled(odEnabled);
 
         osdManager.restoreOSDConfig();
 
@@ -1736,5 +1758,173 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 handler.proceed(username, password);
             }
         });
+    }
+
+    private void setupObjectDetectionSubMenu(PopupMenu popup) {
+        SubMenu odMenu = popup.getMenu().addSubMenu("Object Detection");
+
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        boolean odEnabled = prefs.getBoolean("od_enabled", false);
+
+        MenuItem enableItem = odMenu.add("Enable");
+        enableItem.setCheckable(true);
+        enableItem.setChecked(odEnabled);
+        enableItem.setOnMenuItemClickListener(item -> {
+            boolean newState = !item.isChecked();
+            item.setChecked(newState);
+            setObjectDetectionEnabled(newState);
+            return true;
+        });
+
+        SubMenu delegateMenu = odMenu.addSubMenu("Delegate");
+        int savedDelegate = prefs.getInt("od_delegate", ObjectDetectorHelper.DELEGATE_CPU);
+
+        MenuItem cpuItem = delegateMenu.add("CPU");
+        cpuItem.setCheckable(true);
+        cpuItem.setChecked(savedDelegate == ObjectDetectorHelper.DELEGATE_CPU);
+        cpuItem.setOnMenuItemClickListener(item -> {
+            prefs.edit().putInt("od_delegate", ObjectDetectorHelper.DELEGATE_CPU).apply();
+            restartObjectDetector();
+            return true;
+        });
+
+        MenuItem gpuItem = delegateMenu.add("GPU");
+        gpuItem.setCheckable(true);
+        gpuItem.setChecked(savedDelegate == ObjectDetectorHelper.DELEGATE_GPU);
+        gpuItem.setOnMenuItemClickListener(item -> {
+            prefs.edit().putInt("od_delegate", ObjectDetectorHelper.DELEGATE_GPU).apply();
+            restartObjectDetector();
+            return true;
+        });
+
+        SubMenu modelMenu = odMenu.addSubMenu("Model");
+        int savedModel = prefs.getInt("od_model", ObjectDetectorHelper.MODEL_EFFICIENTDETV0);
+
+        MenuItem v0Item = modelMenu.add("EfficientDet-Lite0");
+        v0Item.setCheckable(true);
+        v0Item.setChecked(savedModel == ObjectDetectorHelper.MODEL_EFFICIENTDETV0);
+        v0Item.setOnMenuItemClickListener(item -> {
+            prefs.edit().putInt("od_model", ObjectDetectorHelper.MODEL_EFFICIENTDETV0).apply();
+            restartObjectDetector();
+            return true;
+        });
+
+        MenuItem v2Item = modelMenu.add("EfficientDet-Lite2");
+        v2Item.setCheckable(true);
+        v2Item.setChecked(savedModel == ObjectDetectorHelper.MODEL_EFFICIENTDETV2);
+        v2Item.setOnMenuItemClickListener(item -> {
+            prefs.edit().putInt("od_model", ObjectDetectorHelper.MODEL_EFFICIENTDETV2).apply();
+            restartObjectDetector();
+            return true;
+        });
+    }
+
+    private void setObjectDetectionEnabled(boolean enabled) {
+        isObjectDetectionEnabled = enabled;
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        prefs.edit().putBoolean("od_enabled", enabled).apply();
+
+        if (enabled) {
+            binding.detectionOverlay.setVisibility(View.VISIBLE);
+            startObjectDetectionLoop();
+        } else {
+            binding.detectionOverlay.setVisibility(View.GONE);
+            binding.detectionOverlay.clear();
+            stopObjectDetectionLoop();
+        }
+    }
+
+    private void restartObjectDetector() {
+        if (isObjectDetectionEnabled) {
+            stopObjectDetectionLoop();
+            startObjectDetectionLoop();
+        }
+    }
+
+    private void startObjectDetectionLoop() {
+        if (isVRMode) return; // Standard mode only
+        if (objectDetectionExecutor == null) {
+            objectDetectionExecutor = Executors.newSingleThreadExecutor();
+        }
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        int delegate = prefs.getInt("od_delegate", ObjectDetectorHelper.DELEGATE_CPU);
+        int model = prefs.getInt("od_model", ObjectDetectorHelper.MODEL_EFFICIENTDETV0);
+
+        objectDetectionExecutor.execute(() -> {
+            synchronized (detectorLock) {
+                if (objectDetectorHelper != null) {
+                    objectDetectorHelper.clear();
+                }
+                objectDetectorHelper = new ObjectDetectorHelper(
+                        VideoActivity.this,
+                        0.5f,
+                        3,
+                        delegate,
+                        model
+                );
+            }
+
+            isDetecting = true;
+            while (isDetecting && isObjectDetectionEnabled) {
+                Bitmap bitmap = null;
+                try {
+                    long start = SystemClock.uptimeMillis();
+                    if (binding.mainVideo != null && binding.mainVideo.isAvailable()) {
+                        bitmap = binding.mainVideo.getBitmap();
+                    }
+
+                    if (bitmap != null) {
+                        ObjectDetectorHelper.ResultBundle result = null;
+                        synchronized (detectorLock) {
+                            if (objectDetectorHelper != null) {
+                                result = objectDetectorHelper.detectImage(bitmap);
+                            }
+                        }
+                        
+                        if (result != null && !result.results.isEmpty() && isObjectDetectionEnabled) {
+                            final ObjectDetectorHelper.ResultBundle finalResult = result;
+                            runOnUiThread(() -> {
+                                if (isObjectDetectionEnabled) {
+                                    binding.detectionOverlay.setResults(finalResult.results.get(0), finalResult.inputImageHeight, finalResult.inputImageWidth);
+                                }
+                            });
+                        } else {
+                            runOnUiThread(() -> {
+                                if (isObjectDetectionEnabled) {
+                                    binding.detectionOverlay.clear();
+                                }
+                            });
+                        }
+                    }
+
+                    long sleepTime = 100 - (SystemClock.uptimeMillis() - start); // ~10 FPS
+                    if (sleepTime > 0) {
+                        Thread.sleep(sleepTime);
+                    }
+                } catch (InterruptedException e) {
+                    break;
+                } catch (Exception e) {
+                    Log.e(TAG, "Error in detection loop", e);
+                } finally {
+                    if (bitmap != null) {
+                        bitmap.recycle();
+                    }
+                }
+            }
+        });
+    }
+
+    private void stopObjectDetectionLoop() {
+        isDetecting = false;
+        if (objectDetectionExecutor != null) {
+            objectDetectionExecutor.shutdownNow();
+            objectDetectionExecutor = null;
+        }
+        synchronized (detectorLock) {
+            if (objectDetectorHelper != null) {
+                objectDetectorHelper.clear();
+                objectDetectorHelper = null;
+            }
+        }
     }
 }

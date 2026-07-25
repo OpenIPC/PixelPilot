@@ -187,6 +187,29 @@ public class VideoPlayer implements IVideoParamsChanged {
         };
     }
 
+    public android.view.TextureView.SurfaceTextureListener configureTextureView(final int index) {
+        return new android.view.TextureView.SurfaceTextureListener() {
+            @Override
+            public void onSurfaceTextureAvailable(android.graphics.SurfaceTexture surfaceTexture, int width, int height) {
+                addAndStartDecoderReceiver(new Surface(surfaceTexture), index);
+            }
+
+            @Override
+            public void onSurfaceTextureSizeChanged(android.graphics.SurfaceTexture surfaceTexture, int width, int height) {
+            }
+
+            @Override
+            public boolean onSurfaceTextureDestroyed(android.graphics.SurfaceTexture surfaceTexture) {
+                stopAndRemoveReceiverDecoder(index);
+                return true;
+            }
+
+            @Override
+            public void onSurfaceTextureUpdated(android.graphics.SurfaceTexture surfaceTexture) {
+            }
+        };
+    }
+
 //    /**
 //     * Configure for use with VideoSurfaceHolder (OpenGL)
 //     * The callback will handle the lifecycle of the video player

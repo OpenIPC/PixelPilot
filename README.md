@@ -103,6 +103,22 @@ Higher values → leaner bandwidth, less resilience.
 
 ---
 
+## Object Detection (Optional)
+PixelPilot features an optional, real-time object detection overlay using Google's MediaPipe Object Detection library.
+
+### Features
+* **Live Overlay**: Draws bounding boxes, class names, and confidence scores directly over the standard video stream.
+* **Hardware Acceleration**: Toggle between CPU and GPU delegates to optimize performance for your device.
+* **Model Choices**: Supports switching between `EfficientDet-Lite0` (lightweight/faster) and `EfficientDet-Lite2` (larger/more accurate) models.
+* **Automated Setup**: The necessary TFLite model files are downloaded automatically from Google's CDN during the Gradle build phase.
+
+### How to Use
+1. In the application settings menu, click on the **Object Detection** submenu.
+2. Select **Enable** to toggle the detection overlay on/off.
+3. Choose your preferred hardware **Delegate** (CPU/GPU) and **Model** (Lite0/Lite2) based on your device's processing capabilities.
+
+---
+
 ## List of potential improvements:
  * adaptive link [x]
  * 40 MHz bandwidth [?] - works but buggy
