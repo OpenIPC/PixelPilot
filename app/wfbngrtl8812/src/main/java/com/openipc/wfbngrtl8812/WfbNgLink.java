@@ -49,6 +49,9 @@ public class WfbNgLink implements WfbNGStatsChanged {
     public static native void nativeSetUseFec(long nativeInstance, int use);
     public static native void nativeSetUseLdpc(long nativeInstance, int use);
     public static native void nativeSetUseStbc(long nativeInstance, int use);
+    public static native void nativeSetUplinkEnabled(long nativeInstance, int enabled);
+    public static native void nativeSetUplinkMcs(long nativeInstance, int mcs);
+    public static native void nativeSetUplinkFecN(long nativeInstance, int n);
 
     public WfbNgLink(final AppCompatActivity parent) {
         this.context = parent;
@@ -90,6 +93,21 @@ public class WfbNgLink implements WfbNGStatsChanged {
 
     public void nativeSetUseStbc(int use) {
         nativeSetUseStbc(nativeWfbngLink, use);
+    }
+
+    // Uplink airtime controls. Every uplink frame is a receive blackout on this
+    // half-duplex radio, so these trade uplink margin for video integrity. Like
+    // LDPC/STBC they are read when the link starts, so a change needs a reconnect.
+    public void nativeSetUplinkEnabled(boolean enabled) {
+        nativeSetUplinkEnabled(nativeWfbngLink, enabled ? 1 : 0);
+    }
+
+    public void nativeSetUplinkMcs(int mcs) {
+        nativeSetUplinkMcs(nativeWfbngLink, mcs);
+    }
+
+    public void nativeSetUplinkFecN(int n) {
+        nativeSetUplinkFecN(nativeWfbngLink, n);
     }
 
     public synchronized void start(int wifiChannel, int bandWidth, UsbDevice usbDevice) {

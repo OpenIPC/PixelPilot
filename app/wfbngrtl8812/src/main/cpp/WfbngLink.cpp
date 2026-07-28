@@ -207,19 +207,26 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
             .ChannelWidth = bandWidth,
         });
 
-        if (!usb_tx_thread) {
+        // Uplink off: start neither the TX worker nor the adaptive-link thread,
+        // so the radio only ever receives. Costs adaptive bitrate and the
+        // mavlink uplink — the setting exists for ground stations that carry RC
+        // and telemetry on a separate radio, where uplink airtime here buys
+        // nothing and only steals receive time.
+        if (!uplink_enabled) {
+            __android_log_print(ANDROID_LOG_WARN, TAG, "uplink disabled: RX only, no adaptive link");
+        } else if (!usb_tx_thread) {
             std::shared_ptr<TxArgs> args = std::make_shared<TxArgs>();
             args->udp_port = 8001;
             args->link_id = link_id;
             args->keypair = keyPath;
             args->stbc = stbc_enabled;
             args->ldpc = ldpc_enabled;
-            args->mcs_index = 0;
+            args->mcs_index = uplink_mcs;
             args->vht_mode = false;
             args->short_gi = false;
             args->bandwidth = 20;
             args->k = 1;
-            args->n = 5;
+            args->n = uplink_fec_n;
             args->radio_port = wfb_tx_port;
 
             __android_log_print(
@@ -580,6 +587,44 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
                                                                                            jint use) {
     WfbngLink *link = native(wfbngLinkN);
     link->stbc_enabled = (use != 0);
+}
+
+/* Uplink airtime controls. Applied when the link (re)starts, since TxArgs is
+ * built once per run() — same lifecycle as ldpc/stbc. */
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetUplinkEnabled(JNIEnv *env,
+                                                                                                jclass clazz,
+                                                                                                jlong wfbngLinkN,
+                                                                                                jint enabled) {
+    WfbngLink *link = native(wfbngLinkN);
+    link->uplink_enabled = (enabled != 0);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetUplinkMcs(JNIEnv *env,
+                                                                                            jclass clazz,
+                                                                                            jlong wfbngLinkN,
+                                                                                            jint mcs) {
+    WfbngLink *link = native(wfbngLinkN);
+    // Single spatial stream: 0..7. Out-of-range values are ignored rather than
+    // clamped, so a bad setting cannot silently become a different rate.
+    if (mcs >= 0 && mcs <= 7) {
+        link->uplink_mcs = mcs;
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "ignoring out-of-range uplink MCS %d", mcs);
+    }
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetUplinkFecN(JNIEnv *env,
+                                                                                             jclass clazz,
+                                                                                             jlong wfbngLinkN,
+                                                                                             jint n) {
+    WfbngLink *link = native(wfbngLinkN);
+    // k is 1, so n is copies-per-message and must be >= 1. Upper bound keeps the
+    // airtime this was written to contain from creeping back.
+    if (n >= 1 && n <= 8) {
+        link->uplink_fec_n = n;
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "ignoring out-of-range uplink FEC n %d", n);
+    }
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetFecThresholds(

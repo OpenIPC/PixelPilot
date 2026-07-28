@@ -58,6 +58,25 @@ class WfbngLink {
     bool ldpc_enabled{true};
     bool stbc_enabled{true};
 
+    // Uplink airtime controls. The adapter is half duplex, so every uplink frame
+    // is a receive blackout and the downlink loses whatever video fragments land
+    // in it. Measured on an RTL8812AU at 5 GHz, in lost video fragments/s that
+    // the downlink FEC could not recover:
+    //
+    //   mcs 0, n 5  15.82   (the old hardcoded values)
+    //   mcs 1, n 5   2.18   <- default: one MCS step, redundancy untouched
+    //   mcs 3, n 2   0.12
+    //   uplink off   0.00
+    //
+    // The default spends ~3 dB of uplink margin and keeps all five copies, which
+    // matters because losing mavlink is worse than losing video. Anyone who wants
+    // the last of the artefacts gone can trade further in the Uplink dialog.
+    // Read when TxArgs is built, so a change applies on the next link start —
+    // same lifecycle as ldpc/stbc.
+    bool uplink_enabled{true};  // false = transmit nothing at all
+    int uplink_mcs{1};          // HT MCS index for uplink frames
+    int uplink_fec_n{5};        // uplink FEC n (with k=1: copies per message)
+
     std::map<int, std::shared_ptr<IRtlDevice>> rtl_devices;
     std::unique_ptr<std::thread> link_quality_thread{nullptr};
     bool should_clear_stats{false};
