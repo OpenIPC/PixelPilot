@@ -124,6 +124,12 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
     // The per-adapter advisory lock defaults to /tmp, which doesn't exist on
     // Android — use the app's files dir (same location as gs.key).
     cfg.usb.lock_dir = "/data/user/0/com.openipc.pixelpilot/files";
+    // Keep the RX ring on plain heap buffers. The zerocopy dev-mem path
+    // (libusb_dev_mem_alloc / USBDEVFS mmap) is unvalidated on Android vendor
+    // kernels; if the mmap succeeds but the HCD's zerocopy path is broken,
+    // the heap fallback never triggers. Heap is the behavior every working
+    // Android build has shipped.
+    cfg.usb.rx_zerocopy = false;
 
     rtl_devices[fd] = wifi_driver->CreateRtlDevice(dev_handle, ctx, nullptr, cfg);
     if (!rtl_devices.at(fd)) {
