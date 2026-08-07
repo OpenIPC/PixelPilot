@@ -31,8 +31,8 @@ public class UsbDeviceFilter {
                     String vendorIdString = parser.getAttributeValue(null, "vendor-id");
                     String productIdString = parser.getAttributeValue(null, "product-id");
 
-                    int vendorId = Integer.parseInt(vendorIdString, 16);
-                    int productId = Integer.parseInt(productIdString, 16);
+                    int vendorId = parseHexId(vendorIdString);
+                    int productId = parseHexId(productIdString);
 
                     UsbDeviceFilter device = new UsbDeviceFilter(vendorId, productId);
                     devices.add(device);
@@ -41,5 +41,13 @@ public class UsbDeviceFilter {
             eventType = parser.next();
         }
         return devices;
+    }
+
+    private static int parseHexId(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("USB ID is missing");
+        }
+        String normalized = value.trim().replaceFirst("^0[xX]", "");
+        return Integer.parseInt(normalized, 16);
     }
 }
