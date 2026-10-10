@@ -6,29 +6,27 @@
 #define PIXELPILOT_AUDIODECODER_H
 #include <aaudio/AAudio.h>
 #include <condition_variable>
-#include <cstring>
 #include <memory>
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <vector>
 #include "libs/include/opus.h"
 
 typedef struct _AudioUDPPacket
 {
-    // Room for any RTP packet the link delivers. It was 250 bytes with nothing checking the
-    // length, so a perfectly ordinary packet - PCM at 8 kHz is already 320 bytes per 20 ms -
-    // was written past the end of the array. enqueueAudio() drops anything larger.
-    static constexpr size_t kMaxLen = 1500;
+    // Sized to the packet. It used to be a fixed 250-byte array filled with no length check,
+    // so an ordinary packet - 20 ms of PCM at 8 kHz is already 320 bytes - was written past
+    // its end.
+    //
+    // The limit is the largest datagram either receiver can hand over: UdpReceiver's
+    // UDP_PACKET_MAX_SIZE, 65507 (UdsReceiver stops at 3700). Anything the link can deliver
+    // therefore fits, and enqueueAudio() only refuses what could not have come from it.
+    static constexpr size_t kMaxLen = 65507;
 
-    _AudioUDPPacket(const uint8_t* _data, size_t _len) : len(_len <= kMaxLen ? _len : 0)
-    {
-        if (len > 0)
-        {
-            memcpy(data, _data, len);
-        }
-    };
-    uint8_t data[kMaxLen];
-    size_t  len;
+    _AudioUDPPacket(const uint8_t* _data, size_t _len) : data(_data, _data + _len) {}
+
+    std::vector<uint8_t> data;
 } AudioUDPPacket;
 
 class AudioDecoder
@@ -39,6 +37,9 @@ class AudioDecoder
     // The longest an Opus packet can be is 120 ms, which at 48 kHz is 5760 samples per
     // channel - so a buffer this size holds any packet opus_decode() will accept.
     static constexpr int kMaxFrameSamples = 5760;
+    // Packets waiting to be decoded, at most. About a second of 20 ms frames: more than any
+    // decoder should ever fall behind, and for live audio an older packet is only latency.
+    static constexpr size_t kMaxQueued = 50;
 
     AudioDecoder();
     ~AudioDecoder();

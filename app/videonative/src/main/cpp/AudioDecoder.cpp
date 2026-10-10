@@ -31,13 +31,20 @@ AudioDecoder::~AudioDecoder()
 void AudioDecoder::enqueueAudio(const uint8_t* data, const std::size_t data_length)
 {
     // Dropped rather than truncated: a cut Opus packet does not fail to decode, it decodes to
-    // noise.
+    // noise. Nothing either receiver delivers is this long; see AudioUDPPacket::kMaxLen.
     if (data_length == 0 || data_length > AudioUDPPacket::kMaxLen)
     {
         return;
     }
     {
         std::lock_guard<std::mutex> lock(m_mtxQueue);
+        // Bounded, because decoding runs without this lock now and nothing else holds the
+        // receive thread back. If the decoder ever falls behind, the oldest packet goes:
+        // played late it would only be latency.
+        if (m_audioQueue.size() >= kMaxQueued)
+        {
+            m_audioQueue.pop();
+        }
         m_audioQueue.push(AudioUDPPacket(data, data_length));
     }
     m_cvQueue.notify_one();
@@ -54,12 +61,12 @@ void AudioDecoder::processAudioQueue()
         {
             break;
         }
-        AudioUDPPacket audioPkt = m_audioQueue.front();
+        AudioUDPPacket audioPkt = std::move(m_audioQueue.front());
         m_audioQueue.pop();
         // Decoded with the queue released. enqueueAudio() is called on the receive thread, which
         // carries the video as well, and it used to wait for every decode to finish.
         lock.unlock();
-        onNewAudioData(audioPkt.data, audioPkt.len);
+        onNewAudioData(audioPkt.data.data(), audioPkt.data.size());
     }
 }
 
