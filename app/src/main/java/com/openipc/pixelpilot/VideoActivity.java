@@ -1564,11 +1564,10 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         videoPlayer.stopAudio();
         wfbLinkManager.stopAdapters();
 
-        // Stop VPN service
+        // Stop VPN service - directly, not with a STOP_SERVICE start, which Android can refuse
+        // from the background. See WfbNgVpnService.stopRunning().
         Log.w(TAG, "onPause: stopping service");
-        Intent intent = new Intent(this, WfbNgVpnService.class);
-        intent.setAction("STOP_SERVICE");
-        startServiceIfAllowed(intent);
+        WfbNgVpnService.stopRunning();
     }
 
     @Override
