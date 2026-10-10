@@ -7,9 +7,6 @@
 
 #define TAG "pixelpilot"
 
-#define SAMPLE_RATE 48000
-#define CHANNELS 1
-
 AudioDecoder::AudioDecoder()
 {
     initAudio();
@@ -18,15 +15,36 @@ AudioDecoder::AudioDecoder()
 AudioDecoder::~AudioDecoder()
 {
     stopAudioProcessing();
-    delete pOpusDecoder;
-    AAudioStream_requestStop(m_stream);
-    AAudioStream_close(m_stream);
+    {
+        std::lock_guard<std::mutex> lock(m_mtxStream);
+        closeOutputLocked();
+    }
+    // opus_decoder_create() allocates with malloc, so this is the only correct way to free it;
+    // the delete that used to be here was undefined behaviour.
+    if (pOpusDecoder != nullptr)
+    {
+        opus_decoder_destroy(pOpusDecoder);
+        pOpusDecoder = nullptr;
+    }
 }
 
 void AudioDecoder::enqueueAudio(const uint8_t* data, const std::size_t data_length)
 {
+    // Dropped rather than truncated: a cut Opus packet does not fail to decode, it decodes to
+    // noise. Nothing either receiver delivers is this long; see AudioUDPPacket::kMaxLen.
+    if (data_length == 0 || data_length > AudioUDPPacket::kMaxLen)
+    {
+        return;
+    }
     {
         std::lock_guard<std::mutex> lock(m_mtxQueue);
+        // Bounded, because decoding runs without this lock now and nothing else holds the
+        // receive thread back. If the decoder ever falls behind, the oldest packet goes:
+        // played late it would only be latency.
+        if (m_audioQueue.size() >= kMaxQueued)
+        {
+            m_audioQueue.pop();
+        }
         m_audioQueue.push(AudioUDPPacket(data, data_length));
     }
     m_cvQueue.notify_one();
@@ -43,70 +61,153 @@ void AudioDecoder::processAudioQueue()
         {
             break;
         }
-        if (!m_audioQueue.empty())
-        {
-            AudioUDPPacket audioPkt = m_audioQueue.front();
-            onNewAudioData(audioPkt.data, audioPkt.len);
-            m_audioQueue.pop();
-            lock.unlock();
-        }
+        AudioUDPPacket audioPkt = std::move(m_audioQueue.front());
+        m_audioQueue.pop();
+        // Decoded with the queue released. enqueueAudio() is called on the receive thread, which
+        // carries the video as well, and it used to wait for every decode to finish.
+        lock.unlock();
+        onNewAudioData(audioPkt.data.data(), audioPkt.data.size());
     }
 }
 
 void AudioDecoder::initAudio()
 {
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "initAudio");
-    int error;
-    pOpusDecoder = opus_decoder_create(SAMPLE_RATE, CHANNELS, &error);
-    // Create a stream m_builder
-    AAudio_createStreamBuilder(&m_builder);
+    // Only once: start after stop() comes back through here, and creating a second decoder
+    // leaked the first.
+    if (pOpusDecoder == nullptr)
+    {
+        int error    = OPUS_OK;
+        pOpusDecoder = opus_decoder_create(kSampleRate, kChannels, &error);
+        if (error != OPUS_OK || pOpusDecoder == nullptr)
+        {
+            __android_log_print(ANDROID_LOG_ERROR, TAG, "opus decoder could not be created: %s",
+                                opus_strerror(error));
+            pOpusDecoder = nullptr;
+            isInit       = false;
+            return;
+        }
+    }
+    std::lock_guard<std::mutex> lock(m_mtxStream);
+    isInit = openOutputLocked();
+}
 
-    // Set the stream format
-    AAudioStreamBuilder_setFormat(m_builder, AAUDIO_FORMAT_PCM_I16);
-    AAudioStreamBuilder_setChannelCount(m_builder, CHANNELS);   // Mono
-    AAudioStreamBuilder_setSampleRate(m_builder, SAMPLE_RATE);  // 8000 Hz
+bool AudioDecoder::openOutputLocked()
+{
+    AAudioStreamBuilder* builder = nullptr;
+    aaudio_result_t      result  = AAudio_createStreamBuilder(&builder);
+    if (result != AAUDIO_OK)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "audio stream builder failed: %s",
+                            AAudio_convertResultToText(result));
+        return false;
+    }
 
-    AAudioStreamBuilder_setBufferCapacityInFrames(m_builder, BUFFER_CAPACITY_IN_FRAMES);
+    // The camera may encode at 8 kHz; that does not matter here, because an Opus decoder
+    // renders any Opus stream at whichever of its rates it was created for.
+    AAudioStreamBuilder_setFormat(builder, AAUDIO_FORMAT_PCM_I16);
+    AAudioStreamBuilder_setChannelCount(builder, kChannels);
+    AAudioStreamBuilder_setSampleRate(builder, kSampleRate);
+    AAudioStreamBuilder_setBufferCapacityInFrames(builder, BUFFER_CAPACITY_IN_FRAMES);
 
-    // Open the stream
-    AAudioStreamBuilder_openStream(m_builder, &m_stream);
-    // Clean up the m_builder
-    AAudioStreamBuilder_delete(m_builder);
+    result = AAudioStreamBuilder_openStream(builder, &m_stream);
+    AAudioStreamBuilder_delete(builder);
+    if (result != AAUDIO_OK)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "audio stream could not be opened: %s",
+                            AAudio_convertResultToText(result));
+        m_stream = nullptr;
+        return false;
+    }
 
-    AAudioStream_requestStart(m_stream);
+    result = AAudioStream_requestStart(m_stream);
+    if (result != AAUDIO_OK)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "audio stream would not start: %s",
+                            AAudio_convertResultToText(result));
+        AAudioStream_close(m_stream);
+        m_stream = nullptr;
+        return false;
+    }
+    return true;
+}
 
-    isInit = true;
+void AudioDecoder::closeOutputLocked()
+{
+    if (m_stream != nullptr)
+    {
+        AAudioStream_requestStop(m_stream);
+        AAudioStream_close(m_stream);
+        // Cleared, so nothing writes to a closed stream and the destructor cannot close it a
+        // second time - which is what stopAudio() followed by destruction used to do.
+        m_stream = nullptr;
+    }
 }
 
 void AudioDecoder::stopAudio()
 {
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "stopAudio");
-    AAudioStream_requestStop(m_stream);
-    AAudioStream_close(m_stream);
+    std::lock_guard<std::mutex> lock(m_mtxStream);
+    closeOutputLocked();
     isInit = false;
 }
 
 void AudioDecoder::onNewAudioData(const uint8_t* data, const std::size_t data_length)
 {
-    const int      rtp_header_size   = 12;
-    const uint8_t* opus_payload      = data + rtp_header_size;
-    int            opus_payload_size = data_length - rtp_header_size;
-
-    int frame_size = opus_packet_get_samples_per_frame(opus_payload, SAMPLE_RATE);
-    int nb_frames  = opus_packet_get_nb_frames(opus_payload, opus_payload_size);
-
-    // Decode the frame
-    int pcm_size = frame_size * nb_frames * CHANNELS;
-    if (pOpusDecoder && m_stream)
+    // Everything below is read from the radio, so every length is checked before it is used.
+    // The payload used to be taken from a fixed offset of 12 with no check at all: a packet
+    // shorter than that gave a negative size, which then sized a stack array.
+    constexpr std::size_t kFixedHeader = 12;
+    if (data_length < kFixedHeader)
     {
-        opus_int16 pcm[pcm_size];
-        int        decoded_samples = opus_decode(pOpusDecoder, opus_payload, opus_payload_size, pcm, pcm_size, 0);
+        return;
+    }
 
-        if (decoded_samples < 0)
+    // The real header length: CSRCs and an extension both lengthen it, and reading from a
+    // fixed offset would decode the end of the header as audio.
+    std::size_t header = kFixedHeader + 4 * (data[0] & 0x0F);
+    if (data[0] & 0x10)
+    {
+        if (data_length < header + 4)
         {
             return;
         }
-        // Process the decoded PCM data
-        AAudioStream_write(m_stream, pcm, decoded_samples, 0);
+        const std::size_t words = (static_cast<std::size_t>(data[header + 2]) << 8) | data[header + 3];
+        header += 4 + 4 * words;
+    }
+    if (data_length <= header)
+    {
+        return;
+    }
+
+    std::size_t payload = data_length - header;
+    if (data[0] & 0x20)
+    {
+        // Padding, with its own length in the last byte.
+        const uint8_t padding = data[data_length - 1];
+        if (padding >= payload)
+        {
+            return;
+        }
+        payload -= padding;
+    }
+
+    if (pOpusDecoder == nullptr)
+    {
+        return;
+    }
+    // Into a fixed buffer sized for the longest packet Opus allows, rather than one sized from
+    // what the packet claims about itself.
+    const int decoded = opus_decode(pOpusDecoder, data + header, static_cast<opus_int32>(payload), m_pcm,
+                                    kMaxFrameSamples, 0);
+    if (decoded <= 0)
+    {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(m_mtxStream);
+    if (m_stream != nullptr)
+    {
+        AAudioStream_write(m_stream, m_pcm, decoded, 0);
     }
 }
