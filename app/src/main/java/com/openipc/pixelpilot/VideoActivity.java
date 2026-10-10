@@ -1294,10 +1294,28 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         if (intent != null) {
             startActivityForResult(intent, VPN_REQUEST_CODE);
         } else {
-            Intent serviceIntent = new Intent(this, WfbNgVpnService.class);
-            startService(serviceIntent);
+            startServiceIfAllowed(new Intent(this, WfbNgVpnService.class));
         }
 
+    }
+
+    /**
+     * Starts a service, or does nothing if the app is in the background.
+     *
+     * <p>Android 12 and later refuse a service start from a background app with
+     * BackgroundServiceStartNotAllowedException, and this activity can be created in the
+     * background: started while the screen is off, it threw from onCreate() and took the app
+     * down before it had shown anything. Nothing is lost by skipping it, because onResume() calls
+     * startVpnService() again once the app is actually in front.
+     */
+    private void startServiceIfAllowed(Intent intent) {
+        try {
+            startService(intent);
+        } catch (IllegalStateException e) {
+            // BackgroundServiceStartNotAllowedException is an IllegalStateException. Catching the
+            // parent avoids naming a class that only exists from API 31, below minSdk.
+            Log.w(TAG, "not starting " + intent.getComponent() + " from the background", e);
+        }
     }
 
     private Uri openDvrFile() {
@@ -1452,8 +1470,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         } else if (requestCode == 100) {  // VPN_REQUEST_CODE is 100
             if (resultCode == RESULT_OK) {
                 // VPN permission granted, start the VPN service
-                Intent serviceIntent = new Intent(this, WfbNgVpnService.class);
-                startService(serviceIntent);
+                startServiceIfAllowed(new Intent(this, WfbNgVpnService.class));
             } else {
                 // VPN permission not granted
                 Log.e(TAG, "VPN permission was not granted by the user.");
@@ -1551,7 +1568,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         Log.w(TAG, "onPause: stopping service");
         Intent intent = new Intent(this, WfbNgVpnService.class);
         intent.setAction("STOP_SERVICE");
-        startService(intent);
+        startServiceIfAllowed(intent);
     }
 
     @Override
