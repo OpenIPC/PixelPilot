@@ -51,6 +51,75 @@ audio:
   outputVolume: 30
 ```
 
+## Link modes: WFB-NG and APFPV
+
+Settings → **Link mode** switches how the wifi adapter is used:
+
+- **WFB-NG** (default): wfb-ng broadcast in monitor mode, as before.
+- **APFPV**: the adapter joins the camera's own **open** (unencrypted) Wi-Fi access point as a
+  regular station, driven entirely by the devourer userspace driver. The phone uses a static IP
+  and the camera pushes its RTP stream there. Made for the OpenIPC apfpv firmware.
+
+**APFPV settings...** holds the SSID, the phone's static IP, the video UDP port and the adapter's
+MAC address (generated once, locally administered), the camera's IP and the maximum channel width.
+Defaults match the OpenIPC apfpv firmware (camera `192.168.0.1`, ground station `192.168.0.10`,
+video to port 5600).
+
+Finding the camera without a scan: the app starts on the channel the camera was last seen on
+(remembered automatically), then checks the channels the apfpv camera passes through while booting
+(157, then 165, before `air_man_ap` moves to `wlanchan`). Channel switch announcements from the
+camera's access point (hostapd `chan_switch`) are followed without reconnecting. A sweep of all
+5 GHz and 2.4 GHz channels (DFS channels passively) is optional in **APFPV settings**. Received UDP
+datagrams for the video port are handed to the player, port 14550 to the MAVLink OSD.
+
+In APFPV mode the **Channel** menu changes the camera's channel: while connected it sends
+`set_ap_channel <ch>` to the camera's `air_man_ap` (TCP 12355), the camera announces the switch
+and the app follows, so `air_man_ap`'s ping check afterwards succeeds. The camera's reply is shown
+as a toast. Without a connection the menu only changes where the next search starts.
+
+Channel width: the app follows the camera's channel width up to **Max. channel width** in APFPV
+settings (20/40/80 MHz, default 80). It reads the width from the camera's beacons and from its
+channel switch announcements, so a switch to a 40/80 MHz channel is followed at the new width
+right away (`air_man_ap` pings the ground station right after a switch and reverts when that
+fails). 80 MHz requires the primary to be the lowest 20 MHz of the block, which every 80 MHz
+channel `air_man_ap` offers is. If a wide channel does not work with an adapter, set the maximum
+to 20 MHz: the app then only advertises 20 MHz and the camera sends to it at 20 MHz.
+
+Camera control: in APFPV mode **Drone → Settings** opens the camera's controls instead of the web
+page: channel and width, video mode, region (`air_man_ap`, TCP 12355, no login) and image options
+(flip, overshoot fix, HQ i-frames, focus mode), aalink link parameters (max MCS per width, link
+resilience, max throughput, LQ consideration, temperature threshold, VTX power, OSD size),
+flight-controller port, CPU overclock, SSID, hostapd start channel and reboot (the camera's
+aalinkFPV web API, with the Drone login credentials). They go over the USB adapter while it is
+joined to the camera (a WebView could not reach it there, it uses the phone's network), otherwise
+over the phone's own Wi-Fi, for when the phone itself is connected to the camera. In WFB-NG mode
+Settings opens the web page at **Drone → Address** (default `10.5.0.10`).
+
+Dropouts: losing the signal does not end the association. The app stays on the channel and takes
+video again the moment the camera is heard, with nothing to rebuild. It only rejoins when the camera
+says it no longer knows the app (deauth, also sent in answer to the keepalive that goes out as soon
+as the camera is heard again) or the beacon timestamp shows the camera restarted; the rejoin goes
+straight to the known BSSID on the current channel, without searching. After 3 s of silence the
+app also glances at the camera's boot channels (150 ms each, between 1 s on the home channel).
+Whenever video can flow again, the app asks majestic for a key frame (`GET /request/idr`, with the
+Drone login credentials), so the picture does not wait for the next scheduled one.
+
+Until video arrives, the connection state is shown in the middle of the screen, including the
+networks the adapter hears on the current channel. Logcat tag `pixelpilot-sta` has the details.
+
+On the camera, send the stream to the phone's IP, e.g. in `/etc/majestic.yaml`:
+```
+outgoing:
+  enabled: true
+  server: udp://192.168.0.10:5600
+```
+
+Limitations: open networks only (no WEP/WPA), no DHCP (static IP), no 802.11 fragment reassembly,
+UDP only, plus one short TCP request at a time for the camera's control port. The adapter answers
+ARP and ping for its IP and sends a keepalive every 5 s. On RTL8812AU adapters devourer sends every
+frame without hardware retries, so the few frames the phone sends (association, ARP) rely on
+software retries; the video direction is acknowledged in hardware on all chips.
+
 ## Quick Reference: Auto-FEC Levels 0 – 5
 
 | Level | Denominator | Added Redundancy |

@@ -26,6 +26,7 @@ public class WfbLinkManager extends BroadcastReceiver {
     private final Context context;
     private int wifiChannel;
     private Bandwidth bandWidth;
+    private boolean apMode;
 
     public enum Bandwidth {
         BANDWIDTH_20(20),
@@ -50,6 +51,11 @@ public class WfbLinkManager extends BroadcastReceiver {
 
     public void refreshKey() {
         wfbLink.refreshKey();
+    }
+
+    /** Only changes the status messages; the mode itself lives in WfbNgLink. */
+    public void setApMode(boolean apMode) {
+        this.apMode = apMode;
     }
 
     public void setChannel(int channel) {
@@ -234,7 +240,7 @@ public class WfbLinkManager extends BroadcastReceiver {
 
     public synchronized boolean startAdapter(UsbDevice dev) {
         binding.tvMessage.setVisibility(View.VISIBLE);
-        String text = "Starting wfb-ng channel " + wifiChannel + " with " + String.format(
+        String text = (apMode ? "Joining APFPV camera on channel " : "Starting wfb-ng channel ") + wifiChannel + " with " + String.format(
                 "[%04X", dev.getVendorId()) + ":" + String.format("%04X]", dev.getProductId());
         binding.tvMessage.setText(text);
         if (!wfbLink.start(wifiChannel, bandWidth.getValue(), dev)) {

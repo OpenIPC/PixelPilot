@@ -3,6 +3,7 @@
 
 #include "FecChangeController.h"
 #include "SignalQualityCalculator.h"
+#include "StaLink.h"
 #include "TxFrame.h"
 
 extern "C" {
@@ -12,6 +13,7 @@ extern "C" {
 #include "devourer/src/IRtlDevice.h"
 #include "devourer/src/WiFiDriver.h"
 #include "wfb-ng/src/rx.hpp"
+#include <atomic>
 #include <cstdint>
 #include <functional>
 #include <jni.h>
@@ -22,11 +24,30 @@ extern "C" {
 #include <thread>
 #include <vector> // Added for std::vector
 
+struct libusb_context;
+
 const uint8_t wfb_tx_port = 160;
 const uint8_t wfb_rx_port = 32;
 
+// How the adapter is used. Must match the constants in WfbNgLink.java.
+enum class LinkMode : int {
+    // wfb-ng broadcast in monitor mode (the original behaviour).
+    WFB = 0,
+    // Regular Wi-Fi station joining the camera's open access point (StaLink).
+    AP = 1,
+};
+
 class WfbngLink {
   public:
+    // Takes effect on the next run(); the Java side restarts the adapters after changing it.
+    std::atomic<LinkMode> link_mode{LinkMode::WFB};
+    std::mutex sta_mutex;
+    StaConfig sta_config;            // guarded by sta_mutex
+    // Guarded by sta_mutex; set while an AP-mode run() is active. Shared so a camera
+    // command can keep using it without holding sta_mutex for seconds; run() stops it
+    // before the device goes away, after which every call on it is a no-op.
+    std::shared_ptr<StaLink> sta_link;
+
     // FEC switching thresholds (for menu)
     int fec_lost_to_5 = 2;
     int fec_recovered_to_4 = 30;
@@ -114,6 +135,19 @@ class WfbngLink {
     }
 
   private:
+    // AP-mode half of run(), entered once the device exists. Owns the device
+    // shutdown and libusb teardown, like the rest of run() does for wfb-ng mode.
+    int runStation(libusb_device_handle *dev_handle, libusb_context *ctx, int fd, int wifiChannel);
+
+    // Destroys the device object once run() is done with it. devourer's per-adapter
+    // lock lives inside that object, so as long as it stays in rtl_devices the next
+    // run() - after a mode, channel or settings change - is refused with "USB adapter
+    // in use ... by another devourer process". Must come before libusb_exit().
+    void releaseDevice(int fd) {
+        rtl_devices.erase(fd);
+        if (current_fd == fd) current_fd = -1;
+    }
+
     void stopDevice() {
         if (rtl_devices.find(current_fd) == rtl_devices.end()) return;
         auto dev = rtl_devices.at(current_fd).get();

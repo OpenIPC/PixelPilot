@@ -49,6 +49,21 @@ public class WfbNgLink implements WfbNGStatsChanged {
     public static native void nativeSetUseFec(long nativeInstance, int use);
     public static native void nativeSetUseLdpc(long nativeInstance, int use);
     public static native void nativeSetUseStbc(long nativeInstance, int use);
+    public static native void nativeSetLinkMode(long nativeInstance, int mode);
+    public static native boolean nativeSetApConfig(long nativeInstance, String ssid, String ownIp,
+                                                   String ownMac, int videoPort,
+                                                   int[] candidateChannels, boolean fullScan,
+                                                   int maxWidthMhz);
+    public static native String nativeGetApStatus(long nativeInstance);
+    public static native int nativeGetApChannel(long nativeInstance);
+    public static native int nativeGetApRecoveries(long nativeInstance);
+    public static native String nativeCameraCommand(long nativeInstance, String cameraIp, int port,
+                                                    String command, int timeoutMs, boolean halfClose);
+
+    /** wfb-ng broadcast in monitor mode. Must match LinkMode in WfbngLink.hpp. */
+    public static final int LINK_MODE_WFB = 0;
+    /** Join the camera's open Wi-Fi access point as a regular station. */
+    public static final int LINK_MODE_AP = 1;
 
     public WfbNgLink(final Context parent) {
         this.context = parent;
@@ -90,6 +105,61 @@ public class WfbNgLink implements WfbNGStatsChanged {
 
     public void nativeSetUseStbc(int use) {
         nativeSetUseStbc(nativeWfbngLink, use);
+    }
+
+    /** Takes effect the next time the adapters are started. */
+    public void setLinkMode(int mode) {
+        nativeSetLinkMode(nativeWfbngLink, mode);
+    }
+
+    /**
+     * Network the AP mode joins. Takes effect the next time the adapters are started.
+     *
+     * @param candidateChannels checked in turn when the AP is not on the start channel
+     * @param fullScan          after the candidates, also sweep every other channel
+     * @param maxWidthMhz       widest channel to follow the AP to: 20, 40 or 80
+     * @return false if the IP or MAC address is malformed, or the MAC is not unicast.
+     */
+    public boolean setApConfig(String ssid, String ownIp, String ownMac, int videoPort,
+                               int[] candidateChannels, boolean fullScan, int maxWidthMhz) {
+        return nativeSetApConfig(nativeWfbngLink, ssid, ownIp, ownMac, videoPort,
+                candidateChannels, fullScan, maxWidthMhz);
+    }
+
+    /** Channel of the AP while connected in AP mode, 0 otherwise. */
+    public int getApChannel() {
+        return nativeGetApChannel(nativeWfbngLink);
+    }
+
+    /**
+     * Grows each time video can flow again in AP mode: every (re)association and every end
+     * of a dropout. Starts again from 0 when the adapter restarts.
+     */
+    public int getApRecoveries() {
+        return nativeGetApRecoveries(nativeWfbngLink);
+    }
+
+    /**
+     * Sends one command line to a TCP service on the camera over the AP link and returns
+     * its reply, or null when not connected or nothing came back. Blocks for up to
+     * timeoutMs, so never call it on the main thread.
+     */
+    public String cameraCommand(String cameraIp, int port, String command, int timeoutMs) {
+        return cameraCommand(cameraIp, port, command, timeoutMs, false);
+    }
+
+    /**
+     * @param halfClose end the sending side with the command, as {@code echo cmd | nc}
+     *                  does; for line servers such as air_man_ap that act on end of input.
+     */
+    public String cameraCommand(String cameraIp, int port, String command, int timeoutMs,
+                                boolean halfClose) {
+        return nativeCameraCommand(nativeWfbngLink, cameraIp, port, command, timeoutMs, halfClose);
+    }
+
+    /** One-line AP connection state, or an empty string while no adapter runs in AP mode. */
+    public String getApStatus() {
+        return nativeGetApStatus(nativeWfbngLink);
     }
 
     public synchronized boolean start(int wifiChannel, int bandWidth, UsbDevice usbDevice) {
