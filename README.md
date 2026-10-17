@@ -107,6 +107,14 @@ Drone login credentials), so the picture does not wait for the next scheduled on
 Until video arrives, the connection state is shown in the middle of the screen, including the
 networks the adapter hears on the current channel. Logcat tag `pixelpilot-sta` has the details.
 
+The stock apfpv firmware runs a WPA2 access point with DHCP. `tools/apfpv-open-static-cam.sh`
+prepares the camera for this mode: it patches `/usr/bin/adapter` (which writes `hostapd.conf`)
+for an open network without DHCP and with `disassoc_low_ack=0`, so a fade does not end the
+association, optionally with a MAC filter for the adapter. It keeps a backup (`--revert`):
+```
+ssh root@192.168.0.1 sh -s < tools/apfpv-open-static-cam.sh
+```
+
 On the camera, send the stream to the phone's IP, e.g. in `/etc/majestic.yaml`:
 ```
 outgoing:
