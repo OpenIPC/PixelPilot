@@ -32,30 +32,63 @@ public class WfbNgVpnService extends VpnService {
     // Control flags
     private volatile boolean isRunning = false;
 
+    // The instance that is running, if any - see stopRunning().
+    private static volatile WfbNgVpnService running;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        running = this;
+    }
+
+    /**
+     * Takes the tunnel down if it is up. Safe to call from anywhere in the app's process, in any
+     * state.
+     *
+     * <p>Not through startService(): Android refuses a service start from the background, and a
+     * stop sent that way is dropped along with it. onPause() normally still runs while the app
+     * may start services - going to sleep with the app in front, the stop went through - but
+     * nothing guarantees it, and an activity created in the background pauses there too. Not
+     * through stopService() either: once the interface is established the system holds its own
+     * binding to a VpnService, and stopService() leaves it running until the interface is closed.
+     * The service lives in this process, so closing it directly cannot be refused.
+     */
+    public static void stopRunning() {
+        final WfbNgVpnService service = running;
+        if (service != null) {
+            service.shutDown();
+        }
+    }
+
+    /** Stops the worker threads, closes the interface and stops the service. */
+    private void shutDown() {
+        Log.i(TAG, "VPN Service stopping");
+        // Stop threads
+        isRunning = false;
+
+        if (udpToVpnThread != null) {
+            udpToVpnThread.interrupt();
+        }
+        if (vpnToUdpThread != null) {
+            vpnToUdpThread.interrupt();
+        }
+
+        // Close the interface
+        if (vpnInterface != null) {
+            try {
+                vpnInterface.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to close VPN interface", e);
+            }
+            vpnInterface = null;
+        }
+        stopSelf();
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && "STOP_SERVICE".equals(intent.getAction())) {
-            Log.i(TAG, "VPN Service stopping");
-            // Stop threads
-            isRunning = false;
-
-            if (udpToVpnThread != null) {
-                udpToVpnThread.interrupt();
-            }
-            if (vpnToUdpThread != null) {
-                vpnToUdpThread.interrupt();
-            }
-
-            // Close the interface
-            if (vpnInterface != null) {
-                try {
-                    vpnInterface.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "Failed to close VPN interface", e);
-                }
-                vpnInterface = null;
-            }
-            stopSelf();
+            shutDown();
             return START_NOT_STICKY;
         }
 
@@ -211,6 +244,9 @@ public class WfbNgVpnService extends VpnService {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "VPN Service destroyed");
+        if (running == this) {
+            running = null;
+        }
 
         // Stop threads
         isRunning = false;
