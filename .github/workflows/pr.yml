@@ -104,10 +104,8 @@ jobs:
       - name: Check out the QA harness
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # TODO: switch to OpenIPC/android-emulator-qa at a pinned main SHA once
-          # the pixelpilot-smoke flow PR is merged there.
-          repository: josephnef/android-emulator-qa
-          ref: pixelpilot-smoke
+          repository: OpenIPC/android-emulator-qa
+          ref: 3be94489105f6ff8903a1dcdae90fa437cbbb23c # main, flows/pixelpilot_smoke.py added
           path: qa
 
       - name: Download debug APK
