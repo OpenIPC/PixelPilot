@@ -2,6 +2,20 @@ plugins {
     alias(libs.plugins.androidApplication)
 }
 
+// Version metadata comes from git so releases and dev builds identify themselves
+// without hand edits. A v1.2.3 tag yields versionName "1.2.3"; commits after it
+// yield "1.2.3-<n>-g<sha>". versionCode is the commit count, monotonic on master.
+def gitOutput = { List<String> args, String fallback ->
+    def result = providers.exec {
+        commandLine(["git"] + args)
+        ignoreExitValue = true
+    }
+    def out = result.standardOutput.asText.get().trim()
+    return (result.result.get().exitValue == 0 && !out.isEmpty()) ? out : fallback
+}
+def gitVersionName = gitOutput(["describe", "--tags", "--always", "--dirty"], "0.0.0-dev").replaceFirst(/^v/, "")
+def gitVersionCode = gitOutput(["rev-list", "--count", "HEAD"], "1").toInteger()
+
 android {
     namespace = "com.openipc.pixelpilot"
     compileSdk = 34
@@ -10,8 +24,8 @@ android {
         applicationId = "com.openipc.pixelpilot"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.23.0"
+        versionCode = gitVersionCode
+        versionName = gitVersionName
 
         ndk {
             abiFilters.add("arm64-v8a")
