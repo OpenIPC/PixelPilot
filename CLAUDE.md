@@ -22,7 +22,8 @@ git submodule update --init --recursive
 
 Toolchain: JDK 17, AGP 8.5.2, NDK 26.1.10909125, CMake 3.22.1. `org.gradle.configuration-cache=true`
 is on. The release `signingConfig` references `../fpv.jks`, which is not in the repo; CI overrides
-it with injected signing properties. The app version lives in `app/build.gradle` (`versionName`).
+it with injected signing properties. `versionName`/`versionCode` are derived from git in
+`app/build.gradle` (`git describe --tags` and the commit count); cut a release by pushing a `vX.Y.Z` tag.
 
 Prebuilt native deps are checked in per ABI: `app/wfbngrtl8812/src/main/cpp/libs/<abi>/`
 (libusb1.0, libsodium, libpcap) and `app/videonative/src/main/cpp/libs/<abi>/` (libopus).
@@ -36,7 +37,14 @@ source list against devourer's CMakeLists; chip generations are selected with
 ```
 scripts/format_sources.sh          # clang-format (.clang-format, LLVM-based, 120 cols) over project C/C++,
                                    # skipping submodules, .cxx, app/mavlink and the vendored include dirs
+pip install clang-format==18.1.8   # CI pins this exact version; other releases format differently
 ```
+
+CI on pull requests (`.github/workflows/pr.yml`): format check, the host GoogleTest below, an
+`assembleDebug` whose APK is uploaded as a `PixelPilot-debug-<sha>` artifact, and a non-blocking
+emulator smoke job (API 34 x86_64 under ARM translation, driven by `flows/pixelpilot_smoke.py` from
+OpenIPC/android-emulator-qa). Submodule checkout is deliberately non-recursive: devourer's
+`reference/` submodules are not needed and one is unfetchable.
 
 There are no Java/Android unit tests. The only native test is a host-side GoogleTest for
 `BufferedPacketQueue`, built outside Gradle:
@@ -47,7 +55,7 @@ cmake -B build && cmake --build build && ctest --test-dir build
 # single test: ./build/queue_test --gtest_filter='Name.Case'
 ```
 
-Real verification is on-device: install the APK, plug in a supported adapter (IDs in
+Real verification is on-device (or via the PR's debug APK artifact): install the APK, plug in a supported adapter (IDs in
 `app/src/main/res/xml/usb_device_filter.xml`), watch logcat tags `pixelpilot` and `devourer`.
 
 ## Architecture
