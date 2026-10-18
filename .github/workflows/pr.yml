@@ -55,6 +55,8 @@ jobs:
   build:
     name: Debug APK
     runs-on: ubuntu-latest
+    outputs:
+      artifact: ${{ steps.artifact_name.outputs.name }}
     steps:
       # Non-recursive on purpose: the build only needs devourer and wfb-ng
       # themselves. devourer's own reference/ submodules are vendor driver
@@ -74,14 +76,71 @@ jobs:
       - name: Build
         run: ./gradlew assembleDebug
 
-      - name: Short SHA
-        id: sha
-        run: echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Artifact name
+        id: artifact_name
+        run: echo "name=PixelPilot-debug-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Upload debug APK
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: PixelPilot-debug-${{ steps.sha.outputs.short }}
+          name: ${{ steps.artifact_name.outputs.name }}
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 14
           if-no-files-found: error
+
+  # Hardware-free end-to-end check of the videonative path: the debug APK runs
+  # on an x86_64 API-34 emulator under NDK ARM translation (PixelPilot ships
+  # arm64/armv7 only), accepts the VPN consent, reaches the no-adapter screen,
+  # and decodes a synthetic H.264 RTP stream pushed to UDP 5600. Driven by
+  # flows/pixelpilot_smoke.py from OpenIPC/android-emulator-qa.
+  # Non-blocking for now: emulator runs are slower and flakier than the rest.
+  emulator-smoke:
+    name: Emulator smoke (non-blocking)
+    runs-on: ubuntu-latest
+    needs: build
+    continue-on-error: true
+    timeout-minutes: 30
+    steps:
+      - name: Check out the QA harness
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: OpenIPC/android-emulator-qa
+          ref: 3be94489105f6ff8903a1dcdae90fa437cbbb23c # main, flows/pixelpilot_smoke.py added
+          path: qa
+
+      - name: Download debug APK
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+          path: apk
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg
+
+      - name: Run smoke flow on an API 34 x86_64 emulator
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save -camera-back none
+          disable-animations: true
+          script: python3 qa/flows/pixelpilot_smoke.py --apk apk/app-debug.apk --run-dir qa-run --stream 15
+
+      - name: Upload run artifacts (screenshots, dumps, logcat, verdict)
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: emulator-smoke-${{ needs.build.outputs.artifact }}
+          path: qa-run
+          retention-days: 14
+          if-no-files-found: warn
