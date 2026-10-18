@@ -127,8 +127,8 @@ class VideoPlayer
 
     void processQueue();
 
-    std::string mForwardIP = "";
-    int         mForwardPort = 0;
+    std::string mForwardIP      = "";
+    int         mForwardPort    = 0;
     bool        mForwardEnabled = false;
 
   public:

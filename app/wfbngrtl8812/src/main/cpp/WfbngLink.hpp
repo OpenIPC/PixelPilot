@@ -67,7 +67,7 @@ class WfbngLink {
     // is the longest part of run() - is thrown away, and run() then blocks in a loop nobody
     // asked for. Recorded here instead, so run() can see it at the points where the flag
     // itself cannot be trusted.
-    std::mutex    stop_requested_mutex;
+    std::mutex stop_requested_mutex;
     std::set<int> stop_requested_fds;
 
     void note_stop_requested(int fd) {

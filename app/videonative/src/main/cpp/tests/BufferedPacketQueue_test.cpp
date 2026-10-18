@@ -122,8 +122,7 @@ TEST_F(BufferedPacketQueueTest, LargeJumpFallsBackToTheBufferCap)
     feed(1);
     for (uint16_t s = 30000; s < 30000 + MAX_BUFFER_SIZE; ++s) feed(s);
 
-    ASSERT_EQ(delivered.size(), 1u + MAX_BUFFER_SIZE)
-        << "The buffer cap should have released the jumped-to block";
+    ASSERT_EQ(delivered.size(), 1u + MAX_BUFFER_SIZE) << "The buffer cap should have released the jumped-to block";
     ASSERT_EQ(delivered.front(), 1);
     ASSERT_EQ(delivered.back(), static_cast<uint16_t>(30000 + MAX_BUFFER_SIZE - 1));
 }

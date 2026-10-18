@@ -2752,8 +2752,7 @@ int MP4D_open(
 #endif
             {BOX_udta, BOX_ATOM},
             {BOX_meta, BOX_ATOM},
-            {BOX_ilst, BOX_ATOM}
-        };
+            {BOX_ilst, BOX_ATOM}};
 
         uint32_t  FullAtomVersionAndFlags = 0;
         boxsize_t payload_bytes;
