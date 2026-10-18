@@ -212,7 +212,7 @@ class AvgCalculator2
 
   public:
     // Use zero for infinite n of recorded samples
-    AvgCalculator2(size_t sampleSize = 60) : sampleSize(sampleSize){};
+    AvgCalculator2(size_t sampleSize = 60) : sampleSize(sampleSize) {};
 
     //
     void add(const std::chrono::nanoseconds& value)

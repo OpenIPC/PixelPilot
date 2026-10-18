@@ -65,11 +65,11 @@ class BufferedPacketQueue
      */
     template <typename Callback>
     void processPacket(
-        SeqType         currPacketIdx,
-        const uint8_t*  data,
-        std::size_t     data_length,
-        Callback&       callback,
-        QueueTimePoint  now = QueueClock::now())
+        SeqType        currPacketIdx,
+        const uint8_t* data,
+        std::size_t    data_length,
+        Callback&      callback,
+        QueueTimePoint now = QueueClock::now())
     {
         logDebug(
             "Processing packet with Sequence=%u, lastPacketIdx=%u, firstPacket=%s",
@@ -215,11 +215,7 @@ class BufferedPacketQueue
      */
     template <typename Callback>
     void handleOutOfOrderPacket(
-        SeqType        currPacketIdx,
-        const uint8_t* data,
-        std::size_t    data_length,
-        Callback&      callback,
-        QueueTimePoint now)
+        SeqType currPacketIdx, const uint8_t* data, std::size_t data_length, Callback& callback, QueueTimePoint now)
     {
         logDebug("Out-of-order packet detected. Sequence=%u", currPacketIdx);
 
@@ -325,9 +321,8 @@ class BufferedPacketQueue
             std::sort(
                 sortedPackets.begin(),
                 sortedPackets.end(),
-                [from](const auto& a, const auto& b) {
-                    return static_cast<SeqType>(a->first - from) < static_cast<SeqType>(b->first - from);
-                });
+                [from](const auto& a, const auto& b)
+                { return static_cast<SeqType>(a->first - from) < static_cast<SeqType>(b->first - from); });
 
             // Seeded from a packet that is actually in the buffer rather than from
             // mLastPacketIdx. RTP starts at a random sequence number, so a VTX that reboots

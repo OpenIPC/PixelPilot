@@ -176,13 +176,13 @@ int UDPReceiver::getPort() const
 void UDPReceiver::setForwarding(const std::string& ip, int port, bool enabled)
 {
     std::lock_guard<std::mutex> lock(mForwardMutex);
-    mForwardIP = ip;
-    mForwardPort = port;
+    mForwardIP      = ip;
+    mForwardPort    = port;
     mForwardEnabled = enabled;
 
     memset(&mDestAddr, 0, sizeof(mDestAddr));
     mDestAddr.sin_family = AF_INET;
-    mDestAddr.sin_port = htons(port);
+    mDestAddr.sin_port   = htons(port);
     if (inet_pton(AF_INET, ip.c_str(), &mDestAddr.sin_addr) <= 0)
     {
         mForwardEnabled = false;

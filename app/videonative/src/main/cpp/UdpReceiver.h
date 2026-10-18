@@ -12,8 +12,8 @@
 #include <atomic>
 #include <cstdio>
 #include <iostream>
-#include <thread>
 #include <mutex>
+#include <thread>
 // Starts a new thread that continuously checks for new data on UDP port
 
 class UDPReceiver
@@ -88,11 +88,11 @@ class UDPReceiver
     static constexpr const size_t UDP_PACKET_MAX_SIZE = 65507;
     JavaVM*                       javaVm;
 
-    std::mutex                    mForwardMutex;
-    std::string                   mForwardIP      = "";
-    int                           mForwardPort    = 0;
-    bool                          mForwardEnabled = false;
-    struct sockaddr_in            mDestAddr;
+    std::mutex         mForwardMutex;
+    std::string        mForwardIP      = "";
+    int                mForwardPort    = 0;
+    bool               mForwardEnabled = false;
+    struct sockaddr_in mDestAddr;
 };
 
 #endif  // FPVUE_UDPRECEIVER_H

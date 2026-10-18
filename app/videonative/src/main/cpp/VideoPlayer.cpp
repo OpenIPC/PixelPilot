@@ -145,8 +145,7 @@ void VideoPlayer::onNewNALU(const NALU& nalu)
         return;
     }
     // The writer thread outlives this call, so hand it an owning copy.
-    enqueueNALU(DvrNalu{std::vector<uint8_t>(nalu.getData(), nalu.getData() + nalu.getSize()),
-                        nalu.IS_H265_PACKET});
+    enqueueNALU(DvrNalu{std::vector<uint8_t>(nalu.getData(), nalu.getData() + nalu.getSize()), nalu.IS_H265_PACKET});
 }
 
 void VideoPlayer::setVideoSurface(JNIEnv* env, jobject surface, jint i)
@@ -251,8 +250,8 @@ void VideoPlayer::stopDvr()
 
 void VideoPlayer::setForwarding(const std::string& ip, int port, bool enabled)
 {
-    mForwardIP = ip;
-    mForwardPort = port;
+    mForwardIP      = ip;
+    mForwardPort    = port;
     mForwardEnabled = enabled;
     if (mUDPReceiver)
     {

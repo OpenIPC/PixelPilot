@@ -114,7 +114,7 @@ class VideoDecoder
     std::unique_ptr<std::thread> mCheckOutputThread[2]  = {nullptr, nullptr};
     bool                         USE_SW_DECODER_INSTEAD = false;
     // Some decoders misbehave with the low-latency keys, so it stays user switchable.
-    std::atomic<bool>            mLowLatency            = true;
+    std::atomic<bool> mLowLatency = true;
     // Holds the AMediaCodec instance, as well as the state (configured or not configured)
     Decoder      decoder{};
     DecodingInfo decodingInfo;
