@@ -37,9 +37,11 @@ Do not report pure style issues; clang-format 18.1.8 is enforced by CI.
 
 compliance_user_guidelines = """
 Repository conventions to check on every PR:
-- Modules (app, videonative, wfbngrtl8812, mavlink) communicate only over loopback UDP
-  (5600 video, 14550 MAVLink, 8000/8001 VPN) and the 10.5.0.0/24 TUN; new cross-module native
-  calls or new hard-coded ports without a named constant are violations.
+- Modules (app, videonative, wfbngrtl8812, mavlink) communicate through UDP sockets, not direct
+  native calls: wfb-ng aggregators send to 127.0.0.1:5600 (video), :14550 (MAVLink) and :8000
+  (VPN ingress), the VPN service feeds :8001 to the transmitter, and the TUN is 10.5.0.0/24. The
+  video receiver deliberately binds INADDR_ANY:5600 so Wi-Fi senders work without an adapter.
+  New cross-module native calls or new hard-coded ports without a named constant are violations.
 - No new hard-coded app-private paths such as /data/user/0/com.openipc.pixelpilot/...; pass the
   Context files dir from Java.
 - app/mavlink/src/main/cpp/mavlink/ is generated MAVLink code and must not be hand-edited.
@@ -47,8 +49,12 @@ Repository conventions to check on every PR:
   must come with a matching devourer submodule bump, and submodule bumps must state what changed.
 - Submodule checkouts in workflows stay non-recursive (devourer's reference/ submodules are not
   buildable); do not add submodules: recursive.
-- Log tag is "pixelpilot" in Java and C++ (devourer logs under "devourer").
-- Native code is C++20, formatted with scripts/format_sources.sh (clang-format 18.1.8).
+- Log tag is "pixelpilot" in Java and in most project-owned C++; a few native components use
+  their own tag (e.g. FecChangeController, SignalQualityCalculator, TXFrame, wfb-ng) and devourer
+  logs under "devourer". New code should use "pixelpilot" or an existing component tag.
+- wfbngrtl8812 and videonative are C++20 (CXX_STANDARD 20 in their CMakeLists); the mavlink
+  target sets no standard, so keep it to features the NDK default supports. All project C++ is
+  formatted with scripts/format_sources.sh (clang-format 18.1.8).
 - PRs that add a Java type touched from JNI must add @Keep or a proguard keep rule.
 """
 
