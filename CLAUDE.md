@@ -103,6 +103,7 @@ TUN 10.5.0.0/24 egress -> WfbNgVpnService -> :8001 -> TxFrame (FEC k=1,n=5, radi
 ## Conventions
 
 - Log tag is `"pixelpilot"` across Java and most C++; devourer logs under `"devourer"`.
+- Qodo reviews every PR; its repo-level guidelines live in `.pr_agent.toml` and mirror the rules above.
 - JNI symbols follow `Java_com_openipc_<module>_<Class>_<method>`. Release builds run R8:
   `app/proguard-rules.pro` keeps native-method classes and the mavlink types, and classes that
   native code reflects on (`WfbNGStats`, `DecodingInfo`, callback interfaces) are `@Keep`. Any new

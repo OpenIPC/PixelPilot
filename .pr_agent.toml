@@ -1,0 +1,63 @@
+# Qodo (free open-source tier) review configuration for PixelPilot.
+# Repo-level file: takes precedence over wiki and org settings.
+# Only keys honoured by the free tier are used; custom Rules / Review Standards are paid-only.
+
+[review_agent]
+# Inline comments only for High and Medium findings; everything still appears in the summary.
+inline_comments_severity_threshold = 2
+
+issues_user_guidelines = """
+Project: Android FPV ground station. Hot path is C++ behind thin JNI wrappers; a USB Realtek
+adapter is driven in userspace (devourer) and wfb-ng / 802.11 frames are parsed in-process.
+
+Prioritise these classes of bugs, in order:
+1. Native packet parsing (devourer RX callbacks, RxFrame, StaLink, wfb-ng aggregators): every read
+   of an 802.11 / LLC / IP / UDP / TCP / ICMP header or payload must be bounds-checked against the
+   remaining buffer length. Flag pointer arithmetic on packet data without a length check,
+   reassembly that does not track byte coverage, and any input-sized allocation or frame
+   injection without an upper bound.
+2. WfbngLink threading: rtl_devices, current_fd, the aggregators and the worker/adaptive-link
+   threads are shared between the run thread, Java-called stop()/setters, and native workers.
+   Flag map mutation or device erase/reset without a mutex, raw pointers kept across a possible
+   erase, and .at() on an fd that another thread may have removed. devourer's IRtlDevice expects
+   a single control thread per device: flag SetTxPower / SetMonitorChannel / FastRetune calls
+   from a second thread.
+3. Thread lifecycle: every std::thread started in native code must be joinable and joined on
+   stop() and on USB detach; flag detached threads, blocking calls that can hang stopAll(), and
+   condition-variable waits without a predicate or timeout.
+4. JNI/R8: Java_com_openipc_<module>_<Class>_<method> names and signatures must match the Java
+   declarations; any Java class, interface or field reached from C++ (reflection, callbacks)
+   needs @Keep or a rule in app/proguard-rules.pro, otherwise release builds crash.
+5. Android: no blocking socket waits, Thread.join or synchronous camera HTTP on the UI thread in
+   VideoActivity or dialogs; runtime permissions and foreground-service rules for API 26-34.
+6. Shell scripts under tools/: must validate every option argument, use set -euo pipefail, and
+   make changes on the camera atomic (backup first, restore on any later failure).
+Do not report pure style issues; clang-format 18.1.8 is enforced by CI.
+"""
+
+compliance_user_guidelines = """
+Repository conventions to check on every PR:
+- Modules (app, videonative, wfbngrtl8812, mavlink) communicate through UDP sockets, not direct
+  native calls: wfb-ng aggregators send to 127.0.0.1:5600 (video), :14550 (MAVLink) and :8000
+  (VPN ingress), the VPN service feeds :8001 to the transmitter, and the TUN is 10.5.0.0/24. The
+  video receiver deliberately binds INADDR_ANY:5600 so Wi-Fi senders work without an adapter.
+  New cross-module native calls or new hard-coded ports without a named constant are violations.
+- No new hard-coded app-private paths such as /data/user/0/com.openipc.pixelpilot/...; pass the
+  Context files dir from Java.
+- app/mavlink/src/main/cpp/mavlink/ is generated MAVLink code and must not be hand-edited.
+- Changes to app/wfbngrtl8812/src/main/cpp/CMakeLists.txt that touch the devourer source list
+  must come with a matching devourer submodule bump, and submodule bumps must state what changed.
+- Submodule checkouts in workflows stay non-recursive (devourer's reference/ submodules are not
+  buildable); do not add submodules: recursive.
+- Log tag is "pixelpilot" in Java and in most project-owned C++; a few native components use
+  their own tag (e.g. FecChangeController, SignalQualityCalculator, TXFrame, wfb-ng) and devourer
+  logs under "devourer". New code should use "pixelpilot" or an existing component tag.
+- wfbngrtl8812 and videonative are C++20 (CXX_STANDARD 20 in their CMakeLists); the mavlink
+  target sets no standard, so keep it to features the NDK default supports. All project C++ is
+  formatted with scripts/format_sources.sh (clang-format 18.1.8).
+- PRs that add a Java type touched from JNI must add @Keep or a proguard keep rule.
+"""
+
+[github_app]
+pr_commands = ["/agentic_describe", "/agentic_review"]
+handle_push_trigger = false
