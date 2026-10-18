@@ -28,9 +28,11 @@ add_executable(queue_test
     BufferedPacketQueue_test.cpp
 )
 
+# shim/ provides a host <android/log.h> so the header under test compiles off-device.
 target_include_directories(queue_test PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../
+    ${CMAKE_CURRENT_SOURCE_DIR}/shim
 )
 target_link_libraries(queue_test
     GTest::gtest_main
