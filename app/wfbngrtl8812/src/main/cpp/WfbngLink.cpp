@@ -34,6 +34,54 @@
 #undef TAG
 #define TAG "pixelpilot"
 
+namespace {
+
+// Finds the vendor-specific Wi-Fi interface before libusb claims it.
+// RTL8812BU / RTL8822BU is a composite USB device: interfaces 0 and 1 belong to
+// Bluetooth, while its Wi-Fi bulk endpoints are on interface 2. Assuming
+// interface 0 works for RTL8812AU but claims the wrong function on that BU
+// layout, so select the interface that actually provides bulk IN and OUT.
+int findRtlWifiInterface(libusb_device_handle *dev_handle) {
+    if (dev_handle == nullptr) {
+        return 0;
+    }
+
+    libusb_config_descriptor *config = nullptr;
+    if (libusb_get_active_config_descriptor(libusb_get_device(dev_handle), &config) != LIBUSB_SUCCESS) {
+        return 0;
+    }
+
+    for (uint8_t interface_index = 0; interface_index < config->bNumInterfaces; interface_index++) {
+        const libusb_interface &interface = config->interface[interface_index];
+        for (int alt_index = 0; alt_index < interface.num_altsetting; alt_index++) {
+            const libusb_interface_descriptor &descriptor = interface.altsetting[alt_index];
+            bool has_bulk_in = false;
+            bool has_bulk_out = false;
+            for (uint8_t endpoint_index = 0; endpoint_index < descriptor.bNumEndpoints; endpoint_index++) {
+                const libusb_endpoint_descriptor &endpoint = descriptor.endpoint[endpoint_index];
+                if ((endpoint.bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) != LIBUSB_TRANSFER_TYPE_BULK) {
+                    continue;
+                }
+                if (endpoint.bEndpointAddress & LIBUSB_ENDPOINT_IN) {
+                    has_bulk_in = true;
+                } else {
+                    has_bulk_out = true;
+                }
+            }
+            if (descriptor.bInterfaceClass == LIBUSB_CLASS_VENDOR_SPEC && has_bulk_in && has_bulk_out) {
+                const int interface_number = descriptor.bInterfaceNumber;
+                libusb_free_config_descriptor(config);
+                return interface_number;
+            }
+        }
+    }
+
+    libusb_free_config_descriptor(config);
+    return 0;
+}
+
+}
+
 std::string generate_random_string(size_t length) {
     const std::string characters = "abcdefghijklmnopqrstuvwxyz";
     std::random_device rd;
@@ -104,12 +152,18 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         return r;
     }
 
-    if (libusb_kernel_driver_active(dev_handle, 0)) {
-        r = libusb_detach_kernel_driver(dev_handle, 0);
+    const int wifi_interface = findRtlWifiInterface(dev_handle);
+    if (libusb_kernel_driver_active(dev_handle, wifi_interface)) {
+        r = libusb_detach_kernel_driver(dev_handle, wifi_interface);
         __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_detach_kernel_driver: %d", r);
     }
-    r = libusb_claim_interface(dev_handle, 0);
-    __android_log_print(ANDROID_LOG_DEBUG, TAG, "Creating driver and device for fd=%d", fd);
+    r = libusb_claim_interface(dev_handle, wifi_interface);
+    if (r != LIBUSB_SUCCESS) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "libusb_claim_interface(%d) failed: %d", wifi_interface, r);
+        libusb_exit(ctx);
+        return r;
+    }
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "Creating driver and device for fd=%d interface=%d", fd, wifi_interface);
 
     devourer::DeviceConfig cfg;
     // TX+RX on the one claimed handle. Jaguar3 (RTL8812EU/8822EU) must know
@@ -136,7 +190,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
     if (stop_requested(fd)) {
         __android_log_print(ANDROID_LOG_WARN, TAG, "stop requested for fd=%d before bring-up, aborting", fd);
         rtl_devices.erase(fd);
-        libusb_release_interface(dev_handle, 0);
+        libusb_release_interface(dev_handle, wifi_interface);
         libusb_exit(ctx);
         return -1;
     }
@@ -158,12 +212,23 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
                 uint8_t antenna[4] = {1, 1, 1, 1};
 
                 std::lock_guard<std::mutex> lock(agg_mutex);
+                // Every device parser returns the complete 802.11 frame,
+                // including its four-byte FCS. wfb-ng authenticates only the
+                // payload, after both the MAC header and FCS are removed.
+                constexpr size_t fcs_length = 4;
+                if (packet.Data.size() < sizeof(ieee80211_header) + fcs_length) {
+                    return;
+                }
+
+                const size_t wfb_packet_length =
+                    packet.Data.size() - sizeof(ieee80211_header) - fcs_length;
+
                 if (frame.MatchesChannelID(video_channel_id_be8)) {
                     SignalQualityCalculator::get_instance().add_rssi(packet.RxAtrib.rssi[0], packet.RxAtrib.rssi[1]);
                     SignalQualityCalculator::get_instance().add_snr(packet.RxAtrib.snr[0], packet.RxAtrib.snr[1]);
 
                     video_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
-                                                     packet.Data.size() - sizeof(ieee80211_header) - 4,
+                                                     wfb_packet_length,
                                                      0,
                                                      antenna,
                                                      rssi,
@@ -178,7 +243,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
                     }
                 } else if (frame.MatchesChannelID(mavlink_channel_id_be8)) {
                     mavlink_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
-                                                       packet.Data.size() - sizeof(ieee80211_header) - 4,
+                                                       wfb_packet_length,
                                                        0,
                                                        antenna,
                                                        rssi,
@@ -189,7 +254,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
                                                        NULL);
                 } else if (frame.MatchesChannelID(udp_channel_id_be8)) {
                     udp_aggregator->process_packet(packet.Data.data() + sizeof(ieee80211_header),
-                                                   packet.Data.size() - sizeof(ieee80211_header) - 4,
+                                                   wfb_packet_length,
                                                    0,
                                                    antenna,
                                                    rssi,
@@ -265,7 +330,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         if (dev) {
             dev->Stop();
         }
-        libusb_release_interface(dev_handle, 0);
+        libusb_release_interface(dev_handle, wifi_interface);
         libusb_exit(ctx);
         return -1;
     }
@@ -283,7 +348,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         dev->Stop();
     }
 
-    r = libusb_release_interface(dev_handle, 0);
+    r = libusb_release_interface(dev_handle, wifi_interface);
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_release_interface: %d", r);
     libusb_exit(ctx);
     return 0;

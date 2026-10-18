@@ -70,4 +70,7 @@
     <usb-device
         product-id="0xE822"
         vendor-id="0x0BDA" /> <!-- RTL8822EU (multi-function) -->
+    <usb-device
+        product-id="0xB82C"
+        vendor-id="0x0BDA" /> <!-- RTL8822BU -->
 </resources>
