@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+
+  # devourer and wfb-ng pointer bumps as reviewable PRs
+  - package-ecosystem: gitsubmodule
+    directory: /
+    schedule:
+      interval: weekly
