@@ -78,6 +78,7 @@ void *listen(int mavlink_port) {
     if (bind(fd, (struct sockaddr *) (&addr), sizeof(addr)) != 0) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "Unable to bind MavLink port %d: %s",
                             mavlink_port, strerror(errno));
+        close(fd);
         return 0;
     }
 
@@ -88,6 +89,7 @@ void *listen(int mavlink_port) {
     if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
         __android_log_print(ANDROID_LOG_ERROR, TAG,
                             "Unable to bind MavLink rx timeout:  %s", strerror(errno));
+        close(fd);
         return 0;
     }
 
@@ -102,11 +104,13 @@ void *listen(int mavlink_port) {
                 continue;
             } else {
                 __android_log_print(ANDROID_LOG_ERROR, TAG, "Error receiving mavlink: %s", strerror(errno));
+                close(fd);
                 return 0;
             }
         } else if (ret == 0) {
             // peer has done an orderly shutdown
             __android_log_print(ANDROID_LOG_ERROR, TAG, "Shutting down mavlink: ret=0");
+            close(fd);
             return 0;
         }
 
@@ -315,6 +319,7 @@ void *listen(int mavlink_port) {
         usleep(1);
     }
 
+    close(fd);
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "Mavlink thread done.");
     return 0;
 }
@@ -375,6 +380,11 @@ Java_com_openipc_mavlink_MavlinkNative_nativeCallBack(JNIEnv *env, jclass clazz,
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_openipc_mavlink_MavlinkNative_nativeStart(JNIEnv *env, jclass clazz, jobject context) {
+    // mavlink_thread_signal is how a previous listen() loop was told to exit;
+    // it has to be cleared here or a restart (e.g. toggling streaming mode off
+    // again) would see it already set and exit its loop before ever reading a
+    // packet.
+    mavlink_thread_signal = 0;
     auto threadFunction = []() {
         listen(14550);
     };
