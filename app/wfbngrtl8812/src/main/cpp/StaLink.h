@@ -91,9 +91,10 @@ class StaLink {
     // Opens a TCP connection to ip:port, sends `request` and collects the reply
     // until the peer closes, goes quiet after answering, or `timeout` passes.
     // half_close ends our sending side with the request (as `echo cmd | nc` does).
-    // Blocks the caller (not an RX or worker thread). Waits (within `timeout`) for a
-    // request that is already running. Returns false when not connected, the slot
-    // stayed busy, the reply is missing, or an HTTP reply was cut off.
+    // Blocks the caller (not an RX or worker thread). Waits for a request that is
+    // already running; `timeout` covers that wait and the exchange together.
+    // Returns false when not connected, the slot stayed busy, the reply is
+    // missing, or an HTTP reply was cut off.
     bool tcpRequest(const std::array<uint8_t, 4> &ip,
                     uint16_t port,
                     const std::string &request,

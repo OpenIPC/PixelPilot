@@ -690,10 +690,10 @@ void WfbngLink::applyTxPower(int fd, int power) {
             std::lock_guard<std::mutex> lock(sta_mutex);
             sta = sta_link;
         }
-        if (sta) {
-            sta->requestTxPower(power);
-            return;
-        }
+        if (sta) sta->requestTxPower(power);
+        // Without a running station the device is being brought up or torn down on the
+        // run thread; runStation() applies adaptive_tx_power itself during bring-up.
+        return;
     }
     if (auto dev = getDevice(fd)) {
         dev->SetTxPower(power);

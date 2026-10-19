@@ -121,7 +121,10 @@ constexpr size_t kMaxSeenNetworks = 64;
 // True for an HTTP reply whose headers or body are not all there yet. Anything that
 // is not HTTP (air_man_ap speaks plain lines) counts as complete.
 bool httpReplyIncomplete(const std::string &rx) {
-    if (rx.compare(0, 5, "HTTP/") != 0) return false;
+    static const std::string kHttp = "HTTP/";
+    // Fewer bytes than the status line prefix: still HTTP if they match its start.
+    if (rx.size() < kHttp.size()) return !rx.empty() && kHttp.compare(0, rx.size(), rx) == 0;
+    if (rx.compare(0, kHttp.size(), kHttp) != 0) return false;
     const auto hdr_end = rx.find("\r\n\r\n");
     if (hdr_end == std::string::npos) return true;
     std::string head = rx.substr(0, hdr_end);
@@ -1295,8 +1298,10 @@ bool StaLink::tcpRequest(const std::array<uint8_t, 4> &ip,
     std::unique_lock<std::mutex> lock(mu_);
     // One session slot: a caller that finds it busy (e.g. the key-frame request after a
     // recovery) waits its turn instead of being told the camera did not answer.
+    // `timeout` covers the wait and the exchange together, so the caller never waits longer.
+    const auto deadline = Clock::now() + timeout;
     const auto usable = [this] { return running_ && state_.load() == State::Connected; };
-    if (!tcp_cv_.wait_for(lock, timeout, [&] { return !usable() || tcp_.st == St::Idle; })) return false;
+    if (!tcp_cv_.wait_until(lock, deadline, [&] { return !usable() || tcp_.st == St::Idle; })) return false;
     if (!usable()) return false;
 
     std::random_device rd;
@@ -1308,7 +1313,7 @@ bool StaLink::tcpRequest(const std::array<uint8_t, 4> &ip,
     s.snd_nxt = s.iss + 1;
     s.half_close = half_close;
     s.data.assign(request.begin(), request.end());
-    s.deadline = Clock::now() + timeout;
+    s.deadline = deadline;
     s.last_tx = Clock::now();
     tcp_ = std::move(s);
 
@@ -1415,7 +1420,7 @@ void StaLink::handleTcp(const uint8_t *ip, size_t ihl, size_t len) {
 
     if (flags & kTcpRst) {
         __android_log_print(ANDROID_LOG_WARN, TAG, "TCP connection reset by the peer");
-        tcp_.st = tcp_.rx.empty() ? St::Failed : St::Done;
+        tcp_.st = tcp_.rx.empty() || httpReplyIncomplete(tcp_.rx) ? St::Failed : St::Done;
         tcp_cv_.notify_all();
         return;
     }
@@ -1434,7 +1439,13 @@ void StaLink::handleTcp(const uint8_t *ip, size_t ihl, size_t len) {
     }
 
     if ((flags & kTcpAck) && static_cast<int32_t>(ack - our_end) >= 0) tcp_.data_acked = true;
-    if (plen > 0 && seq == tcp_.rcv_nxt && tcp_.rx.size() + plen <= kTcpMaxReply) {
+    if (plen > 0 && seq == tcp_.rcv_nxt) {
+        if (tcp_.rx.size() + plen > kTcpMaxReply) {
+            // Not a camera reply; give up now instead of re-ACKing until the deadline.
+            __android_log_print(ANDROID_LOG_WARN, TAG, "TCP reply over %zu bytes, dropping it", kTcpMaxReply);
+            tcpFinish(false);
+            return;
+        }
         tcp_.rx.append(reinterpret_cast<const char *>(payload), plen);
         tcp_.rcv_nxt += static_cast<uint32_t>(plen);
         tcp_.last_rx = now;
@@ -1448,7 +1459,8 @@ void StaLink::handleTcp(const uint8_t *ip, size_t ihl, size_t len) {
         } else {
             tcpSend(kTcpFin | kTcpAck, data_end, nullptr, 0);
         }
-        tcp_.st = St::Done;
+        // Closed before the Content-Length was reached: a cut-off reply, not an answer.
+        tcp_.st = httpReplyIncomplete(tcp_.rx) ? St::Failed : St::Done;
         tcp_cv_.notify_all();
         return;
     }

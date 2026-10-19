@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.openipc.wfbngrtl8812.WfbNgLink;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
@@ -530,8 +531,8 @@ final class CameraControlDialog {
                     return null;
                 }
                 int brace = reply.indexOf('{', reply.indexOf("\r\n\r\n") + 1);
-                if (brace < 0) return null;
                 try {
+                    if (brace < 0) throw new JSONException("no JSON body");
                     return new JSONObject(reply.substring(brace).trim());
                 } catch (Exception e) {
                     // Most likely a reply that was cut off on the way: ask again.
