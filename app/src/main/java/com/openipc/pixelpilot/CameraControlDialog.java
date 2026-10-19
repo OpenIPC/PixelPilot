@@ -313,9 +313,12 @@ final class CameraControlDialog {
                     () -> run("SSID", () -> {
                         // The CGI insists on a passphrase; the open-network adapter ignores it.
                         String pass = wlanPass.isEmpty() ? "12345678" : wlanPass;
-                        String r = result(cgi(WLAN + "?action=set&ssid=" + enc(ssid) + "&pass=" + enc(pass)));
+                        JSONObject reply = cgiOnce(WLAN + "?action=set&ssid=" + enc(ssid) + "&pass=" + enc(pass));
+                        String r = result(reply);
                         if (r != null && r.contains("ok")) main.post(() -> listener.onSsidChanged(ssid));
-                        return r;
+                        // Not adopted blindly: if the camera did not take it, the app would lose it.
+                        return reply != null ? r : rebootResult(null) + "; if it comes back as \"" + ssid
+                                + "\", set that SSID in APFPV settings";
                     }));
         }));
         root.addView(ssidLine);
@@ -324,11 +327,11 @@ final class CameraControlDialog {
                 "Start the access point on channel " + value + "?",
                 "Changes the channel hostapd starts on (before the switch to the stored channel) and "
                         + "reboots the camera.",
-                () -> run("Start channel", () -> result(cgi(BOOT_CHANNEL + "?action=set&channel=" + value)))));
+                () -> run("Start channel", () -> rebootResult(cgiOnce(BOOT_CHANNEL + "?action=set&channel=" + value)))));
         LinearLayout bootLine = line();
         bootLine.addView(button("Restore 157", v -> confirm("Restore the default start channel 157?",
                 "The camera reboots.",
-                () -> run("Start channel", () -> result(cgi(BOOT_CHANNEL + "?action=restore"))))));
+                () -> run("Start channel", () -> rebootResult(cgiOnce(BOOT_CHANNEL + "?action=restore"))))));
         root.addView(bootLine);
 
         LinearLayout rebootLine = line();
@@ -338,7 +341,7 @@ final class CameraControlDialog {
         }));
         rebootLine.addView(button("Reboot camera", v -> confirm("Reboot the camera?",
                 "The link drops and the app rejoins once the camera is back.",
-                () -> run("Reboot", () -> result(cgi(MAIN_PAGE + "?action=reboot"))))));
+                () -> run("Reboot", () -> rebootResult(cgiOnce(MAIN_PAGE + "?action=reboot"))))));
         root.addView(rebootLine);
     }
 
@@ -517,11 +520,29 @@ final class CameraControlDialog {
 
     /** GET on the camera's web API with the drone login; the JSON body, or null. */
     private JSONObject cgi(String pathAndQuery) {
+        return cgi(pathAndQuery, 3);
+    }
+
+    /**
+     * Like cgi(), but sent only once: for actions that reboot the camera. Its answer is often cut
+     * off by the reboot itself, and asking again would reboot it a second time.
+     */
+    private JSONObject cgiOnce(String pathAndQuery) {
+        return cgi(pathAndQuery, 1);
+    }
+
+    /** Result text of a rebooting action; a missing answer does not mean it was not done. */
+    private String rebootResult(JSONObject reply) {
+        return reply != null ? result(reply) : "sent, no complete answer - the camera may already be rebooting";
+    }
+
+    private JSONObject cgi(String pathAndQuery, int attempts) {
         String request = "GET " + pathAndQuery + " HTTP/1.0\r\n"
                 + "Host: " + cameraIp + "\r\n"
                 + "Authorization: Basic " + auth + "\r\n"
                 + "Connection: close\r\n\r\n";
-        for (int attempt = 0; attempt < 3; attempt++) {
+        for (int attempt = 0; attempt < attempts; attempt++) {
+            if (attempt > 0 && !pause(400)) break;
             String reply = transport.request(cameraIp, HTTP_PORT, request, false, TIMEOUT_MS);
             if (reply != null) {
                 int nl = reply.indexOf('\n');
@@ -537,11 +558,8 @@ final class CameraControlDialog {
                 } catch (Exception e) {
                     // Most likely a reply that was cut off on the way: ask again.
                     Log.w(TAG, "camera " + pathAndQuery + ": unreadable answer", e);
-                    if (!pause(400)) break;
-                    continue;
                 }
             }
-            if (!pause(400)) break;
         }
         return null;
     }
