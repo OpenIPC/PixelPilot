@@ -42,7 +42,10 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --revert) REVERT=1 ;;
         --no-restart) RESTART=0 ;;
-        --allow-mac) shift; MAC=$(echo "$1" | tr 'A-F' 'a-f') ;;
+        --allow-mac)
+            # Without a value the filter would silently be left out.
+            [ -n "${2:-}" ] || die "--allow-mac needs a MAC address, nothing changed."
+            shift; MAC=$(echo "$1" | tr 'A-F' 'a-f') ;;
         *) die "unknown option: $1" ;;
     esac
     shift
@@ -92,6 +95,8 @@ for pat in '^wpa_passphrase=\$pass$' '^wpa=2$' '^rsn_pairwise=CCMP$' '^disassoc_
            '^        udhcpd -S /etc/udhcpd.conf$' '^                    reset_single_ip_dhcp "\$1"$'; do
     [ "$(grep -c "$pat" "$ADAPTER")" = 1 ] || die "spot '$pat' not found exactly once - nothing changed."
 done
+# The ARP reset that replaces reset_single_ip_dhcp uses the adapter's $master.
+grep -qE '^[[:space:]]*master=' "$ADAPTER" || die "\$master not set in $ADAPTER - nothing changed."
 
 cp "$ADAPTER" "$BACKUP" || die "backup to $BACKUP failed"
 TMP="$ADAPTER.tmp.$$"
@@ -115,8 +120,14 @@ sh -n "$TMP" || { rm -f "$TMP"; die "syntax error in the result, nothing changed
 [ "$(grep -c "$MARK" "$TMP")" -ge 4 ] || { rm -f "$TMP"; die "not all spots replaced, nothing changed."; }
 grep -q '^disassoc_low_ack=0$' "$TMP" || { rm -f "$TMP"; die "disassoc_low_ack not replaced, nothing changed."; }
 
-mv "$TMP" "$ADAPTER" && chmod 755 "$ADAPTER" || die "writing $ADAPTER failed"
-[ -n "$MAC" ] && { echo "$MAC" > "$ACCEPT" || die "writing $ACCEPT failed"; echo "Only $MAC may join ($ACCEPT)."; }
+# The accept file goes first: the patched adapter must never be in place without it.
+if [ -n "$MAC" ]; then
+    echo "$MAC" > "$ACCEPT" && [ "$(cat "$ACCEPT")" = "$MAC" ] ||
+        { rm -f "$TMP" "$ACCEPT"; die "writing $ACCEPT failed, nothing changed."; }
+fi
+mv "$TMP" "$ADAPTER" && chmod 755 "$ADAPTER" ||
+    { cp "$BACKUP" "$ADAPTER"; rm -f "$TMP"; [ -n "$MAC" ] && rm -f "$ACCEPT"; die "writing $ADAPTER failed, original restored."; }
+[ -n "$MAC" ] && echo "Only $MAC may join ($ACCEPT)."
 echo "Installed. Backup: $BACKUP"
 
 killall -q udhcpd 2>/dev/null
