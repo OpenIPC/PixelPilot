@@ -128,6 +128,20 @@ ARP and ping for its IP and sends a keepalive every 5 s. On RTL8812AU adapters d
 frame without hardware retries, so the few frames the phone sends (association, ARP) rely on
 software retries; the video direction is acknowledged in hardware on all chips.
 
+Security: the camera's access point is open, without encryption and without protected
+management frames (PMF), so everything on it can be read and forged by anyone in radio range.
+Video and MAVLink go out unencrypted. A spoofed deauth makes the app rejoin, and a spoofed beacon
+with the camera's SSID can draw it to another channel or access point. Install with a MAC filter
+for the adapter (its address is in **APFPV settings**), so other stations cannot join the camera:
+```
+ssh root@192.168.0.1 sh -s -- --allow-mac aa:bb:cc:dd:ee:ff < tools/apfpv-open-static-cam.sh
+```
+The filter only keeps honest stations out; an attacker can copy the adapter's address from the air.
+The Drone login is sent as HTTP Basic auth, i.e. in cleartext, with every camera control request
+and with the key-frame request after each (re)association and each end of a dropout. On the
+apfpv firmware that is usually the camera's root login: use APFPV mode only where nobody else is
+listening, or give the camera a password that is not used anywhere else.
+
 ## Quick Reference: Auto-FEC Levels 0 – 5
 
 | Level | Denominator | Added Redundancy |
