@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <android/log.h>
 #include <arpa/inet.h>
+#include <cctype>
+#include <cstdlib>
 #include <cstring>
 #include <exception>
 #include <netinet/in.h>
@@ -106,6 +108,27 @@ constexpr auto kTcpRetransmit = 400ms;
 // air_man_ap answers once it is done; when it keeps the connection open after
 // that, this much silence after the first reply bytes ends the request.
 constexpr auto kTcpReplyIdle = 1500ms;
+// Replies are small status lines or JSON; anything beyond this is not from the camera.
+constexpr size_t kTcpMaxReply = 64 * 1024;
+// ICMP echo requests larger than a normal MTU are not answered (they would have to go
+// out as one oversized MPDU).
+constexpr size_t kMaxEchoDatagram = 1500;
+// Networks remembered while searching (diagnostics only).
+constexpr size_t kMaxSeenNetworks = 64;
+
+// True for an HTTP reply whose headers or body are not all there yet. Anything that
+// is not HTTP (air_man_ap speaks plain lines) counts as complete.
+bool httpReplyIncomplete(const std::string &rx) {
+    if (rx.compare(0, 5, "HTTP/") != 0) return false;
+    const auto hdr_end = rx.find("\r\n\r\n");
+    if (hdr_end == std::string::npos) return true;
+    std::string head = rx.substr(0, hdr_end);
+    std::transform(head.begin(), head.end(), head.begin(), [](unsigned char ch) { return std::tolower(ch); });
+    const auto cl = head.find("\r\ncontent-length:");
+    if (cl == std::string::npos) return false; // delimited by the peer closing
+    const size_t want = std::strtoul(head.c_str() + cl + 17, nullptr, 10);
+    return rx.size() - (hdr_end + 4) < want;
+}
 
 const char *stateName(StaLink::State s) {
     switch (s) {
@@ -170,6 +193,7 @@ void StaLink::stop() {
     // Release a caller blocked in tcpRequest(); nothing will answer it any more.
     std::lock_guard<std::mutex> lock(mu_);
     tcpFinish(false);
+    tcp_cv_.notify_all(); // callers queued for the session slot give up too
 }
 
 uint8_t StaLink::connectedChannel() const {
@@ -270,7 +294,17 @@ void StaLink::worker() {
             if (dev_->send_packet(f.data(), f.size())) tx_frames_++;
         }
 
+        // Control-path calls stay on this thread (see IRtlDevice: single control thread).
+        if (const int power = pending_tx_power_.exchange(-1); power >= 0) {
+            try {
+                dev_->SetTxPower(power);
+            } catch (const std::exception &e) {
+                __android_log_print(ANDROID_LOG_ERROR, TAG, "SetTxPower(%d) failed: %s", power, e.what());
+            }
+        }
+
         if (retune > 0) {
+            bool tuned = true;
             // Outside mu_: a retune takes milliseconds (more on a band change) and the
             // RX thread must keep draining meanwhile. devourer's own hopping RX does the
             // same from a second thread while StartRxLoop runs.
@@ -295,12 +329,18 @@ void StaLink::worker() {
                                         retune_width == 40 ? (retune_offset == 2 ? " (HT40-)" : " (HT40+)") : "");
                 }
             } catch (const std::exception &e) {
+                tuned = false;
                 __android_log_print(ANDROID_LOG_ERROR, TAG, "retune to ch %d failed: %s", retune, e.what());
             }
             std::lock_guard<std::mutex> lock(mu_);
-            channel_ = static_cast<uint8_t>(retune);
-            width_mhz_ = retune_width;
-            chan_offset_ = retune_offset;
+            // Only record what the radio really switched to; after a failure the old
+            // channel/width stay in force, so the search and probe logic keeps working
+            // from the truth and simply tries again after the dwell time.
+            if (tuned) {
+                channel_ = static_cast<uint8_t>(retune);
+                width_mhz_ = retune_width;
+                chan_offset_ = retune_offset;
+            }
             dwell_start_ = Clock::now();
             last_tx_attempt_ = Clock::time_point{}; // probe right away on the new channel
         }
@@ -685,7 +725,10 @@ void StaLink::onRx(const Packet &packet) {
     const bool from_ap = state_.load() != State::Searching && macEq(addr2, bssid_.data());
     if (from_ap) {
         const auto now = Clock::now();
-        if (in_gap_ && state_.load() == State::Connected) {
+        // tick() flags a gap only every kTickInterval; judge the silence here too, so a
+        // dropout that ends between two ticks still triggers the key-frame request.
+        if (state_.load() == State::Connected && last_heard_ != Clock::time_point{} &&
+            (in_gap_ || now - last_heard_ >= kDropoutGap)) {
             // Dropout over: video flows again right now, nothing to rebuild.
             in_gap_ = false;
             recoveries_++;
@@ -833,6 +876,13 @@ void StaLink::handleBeacon(const uint8_t *f, size_t len, uint8_t rssi) {
 
     std::array<uint8_t, 6> bssid;
     std::memcpy(bssid.data(), f + 16, 6);
+    if (seen_.size() >= kMaxSeenNetworks && seen_.find(bssid) == seen_.end()) {
+        // Forget the stalest entry rather than growing without bound on a busy band.
+        auto oldest = std::min_element(seen_.begin(), seen_.end(), [](const auto &a, const auto &b) {
+            return a.second.last < b.second.last;
+        });
+        seen_.erase(oldest);
+    }
     seen_[bssid] = SeenNetwork{ssid, ds_channel != -1 ? ds_channel : channel_, (capability & 0x0010) != 0,
                                rssi, Clock::now()};
 
@@ -1007,8 +1057,9 @@ void StaLink::handleMsdu(uint16_t ethertype, const uint8_t *payload, size_t len,
 }
 
 // Called with mu_ held. RFC 791 reassembly, kept small: at most 8 datagrams in
-// flight, each dropped 1 s after its first fragment. Overlapping fragments are
-// not expected from a single sender and are not handled specially.
+// flight, each dropped 1 s after its first fragment. Which 8-byte units have
+// arrived is tracked, so duplicates and overlaps cannot complete a datagram that
+// still has holes.
 std::vector<uint8_t> StaLink::reassemble(const uint8_t *ip, size_t ihl, size_t len) {
     const auto now = Clock::now();
     frags_.erase(std::remove_if(frags_.begin(), frags_.end(),
@@ -1023,20 +1074,28 @@ std::vector<uint8_t> StaLink::reassemble(const uint8_t *ip, size_t ihl, size_t l
     const size_t off = static_cast<size_t>(fo & 0x1fff) * 8;
     const size_t plen = len - ihl;
     if (off + plen + ihl > 65535) return {};
+    if (more && (plen % 8) != 0) return {}; // only the last fragment may end off a unit boundary
 
     auto it = std::find_if(frags_.begin(), frags_.end(),
                            [src, id](const IpFragments &f) { return f.src == src && f.id == id; });
     if (it == frags_.end()) {
         if (frags_.size() >= 8) frags_.erase(frags_.begin());
-        frags_.push_back(IpFragments{src, id, {}, {}, 0, 0, now});
+        frags_.push_back(IpFragments{src, id, {}, {}, {}, 0, now});
         it = frags_.end() - 1;
     }
     if (it->payload.size() < off + plen) it->payload.resize(off + plen);
     std::memcpy(it->payload.data() + off, ip + ihl, plen);
-    it->received += plen;
+    const size_t first_unit = off / 8, end_unit = (off + plen + 7) / 8;
+    if (it->got.size() < end_unit) it->got.resize(end_unit, false);
+    for (size_t u = first_unit; u < end_unit; u++) it->got[u] = true;
     if (off == 0) it->header.assign(ip, ip + ihl);
     if (!more) it->total = off + plen;
-    if (it->total == 0 || it->header.empty() || it->received < it->total) return {};
+    if (it->total == 0 || it->header.empty()) return {};
+    const size_t units = (it->total + 7) / 8;
+    if (it->got.size() < units) return {};
+    for (size_t u = 0; u < units; u++) {
+        if (!it->got[u]) return {};
+    }
 
     std::vector<uint8_t> whole(it->header);
     whole.insert(whole.end(), it->payload.begin(), it->payload.begin() + it->total);
@@ -1158,7 +1217,7 @@ void StaLink::handleIpv4(const uint8_t *ip, size_t len, const uint8_t *src_mac) 
                                 ip[12], ip[13], ip[14], ip[15],
                                 dport);
         }
-    } else if (proto == 1 && for_us && l4len >= 8 && l4[0] == 8) { // ICMP echo request
+    } else if (proto == 1 && for_us && l4len >= 8 && len <= kMaxEchoDatagram && l4[0] == 8) { // ICMP echo request
         std::vector<uint8_t> r(ip, ip + len);
         std::memcpy(r.data() + 16, ip + 12, 4); // dst = original src
         std::memcpy(r.data() + 12, cfg_.own_ip.data(), 4);
@@ -1205,7 +1264,11 @@ bool StaLink::tcpRequest(const std::array<uint8_t, 4> &ip,
                          std::string &reply) {
     using St = TcpSession::St;
     std::unique_lock<std::mutex> lock(mu_);
-    if (!running_ || state_.load() != State::Connected || tcp_.st != St::Idle) return false;
+    // One session slot: a caller that finds it busy (e.g. the key-frame request after a
+    // recovery) waits its turn instead of being told the camera did not answer.
+    const auto usable = [this] { return running_ && state_.load() == State::Connected; };
+    if (!tcp_cv_.wait_for(lock, timeout, [&] { return !usable() || tcp_.st == St::Idle; })) return false;
+    if (!usable()) return false;
 
     std::random_device rd;
     TcpSession s;
@@ -1248,8 +1311,10 @@ bool StaLink::tcpRequest(const std::array<uint8_t, 4> &ip,
                         port,
                         tcp_.st == St::Done ? "done" : "failed",
                         reply.c_str());
+    const bool ok = tcp_.st == St::Done && !reply.empty();
     tcp_.st = St::Idle;
-    return !reply.empty();
+    tcp_cv_.notify_all(); // the slot is free for the next caller
+    return ok;
 }
 
 void StaLink::tcpFinish(bool ok) {
@@ -1269,10 +1334,12 @@ void StaLink::tcpTick(Clock::time_point now) {
     if (tcp_.st != St::Resolving && tcp_.st != St::SynSent && tcp_.st != St::Established) return;
     if (now >= tcp_.deadline) {
         __android_log_print(ANDROID_LOG_WARN, TAG, "TCP request timed out");
-        tcpFinish(!tcp_.rx.empty());
+        // A cut-off HTTP reply is a failure, so the caller retries instead of parsing half a body.
+        tcpFinish(!tcp_.rx.empty() && !httpReplyIncomplete(tcp_.rx));
         return;
     }
-    if (tcp_.st == St::Established && !tcp_.rx.empty() && now - tcp_.last_rx >= kTcpReplyIdle) {
+    if (tcp_.st == St::Established && !tcp_.rx.empty() && now - tcp_.last_rx >= kTcpReplyIdle &&
+        !httpReplyIncomplete(tcp_.rx)) {
         tcpFinish(true);
         return;
     }
@@ -1344,7 +1411,7 @@ void StaLink::handleTcp(const uint8_t *ip, size_t ihl, size_t len) {
     }
 
     if ((flags & kTcpAck) && static_cast<int32_t>(ack - our_end) >= 0) tcp_.data_acked = true;
-    if (plen > 0 && seq == tcp_.rcv_nxt) {
+    if (plen > 0 && seq == tcp_.rcv_nxt && tcp_.rx.size() + plen <= kTcpMaxReply) {
         tcp_.rx.append(reinterpret_cast<const char *>(payload), plen);
         tcp_.rcv_nxt += static_cast<uint32_t>(plen);
         tcp_.last_rx = now;

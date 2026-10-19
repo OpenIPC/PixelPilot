@@ -47,6 +47,10 @@ class WfbngLink {
     // command can keep using it without holding sta_mutex for seconds; run() stops it
     // before the device goes away, after which every call on it is a no-op.
     std::shared_ptr<StaLink> sta_link;
+    // Recoveries of earlier StaLink instances (guarded by sta_mutex). The counter the UI
+    // sees keeps growing across adapter restarts, so a new association is never mistaken
+    // for "no change" just because a fresh StaLink starts counting at zero again.
+    uint32_t ap_recovery_base{0};
 
     // FEC switching thresholds (for menu)
     int fec_lost_to_5 = 2;
@@ -71,7 +75,8 @@ class WfbngLink {
 
     // adaptive link
     // TODO: move this to private section
-    int current_fd;
+    // Read from the JNI threads and written by run(); the device map below is guarded by dev_mutex.
+    std::atomic<int> current_fd;
     bool adaptive_link_enabled;
     bool adaptive_link_should_stop{false};
     int adaptive_tx_power;
@@ -80,7 +85,21 @@ class WfbngLink {
     bool ldpc_enabled{true};
     bool stbc_enabled{true};
 
+    // Guarded by dev_mutex. Other threads (stop(), the TX power setter, the link-quality
+    // thread) must copy the shared_ptr under the lock via getDevice() and call through
+    // that copy, so the device cannot be destroyed under them by run() releasing it.
+    std::mutex dev_mutex;
     std::map<int, std::shared_ptr<IRtlDevice>> rtl_devices;
+
+    std::shared_ptr<IRtlDevice> getDevice(int fd) {
+        std::lock_guard<std::mutex> lock(dev_mutex);
+        auto it = rtl_devices.find(fd);
+        return it == rtl_devices.end() ? nullptr : it->second;
+    }
+
+    // Applies a TX power. In AP mode it goes through the station's worker thread, which
+    // is the only one allowed to use the device's control path while the link runs.
+    void applyTxPower(int fd, int power);
 
     // Set by stop() and read by run(). A StopRxLoop() only takes effect once the RX loop is
     // running: RtlJaguarDevice::StartRxLoop() clears should_stop on entry, so a stop that
@@ -137,21 +156,34 @@ class WfbngLink {
   private:
     // AP-mode half of run(), entered once the device exists. Owns the device
     // shutdown and libusb teardown, like the rest of run() does for wfb-ng mode.
-    int runStation(libusb_device_handle *dev_handle, libusb_context *ctx, int fd, int wifiChannel);
+    int runStation(libusb_device_handle *dev_handle,
+                   libusb_context *ctx,
+                   int fd,
+                   int wifiChannel,
+                   std::shared_ptr<IRtlDevice> device);
 
     // Destroys the device object once run() is done with it. devourer's per-adapter
     // lock lives inside that object, so as long as it stays in rtl_devices the next
     // run() - after a mode, channel or settings change - is refused with "USB adapter
     // in use ... by another devourer process". Must come before libusb_exit().
+    // A caller that still holds a copy from getDevice() keeps the object alive until it is done.
     void releaseDevice(int fd) {
-        rtl_devices.erase(fd);
-        if (current_fd == fd) current_fd = -1;
+        std::shared_ptr<IRtlDevice> doomed;
+        {
+            std::lock_guard<std::mutex> lock(dev_mutex);
+            auto it = rtl_devices.find(fd);
+            if (it != rtl_devices.end()) {
+                doomed = std::move(it->second);
+                rtl_devices.erase(it);
+            }
+            int expected = fd;
+            current_fd.compare_exchange_strong(expected, -1);
+        }
+        // `doomed` is destroyed here, outside the lock.
     }
 
     void stopDevice() {
-        if (rtl_devices.find(current_fd) == rtl_devices.end()) return;
-        auto dev = rtl_devices.at(current_fd).get();
-        if (dev) {
+        if (auto dev = getDevice(current_fd.load())) {
             dev->StopRxLoop();
         }
     }

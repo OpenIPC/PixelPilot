@@ -132,23 +132,29 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         cfg.tx.retry_limit = 7;
     }
 
-    rtl_devices[fd] = wifi_driver->CreateRtlDevice(dev_handle, ctx, nullptr, cfg);
-    if (!rtl_devices.at(fd)) {
+    // The local copy is dropped (device.reset()) before libusb is torn down below.
+    std::shared_ptr<IRtlDevice> device = wifi_driver->CreateRtlDevice(dev_handle, ctx, nullptr, cfg);
+    if (!device) {
         libusb_exit(ctx);
         __android_log_print(ANDROID_LOG_ERROR, TAG, "CreateRtlDevice error");
         return -1;
     }
+    {
+        std::lock_guard<std::mutex> lock(dev_mutex);
+        rtl_devices[fd] = device;
+    }
 
     if (stop_requested(fd)) {
         __android_log_print(ANDROID_LOG_WARN, TAG, "stop requested for fd=%d before bring-up, aborting", fd);
-        rtl_devices.erase(fd);
+        releaseDevice(fd);
+        device.reset();
         libusb_release_interface(dev_handle, 0);
         libusb_exit(ctx);
         return -1;
     }
 
     if (ap_mode) {
-        return runStation(dev_handle, ctx, fd, wifiChannel);
+        return runStation(dev_handle, ctx, fd, wifiChannel, std::move(device));
     }
 
     uint8_t *video_channel_id_be8 = reinterpret_cast<uint8_t *>(&video_channel_id_be);
@@ -214,7 +220,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         // Store the current fd for later TX power updates.
         current_fd = fd;
 
-        IRtlDevice *current_device = rtl_devices.at(fd).get();
+        IRtlDevice *current_device = device.get();
 
         // TX-capable bring-up with RX enabled (cfg.rx.enable_with_tx). On
         // Jaguar3 (RTL8812EU/8822EU) this also starts the coex runtime thread
@@ -271,11 +277,11 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
 
         destroy_thread(usb_tx_thread);
         stop_adaptive_link();
-        auto dev = rtl_devices.at(fd).get();
-        if (dev) {
-            dev->Stop();
+        if (device) {
+            device->Stop();
         }
         releaseDevice(fd);
+        device.reset(); // before libusb_exit(): the device must not outlive its context
         libusb_release_interface(dev_handle, 0);
         libusb_exit(ctx);
         return -1;
@@ -289,11 +295,11 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
 
     // Clean shutdown: halt TRX DMA and power the chip down before releasing
     // the USB interface.
-    auto dev = rtl_devices.at(fd).get();
-    if (dev) {
-        dev->Stop();
+    if (device) {
+        device->Stop();
     }
     releaseDevice(fd);
+    device.reset(); // before libusb_exit(): the device must not outlive its context
 
     r = libusb_release_interface(dev_handle, 0);
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_release_interface: %d", r);
@@ -301,9 +307,12 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
     return 0;
 }
 
-int WfbngLink::runStation(libusb_device_handle *dev_handle, libusb_context *ctx, int fd, int wifiChannel) {
-    IRtlDevice *dev = rtl_devices.at(fd).get();
-    current_fd = fd;
+int WfbngLink::runStation(libusb_device_handle *dev_handle,
+                          libusb_context *ctx,
+                          int fd,
+                          int wifiChannel,
+                          std::shared_ptr<IRtlDevice> device) {
+    IRtlDevice *dev = device.get();
 
     StaLink *sta = nullptr;
     devourer::MacAddr own_mac;
@@ -320,12 +329,16 @@ int WfbngLink::runStation(libusb_device_handle *dev_handle, libusb_context *ctx,
             own_mac.bytes = cfg.own_mac;
             sta_link = std::make_shared<StaLink>(dev, cfg);
             sta = sta_link.get();
+            // Only the adapter that owns the association becomes the current one; a
+            // rejected second adapter must not overwrite it.
+            current_fd = fd;
         }
     }
 
     if (!sta) {
         // Never brought up, so nothing to power down; same exit as an early stop in run().
-        rtl_devices.erase(fd);
+        releaseDevice(fd);
+        device.reset();
         libusb_release_interface(dev_handle, 0);
         libusb_exit(ctx);
         return -1;
@@ -367,12 +380,14 @@ int WfbngLink::runStation(libusb_device_handle *dev_handle, libusb_context *ctx,
     sta->stop();
     {
         std::lock_guard<std::mutex> lock(sta_mutex);
+        ap_recovery_base += sta_link->recoveries();
         sta_link.reset();
     }
 
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "AP mode RX loop exited, releasing...");
     dev->Stop();
     releaseDevice(fd);
+    device.reset(); // before libusb_exit(): the device must not outlive its context
     int r = libusb_release_interface(dev_handle, 0);
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_release_interface: %d", r);
     libusb_exit(ctx);
@@ -383,18 +398,15 @@ void WfbngLink::stop(JNIEnv *env, jobject context, jint fd) {
     // Recorded first, and whether or not the device exists yet: run() may not have got as far
     // as creating it, and StartRxLoop() would clear the flag set below anyway.
     note_stop_requested(fd);
-    if (rtl_devices.find(fd) == rtl_devices.end()) {
+    // A copy keeps the device alive while StopRxLoop() runs, even if run() releases it meanwhile.
+    std::shared_ptr<IRtlDevice> dev = getDevice(fd);
+    if (!dev) {
         // Happens when the adapter was already gone by the time the stop arrived, e.g. it
         // was unplugged or the hub re-enumerated it. Nothing left to stop.
         __android_log_print(ANDROID_LOG_WARN, TAG, "stop: no rtl device for fd=%d, already gone", fd);
         return;
     }
-    auto dev = rtl_devices.at(fd).get();
-    if (dev) {
-        dev->StopRxLoop();
-    } else {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "rtl_devices.at(%d) is nullptr", fd);
-    }
+    dev->StopRxLoop();
     stop_adaptive_link();
 }
 
@@ -631,7 +643,7 @@ extern "C" JNIEXPORT jint JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
                                                                                               jlong wfbngLinkN) {
     WfbngLink *link = native(wfbngLinkN);
     std::lock_guard<std::mutex> lock(link->sta_mutex);
-    return link->sta_link ? static_cast<jint>(link->sta_link->recoveries()) : 0;
+    return static_cast<jint>(link->ap_recovery_base + (link->sta_link ? link->sta_link->recoveries() : 0));
 }
 
 // Sends one line to a TCP service on the camera (air_man_ap on 12355) over the AP
@@ -672,11 +684,28 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nat
 }
 
 // Modified start_link_quality_thread: use adaptive_link_enabled and adaptive_tx_power
+void WfbngLink::applyTxPower(int fd, int power) {
+    if (link_mode.load() == LinkMode::AP) {
+        std::shared_ptr<StaLink> sta;
+        {
+            std::lock_guard<std::mutex> lock(sta_mutex);
+            sta = sta_link;
+        }
+        if (sta) {
+            sta->requestTxPower(power);
+            return;
+        }
+    }
+    if (auto dev = getDevice(fd)) {
+        dev->SetTxPower(power);
+    }
+}
+
 void WfbngLink::start_link_quality_thread(int fd) {
     if (link_mode.load() == LinkMode::AP) {
         // The adaptive link talks to the camera through the wfb-ng tunnel, which
         // does not exist in AP mode. Only the TX power applies.
-        rtl_devices.at(fd)->SetTxPower(adaptive_tx_power);
+        applyTxPower(fd, adaptive_tx_power);
         return;
     }
     auto thread_func = [this, fd]() {
@@ -783,7 +812,7 @@ void WfbngLink::start_link_quality_thread(int fd) {
     };
 
     init_thread(link_quality_thread, [=]() { return std::make_unique<std::thread>(thread_func); });
-    rtl_devices.at(fd)->SetTxPower(adaptive_tx_power);
+    applyTxPower(fd, adaptive_tx_power);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetAdaptiveLinkEnabled(
@@ -814,8 +843,8 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     if (link->adaptive_tx_power == power) return;
 
     link->adaptive_tx_power = power;
-    if (link->current_fd != -1 && link->rtl_devices.find(link->current_fd) != link->rtl_devices.end()) {
-        link->rtl_devices.at(link->current_fd)->SetTxPower(power);
+    if (const int fd = link->current_fd.load(); fd != -1) {
+        link->applyTxPower(fd, power);
     }
     // If adaptive mode is enabled and the adaptive thread is not running, restart it.
     if (link->adaptive_link_enabled) {

@@ -534,8 +534,10 @@ final class CameraControlDialog {
                 try {
                     return new JSONObject(reply.substring(brace).trim());
                 } catch (Exception e) {
+                    // Most likely a reply that was cut off on the way: ask again.
                     Log.w(TAG, "camera " + pathAndQuery + ": unreadable answer", e);
-                    return null;
+                    if (!pause(400)) break;
+                    continue;
                 }
             }
             if (!pause(400)) break;

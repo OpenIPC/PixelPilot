@@ -84,11 +84,16 @@ class StaLink {
     // wait for the next scheduled one.
     uint32_t recoveries() const { return recoveries_.load(); }
 
+    // Queues a TX power change. It is applied by the worker thread, the only one that
+    // may talk to the device's control path (retunes run there too).
+    void requestTxPower(int power) { pending_tx_power_ = power; }
+
     // Opens a TCP connection to ip:port, sends `request` and collects the reply
     // until the peer closes, goes quiet after answering, or `timeout` passes.
     // half_close ends our sending side with the request (as `echo cmd | nc` does).
-    // Blocks the caller (not an RX or worker thread). Returns false when not
-    // connected, another request is running, or nothing came back.
+    // Blocks the caller (not an RX or worker thread). Waits (within `timeout`) for a
+    // request that is already running. Returns false when not connected, the slot
+    // stayed busy, the reply is missing, or an HTTP reply was cut off.
     bool tcpRequest(const std::array<uint8_t, 4> &ip,
                     uint16_t port,
                     const std::string &request,
@@ -201,6 +206,7 @@ class StaLink {
     bool in_gap_{false};   // connected, but nothing heard from the AP for kDropoutGap
     uint64_t last_tsf_{0}; // AP's beacon timestamp; jumping back means the AP restarted
     std::atomic<uint32_t> recoveries_{0};
+    std::atomic<int> pending_tx_power_{-1}; // -1: nothing queued
 
     // Diagnostics, so a user can tell why nothing connects.
     struct SeenNetwork {
@@ -227,7 +233,7 @@ class StaLink {
         uint16_t id;
         std::vector<uint8_t> header; // from the offset-0 fragment
         std::vector<uint8_t> payload;
-        size_t received{0};
+        std::vector<bool> got; // one flag per 8-byte unit of payload that has arrived
         size_t total{0}; // known once the last fragment arrived
         Clock::time_point start;
     };
