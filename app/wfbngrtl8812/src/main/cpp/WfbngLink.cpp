@@ -555,24 +555,24 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetLinkMode(JNIEnv *env,
-                                                                                          jclass clazz,
-                                                                                          jlong wfbngLinkN,
-                                                                                          jint mode) {
+                                                                                            jclass clazz,
+                                                                                            jlong wfbngLinkN,
+                                                                                            jint mode) {
     native(wfbngLinkN)->link_mode = (mode == static_cast<int>(LinkMode::AP)) ? LinkMode::AP : LinkMode::WFB;
 }
 
 // Returns false (and keeps the previous config) when the IP or MAC does not parse.
-extern "C" JNIEXPORT jboolean JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetApConfig(
-    JNIEnv *env,
-    jclass clazz,
-    jlong wfbngLinkN,
-    jstring ssid,
-    jstring ownIp,
-    jstring ownMac,
-    jint videoPort,
-    jintArray candidateChannels,
-    jboolean fullScan,
-    jint maxWidthMhz) {
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetApConfig(JNIEnv *env,
+                                                          jclass clazz,
+                                                          jlong wfbngLinkN,
+                                                          jstring ssid,
+                                                          jstring ownIp,
+                                                          jstring ownMac,
+                                                          jint videoPort,
+                                                          jintArray candidateChannels,
+                                                          jboolean fullScan,
+                                                          jint maxWidthMhz) {
     auto str = [env](jstring s) {
         const char *c = env->GetStringUTFChars(s, nullptr);
         std::string out(c ? c : "");
@@ -618,8 +618,8 @@ static std::string printableAscii(std::string s) {
 }
 
 extern "C" JNIEXPORT jstring JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeGetApStatus(JNIEnv *env,
-                                                                                             jclass clazz,
-                                                                                             jlong wfbngLinkN) {
+                                                                                               jclass clazz,
+                                                                                               jlong wfbngLinkN) {
     WfbngLink *link = native(wfbngLinkN);
     std::string text; // empty: no adapter running in AP mode
     {
@@ -630,8 +630,8 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nat
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeGetApChannel(JNIEnv *env,
-                                                                                           jclass clazz,
-                                                                                           jlong wfbngLinkN) {
+                                                                                             jclass clazz,
+                                                                                             jlong wfbngLinkN) {
     WfbngLink *link = native(wfbngLinkN);
     std::lock_guard<std::mutex> lock(link->sta_mutex);
     return link->sta_link ? link->sta_link->connectedChannel() : 0;
@@ -639,8 +639,8 @@ extern "C" JNIEXPORT jint JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
 
 // Grows each time video can flow again in AP mode (association, end of a dropout).
 extern "C" JNIEXPORT jint JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeGetApRecoveries(JNIEnv *env,
-                                                                                              jclass clazz,
-                                                                                              jlong wfbngLinkN) {
+                                                                                                jclass clazz,
+                                                                                                jlong wfbngLinkN) {
     WfbngLink *link = native(wfbngLinkN);
     std::lock_guard<std::mutex> lock(link->sta_mutex);
     return static_cast<jint>(link->ap_recovery_base + (link->sta_link ? link->sta_link->recoveries() : 0));
@@ -648,15 +648,14 @@ extern "C" JNIEXPORT jint JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
 
 // Sends one line to a TCP service on the camera (air_man_ap on 12355) over the AP
 // link and returns its reply, or null. Blocks: call from a background thread.
-extern "C" JNIEXPORT jstring JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeCameraCommand(
-    JNIEnv *env,
-    jclass clazz,
-    jlong wfbngLinkN,
-    jstring cameraIp,
-    jint port,
-    jstring command,
-    jint timeoutMs,
-    jboolean halfClose) {
+extern "C" JNIEXPORT jstring JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeCameraCommand(JNIEnv *env,
+                                                                                                 jclass clazz,
+                                                                                                 jlong wfbngLinkN,
+                                                                                                 jstring cameraIp,
+                                                                                                 jint port,
+                                                                                                 jstring command,
+                                                                                                 jint timeoutMs,
+                                                                                                 jboolean halfClose) {
     WfbngLink *link = native(wfbngLinkN);
     std::shared_ptr<StaLink> sta;
     {

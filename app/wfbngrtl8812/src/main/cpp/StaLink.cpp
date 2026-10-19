@@ -76,13 +76,15 @@ bool macEq(const uint8_t *a, const uint8_t *b) { return std::memcmp(a, b, 6) == 
 
 // One's-complement sum over big-endian 16-bit words, for IP/ICMP/TCP checksums.
 uint32_t csumAdd(uint32_t s, const uint8_t *d, size_t len) {
-    for (size_t i = 0; i + 1 < len; i += 2) s += (uint32_t)(d[i] << 8) | d[i + 1];
+    for (size_t i = 0; i + 1 < len; i += 2)
+        s += (uint32_t)(d[i] << 8) | d[i + 1];
     if (len & 1) s += (uint32_t)d[len - 1] << 8;
     return s;
 }
 
 uint16_t csumFold(uint32_t s) {
-    while (s >> 16) s = (s & 0xffff) + (s >> 16);
+    while (s >> 16)
+        s = (s & 0xffff) + (s >> 16);
     return (uint16_t)~s;
 }
 
@@ -147,7 +149,7 @@ const char *stateName(StaLink::State s) {
 } // namespace
 
 StaLink::StaLink(IRtlDevice *dev, StaConfig cfg)
-    : dev_(dev), cfg_(std::move(cfg)), channel_(cfg_.channel), home_channel_(cfg_.channel) {
+        : dev_(dev), cfg_(std::move(cfg)), channel_(cfg_.channel), home_channel_(cfg_.channel) {
     buildScanList();
     radiotap_ = devourer::build_stream_radiotap(devourer::parse_tx_mode_str("6M"));
     udp_sock_ = socket(AF_INET, SOCK_DGRAM, 0);
@@ -247,12 +249,16 @@ std::string StaLink::statusText() const {
         std::string text = buf;
         const auto silence = Clock::now() - last_heard_;
         if (s == State::Connected && silence >= kDropoutGap) {
-            snprintf(buf, sizeof(buf), " | no signal %.1f s",
-                     std::chrono::duration<double>(silence).count());
+            snprintf(buf, sizeof(buf), " | no signal %.1f s", std::chrono::duration<double>(silence).count());
             text += buf;
         }
         if (have_camera_ip_) {
-            snprintf(buf, sizeof(buf), " | video from %d.%d.%d.%d", camera_ip_[0], camera_ip_[1], camera_ip_[2],
+            snprintf(buf,
+                     sizeof(buf),
+                     " | video from %d.%d.%d.%d",
+                     camera_ip_[0],
+                     camera_ip_[1],
+                     camera_ip_[2],
                      camera_ip_[3]);
             text += buf;
         }
@@ -425,7 +431,12 @@ void StaLink::reconnect(const char *why) {
                         TAG,
                         "%s: rejoining %02x:%02x:%02x:%02x:%02x:%02x on ch %d",
                         why,
-                        bssid_[0], bssid_[1], bssid_[2], bssid_[3], bssid_[4], bssid_[5],
+                        bssid_[0],
+                        bssid_[1],
+                        bssid_[2],
+                        bssid_[3],
+                        bssid_[4],
+                        bssid_[5],
                         channel_);
     aid_ = 0;
     last_rx_seq_ = -1;
@@ -440,9 +451,11 @@ void StaLink::buildScanList() {
         }
     };
     add(home_channel_);
-    for (uint8_t ch : cfg_.candidate_channels) add(ch);
+    for (uint8_t ch : cfg_.candidate_channels)
+        add(ch);
     if (cfg_.full_scan) {
-        for (uint8_t ch : kScanChannels) add(ch);
+        for (uint8_t ch : kScanChannels)
+            add(ch);
     }
     scan_index_ = 0;
 }
@@ -550,12 +563,8 @@ void StaLink::tick() {
     if (csa_channel_ > 0 && state_.load() != State::Searching && now >= csa_at_) {
         // The AP announced a channel switch and is leaving now; go with it. The
         // association survives a CSA, so the state stays as it is.
-        __android_log_print(ANDROID_LOG_INFO,
-                            TAG,
-                            "following the AP: ch %d -> ch %d at %d MHz",
-                            channel_,
-                            csa_channel_,
-                            csa_width_);
+        __android_log_print(
+            ANDROID_LOG_INFO, TAG, "following the AP: ch %d -> ch %d at %d MHz", channel_, csa_channel_, csa_width_);
         requestTune(csa_channel_, csa_width_, csa_offset_);
         last_width_change_ = now; // the beacon check would otherwise second-guess it mid-switch
         home_channel_ = static_cast<uint8_t>(csa_channel_);
@@ -650,7 +659,8 @@ void StaLink::report(Clock::time_point now) {
         std::string ports;
         for (const auto &[port, n] : udp_by_port_) {
             bool fwd = false;
-            for (const auto &f : cfg_.forward_ports) fwd |= f.first == port;
+            for (const auto &f : cfg_.forward_ports)
+                fwd |= f.first == port;
             char b[48];
             snprintf(b, sizeof(b), " %u:%u%s", port, n, fwd ? "" : "(not forwarded)");
             ports += b;
@@ -732,11 +742,12 @@ void StaLink::onRx(const Packet &packet) {
             // Dropout over: video flows again right now, nothing to rebuild.
             in_gap_ = false;
             recoveries_++;
-            __android_log_print(ANDROID_LOG_INFO,
-                                TAG,
-                                "AP back after %lld ms on ch %d",
-                                (long long)std::chrono::duration_cast<std::chrono::milliseconds>(now - last_heard_).count(),
-                                channel_);
+            __android_log_print(
+                ANDROID_LOG_INFO,
+                TAG,
+                "AP back after %lld ms on ch %d",
+                (long long)std::chrono::duration_cast<std::chrono::milliseconds>(now - last_heard_).count(),
+                channel_);
             if (channel_ != home_channel_) {
                 // Heard while peeking at a candidate: the camera lives here now.
                 home_channel_ = channel_;
@@ -759,7 +770,8 @@ void StaLink::onRx(const Packet &packet) {
                 handleBeacon(f, len, packet.RxAtrib.rssi[0]);
             } else if (from_ap && len > 36) {
                 uint64_t tsf = 0;
-                for (int i = 7; i >= 0; i--) tsf = (tsf << 8) | f[24 + i];
+                for (int i = 7; i >= 0; i--)
+                    tsf = (tsf << 8) | f[24 + i];
                 if (state_.load() == State::Connected && last_tsf_ != 0 && tsf + kTsfRestartUs < last_tsf_) {
                     // A restarted hostapd no longer knows us; don't wait for its deauth.
                     last_tsf_ = tsf;
@@ -878,13 +890,12 @@ void StaLink::handleBeacon(const uint8_t *f, size_t len, uint8_t rssi) {
     std::memcpy(bssid.data(), f + 16, 6);
     if (seen_.size() >= kMaxSeenNetworks && seen_.find(bssid) == seen_.end()) {
         // Forget the stalest entry rather than growing without bound on a busy band.
-        auto oldest = std::min_element(seen_.begin(), seen_.end(), [](const auto &a, const auto &b) {
-            return a.second.last < b.second.last;
-        });
+        auto oldest = std::min_element(
+            seen_.begin(), seen_.end(), [](const auto &a, const auto &b) { return a.second.last < b.second.last; });
         seen_.erase(oldest);
     }
-    seen_[bssid] = SeenNetwork{ssid, ds_channel != -1 ? ds_channel : channel_, (capability & 0x0010) != 0,
-                               rssi, Clock::now()};
+    seen_[bssid] =
+        SeenNetwork{ssid, ds_channel != -1 ? ds_channel : channel_, (capability & 0x0010) != 0, rssi, Clock::now()};
 
     if (!ssid_match) return;
     // On 2.4 GHz neighbouring channels leak in; only join on the channel we are tuned to.
@@ -892,10 +903,8 @@ void StaLink::handleBeacon(const uint8_t *f, size_t len, uint8_t rssi) {
     if (capability & 0x0010) {
         if (!warned_encrypted_) {
             warned_encrypted_ = true;
-            __android_log_print(ANDROID_LOG_ERROR,
-                                TAG,
-                                "\"%s\" is encrypted, only open networks are supported",
-                                cfg_.ssid.c_str());
+            __android_log_print(
+                ANDROID_LOG_ERROR, TAG, "\"%s\" is encrypted, only open networks are supported", cfg_.ssid.c_str());
         }
         return;
     }
@@ -930,7 +939,8 @@ void StaLink::handleBeacon(const uint8_t *f, size_t len, uint8_t rssi) {
                         vht,
                         wmm);
     last_tsf_ = 0;
-    for (int i = 7; i >= 0; i--) last_tsf_ = (last_tsf_ << 8) | f[24 + i];
+    for (int i = 7; i >= 0; i--)
+        last_tsf_ = (last_tsf_ << 8) | f[24 + i];
     // Straight from the RX callback (only queued here; the worker sends it), which
     // saves up to one tick per handshake step.
     beginAuth();
@@ -1062,9 +1072,9 @@ void StaLink::handleMsdu(uint16_t ethertype, const uint8_t *payload, size_t len,
 // still has holes.
 std::vector<uint8_t> StaLink::reassemble(const uint8_t *ip, size_t ihl, size_t len) {
     const auto now = Clock::now();
-    frags_.erase(std::remove_if(frags_.begin(), frags_.end(),
-                                [now](const IpFragments &f) { return now - f.start > 1s; }),
-                 frags_.end());
+    frags_.erase(
+        std::remove_if(frags_.begin(), frags_.end(), [now](const IpFragments &f) { return now - f.start > 1s; }),
+        frags_.end());
 
     uint32_t src;
     std::memcpy(&src, ip + 12, 4);
@@ -1076,8 +1086,8 @@ std::vector<uint8_t> StaLink::reassemble(const uint8_t *ip, size_t ihl, size_t l
     if (off + plen + ihl > 65535) return {};
     if (more && (plen % 8) != 0) return {}; // only the last fragment may end off a unit boundary
 
-    auto it = std::find_if(frags_.begin(), frags_.end(),
-                           [src, id](const IpFragments &f) { return f.src == src && f.id == id; });
+    auto it = std::find_if(
+        frags_.begin(), frags_.end(), [src, id](const IpFragments &f) { return f.src == src && f.id == id; });
     if (it == frags_.end()) {
         if (frags_.size() >= 8) frags_.erase(frags_.begin());
         frags_.push_back(IpFragments{src, id, {}, {}, {}, 0, now});
@@ -1087,7 +1097,8 @@ std::vector<uint8_t> StaLink::reassemble(const uint8_t *ip, size_t ihl, size_t l
     std::memcpy(it->payload.data() + off, ip + ihl, plen);
     const size_t first_unit = off / 8, end_unit = (off + plen + 7) / 8;
     if (it->got.size() < end_unit) it->got.resize(end_unit, false);
-    for (size_t u = first_unit; u < end_unit; u++) it->got[u] = true;
+    for (size_t u = first_unit; u < end_unit; u++)
+        it->got[u] = true;
     if (off == 0) it->header.assign(ip, ip + ihl);
     if (!more) it->total = off + plen;
     if (it->total == 0 || it->header.empty()) return {};
@@ -1130,9 +1141,18 @@ void StaLink::handleArp(const uint8_t *a, size_t len) {
                             TAG,
                             "%d.%d.%d.%d asks for %d.%d.%d.%d (our IP is %d.%d.%d.%d). "
                             "If that is the camera's stream target, set it as the phone IP.",
-                            spa[0], spa[1], spa[2], spa[3],
-                            tpa[0], tpa[1], tpa[2], tpa[3],
-                            cfg_.own_ip[0], cfg_.own_ip[1], cfg_.own_ip[2], cfg_.own_ip[3]);
+                            spa[0],
+                            spa[1],
+                            spa[2],
+                            spa[3],
+                            tpa[0],
+                            tpa[1],
+                            tpa[2],
+                            tpa[3],
+                            cfg_.own_ip[0],
+                            cfg_.own_ip[1],
+                            cfg_.own_ip[2],
+                            cfg_.own_ip[3]);
     }
 }
 
@@ -1181,7 +1201,10 @@ void StaLink::handleIpv4(const uint8_t *ip, size_t len, const uint8_t *src_mac) 
                                     TAG,
                                     "first UDP datagram for port %d: from %d.%d.%d.%d:%d, %zu bytes",
                                     dport,
-                                    ip[12], ip[13], ip[14], ip[15],
+                                    ip[12],
+                                    ip[13],
+                                    ip[14],
+                                    ip[15],
                                     (l4[0] << 8) | l4[1],
                                     ulen - 8);
             }
@@ -1196,7 +1219,10 @@ void StaLink::handleIpv4(const uint8_t *ip, size_t len, const uint8_t *src_mac) 
                 __android_log_print(ANDROID_LOG_INFO,
                                     TAG,
                                     "receiving UDP from %d.%d.%d.%d:%d on port %d",
-                                    ip[12], ip[13], ip[14], ip[15],
+                                    ip[12],
+                                    ip[13],
+                                    ip[14],
+                                    ip[15],
                                     (l4[0] << 8) | l4[1],
                                     dport);
             }
@@ -1214,7 +1240,10 @@ void StaLink::handleIpv4(const uint8_t *ip, size_t len, const uint8_t *src_mac) 
             __android_log_print(ANDROID_LOG_WARN,
                                 TAG,
                                 "UDP from %d.%d.%d.%d to port %d is not forwarded (video port setting?)",
-                                ip[12], ip[13], ip[14], ip[15],
+                                ip[12],
+                                ip[13],
+                                ip[14],
+                                ip[15],
                                 dport);
         }
     } else if (proto == 1 && for_us && l4len >= 8 && len <= kMaxEchoDatagram && l4[0] == 8) { // ICMP echo request
@@ -1283,12 +1312,8 @@ bool StaLink::tcpRequest(const std::array<uint8_t, 4> &ip,
     s.last_tx = Clock::now();
     tcp_ = std::move(s);
 
-    __android_log_print(ANDROID_LOG_INFO,
-                        TAG,
-                        "TCP %d.%d.%d.%d:%d <- \"%s\"",
-                        ip[0], ip[1], ip[2], ip[3],
-                        port,
-                        request.c_str());
+    __android_log_print(
+        ANDROID_LOG_INFO, TAG, "TCP %d.%d.%d.%d:%d <- \"%s\"", ip[0], ip[1], ip[2], ip[3], port, request.c_str());
     auto known = arp_cache_.find(ipKey(ip.data()));
     if (known != arp_cache_.end()) {
         tcp_.mac = known->second;
@@ -1307,7 +1332,10 @@ bool StaLink::tcpRequest(const std::array<uint8_t, 4> &ip,
     __android_log_print(ANDROID_LOG_INFO,
                         TAG,
                         "TCP %d.%d.%d.%d:%d -> %s \"%s\"",
-                        ip[0], ip[1], ip[2], ip[3],
+                        ip[0],
+                        ip[1],
+                        ip[2],
+                        ip[3],
                         port,
                         tcp_.st == St::Done ? "done" : "failed",
                         reply.c_str());
@@ -1355,10 +1383,8 @@ void StaLink::tcpTick(Clock::time_point now) {
         break;
     case St::Established:
         if (!tcp_.data_acked) {
-            tcpSend(kTcpAck | kTcpPsh | (tcp_.half_close ? kTcpFin : 0),
-                    tcp_.snd_nxt,
-                    tcp_.data.data(),
-                    tcp_.data.size());
+            tcpSend(
+                kTcpAck | kTcpPsh | (tcp_.half_close ? kTcpFin : 0), tcp_.snd_nxt, tcp_.data.data(), tcp_.data.size());
         }
         break;
     default:
@@ -1403,10 +1429,7 @@ void StaLink::handleTcp(const uint8_t *ip, size_t ihl, size_t len) {
         // The ACK of the handshake rides on the request. A half-closing request ends
         // our side right away, like `echo cmd | nc` does: some line servers only act
         // on end of input.
-        tcpSend(kTcpAck | kTcpPsh | (tcp_.half_close ? kTcpFin : 0),
-                tcp_.snd_nxt,
-                tcp_.data.data(),
-                tcp_.data.size());
+        tcpSend(kTcpAck | kTcpPsh | (tcp_.half_close ? kTcpFin : 0), tcp_.snd_nxt, tcp_.data.data(), tcp_.data.size());
         return;
     }
 
@@ -1503,10 +1526,30 @@ uint16_t StaLink::nextSeq() {
 std::vector<uint8_t> StaLink::mgmtHeader(uint8_t fc0, const uint8_t *addr1, const uint8_t *addr3) {
     const uint8_t *own = cfg_.own_mac.data();
     const uint16_t seq = nextSeq();
-    return {fc0,      0x00,     0x00,     0x00,     addr1[0], addr1[1],         addr1[2],
-            addr1[3], addr1[4], addr1[5], own[0],   own[1],   own[2],           own[3],
-            own[4],   own[5],   addr3[0], addr3[1], addr3[2], addr3[3],         addr3[4],
-            addr3[5], (uint8_t)(seq & 0xff), (uint8_t)(seq >> 8)};
+    return {fc0,
+            0x00,
+            0x00,
+            0x00,
+            addr1[0],
+            addr1[1],
+            addr1[2],
+            addr1[3],
+            addr1[4],
+            addr1[5],
+            own[0],
+            own[1],
+            own[2],
+            own[3],
+            own[4],
+            own[5],
+            addr3[0],
+            addr3[1],
+            addr3[2],
+            addr3[3],
+            addr3[4],
+            addr3[5],
+            (uint8_t)(seq & 0xff),
+            (uint8_t)(seq >> 8)};
 }
 
 // Supported Rates (max 8) + Extended Supported Rates. Mirrors the AP's own set
@@ -1585,12 +1628,34 @@ void StaLink::sendAssocRequest() {
 void StaLink::sendArp(uint16_t oper, const uint8_t *target_mac, const uint8_t *target_ip, const uint8_t *dst_mac) {
     const uint8_t *own = cfg_.own_mac.data();
     const uint8_t *ip = cfg_.own_ip.data();
-    const uint8_t a[28] = {0x00,          0x01,          0x08,          0x00,          6,
-                           4,             (uint8_t)(oper >> 8), (uint8_t)(oper & 0xff), own[0],
-                           own[1],        own[2],        own[3],        own[4],        own[5],
-                           ip[0],         ip[1],         ip[2],         ip[3],         target_mac[0],
-                           target_mac[1], target_mac[2], target_mac[3], target_mac[4], target_mac[5],
-                           target_ip[0],  target_ip[1],  target_ip[2],  target_ip[3]};
+    const uint8_t a[28] = {0x00,
+                           0x01,
+                           0x08,
+                           0x00,
+                           6,
+                           4,
+                           (uint8_t)(oper >> 8),
+                           (uint8_t)(oper & 0xff),
+                           own[0],
+                           own[1],
+                           own[2],
+                           own[3],
+                           own[4],
+                           own[5],
+                           ip[0],
+                           ip[1],
+                           ip[2],
+                           ip[3],
+                           target_mac[0],
+                           target_mac[1],
+                           target_mac[2],
+                           target_mac[3],
+                           target_mac[4],
+                           target_mac[5],
+                           target_ip[0],
+                           target_ip[1],
+                           target_ip[2],
+                           target_ip[3]};
     sendData(dst_mac, kEthArp, a, sizeof(a));
 }
 

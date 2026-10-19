@@ -42,7 +42,7 @@ class WfbngLink {
     // Takes effect on the next run(); the Java side restarts the adapters after changing it.
     std::atomic<LinkMode> link_mode{LinkMode::WFB};
     std::mutex sta_mutex;
-    StaConfig sta_config;            // guarded by sta_mutex
+    StaConfig sta_config; // guarded by sta_mutex
     // Guarded by sta_mutex; set while an AP-mode run() is active. Shared so a camera
     // command can keep using it without holding sta_mutex for seconds; run() stops it
     // before the device goes away, after which every call on it is a no-op.

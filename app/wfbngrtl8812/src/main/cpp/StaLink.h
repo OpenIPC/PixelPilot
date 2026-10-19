@@ -57,10 +57,10 @@ class StaLink {
     enum class State { Searching, Authenticating, Associating, Connected };
 
     struct Stats {
-        uint32_t rx_data;     // data frames from the AP addressed to us
-        uint32_t rx_udp;      // UDP datagrams forwarded to localhost
-        uint32_t rx_dropped;  // data frames we could not use (fragments, encrypted, ...)
-        uint32_t tx_frames;   // frames handed to the driver
+        uint32_t rx_data;    // data frames from the AP addressed to us
+        uint32_t rx_udp;     // UDP datagrams forwarded to localhost
+        uint32_t rx_dropped; // data frames we could not use (fragments, encrypted, ...)
+        uint32_t tx_frames;  // frames handed to the driver
     };
 
     StaLink(IRtlDevice *dev, StaConfig cfg);
@@ -182,17 +182,17 @@ class StaLink {
     std::vector<uint8_t> scan_list_; // scan_list_[0] == home_channel_
     size_t scan_index_{0};
     Clock::time_point dwell_start_{};
-    int retune_to_{-1};              // set via requestTune(), carried out by the worker outside mu_
+    int retune_to_{-1}; // set via requestTune(), carried out by the worker outside mu_
     int retune_width_{20};
     uint8_t retune_offset_{0};
     Clock::time_point last_width_change_{};
-    bool ap_vht_{false};             // AP advertises VHT capabilities (needed for 80 MHz)
-    int csa_channel_{-1};            // announced by the AP, switched to at csa_at_
-    int csa_width_{20};              // ... at this width (from the CSA's width elements)
+    bool ap_vht_{false};  // AP advertises VHT capabilities (needed for 80 MHz)
+    int csa_channel_{-1}; // announced by the AP, switched to at csa_at_
+    int csa_width_{20};   // ... at this width (from the CSA's width elements)
     uint8_t csa_offset_{0};
     Clock::time_point csa_at_{};
     std::array<uint8_t, 6> bssid_{};
-    std::vector<uint8_t> ap_rates_;  // AP's supported + extended rates (raw rate bytes)
+    std::vector<uint8_t> ap_rates_; // AP's supported + extended rates (raw rate bytes)
     bool ap_ht_{false};
     bool ap_wmm_{false};
     bool warned_encrypted_{false};
@@ -221,8 +221,8 @@ class StaLink {
     Clock::time_point last_seen_log_{};
     uint32_t frames_at_last_report_{0};
     uint32_t frames_per_sec_{0};
-    std::set<uint16_t> warned_ports_;        // UDP ports for us that nothing listens on
-    std::set<uint32_t> warned_arp_targets_;  // IPs the camera looks for that are not ours
+    std::set<uint16_t> warned_ports_;       // UDP ports for us that nothing listens on
+    std::set<uint32_t> warned_arp_targets_; // IPs the camera looks for that are not ours
     bool have_camera_ip_{false};
     std::array<uint8_t, 4> camera_ip_{};
     std::atomic<uint32_t> rx_frames_total_{0};
@@ -234,7 +234,7 @@ class StaLink {
         std::vector<uint8_t> header; // from the offset-0 fragment
         std::vector<uint8_t> payload;
         std::vector<bool> got; // one flag per 8-byte unit of payload that has arrived
-        size_t total{0}; // known once the last fragment arrived
+        size_t total{0};       // known once the last fragment arrived
         Clock::time_point start;
     };
     std::vector<IpFragments> frags_;
