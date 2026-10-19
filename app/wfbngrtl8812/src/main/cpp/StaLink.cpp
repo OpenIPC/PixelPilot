@@ -6,8 +6,6 @@
 #include <algorithm>
 #include <android/log.h>
 #include <arpa/inet.h>
-#include <cctype>
-#include <cstdlib>
 #include <cstring>
 #include <exception>
 #include <netinet/in.h>
@@ -110,6 +108,8 @@ constexpr auto kTcpRetransmit = 400ms;
 // air_man_ap answers once it is done; when it keeps the connection open after
 // that, this much silence after the first reply bytes ends the request.
 constexpr auto kTcpReplyIdle = 1500ms;
+// Repeats of a channel switch the driver refused, before the station stays where it is.
+constexpr int kMaxRetuneRetries = 3;
 // Replies are small status lines or JSON; anything beyond this is not from the camera.
 constexpr size_t kTcpMaxReply = 64 * 1024;
 // ICMP echo requests larger than a normal MTU are not answered (they would have to go
@@ -118,21 +118,12 @@ constexpr size_t kMaxEchoDatagram = 1500;
 // Networks remembered while searching (diagnostics only).
 constexpr size_t kMaxSeenNetworks = 64;
 
-// True for an HTTP reply whose headers or body are not all there yet. Anything that
-// is not HTTP (air_man_ap speaks plain lines) counts as complete.
-bool httpReplyIncomplete(const std::string &rx) {
-    static const std::string kHttp = "HTTP/";
-    // Fewer bytes than the status line prefix: still HTTP if they match its start.
-    if (rx.size() < kHttp.size()) return !rx.empty() && kHttp.compare(0, rx.size(), rx) == 0;
-    if (rx.compare(0, kHttp.size(), kHttp) != 0) return false;
-    const auto hdr_end = rx.find("\r\n\r\n");
-    if (hdr_end == std::string::npos) return true;
-    std::string head = rx.substr(0, hdr_end);
-    std::transform(head.begin(), head.end(), head.begin(), [](unsigned char ch) { return std::tolower(ch); });
-    const auto cl = head.find("\r\ncontent-length:");
-    if (cl == std::string::npos) return false; // delimited by the peer closing
-    const size_t want = std::strtoul(head.c_str() + cl + 17, nullptr, 10);
-    return rx.size() - (hdr_end + 4) < want;
+// True for an HTTP/1.x request. The app sends those as HTTP/1.0 with "Connection: close",
+// so the camera ends its reply by closing; nothing short of that is a whole reply.
+bool isHttpRequest(const std::string &request) {
+    const auto line_end = request.find("\r\n");
+    const auto version = request.find(" HTTP/1.");
+    return version != std::string::npos && version < line_end;
 }
 
 const char *stateName(StaLink::State s) {
@@ -344,11 +335,19 @@ void StaLink::worker() {
             std::lock_guard<std::mutex> lock(mu_);
             // Only record what the radio really switched to; after a failure the old
             // channel/width stay in force, so the search and probe logic keeps working
-            // from the truth and simply tries again after the dwell time.
+            // from the truth.
             if (tuned) {
                 channel_ = static_cast<uint8_t>(retune);
                 width_mhz_ = retune_width;
                 chan_offset_ = retune_offset;
+                retune_failures_ = 0;
+            } else if (retune_to_ < 0 && ++retune_failures_ <= kMaxRetuneRetries) {
+                // Nothing newer was asked for meanwhile: try the same switch again on the next
+                // tick. A camera that announced a channel switch is only found again this way;
+                // the search after a dropout looks at its boot channels, not the new one.
+                requestTune(retune, retune_width, retune_offset);
+            } else {
+                retune_failures_ = 0;
             }
             dwell_start_ = Clock::now();
             last_tx_attempt_ = Clock::time_point{}; // probe right away on the new channel
@@ -1312,6 +1311,7 @@ bool StaLink::tcpRequest(const std::array<uint8_t, 4> &ip,
     s.iss = rd();
     s.snd_nxt = s.iss + 1;
     s.half_close = half_close;
+    s.until_close = isHttpRequest(request);
     s.data.assign(request.begin(), request.end());
     s.deadline = deadline;
     s.last_tx = Clock::now();
@@ -1367,12 +1367,12 @@ void StaLink::tcpTick(Clock::time_point now) {
     if (tcp_.st != St::Resolving && tcp_.st != St::SynSent && tcp_.st != St::Established) return;
     if (now >= tcp_.deadline) {
         __android_log_print(ANDROID_LOG_WARN, TAG, "TCP request timed out");
-        // A cut-off HTTP reply is a failure, so the caller retries instead of parsing half a body.
-        tcpFinish(!tcp_.rx.empty() && !httpReplyIncomplete(tcp_.rx));
+        // An HTTP reply the camera never closed may be cut off: a failure, so the caller
+        // retries instead of parsing half a body.
+        tcpFinish(!tcp_.rx.empty() && !tcp_.until_close);
         return;
     }
-    if (tcp_.st == St::Established && !tcp_.rx.empty() && now - tcp_.last_rx >= kTcpReplyIdle &&
-        !httpReplyIncomplete(tcp_.rx)) {
+    if (tcp_.st == St::Established && !tcp_.until_close && !tcp_.rx.empty() && now - tcp_.last_rx >= kTcpReplyIdle) {
         tcpFinish(true);
         return;
     }
@@ -1420,7 +1420,8 @@ void StaLink::handleTcp(const uint8_t *ip, size_t ihl, size_t len) {
 
     if (flags & kTcpRst) {
         __android_log_print(ANDROID_LOG_WARN, TAG, "TCP connection reset by the peer");
-        tcp_.st = tcp_.rx.empty() || httpReplyIncomplete(tcp_.rx) ? St::Failed : St::Done;
+        // A reset is no orderly end, so it cannot vouch for an HTTP reply being whole.
+        tcp_.st = tcp_.rx.empty() || tcp_.until_close ? St::Failed : St::Done;
         tcp_cv_.notify_all();
         return;
     }
@@ -1459,8 +1460,7 @@ void StaLink::handleTcp(const uint8_t *ip, size_t ihl, size_t len) {
         } else {
             tcpSend(kTcpFin | kTcpAck, data_end, nullptr, 0);
         }
-        // Closed before the Content-Length was reached: a cut-off reply, not an answer.
-        tcp_.st = httpReplyIncomplete(tcp_.rx) ? St::Failed : St::Done;
+        tcp_.st = St::Done;
         tcp_cv_.notify_all();
         return;
     }

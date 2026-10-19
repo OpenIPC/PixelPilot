@@ -398,15 +398,13 @@ void WfbngLink::stop(JNIEnv *env, jobject context, jint fd) {
     // Recorded first, and whether or not the device exists yet: run() may not have got as far
     // as creating it, and StartRxLoop() would clear the flag set below anyway.
     note_stop_requested(fd);
-    // A copy keeps the device alive while StopRxLoop() runs, even if run() releases it meanwhile.
-    std::shared_ptr<IRtlDevice> dev = getDevice(fd);
-    if (!dev) {
+    // Under dev_mutex, so run() cannot release the device while StopRxLoop() (a flag) runs.
+    if (!withDevice(fd, [](IRtlDevice &dev) { dev.StopRxLoop(); })) {
         // Happens when the adapter was already gone by the time the stop arrived, e.g. it
         // was unplugged or the hub re-enumerated it. Nothing left to stop.
         __android_log_print(ANDROID_LOG_WARN, TAG, "stop: no rtl device for fd=%d, already gone", fd);
         return;
     }
-    dev->StopRxLoop();
     stop_adaptive_link();
 }
 
@@ -695,9 +693,7 @@ void WfbngLink::applyTxPower(int fd, int power) {
         // run thread; runStation() applies adaptive_tx_power itself during bring-up.
         return;
     }
-    if (auto dev = getDevice(fd)) {
-        dev->SetTxPower(power);
-    }
+    withDevice(fd, [power](IRtlDevice &dev) { dev.SetTxPower(power); });
 }
 
 void WfbngLink::start_link_quality_thread(int fd) {

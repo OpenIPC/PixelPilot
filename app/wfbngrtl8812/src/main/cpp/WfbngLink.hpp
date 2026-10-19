@@ -86,15 +86,20 @@ class WfbngLink {
     bool stbc_enabled{true};
 
     // Guarded by dev_mutex. Other threads (stop(), the TX power setter, the link-quality
-    // thread) must copy the shared_ptr under the lock via getDevice() and call through
-    // that copy, so the device cannot be destroyed under them by run() releasing it.
+    // thread) reach a device only through withDevice(), which holds the lock for the call:
+    // run() cannot release the device meanwhile, and no other thread ever holds a
+    // reference, so the device is always destroyed on the run thread before libusb_exit().
     std::mutex dev_mutex;
     std::map<int, std::shared_ptr<IRtlDevice>> rtl_devices;
 
-    std::shared_ptr<IRtlDevice> getDevice(int fd) {
+    // Calls fn(device) under dev_mutex; false when there is no device for fd. Keep fn short
+    // (a flag, a register write): releaseDevice() waits for it.
+    template <typename Fn> bool withDevice(int fd, Fn &&fn) {
         std::lock_guard<std::mutex> lock(dev_mutex);
         auto it = rtl_devices.find(fd);
-        return it == rtl_devices.end() ? nullptr : it->second;
+        if (it == rtl_devices.end() || !it->second) return false;
+        fn(*it->second);
+        return true;
     }
 
     // Applies a TX power. In AP mode it goes through the station's worker thread, which
@@ -166,26 +171,16 @@ class WfbngLink {
     // lock lives inside that object, so as long as it stays in rtl_devices the next
     // run() - after a mode, channel or settings change - is refused with "USB adapter
     // in use ... by another devourer process". Must come before libusb_exit().
-    // A caller that still holds a copy from getDevice() keeps the object alive until it is done.
+    // run() keeps its own reference and drops it right after, so the object dies there.
     void releaseDevice(int fd) {
-        std::shared_ptr<IRtlDevice> doomed;
-        {
-            std::lock_guard<std::mutex> lock(dev_mutex);
-            auto it = rtl_devices.find(fd);
-            if (it != rtl_devices.end()) {
-                doomed = std::move(it->second);
-                rtl_devices.erase(it);
-            }
-            int expected = fd;
-            current_fd.compare_exchange_strong(expected, -1);
-        }
-        // `doomed` is destroyed here, outside the lock.
+        std::lock_guard<std::mutex> lock(dev_mutex);
+        rtl_devices.erase(fd);
+        int expected = fd;
+        current_fd.compare_exchange_strong(expected, -1);
     }
 
     void stopDevice() {
-        if (auto dev = getDevice(current_fd.load())) {
-            dev->StopRxLoop();
-        }
+        withDevice(current_fd.load(), [](IRtlDevice &dev) { dev.StopRxLoop(); });
     }
 
     const char *keyPath = "/data/user/0/com.openipc.pixelpilot/files/gs.key";

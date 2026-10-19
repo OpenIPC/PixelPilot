@@ -89,12 +89,13 @@ class StaLink {
     void requestTxPower(int power) { pending_tx_power_ = power; }
 
     // Opens a TCP connection to ip:port, sends `request` and collects the reply
-    // until the peer closes, goes quiet after answering, or `timeout` passes.
+    // until the peer closes, goes quiet after answering, or `timeout` passes. An
+    // HTTP/1.x request only counts as answered once the peer closes.
     // half_close ends our sending side with the request (as `echo cmd | nc` does).
     // Blocks the caller (not an RX or worker thread). Waits for a request that is
     // already running; `timeout` covers that wait and the exchange together.
     // Returns false when not connected, the slot stayed busy, the reply is
-    // missing, or an HTTP reply was cut off.
+    // missing, or an HTTP reply was not closed by the peer.
     bool tcpRequest(const std::array<uint8_t, 4> &ip,
                     uint16_t port,
                     const std::string &request,
@@ -114,7 +115,8 @@ class StaLink {
         uint32_t iss{0}, snd_nxt{0}, rcv_nxt{0};
         std::vector<uint8_t> data; // the request
         bool data_acked{false};
-        bool half_close{false}; // FIN goes out with the request
+        bool half_close{false};  // FIN goes out with the request
+        bool until_close{false}; // HTTP: only the peer's FIN ends the reply, not kTcpReplyIdle
         std::string rx;
         int retries{0};
         Clock::time_point last_tx{}, last_rx{}, deadline{};
@@ -186,6 +188,7 @@ class StaLink {
     int retune_to_{-1}; // set via requestTune(), carried out by the worker outside mu_
     int retune_width_{20};
     uint8_t retune_offset_{0};
+    int retune_failures_{0}; // failed attempts at the pending switch, see worker()
     Clock::time_point last_width_change_{};
     bool ap_vht_{false};  // AP advertises VHT capabilities (needed for 80 MHz)
     int csa_channel_{-1}; // announced by the AP, switched to at csa_at_
