@@ -64,6 +64,10 @@ class AudioDecoder
         {
             m_audioThread.join();
         }
+        // What the decode thread had not reached is from before the stop. Left in the queue, it
+        // would be the first thing played after the next start.
+        std::lock_guard<std::mutex> lock(m_mtxQueue);
+        m_audioQueue = {};
     }
     void processAudioQueue();
     void stopAudio();
