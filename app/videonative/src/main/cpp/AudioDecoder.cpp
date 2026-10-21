@@ -81,8 +81,7 @@ void AudioDecoder::initAudio()
         pOpusDecoder = opus_decoder_create(kSampleRate, kChannels, &error);
         if (error != OPUS_OK || pOpusDecoder == nullptr)
         {
-            __android_log_print(ANDROID_LOG_ERROR, TAG, "opus decoder could not be created: %s",
-                                opus_strerror(error));
+            __android_log_print(ANDROID_LOG_ERROR, TAG, "opus decoder could not be created: %s", opus_strerror(error));
             pOpusDecoder = nullptr;
             isInit       = false;
             return;
@@ -98,8 +97,8 @@ bool AudioDecoder::openOutputLocked()
     aaudio_result_t      result  = AAudio_createStreamBuilder(&builder);
     if (result != AAUDIO_OK)
     {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "audio stream builder failed: %s",
-                            AAudio_convertResultToText(result));
+        __android_log_print(
+            ANDROID_LOG_ERROR, TAG, "audio stream builder failed: %s", AAudio_convertResultToText(result));
         return false;
     }
 
@@ -114,8 +113,8 @@ bool AudioDecoder::openOutputLocked()
     AAudioStreamBuilder_delete(builder);
     if (result != AAUDIO_OK)
     {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "audio stream could not be opened: %s",
-                            AAudio_convertResultToText(result));
+        __android_log_print(
+            ANDROID_LOG_ERROR, TAG, "audio stream could not be opened: %s", AAudio_convertResultToText(result));
         m_stream = nullptr;
         return false;
     }
@@ -123,8 +122,8 @@ bool AudioDecoder::openOutputLocked()
     result = AAudioStream_requestStart(m_stream);
     if (result != AAUDIO_OK)
     {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "audio stream would not start: %s",
-                            AAudio_convertResultToText(result));
+        __android_log_print(
+            ANDROID_LOG_ERROR, TAG, "audio stream would not start: %s", AAudio_convertResultToText(result));
         AAudioStream_close(m_stream);
         m_stream = nullptr;
         return false;
@@ -198,8 +197,8 @@ void AudioDecoder::onNewAudioData(const uint8_t* data, const std::size_t data_le
     }
     // Into a fixed buffer sized for the longest packet Opus allows, rather than one sized from
     // what the packet claims about itself.
-    const int decoded = opus_decode(pOpusDecoder, data + header, static_cast<opus_int32>(payload), m_pcm,
-                                    kMaxFrameSamples, 0);
+    const int decoded =
+        opus_decode(pOpusDecoder, data + header, static_cast<opus_int32>(payload), m_pcm, kMaxFrameSamples, 0);
     if (decoded <= 0)
     {
         return;

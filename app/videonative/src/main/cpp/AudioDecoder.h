@@ -85,10 +85,10 @@ class AudioDecoder
     // Guards m_stream. The decode thread writes to it while stopAudio() closes it from another
     // thread - and VideoActivity.onPause() calls VideoPlayer.stop(), which closes the stream,
     // before stopAudio() has stopped that thread.
-    std::mutex                 m_mtxStream;
-    AAudioStream*              m_stream     = nullptr;
-    OpusDecoder*               pOpusDecoder = nullptr;
+    std::mutex    m_mtxStream;
+    AAudioStream* m_stream     = nullptr;
+    OpusDecoder*  pOpusDecoder = nullptr;
     // Only ever touched by the decode thread.
-    opus_int16                 m_pcm[kMaxFrameSamples * kChannels];
+    opus_int16 m_pcm[kMaxFrameSamples * kChannels];
 };
 #endif  // PIXELPILOT_AUDIODECODER_H
