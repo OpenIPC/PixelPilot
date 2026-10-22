@@ -183,7 +183,14 @@ class WfbngLink {
         withDevice(current_fd.load(), [](IRtlDevice &dev) { dev.StopRxLoop(); });
     }
 
-    const char *keyPath = "/data/user/0/com.openipc.pixelpilot/files/gs.key";
+    // Resolved from the running app's own Context.getFilesDir() in the
+    // constructor instead of hardcoding the package name, so this keeps
+    // working under a different applicationId (a fork/rebrand) or a
+    // non-default Android user profile (secondary user, work profile,
+    // Samsung Secure Folder, ...), where "/data/user/0/<pkg>" isn't the
+    // app's actual data directory.
+    std::string filesDir;
+    std::string keyPath;
     std::recursive_mutex thread_mutex;
     std::unique_ptr<WiFiDriver> wifi_driver;
     std::shared_ptr<TxFrame> txFrame;
