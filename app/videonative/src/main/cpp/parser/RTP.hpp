@@ -199,7 +199,9 @@ class RTPPacket
     RTPPacket(const uint8_t* rtp_data, const size_t data_length)
         : header(*((rtp_header_t*) rtp_data)),
           rtpPayload(&rtp_data[sizeof(rtp_header_t)]),
-          rtpPayloadSize(data_length - sizeof(rtp_header_t))
+          // Clamped rather than left to wrap: VideoPlayer::onNewRTPData() drops anything
+          // shorter than a header, but a size_t that underflows is not a mistake to make twice.
+          rtpPayloadSize(data_length >= sizeof(rtp_header_t) ? data_length - sizeof(rtp_header_t) : 0)
     {
         // assert(data_length >= sizeof(rtp_header_t));
         //  r.n we don't support padding

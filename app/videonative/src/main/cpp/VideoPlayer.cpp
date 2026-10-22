@@ -109,6 +109,15 @@ void VideoPlayer::processQueue()
 // Not yet parsed bit stream (e.g. raw h264 or rtp data)
 void VideoPlayer::onNewRTPData(const uint8_t* data, const std::size_t data_length)
 {
+    // Every RTP packet from the link comes through here, and RTPPacket reads its header
+    // straight out of the buffer - its own length check is commented out - so a packet
+    // shorter than a header was an out-of-bounds read, with an underflowed payload size
+    // handed on to the video parser and the audio decoder.
+    if (data_length < sizeof(rtp_header_t))
+    {
+        return;
+    }
+
     // Parse the RTP packet
     const RTP::RTPPacket rtpPacket(data, data_length);
     uint16_t             idx = rtpPacket.header.getSequence();
