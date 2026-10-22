@@ -125,20 +125,36 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
     // the heap fallback never triggers. Heap is the behavior every working
     // Android build has shipped.
     cfg.usb.rx_zerocopy = false;
+    const bool ap_mode = link_mode.load() == LinkMode::AP;
+    if (ap_mode) {
+        // A station's unicast frames to the AP are acknowledged, so let the chip
+        // retransmit until they are (wfb-ng mode relies on FEC and sends once).
+        cfg.tx.retry_limit = 7;
+    }
 
-    rtl_devices[fd] = wifi_driver->CreateRtlDevice(dev_handle, ctx, nullptr, cfg);
-    if (!rtl_devices.at(fd)) {
+    // The local copy is dropped (device.reset()) before libusb is torn down below.
+    std::shared_ptr<IRtlDevice> device = wifi_driver->CreateRtlDevice(dev_handle, ctx, nullptr, cfg);
+    if (!device) {
         libusb_exit(ctx);
         __android_log_print(ANDROID_LOG_ERROR, TAG, "CreateRtlDevice error");
         return -1;
     }
+    {
+        std::lock_guard<std::mutex> lock(dev_mutex);
+        rtl_devices[fd] = device;
+    }
 
     if (stop_requested(fd)) {
         __android_log_print(ANDROID_LOG_WARN, TAG, "stop requested for fd=%d before bring-up, aborting", fd);
-        rtl_devices.erase(fd);
+        releaseDevice(fd);
+        device.reset();
         libusb_release_interface(dev_handle, 0);
         libusb_exit(ctx);
         return -1;
+    }
+
+    if (ap_mode) {
+        return runStation(dev_handle, ctx, fd, wifiChannel, std::move(device));
     }
 
     uint8_t *video_channel_id_be8 = reinterpret_cast<uint8_t *>(&video_channel_id_be);
@@ -204,7 +220,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
         // Store the current fd for later TX power updates.
         current_fd = fd;
 
-        IRtlDevice *current_device = rtl_devices.at(fd).get();
+        IRtlDevice *current_device = device.get();
 
         // TX-capable bring-up with RX enabled (cfg.rx.enable_with_tx). On
         // Jaguar3 (RTL8812EU/8822EU) this also starts the coex runtime thread
@@ -261,10 +277,11 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
 
         destroy_thread(usb_tx_thread);
         stop_adaptive_link();
-        auto dev = rtl_devices.at(fd).get();
-        if (dev) {
-            dev->Stop();
+        if (device) {
+            device->Stop();
         }
+        releaseDevice(fd);
+        device.reset(); // before libusb_exit(): the device must not outlive its context
         libusb_release_interface(dev_handle, 0);
         libusb_exit(ctx);
         return -1;
@@ -278,10 +295,11 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
 
     // Clean shutdown: halt TRX DMA and power the chip down before releasing
     // the USB interface.
-    auto dev = rtl_devices.at(fd).get();
-    if (dev) {
-        dev->Stop();
+    if (device) {
+        device->Stop();
     }
+    releaseDevice(fd);
+    device.reset(); // before libusb_exit(): the device must not outlive its context
 
     r = libusb_release_interface(dev_handle, 0);
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_release_interface: %d", r);
@@ -289,21 +307,103 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
     return 0;
 }
 
+int WfbngLink::runStation(libusb_device_handle *dev_handle,
+                          libusb_context *ctx,
+                          int fd,
+                          int wifiChannel,
+                          std::shared_ptr<IRtlDevice> device) {
+    IRtlDevice *dev = device.get();
+
+    StaLink *sta = nullptr;
+    devourer::MacAddr own_mac;
+    {
+        std::lock_guard<std::mutex> lock(sta_mutex);
+        if (sta_link) {
+            // One association per AP; a second adapter would only fight the first over the same MAC.
+            __android_log_print(ANDROID_LOG_WARN, TAG, "AP mode already runs on another adapter, ignoring fd=%d", fd);
+        } else if (sta_config.ssid.empty()) {
+            __android_log_print(ANDROID_LOG_ERROR, TAG, "AP mode without an SSID configured, not starting");
+        } else {
+            StaConfig cfg = sta_config;
+            cfg.channel = static_cast<uint8_t>(wifiChannel);
+            own_mac.bytes = cfg.own_mac;
+            sta_link = std::make_shared<StaLink>(dev, cfg);
+            sta = sta_link.get();
+            // Only the adapter that owns the association becomes the current one; a
+            // rejected second adapter must not overwrite it.
+            current_fd = fd;
+        }
+    }
+
+    if (!sta) {
+        // Never brought up, so nothing to power down; same exit as an early stop in run().
+        releaseDevice(fd);
+        device.reset();
+        libusb_release_interface(dev_handle, 0);
+        libusb_exit(ctx);
+        return -1;
+    }
+
+    int ret = 0;
+    try {
+        // The camera's AP is joined on its primary channel at 20 MHz; HT40 APs
+        // still talk to a 20 MHz-only station on the primary.
+        dev->InitWrite(SelectedChannel{
+            .Channel = static_cast<uint8_t>(wifiChannel),
+            .ChannelOffset = 0,
+            .ChannelWidth = CHANNEL_WIDTH_20,
+        });
+        dev->SetTxPower(adaptive_tx_power);
+
+        // The chip ACKs every unicast frame addressed to own_mac within SIFS, which a
+        // userspace stack could never do. Without it the AP retries each frame to us.
+        if (!dev->SetAckResponder(own_mac)) {
+            __android_log_print(
+                ANDROID_LOG_WARN, TAG, "adapter has no hardware ACK responder, the AP will retry every frame");
+        }
+
+        if (stop_requested(fd)) {
+            __android_log_print(
+                ANDROID_LOG_WARN, TAG, "stop requested for fd=%d during bring-up, not entering the rx loop", fd);
+        } else {
+            sta->start();
+            // Blocking until stop() calls StopRxLoop().
+            dev->StartRxLoop([sta](const Packet &packet) { sta->onRx(packet); });
+        }
+    } catch (const std::runtime_error &error) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "runtime_error: %s", error.what());
+        ret = -1;
+    }
+
+    // Stop before the device goes: a camera command may still hold a reference,
+    // and a stopped StaLink no longer touches the device.
+    sta->stop();
+    {
+        std::lock_guard<std::mutex> lock(sta_mutex);
+        ap_recovery_base += sta_link->recoveries();
+        sta_link.reset();
+    }
+
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "AP mode RX loop exited, releasing...");
+    dev->Stop();
+    releaseDevice(fd);
+    device.reset(); // before libusb_exit(): the device must not outlive its context
+    int r = libusb_release_interface(dev_handle, 0);
+    __android_log_print(ANDROID_LOG_DEBUG, TAG, "libusb_release_interface: %d", r);
+    libusb_exit(ctx);
+    return ret;
+}
+
 void WfbngLink::stop(JNIEnv *env, jobject context, jint fd) {
     // Recorded first, and whether or not the device exists yet: run() may not have got as far
     // as creating it, and StartRxLoop() would clear the flag set below anyway.
     note_stop_requested(fd);
-    if (rtl_devices.find(fd) == rtl_devices.end()) {
+    // Under dev_mutex, so run() cannot release the device while StopRxLoop() (a flag) runs.
+    if (!withDevice(fd, [](IRtlDevice &dev) { dev.StopRxLoop(); })) {
         // Happens when the adapter was already gone by the time the stop arrived, e.g. it
         // was unplugged or the hub re-enumerated it. Nothing left to stop.
         __android_log_print(ANDROID_LOG_WARN, TAG, "stop: no rtl device for fd=%d, already gone", fd);
         return;
-    }
-    auto dev = rtl_devices.at(fd).get();
-    if (dev) {
-        dev->StopRxLoop();
-    } else {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "rtl_devices.at(%d) is nullptr", fd);
     }
     stop_adaptive_link();
 }
@@ -392,23 +492,48 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     if (jcStatsConstructor == nullptr) {
         return;
     }
-    SignalQualityCalculator::get_instance().add_fec_data(
-        aggregator->count_p_all, aggregator->count_p_fec_recovered, aggregator->count_p_lost);
 
-    auto quality = SignalQualityCalculator::get_instance().calculate_signal_quality();
-    uint32_t avg_rssi_int = round(map_range(quality.quality, -1024.f, 1024.f, 0.f, 100.f));
+    jobject stats;
+    if (native(wfbngLinkN)->link_mode.load() == LinkMode::AP) {
+        // No FEC in AP mode: report data frames received, UDP datagrams handed to
+        // the player, frames we had to drop and frames sent, in the same slots.
+        StaLink::Stats st{};
+        {
+            std::lock_guard<std::mutex> lock(native(wfbngLinkN)->sta_mutex);
+            if (native(wfbngLinkN)->sta_link) st = native(wfbngLinkN)->sta_link->takeStats();
+        }
+        auto quality = SignalQualityCalculator::get_instance().calculate_signal_quality();
+        uint32_t avg_rssi_int = round(map_range(quality.quality, -1024.f, 1024.f, 0.f, 100.f));
+        stats = env->NewObject(jcStats,
+                               jcStatsConstructor,
+                               (jint)st.rx_data,
+                               (jint)0,
+                               (jint)st.rx_udp,
+                               (jint)0,
+                               (jint)st.rx_dropped,
+                               (jint)0,
+                               (jint)0,
+                               (jint)st.tx_frames,
+                               (jint)avg_rssi_int);
+    } else {
+        SignalQualityCalculator::get_instance().add_fec_data(
+            aggregator->count_p_all, aggregator->count_p_fec_recovered, aggregator->count_p_lost);
 
-    auto stats = env->NewObject(jcStats,
-                                jcStatsConstructor,
-                                (jint)aggregator->count_p_all,
-                                (jint)aggregator->count_p_dec_err,
-                                (jint)(aggregator->count_p_all - aggregator->count_p_dec_err),
-                                (jint)aggregator->count_p_fec_recovered,
-                                (jint)aggregator->count_p_lost,
-                                (jint)aggregator->count_p_bad,
-                                (jint)aggregator->count_p_override,
-                                (jint)aggregator->count_p_outgoing,
-                                (jint)avg_rssi_int);
+        auto quality = SignalQualityCalculator::get_instance().calculate_signal_quality();
+        uint32_t avg_rssi_int = round(map_range(quality.quality, -1024.f, 1024.f, 0.f, 100.f));
+
+        stats = env->NewObject(jcStats,
+                               jcStatsConstructor,
+                               (jint)aggregator->count_p_all,
+                               (jint)aggregator->count_p_dec_err,
+                               (jint)(aggregator->count_p_all - aggregator->count_p_dec_err),
+                               (jint)aggregator->count_p_fec_recovered,
+                               (jint)aggregator->count_p_lost,
+                               (jint)aggregator->count_p_bad,
+                               (jint)aggregator->count_p_override,
+                               (jint)aggregator->count_p_outgoing,
+                               (jint)avg_rssi_int);
+    }
     if (stats == nullptr) {
         return;
     }
@@ -427,8 +552,157 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     native(wfbngLinkN)->initAgg();
 }
 
+extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetLinkMode(JNIEnv *env,
+                                                                                            jclass clazz,
+                                                                                            jlong wfbngLinkN,
+                                                                                            jint mode) {
+    native(wfbngLinkN)->link_mode = (mode == static_cast<int>(LinkMode::AP)) ? LinkMode::AP : LinkMode::WFB;
+}
+
+// Returns false (and keeps the previous config) when the IP or MAC does not parse.
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetApConfig(JNIEnv *env,
+                                                          jclass clazz,
+                                                          jlong wfbngLinkN,
+                                                          jstring ssid,
+                                                          jstring ownIp,
+                                                          jstring ownMac,
+                                                          jint videoPort,
+                                                          jintArray candidateChannels,
+                                                          jboolean fullScan,
+                                                          jint maxWidthMhz) {
+    auto str = [env](jstring s) {
+        const char *c = env->GetStringUTFChars(s, nullptr);
+        std::string out(c ? c : "");
+        if (c) env->ReleaseStringUTFChars(s, c);
+        return out;
+    };
+    StaConfig cfg;
+    if (candidateChannels != nullptr) {
+        const jsize n = env->GetArrayLength(candidateChannels);
+        std::vector<jint> chans(n);
+        env->GetIntArrayRegion(candidateChannels, 0, n, chans.data());
+        for (jint ch : chans) {
+            if (ch > 0 && ch < 200) cfg.candidate_channels.push_back(static_cast<uint8_t>(ch));
+        }
+    }
+    cfg.full_scan = fullScan;
+    cfg.max_width_mhz = (maxWidthMhz >= 80) ? 80 : (maxWidthMhz >= 40) ? 40 : 20;
+    cfg.ssid = str(ssid);
+    if (cfg.ssid.size() > 32) return JNI_FALSE;
+    if (inet_pton(AF_INET, str(ownIp).c_str(), cfg.own_ip.data()) != 1) return JNI_FALSE;
+    auto mac = devourer::parse_mac(str(ownMac));
+    // Must be unicast: the ACK engine cannot match a group address.
+    if (!mac || (mac->bytes[0] & 0x01)) return JNI_FALSE;
+    cfg.own_mac = mac->bytes;
+    if (videoPort <= 0 || videoPort > 65535) return JNI_FALSE;
+    // The player and the MAVLink reader listen on fixed local ports.
+    cfg.forward_ports = {{static_cast<uint16_t>(videoPort), 5600}, {14550, 14550}};
+
+    WfbngLink *link = native(wfbngLinkN);
+    std::lock_guard<std::mutex> lock(link->sta_mutex);
+    link->sta_config = std::move(cfg);
+    return JNI_TRUE;
+}
+
+// Bytes from the air (SSIDs of other networks, camera replies) are not guaranteed
+// to be valid modified UTF-8, which NewStringUTF() requires (CheckJNI aborts on it).
+static std::string printableAscii(std::string s) {
+    for (char &c : s) {
+        const auto u = static_cast<unsigned char>(c);
+        if (u >= 0x80 || (u < 0x20 && c != '\n' && c != '\r' && c != '\t')) c = '?';
+    }
+    return s;
+}
+
+extern "C" JNIEXPORT jstring JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeGetApStatus(JNIEnv *env,
+                                                                                               jclass clazz,
+                                                                                               jlong wfbngLinkN) {
+    WfbngLink *link = native(wfbngLinkN);
+    std::string text; // empty: no adapter running in AP mode
+    {
+        std::lock_guard<std::mutex> lock(link->sta_mutex);
+        if (link->sta_link) text = link->sta_link->statusText();
+    }
+    return env->NewStringUTF(printableAscii(text).c_str());
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeGetApChannel(JNIEnv *env,
+                                                                                             jclass clazz,
+                                                                                             jlong wfbngLinkN) {
+    WfbngLink *link = native(wfbngLinkN);
+    std::lock_guard<std::mutex> lock(link->sta_mutex);
+    return link->sta_link ? link->sta_link->connectedChannel() : 0;
+}
+
+// Grows each time video can flow again in AP mode (association, end of a dropout).
+extern "C" JNIEXPORT jint JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeGetApRecoveries(JNIEnv *env,
+                                                                                                jclass clazz,
+                                                                                                jlong wfbngLinkN) {
+    WfbngLink *link = native(wfbngLinkN);
+    std::lock_guard<std::mutex> lock(link->sta_mutex);
+    return static_cast<jint>(link->ap_recovery_base + (link->sta_link ? link->sta_link->recoveries() : 0));
+}
+
+// Sends one line to a TCP service on the camera (air_man_ap on 12355) over the AP
+// link and returns its reply, or null. Blocks: call from a background thread.
+extern "C" JNIEXPORT jstring JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeCameraCommand(JNIEnv *env,
+                                                                                                 jclass clazz,
+                                                                                                 jlong wfbngLinkN,
+                                                                                                 jstring cameraIp,
+                                                                                                 jint port,
+                                                                                                 jstring command,
+                                                                                                 jint timeoutMs,
+                                                                                                 jboolean halfClose) {
+    WfbngLink *link = native(wfbngLinkN);
+    std::shared_ptr<StaLink> sta;
+    {
+        std::lock_guard<std::mutex> lock(link->sta_mutex);
+        sta = link->sta_link;
+    }
+    if (!sta) return nullptr;
+
+    const char *ip_c = env->GetStringUTFChars(cameraIp, nullptr);
+    std::array<uint8_t, 4> ip{};
+    const bool ip_ok = ip_c && inet_pton(AF_INET, ip_c, ip.data()) == 1;
+    if (ip_c) env->ReleaseStringUTFChars(cameraIp, ip_c);
+    const char *cmd_c = env->GetStringUTFChars(command, nullptr);
+    std::string request = cmd_c ? cmd_c : "";
+    if (cmd_c) env->ReleaseStringUTFChars(command, cmd_c);
+    if (!ip_ok || port <= 0 || port > 65535 || request.empty()) return nullptr;
+    if (request.back() != '\n') request += '\n';
+
+    std::string reply;
+    if (!sta->tcpRequest(
+            ip, static_cast<uint16_t>(port), request, std::chrono::milliseconds(timeoutMs), halfClose, reply)) {
+        return nullptr;
+    }
+    return env->NewStringUTF(printableAscii(reply).c_str());
+}
+
 // Modified start_link_quality_thread: use adaptive_link_enabled and adaptive_tx_power
+void WfbngLink::applyTxPower(int fd, int power) {
+    if (link_mode.load() == LinkMode::AP) {
+        std::shared_ptr<StaLink> sta;
+        {
+            std::lock_guard<std::mutex> lock(sta_mutex);
+            sta = sta_link;
+        }
+        if (sta) sta->requestTxPower(power);
+        // Without a running station the device is being brought up or torn down on the
+        // run thread; runStation() applies adaptive_tx_power itself during bring-up.
+        return;
+    }
+    withDevice(fd, [power](IRtlDevice &dev) { dev.SetTxPower(power); });
+}
+
 void WfbngLink::start_link_quality_thread(int fd) {
+    if (link_mode.load() == LinkMode::AP) {
+        // The adaptive link talks to the camera through the wfb-ng tunnel, which
+        // does not exist in AP mode. Only the TX power applies.
+        applyTxPower(fd, adaptive_tx_power);
+        return;
+    }
     auto thread_func = [this, fd]() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         const char *ip = "10.5.0.10";
@@ -533,7 +807,7 @@ void WfbngLink::start_link_quality_thread(int fd) {
     };
 
     init_thread(link_quality_thread, [=]() { return std::make_unique<std::thread>(thread_func); });
-    rtl_devices.at(fd)->SetTxPower(adaptive_tx_power);
+    applyTxPower(fd, adaptive_tx_power);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeSetAdaptiveLinkEnabled(
@@ -564,8 +838,8 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     if (link->adaptive_tx_power == power) return;
 
     link->adaptive_tx_power = power;
-    if (link->current_fd != -1 && link->rtl_devices.find(link->current_fd) != link->rtl_devices.end()) {
-        link->rtl_devices.at(link->current_fd)->SetTxPower(power);
+    if (const int fd = link->current_fd.load(); fd != -1) {
+        link->applyTxPower(fd, power);
     }
     // If adaptive mode is enabled and the adaptive thread is not running, restart it.
     if (link->adaptive_link_enabled) {

@@ -109,6 +109,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         TxFrame.cpp
         SignalQualityCalculator.h
         SignalQualityCalculator.cpp
+        StaLink.h
+        StaLink.cpp
         )
 
 target_link_libraries(${CMAKE_PROJECT_NAME}

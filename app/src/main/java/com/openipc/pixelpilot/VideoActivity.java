@@ -150,6 +150,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
     private static final String PREF_DRONE_USERNAME = "drone_username";
     private static final String PREF_DRONE_PASSWORD = "drone_password";
+    private static final String PREF_DRONE_ADDRESS = "drone_address";
+    // The camera as seen through the wfb-ng tunnel (WfbNgVpnService).
+    private static final String DEFAULT_DRONE_ADDRESS = "10.5.0.10";
     private static final String PREF_DVR_FILENAME = "dvr_filename";
 
     public boolean getVRSetting() {
@@ -370,6 +373,274 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         wfbLink = new WfbNgLink(this);
         wfbLink.SetWfbNGStatsChanged(this);
         wfbLinkManager = new WfbLinkManager(this, binding, wfbLink);
+        applyLinkConfig();
+    }
+
+    // ----------------------------------------------------------------------------
+    // LINK MODE (WFB-NG / AP)
+    // ----------------------------------------------------------------------------
+
+    private static final String PREF_LINK_MODE = "link_mode";
+    private static final String PREF_AP_SSID = "ap_ssid";
+    private static final String PREF_AP_OWN_IP = "ap_own_ip";
+    private static final String PREF_AP_OWN_MAC = "ap_own_mac";
+    private static final String PREF_AP_VIDEO_PORT = "ap_video_port";
+    private static final String PREF_AP_CHANNEL = "ap_channel";
+    private static final String PREF_AP_CAMERA_IP = "ap_camera_ip";
+    private static final String PREF_AP_FULL_SCAN = "ap_full_scan";
+    /** Widest channel AP mode follows the camera to (20/40/80 MHz); 20 is the safe fallback. */
+    private static final String PREF_AP_MAX_WIDTH = "ap_max_width";
+    private static final int DEFAULT_AP_MAX_WIDTH = 80;
+    // Defaults match the OpenIPC apfpv firmware: the camera is 192.168.0.1, its DHCP
+    // server only ever hands out 192.168.0.10 and majestic streams to udp://192.168.0.10:5600.
+    private static final String DEFAULT_AP_SSID = "OpenIPC";
+    private static final String DEFAULT_AP_OWN_IP = "192.168.0.10";
+    private static final String DEFAULT_AP_CAMERA_IP = "192.168.0.1";
+    private static final int DEFAULT_AP_VIDEO_PORT = 5600;
+    /**
+     * Channels the apfpv camera passes through while it boots: hostapd starts on 157,
+     * "adapter start" switches to 165, then air_man_ap moves to the stored wlanchan (all via
+     * channel switch announcements, which the link follows). Checked after the remembered
+     * channel, so a camera that is still booting is found without a full scan.
+     */
+    private static final int[] AP_BOOT_CHANNELS = {165, 157};
+    private static final int DEFAULT_AP_CHANNEL = 165;
+    /** air_man_ap control port on the camera ("set_ap_channel <ch>" etc.). */
+    private static final int AIR_MAN_PORT = 12355;
+    private static final int AIR_MAN_TIMEOUT_MS = 15000;
+
+    public static int getLinkMode(Context context) {
+        return context.getSharedPreferences("general", Context.MODE_PRIVATE)
+                .getInt(PREF_LINK_MODE, WfbNgLink.LINK_MODE_WFB);
+    }
+
+    /** AP mode's start channel: where the camera's AP was last seen. */
+    public static int getApChannel(Context context) {
+        return context.getSharedPreferences("general", Context.MODE_PRIVATE)
+                .getInt(PREF_AP_CHANNEL, DEFAULT_AP_CHANNEL);
+    }
+
+    /** The channel the adapters start on in the current mode. */
+    private int getStartChannel() {
+        return isApMode() ? getApChannel(this) : getChannel(this);
+    }
+
+    private boolean isApMode() {
+        return getLinkMode(this) == WfbNgLink.LINK_MODE_AP;
+    }
+
+    /**
+     * MAC address the adapter uses as a station. Generated once, locally administered and
+     * unicast, then kept so the camera's ARP cache and DHCP leases stay valid across restarts.
+     */
+    private String getApOwnMac() {
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        String mac = prefs.getString(PREF_AP_OWN_MAC, null);
+        if (mac == null) {
+            byte[] b = new byte[6];
+            new java.security.SecureRandom().nextBytes(b);
+            b[0] = (byte) ((b[0] & 0xfc) | 0x02);
+            mac = String.format("%02x:%02x:%02x:%02x:%02x:%02x", b[0], b[1], b[2], b[3], b[4], b[5]);
+            prefs.edit().putString(PREF_AP_OWN_MAC, mac).apply();
+        }
+        return mac;
+    }
+
+    /** Hands the stored mode and AP settings to the native link; used on the next adapter start. */
+    private void applyLinkConfig() {
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        int mode = getLinkMode(this);
+        wfbLink.setLinkMode(mode);
+        boolean valid = wfbLink.setApConfig(
+                prefs.getString(PREF_AP_SSID, DEFAULT_AP_SSID),
+                prefs.getString(PREF_AP_OWN_IP, DEFAULT_AP_OWN_IP),
+                getApOwnMac(),
+                prefs.getInt(PREF_AP_VIDEO_PORT, DEFAULT_AP_VIDEO_PORT),
+                AP_BOOT_CHANNELS,
+                prefs.getBoolean(PREF_AP_FULL_SCAN, false),
+                prefs.getInt(PREF_AP_MAX_WIDTH, DEFAULT_AP_MAX_WIDTH));
+        if (!valid) {
+            Log.e(TAG, "stored AP settings are invalid, AP mode will not connect");
+        }
+        wfbLinkManager.setApMode(mode == WfbNgLink.LINK_MODE_AP);
+        wfbLinkManager.setChannel(getStartChannel());
+    }
+
+    /**
+     * Channel menu in AP mode. The camera owns the channel, so while connected it is asked to
+     * switch (air_man_ap set_ap_channel); it announces the switch and the link follows it,
+     * and air_man_ap's ping check afterwards finds us on the new channel. Without a
+     * connection this only changes where the next search starts.
+     */
+    private void onApChannelSelected(int channel) {
+        if (wfbLink.getApChannel() == 0) {
+            getSharedPreferences("general", MODE_PRIVATE).edit().putInt(PREF_AP_CHANNEL, channel).apply();
+            wfbLinkManager.stopAdapters();
+            wfbLinkManager.setChannel(channel);
+            wfbLinkManager.startAdapters();
+            Toast.makeText(this, "Not connected: searching on channel " + channel, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (wfbLink.getApChannel() == channel) {
+            return;
+        }
+        String cameraIp = getSharedPreferences("general", MODE_PRIVATE)
+                .getString(PREF_AP_CAMERA_IP, DEFAULT_AP_CAMERA_IP);
+        Toast.makeText(this, "Asking the camera to switch to channel " + channel + "...",
+                Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            String reply = wfbLink.cameraCommand(cameraIp, AIR_MAN_PORT,
+                    "set_ap_channel " + channel, AIR_MAN_TIMEOUT_MS, true);
+            runOnUiThread(() -> Toast.makeText(this,
+                    reply == null ? "Camera did not answer, channel unchanged" : "Camera: " + reply.trim(),
+                    Toast.LENGTH_LONG).show());
+        }, "camera-command").start();
+    }
+
+    private void onLinkModeChanged(int mode) {
+        if (getLinkMode(this) == mode) {
+            return;
+        }
+        getSharedPreferences("general", MODE_PRIVATE).edit().putInt(PREF_LINK_MODE, mode).apply();
+        wfbLinkManager.stopAdapters();
+        applyLinkConfig();
+        wfbLinkManager.startAdapters();
+        // The tunnel only exists over wfb-ng.
+        if (mode == WfbNgLink.LINK_MODE_AP) {
+            // Directly, not with a STOP_SERVICE start; see WfbNgVpnService.stopRunning().
+            WfbNgVpnService.stopRunning();
+        } else {
+            startVpnService();
+        }
+    }
+
+    /**
+     * Submenu that switches between wfb-ng and joining the camera's Wi-Fi access point.
+     */
+    private void setupLinkModeSubMenu(PopupMenu popup) {
+        SubMenu modeMenu = popup.getMenu().addSubMenu("Link mode");
+        boolean ap = isApMode();
+
+        MenuItem wfbItem = modeMenu.add("WFB-NG");
+        wfbItem.setCheckable(true);
+        wfbItem.setChecked(!ap);
+        wfbItem.setOnMenuItemClickListener(item -> {
+            onLinkModeChanged(WfbNgLink.LINK_MODE_WFB);
+            return true;
+        });
+
+        MenuItem apItem = modeMenu.add("APFPV");
+        apItem.setCheckable(true);
+        apItem.setChecked(ap);
+        apItem.setOnMenuItemClickListener(item -> {
+            onLinkModeChanged(WfbNgLink.LINK_MODE_AP);
+            return true;
+        });
+
+        modeMenu.add("APFPV settings...").setOnMenuItemClickListener(item -> {
+            showApSettingsDialog();
+            return true;
+        });
+    }
+
+    private static int selectedWidth(android.widget.RadioGroup group) {
+        android.view.View checked = group.findViewById(group.getCheckedRadioButtonId());
+        return checked != null ? (int) checked.getTag() : DEFAULT_AP_MAX_WIDTH;
+    }
+
+    private void showApSettingsDialog() {
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 30, 50, 30);
+
+        String[] labels = {"SSID (open network)", "Phone IP address", "Video UDP port",
+                "Adapter MAC address", "Camera IP address"};
+        String[] values = {
+                prefs.getString(PREF_AP_SSID, DEFAULT_AP_SSID),
+                prefs.getString(PREF_AP_OWN_IP, DEFAULT_AP_OWN_IP),
+                String.valueOf(prefs.getInt(PREF_AP_VIDEO_PORT, DEFAULT_AP_VIDEO_PORT)),
+                getApOwnMac(),
+                prefs.getString(PREF_AP_CAMERA_IP, DEFAULT_AP_CAMERA_IP)
+        };
+        final android.widget.EditText[] edits = new android.widget.EditText[labels.length];
+        for (int i = 0; i < labels.length; i++) {
+            android.widget.TextView tv = new android.widget.TextView(this);
+            tv.setText(labels[i]);
+            layout.addView(tv);
+            edits[i] = new android.widget.EditText(this);
+            edits[i].setSingleLine(true);
+            edits[i].setText(values[i]);
+            layout.addView(edits[i]);
+        }
+        edits[2].setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+
+        final android.widget.CheckBox fullScan = new android.widget.CheckBox(this);
+        fullScan.setText("Scan all channels if the camera is not found");
+        fullScan.setChecked(prefs.getBoolean(PREF_AP_FULL_SCAN, false));
+        layout.addView(fullScan);
+
+        android.widget.TextView widthLabel = new android.widget.TextView(this);
+        widthLabel.setText("Max. channel width (follows the camera up to this; 20 MHz is the fallback "
+                + "if a wider channel does not work)");
+        layout.addView(widthLabel);
+        final android.widget.RadioGroup widthGroup = new android.widget.RadioGroup(this);
+        widthGroup.setOrientation(android.widget.RadioGroup.HORIZONTAL);
+        final int[] widths = {20, 40, 80};
+        int savedWidth = prefs.getInt(PREF_AP_MAX_WIDTH, DEFAULT_AP_MAX_WIDTH);
+        for (int w : widths) {
+            android.widget.RadioButton rb = new android.widget.RadioButton(this);
+            rb.setText(w + " MHz");
+            rb.setId(android.view.View.generateViewId());
+            rb.setTag(w);
+            widthGroup.addView(rb);
+            if (w == savedWidth) widthGroup.check(rb.getId());
+        }
+        layout.addView(widthGroup);
+
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("APFPV settings")
+                .setMessage("The camera has to send its stream to this IP and port. "
+                        + "The search starts on the last known channel (Channel menu), then "
+                        + "checks the channels the camera uses while booting ("
+                        + Arrays.toString(AP_BOOT_CHANNELS) + ").")
+                .setView(layout)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String ssid = edits[0].getText().toString();
+                    String ip = edits[1].getText().toString().trim();
+                    String mac = edits[3].getText().toString().trim().toLowerCase(Locale.US);
+                    String cameraIp = edits[4].getText().toString().trim();
+                    int port;
+                    try {
+                        port = Integer.parseInt(edits[2].getText().toString().trim());
+                    } catch (NumberFormatException e) {
+                        port = -1;
+                    }
+                    boolean cameraIpValid = cameraIp.matches("\\d{1,3}(\\.\\d{1,3}){3}");
+                    if (ssid.isEmpty() || !cameraIpValid
+                            || !wfbLink.setApConfig(ssid, ip, mac, port, AP_BOOT_CHANNELS, fullScan.isChecked(),
+                                    selectedWidth(widthGroup))) {
+                        Toast.makeText(this, "Invalid APFPV settings, nothing saved", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    prefs.edit()
+                            .putString(PREF_AP_SSID, ssid)
+                            .putString(PREF_AP_OWN_IP, ip)
+                            .putString(PREF_AP_OWN_MAC, mac)
+                            .putInt(PREF_AP_VIDEO_PORT, port)
+                            .putString(PREF_AP_CAMERA_IP, cameraIp)
+                            .putBoolean(PREF_AP_FULL_SCAN, fullScan.isChecked())
+                            .putInt(PREF_AP_MAX_WIDTH, selectedWidth(widthGroup))
+                            .apply();
+                    Toast.makeText(this, "APFPV settings saved", Toast.LENGTH_SHORT).show();
+                    if (isApMode()) {
+                        wfbLinkManager.stopAdapters();
+                        wfbLinkManager.startAdapters();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     // ----------------------------------------------------------------------------
@@ -632,6 +903,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     private void showSettingsMenu(View anchor) {
         PopupMenu popup = new PopupMenu(this, anchor);
 
+        // Link mode submenu (WFB-NG / AP)
+        setupLinkModeSubMenu(popup);
+
         // VR submenu
         setupVRSubMenu(popup);
 
@@ -639,7 +913,10 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         setupChannelSubMenu(popup);
 
         // Bandwidth submenu
-        setupBandwidthSubMenu(popup);
+        // Bandwidth submenu (wfb-ng only; in AP mode the camera's channel decides the width)
+        if (!isApMode()) {
+            setupBandwidthSubMenu(popup);
+        }
 
         // Video submenu
         setupVideoSubMenu(popup);
@@ -647,8 +924,10 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         // OSD submenu
         setupOSDSubMenu(popup);
 
-        // WFB submenu
-        setupWFBSubMenu(popup);
+        // WFB submenu (the key only matters to wfb-ng)
+        if (!isApMode()) {
+            setupWFBSubMenu(popup);
+        }
 
         // Adaptive link submenu
         setupAdaptiveLinkSubMenu(popup);
@@ -693,7 +972,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
      */
     private void setupChannelSubMenu(PopupMenu popup) {
         SubMenu chnMenu = popup.getMenu().addSubMenu("Channel");
-        int channelPref = getChannel(this);
+        // In AP mode: the camera's channel (asks the camera to switch while connected).
+        int channelPref = getStartChannel();
 
         // Create a disabled item to act as the header
         MenuItem headerItem = chnMenu.add("Current: " + channelPref);
@@ -1042,7 +1322,17 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         SubMenu drone = popup.getMenu().addSubMenu("Drone");
         MenuItem settings = drone.add("Settings");
         settings.setOnMenuItemClickListener(item -> {
-            startBrowser();
+            if (isApMode()) {
+                showCameraControl();
+            } else {
+                startBrowser();
+            }
+            return true;
+        });
+
+        MenuItem address = drone.add("Address (" + getDroneAddress() + ")");
+        address.setOnMenuItemClickListener(item -> {
+            showDroneAddressDialog();
             return true;
         });
 
@@ -1052,6 +1342,82 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             showLoginCredentialsDialog();
             return true;
         });
+    }
+
+    /**
+     * APFPV mode: the camera's controls (air_man_ap + aalinkFPV web API) instead of its web
+     * page. Over the USB adapter while that is joined to the camera - a WebView could not
+     * reach it there, it uses the phone's network - otherwise over the phone's own Wi-Fi,
+     * for when the phone itself is connected to the camera.
+     */
+    private void showCameraControl() {
+        boolean viaAdapter = wfbLink.getApChannel() != 0;
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        new CameraControlDialog(this,
+                viaAdapter ? CameraControlDialog.overAdapter(wfbLink) : CameraControlDialog.overWifi(this),
+                viaAdapter ? "USB adapter" : "phone Wi-Fi",
+                prefs.getString(PREF_AP_CAMERA_IP, DEFAULT_AP_CAMERA_IP),
+                getDroneUsername(), getDronePassword(),
+                prefs.getInt(PREF_AP_MAX_WIDTH, DEFAULT_AP_MAX_WIDTH),
+                ssid -> {
+                    // The camera reboots under the new name; join that one from now on.
+                    prefs.edit().putString(PREF_AP_SSID, ssid).apply();
+                    wfbLinkManager.stopAdapters();
+                    applyLinkConfig();
+                    wfbLinkManager.startAdapters();
+                    Toast.makeText(this, "APFPV SSID set to " + ssid, Toast.LENGTH_SHORT).show();
+                }).show();
+    }
+
+    private String getDroneAddress() {
+        return getSharedPreferences("general", Context.MODE_PRIVATE)
+                .getString(PREF_DRONE_ADDRESS, DEFAULT_DRONE_ADDRESS);
+    }
+
+    /** The drone's web UI URL; a bare host or host:port gets http:// in front. */
+    private String getDroneUrl() {
+        String address = getDroneAddress();
+        return address.matches("(?i)^https?://.*") ? address : "http://" + address;
+    }
+
+    private void showDroneAddressDialog() {
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 30, 50, 30);
+
+        final android.widget.EditText addressEditText = new android.widget.EditText(this);
+        addressEditText.setHint(DEFAULT_DRONE_ADDRESS);
+        addressEditText.setSingleLine(true);
+        addressEditText.setInputType(android.text.InputType.TYPE_CLASS_TEXT
+                | android.text.InputType.TYPE_TEXT_VARIATION_URI);
+        addressEditText.setText(getDroneAddress());
+        layout.addView(addressEditText);
+
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Drone Address")
+                .setMessage("IP address, host:port or URL of the drone's web interface, opened by "
+                        + "Drone > Settings in WFB-NG mode (default " + DEFAULT_DRONE_ADDRESS
+                        + ", through the tunnel). In APFPV mode Settings opens the camera controls "
+                        + "instead; their camera IP is in APFPV settings.")
+                .setView(layout)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String address = addressEditText.getText().toString().trim();
+                    if (address.isEmpty() || address.contains(" ")) {
+                        Toast.makeText(this, "Invalid address, nothing saved", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    getSharedPreferences("general", MODE_PRIVATE).edit()
+                            .putString(PREF_DRONE_ADDRESS, address).apply();
+                    Toast.makeText(this, "Drone address saved: " + address, Toast.LENGTH_SHORT).show();
+                })
+                .setNeutralButton("Default", (dialog, which) -> {
+                    getSharedPreferences("general", MODE_PRIVATE).edit()
+                            .remove(PREF_DRONE_ADDRESS).apply();
+                    Toast.makeText(this, "Drone address reset to " + DEFAULT_DRONE_ADDRESS,
+                            Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void setupUdpForwardingSubMenu(PopupMenu popup) {
@@ -1288,6 +1654,10 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     // VPN SERVICE
     // ----------------------------------------------------------------------------
     private void startVpnService() {
+        if (isApMode()) {
+            // The VPN carries IP over the wfb-ng tunnel, which AP mode does not have.
+            return;
+        }
         int VPN_REQUEST_CODE = 100;
 
         Intent intent = VpnService.prepare(this);
@@ -1585,7 +1955,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     protected void onResume() {
         registerReceivers();
 
-        wfbLinkManager.setChannel(getChannel(this));
+        wfbLinkManager.setChannel(getStartChannel());
         wfbLinkManager.setBandwidth(getBandwidth(this));
 
         // On resume is called when the app is reopened, a device might have been plugged since the last time it started.
@@ -1609,6 +1979,10 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
     @Override
     public void onChannelSettingChanged(int channel) {
+        if (isApMode()) {
+            onApChannelSelected(channel);
+            return;
+        }
         int currentChannel = getChannel(this);
         if (currentChannel == channel) {
             return;
@@ -1689,6 +2063,10 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
     @Override
     public void onWfbNgStatsChanged(WfbNGStats data) {
+        if (isApMode()) {
+            showApStats(data);
+            return;
+        }
         runOnUiThread(() -> {
             if (data.count_p_all > 0) {
                 binding.tvMessage.setVisibility(View.INVISIBLE);
@@ -1751,6 +2129,90 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             } else {
                 binding.tvLinkStatus.setText("No Video Link");
             }
+        });
+    }
+
+    private int lastApRecoveries = 0;
+    private final java.util.concurrent.atomic.AtomicBoolean keyFrameRequestRunning =
+            new java.util.concurrent.atomic.AtomicBoolean(false);
+
+    /**
+     * Asks majestic on the camera for an immediate IDR frame (GET /request/idr) over the AP
+     * link, with the drone login credentials. One request at a time; a dropout that ends
+     * while one is still running is covered by it.
+     */
+    private void requestKeyFrame() {
+        if (!keyFrameRequestRunning.compareAndSet(false, true)) {
+            return;
+        }
+        SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
+        String cameraIp = prefs.getString(PREF_AP_CAMERA_IP, DEFAULT_AP_CAMERA_IP);
+        String auth = Base64.encodeToString((getDroneUsername() + ":" + getDronePassword())
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8), Base64.NO_WRAP);
+        String request = "GET /request/idr HTTP/1.0\r\n"
+                + "Host: " + cameraIp + "\r\n"
+                + "Authorization: Basic " + auth + "\r\n"
+                + "Connection: close\r\n\r\n";
+        new Thread(() -> {
+            try {
+                String reply = wfbLink.cameraCommand(cameraIp, 80, request, 3000);
+                String status = reply == null ? "no answer" : reply.split("\r?\n", 2)[0];
+                Log.i(TAG, "key frame request: " + status);
+            } finally {
+                keyFrameRequestRunning.set(false);
+            }
+        }, "keyframe-request").start();
+    }
+
+    /**
+     * AP mode has no FEC, so the pie chart is left alone. The native side reuses the stats
+     * fields: count_p_all = data frames from the AP, count_p_dec_ok = UDP datagrams handed
+     * to the player, count_p_lost = frames that had to be dropped, count_p_outgoing = sent.
+     */
+    private void showApStats(WfbNGStats data) {
+        String apStatus = wfbLink.getApStatus();
+        // Empty while no adapter runs; the adapter messages in tvMessage then stay as they are.
+        boolean adapterRunning = !apStatus.isEmpty();
+        String status = adapterRunning ? apStatus : "APFPV: no adapter running";
+
+        // Video can flow again (new association or end of a dropout): the decoder would
+        // otherwise show nothing usable until the next scheduled key frame.
+        int recoveries = wfbLink.getApRecoveries();
+        if (recoveries != lastApRecoveries) {
+            lastApRecoveries = recoveries;
+            if (recoveries > 0) {
+                requestKeyFrame();
+            }
+        }
+
+        // Remember where the camera is (found there, or followed it after a switch), so the
+        // next start looks there first instead of searching.
+        int channel = wfbLink.getApChannel();
+        if (channel > 0 && channel != getApChannel(this)) {
+            getSharedPreferences("general", MODE_PRIVATE).edit().putInt(PREF_AP_CHANNEL, channel).apply();
+            wfbLinkManager.setChannel(channel);
+            Log.i(TAG, "AP is on channel " + channel + ", starting there from now on");
+        }
+        runOnUiThread(() -> {
+            int color = getColor(R.color.colorRedBg);
+            if (data.count_p_dec_ok > 0) {
+                color = data.count_p_lost > 0 ? getColor(R.color.colorYellowBg) : getColor(R.color.colorGreenBg);
+            }
+            binding.imgLinkStatus.setImageTintList(ColorStateList.valueOf(color));
+            // Until video flows, the connection state is the one thing worth looking at,
+            // so it goes in the centre message instead of only the small status line.
+            if (data.count_p_dec_ok > 0) {
+                binding.tvMessage.setVisibility(View.GONE);
+            } else if (adapterRunning) {
+                binding.tvMessage.setText(status);
+                binding.tvMessage.setVisibility(View.VISIBLE);
+            }
+            binding.tvLinkStatus.setText(String.format(Locale.US, "%s | rx %d udp %d drop %d tx %d",
+                    status,
+                    data.count_p_all,
+                    data.count_p_dec_ok,
+                    data.count_p_lost,
+                    data.count_p_outgoing));
         });
     }
 
@@ -1945,7 +2407,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         WebView view = new WebView(this);
         view.setWebViewClient(new WebViewClient());
         view.getSettings().setJavaScriptEnabled(true);
-        view.loadUrl("10.5.0.10");
+        view.loadUrl(getDroneUrl());
 
         Dialog dialog = new Dialog(this);
         dialog.setContentView(view);
