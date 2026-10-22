@@ -5,9 +5,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 PixelPilot is an Android FPV ground-station app (package `com.openipc.pixelpilot`). A USB Realtek
-RTL8812AU/EU adapter is driven entirely in userspace (no kernel driver, no root) to receive a
-wfb-ng (wifibroadcast) stream, which is decoded with MediaCodec and shown with an OSD. Nearly all
-of the hot path is C++ behind thin Java JNI wrappers. Targets arm64-v8a and armeabi-v7a, minSdk 26.
+RTL8812AU/EU adapter is driven entirely in userspace (no kernel driver, no root) in one of two
+link modes: **WFB-NG** (default) receives a wfb-ng (wifibroadcast) stream in monitor mode;
+**APFPV** joins an OpenIPC apfpv camera's open access point as a regular station and receives
+plain RTP over IP. Either way the video is decoded with MediaCodec and shown with an OSD. Nearly
+all of the hot path is C++ behind thin Java JNI wrappers. Targets arm64-v8a and armeabi-v7a, minSdk 26.
 
 ## Build
 
@@ -67,7 +69,7 @@ Four Gradle modules. The three library modules each contain one JNI `.so` whose 
 | Module | Java entry | Native lib | Role |
 |---|---|---|---|
 | `app` | `VideoActivity` (single activity, ~1700 lines), `WfbLinkManager`, `WfbNgVpnService`, `osd/` | – | UI, settings (SharedPreferences `"general"`, `"osd_config"`), USB lifecycle, DVR, OSD |
-| `app/wfbngrtl8812` | `WfbNgLink` | `libWfbngRtl8812.so` | USB wifi RX/TX via devourer + wfb-ng decrypt/FEC, adaptive link |
+| `app/wfbngrtl8812` | `WfbNgLink` | `libWfbngRtl8812.so` | USB wifi RX/TX via devourer; WFB-NG decrypt/FEC + adaptive link, or the APFPV station (`StaLink`) |
 | `app/videonative` | `VideoPlayer` | `libVideoNative.so` | UDP/RTP receive, H.264/H.265 parse, MediaCodec decode, Opus audio, MP4 DVR |
 | `app/mavlink` | `MavlinkNative` | `libmavlink.so` | MAVLink UDP listener feeding OSD telemetry |
 
@@ -100,9 +102,43 @@ TUN 10.5.0.0/24 egress -> WfbNgVpnService -> :8001 -> TxFrame (FEC k=1,n=5, radi
 - Video can also arrive without an adapter: `videonative` listens on :5600 regardless, so any
   sender on the phone's Wi-Fi works (the UI shows the `udp://<ip>:5600` hint).
 
+### APFPV link mode (`StaLink`)
+
+Selected by the `"link_mode"` preference (Settings → Link mode); the other `ap_*` keys in the
+`"general"` prefs hold SSID, static IP, MAC, video port, camera IP, channel, full-scan and max
+width. `WfbngLink::runStation()` replaces `run()`: devourer is still the radio, but
+`StaLink.cpp` implements an 802.11 station (probe/auth/assoc, beacon and CSA tracking, rejoin on
+deauth or TSF jump), ARP, ICMP echo, a minimal single-flight TCP client, and IP fragment
+reassembly. It forwards received UDP to the same loopback ports as WFB-NG mode (video port →
+:5600, :14550 → MAVLink), so videonative and mavlink do not know which mode is active.
+
+```
+camera AP (192.168.0.1, open, no DHCP) <--802.11 station--> adapter (static 192.168.0.10)
+   UDP :5600 / :14550 -> StaLink -> 127.0.0.1:5600 / :14550 (unchanged consumers)
+   TCP 12355 air_man_ap (set_ap_channel, no login) and HTTP aalinkFPV API (Drone login) <- CameraControlDialog
+```
+
+- The TCP client is one request at a time; HTTP replies complete on FIN, `air_man_ap` replies on
+  1.5 s idle. Rebooting camera actions go through `cgiOnce()` and are never retried.
+- Whenever video can flow again the app sends `GET /request/idr` with the Drone login as cleartext
+  Basic auth over the open AP. Agreed follow-up: try unauthenticated first, fall back on 401, and add
+  a default-on opt-out switch.
+- Device access rule: `rtl_devices` and `current_fd` are guarded by `dev_mutex`; threads other
+  than the run thread reach a device only through `withDevice()` and must keep the callback short
+  (a flag or register write). In APFPV mode the StaLink worker is the only thread allowed on
+  devourer's control path (`SetMonitorChannel`, `FastRetune`, `SetTxPower`); TX power from Java
+  goes through `requestTxPower()`. Lock order: `dev_mutex` is never nested inside `mu_`,
+  `sta_mutex` or `thread_mutex` and never held across a join.
+- The VPN tunnel is not used in this mode; switching modes stops it via
+  `WfbNgVpnService.stopRunning()`.
+- `tools/apfpv-open-static-cam.sh` prepares a stock apfpv camera (open AP, no DHCP,
+  `disassoc_low_ack=0`, optional MAC ACL; `--revert` restores the backup). README section
+  "Link modes: WFB-NG and APFPV" is the user-facing description.
+
 ## Conventions
 
-- Log tag is `"pixelpilot"` across Java and most C++; devourer logs under `"devourer"`.
+- Log tag is `"pixelpilot"` across Java and most C++; devourer logs under `"devourer"`, the APFPV
+  station under `"pixelpilot-sta"`.
 - Qodo reviews every PR; its repo-level guidelines live in `.pr_agent.toml` and mirror the rules above.
 - JNI symbols follow `Java_com_openipc_<module>_<Class>_<method>`. Release builds run R8:
   `app/proguard-rules.pro` keeps native-method classes and the mavlink types, and classes that
