@@ -941,6 +941,9 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         // UDP Forwarding submenu
         setupUdpForwardingSubMenu(popup);
 
+        // Ground Station Streaming submenu
+        setupGroundStationStreamingSubMenu(popup);
+
         // Help submenu
         setupHelpSubMenu(popup);
 
@@ -1528,10 +1531,110 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
     /**
      * Starts the native Mavlink service and posts an initial Runnable to the Handler.
+     *
+     * When telemetry streaming is enabled, wfb-ng's own mavlink_aggregator
+     * already forwards the raw MAVLink stream to 127.0.0.1:14550 (see
+     * WfbngLink::initAgg). Skip this app-internal OSD parser so it doesn't
+     * compete for that port.
      */
     private void setupMavlink() {
+        if (isTelemetryStreamingEnabled()) {
+            return;
+        }
         MavlinkNative.nativeStart(this);
         handler.post(runnable);
+    }
+
+    // ----------------------------------------------------------------------------
+    // GROUND STATION STREAMING
+    // ----------------------------------------------------------------------------
+    // Two independent toggles, since a ground station app might only care about
+    // one channel (e.g. a video-only OSD box, or a telemetry-only companion
+    // computer). wfb-ng's own aggregators forward raw RTP/H264 and MAVLink to
+    // 127.0.0.1:5600/14550 unconditionally (see WfbngLink::initAgg) regardless
+    // of these settings -- they only decide whether this app's own in-app
+    // consumers compete for those same ports, so any UDP-based ground station
+    // app (QGroundControl, Mission Planner, a custom OSD, ...) works, not just
+    // QGroundControl specifically.
+
+    private static final String PREF_STREAM_VIDEO = "gs_stream_video";
+    private static final String PREF_STREAM_TELEMETRY = "gs_stream_telemetry";
+
+    public boolean isVideoStreamingEnabled() {
+        return getSharedPreferences("general", MODE_PRIVATE).getBoolean(PREF_STREAM_VIDEO, false);
+    }
+
+    public boolean isTelemetryStreamingEnabled() {
+        return getSharedPreferences("general", MODE_PRIVATE).getBoolean(PREF_STREAM_TELEMETRY, false);
+    }
+
+    /**
+     * True while either channel is being streamed out -- used to keep the
+     * USB/wfb-ng pipeline alive across pause/resume instead of stopping it
+     * (see onPause()/onStop()). Both channels share one adapter, so it can't
+     * be paused for one and kept alive for the other.
+     */
+    private boolean isGroundStationStreamingActive() {
+        return isVideoStreamingEnabled() || isTelemetryStreamingEnabled();
+    }
+
+    /**
+     * Persists the new video-streaming mode and applies it immediately
+     * instead of requiring a restart -- starting or stopping the in-app video
+     * player right away.
+     */
+    private void setVideoStreamingEnabled(boolean enabled) {
+        getSharedPreferences("general", MODE_PRIVATE).edit().putBoolean(PREF_STREAM_VIDEO, enabled).apply();
+        if (enabled) {
+            videoPlayer.stop();
+            videoPlayer.stopAudio();
+        } else {
+            videoPlayer.start();
+            updateUdpForwardingState();
+            videoPlayer.startAudio();
+        }
+    }
+
+    /**
+     * Persists the new telemetry-streaming mode and applies it immediately --
+     * starting or stopping the in-app MAVLink OSD parser right away.
+     */
+    private void setTelemetryStreamingEnabled(boolean enabled) {
+        getSharedPreferences("general", MODE_PRIVATE).edit().putBoolean(PREF_STREAM_TELEMETRY, enabled).apply();
+        if (enabled) {
+            MavlinkNative.nativeStop(this);
+            handler.removeCallbacks(runnable);
+        } else {
+            MavlinkNative.nativeStart(this);
+            handler.post(runnable);
+        }
+    }
+
+    /**
+     * Settings submenu with the two streaming toggles.
+     */
+    private void setupGroundStationStreamingSubMenu(PopupMenu popup) {
+        SubMenu gsMenu = popup.getMenu().addSubMenu("Ground Station Streaming");
+
+        MenuItem videoItem = gsMenu.add("Video");
+        videoItem.setCheckable(true);
+        videoItem.setChecked(isVideoStreamingEnabled());
+        videoItem.setOnMenuItemClickListener(item -> {
+            boolean newState = !item.isChecked();
+            item.setChecked(newState);
+            setVideoStreamingEnabled(newState);
+            return true;
+        });
+
+        MenuItem telemetryItem = gsMenu.add("Telemetry");
+        telemetryItem.setCheckable(true);
+        telemetryItem.setChecked(isTelemetryStreamingEnabled());
+        telemetryItem.setOnMenuItemClickListener(item -> {
+            boolean newState = !item.isChecked();
+            item.setChecked(newState);
+            setTelemetryStreamingEnabled(newState);
+            return true;
+        });
     }
 
     // ----------------------------------------------------------------------------
@@ -1932,7 +2035,18 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         videoPlayer.stop();
         videoPlayer.stopAudio();
-        wfbLinkManager.stopAdapters();
+        // While streaming to QGroundControl the whole point is for wfb-ng to keep
+        // decoding and forwarding to 127.0.0.1:5600/14550 while this Activity is
+        // backgrounded. Stopping/restarting the USB adapter on every pause/resume
+        // also hits a native teardown race in devourer's RtlJaguarDevice
+        // destructor (rtw_hal_deinit on a device that hasn't finished bringing up
+        // yet) when the two happen in quick succession. A real Foreground Service
+        // (Phase 4) is still needed for guaranteed survival under memory pressure
+        // -- this only keeps the pipeline alive across ordinary Activity
+        // lifecycle transitions.
+        if (!isGroundStationStreamingActive()) {
+            wfbLinkManager.stopAdapters();
+        }
 
         // Stop VPN service - directly, not with a STOP_SERVICE start, which Android can refuse
         // from the background. See WfbNgVpnService.stopRunning().
@@ -1945,7 +2059,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         MavlinkNative.nativeStop(this);
         handler.removeCallbacks(runnable);
         unregisterReceivers();
-        wfbLinkManager.stopAdapters();
+        // See the comment in onPause() -- streaming mode keeps the USB/wfb-ng
+        // pipeline running across ordinary lifecycle transitions.
+        if (!isGroundStationStreamingActive()) {
+            wfbLinkManager.stopAdapters();
+        }
         videoPlayer.stop();
         videoPlayer.stopAudio();
         super.onStop();
@@ -1962,9 +2080,15 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         wfbLinkManager.refreshAdapters();
 
         wfbLinkManager.startAdapters();
-        videoPlayer.start();
-        updateUdpForwardingState();
-        videoPlayer.startAudio();
+        // While video streaming is enabled, skip the in-app video/audio
+        // receiver: wfb-ng's own video_aggregator already forwards RTP/H264 to
+        // 127.0.0.1:5600 (see WfbngLink::initAgg), and the ground station app
+        // binds that port instead.
+        if (!isVideoStreamingEnabled()) {
+            videoPlayer.start();
+            updateUdpForwardingState();
+            videoPlayer.startAudio();
+        }
 
         SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
         boolean odEnabled = prefs.getBoolean("od_enabled", false);
