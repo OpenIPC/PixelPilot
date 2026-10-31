@@ -35,6 +35,8 @@ void VideoDecoder::setOutputSurface(JNIEnv* env, jobject surface, jint idx)
         }
         std::lock_guard<std::mutex> lock(mMutexInputPipe);
         inputPipeClosed = true;
+        mAuBuffer.clear();
+        mAuHasVcl = false;
         if (decoder.configured[idx])
         {
             AMediaCodec_stop(decoder.codec[idx]);
@@ -98,19 +100,56 @@ void VideoDecoder::interpretNALU(const NALU& nalu)
         // A feedD thread (e.g. file or udp) thread might be running even tough no output surface was set
         // But at least we can buffer the sps/pps data
         mKeyFrameFinder.saveIfKeyFrame(nalu);
+        mAuBuffer.clear();
+        mAuHasVcl = false;
         return;
     }
     if (decoder.configured[0] || decoder.configured[1])
     {
-        feedDecoder(nalu, 0);
-        feedDecoder(nalu, 1);
+        // One input buffer per access unit, not per NAL (see endAccessUnit
+        // in the header). The transport's AU end (RTP marker) flushes with no
+        // added latency; the next first-slice NAL is the safety net for a
+        // stream without markers (one frame of latency, for those only).
+        const int  type       = nalu.get_nal_unit_type();
+        const bool isVcl      = nalu.IS_H265_PACKET ? (type < 32) : (type >= 1 && type <= 5);
+        bool       firstSlice = false;
+        // H.264 data partitions B and C (types 3, 4) carry no slice header.
+        const bool hasSliceHeader = nalu.IS_H265_PACKET ? isVcl : (type == 1 || type == 2 || type == 5);
+        const int  headerLen      = nalu.IS_H265_PACKET ? 2 : 1;
+        if (hasSliceHeader && nalu.getDataSizeWithoutPrefix() > headerLen)
+        {
+            // first_slice_segment_in_pic_flag (H.265) / first_mb_in_slice == 0
+            // (H.264, ue(v) with a leading 1 bit): the MSB of the first
+            // slice-header byte.
+            firstSlice = (nalu.getDataWithoutPrefix()[headerLen] & 0x80) != 0;
+        }
+        // Parameter sets, AUD and prefix SEI after a slice also start a new
+        // access unit (H.264 7.4.1.2.3, H.265 7.4.2.4.4): without a marker
+        // they belong to the next frame, not the one being gathered.
+        const bool startsAu =
+            nalu.IS_H265_PACKET ? (type >= 32 && type <= 39) : ((type >= 6 && type <= 9) || (type >= 14 && type <= 18));
+        if (mAuHasVcl && (firstSlice || startsAu))
+        {
+            flushAccessUnitLocked();
+        }
+        if (mAuBuffer.size() + nalu.getSize() > kMaxAccessUnitBytes)
+        {
+            // No end of frame in sight (a stream without markers that never
+            // starts a new frame): drop what was gathered.
+            MLOGD << "Access unit over " << kMaxAccessUnitBytes << " bytes, dropped";
+            mAuBuffer.clear();
+            mAuHasVcl = false;
+        }
+        if (mAuBuffer.empty())
+        {
+            mAuFirstNaluTime = nalu.creationTime;
+        }
+        mAuBuffer.insert(mAuBuffer.end(), nalu.getData(), nalu.getData() + nalu.getSize());
+        if (isVcl)
+        {
+            mAuHasVcl = true;
+        }
         decodingInfo.nNALUSFeeded++;
-        // manually feeding AUDs doesn't seem to change anything for high latency streams
-        // Only for the x264 sw encoded example stream it might improve latency slightly
-        // if(!nalu.IS_H265_PACKET && nalu.get_nal_unit_type()==NAL_UNIT_TYPE_CODED_SLICE_NON_IDR){
-        // MLOGD<<"Feeding special AUD";
-        // feedDecoder(NALU::createExampleH264_AUD());
-        //}
     }
     else
     {
@@ -122,6 +161,83 @@ void VideoDecoder::interpretNALU(const NALU& nalu)
             MLOGD << "Configuring decoder...";
             configureStartDecoder(0);
             configureStartDecoder(1);
+        }
+    }
+}
+
+void VideoDecoder::endAccessUnit()
+{
+    std::lock_guard<std::mutex> lock(mMutexInputPipe);
+    if (inputPipeClosed || !(decoder.configured[0] || decoder.configured[1]))
+    {
+        // Nothing downstream: drop a half-built AU rather than let it prefix
+        // the next session's first one.
+        mAuBuffer.clear();
+        mAuHasVcl = false;
+        return;
+    }
+    flushAccessUnitLocked();
+}
+
+void VideoDecoder::flushAccessUnitLocked()
+{
+    if (mAuBuffer.empty())
+    {
+        return;
+    }
+    // A buffer without a VCL NAL (bare parameter sets) is flagged
+    // CODEC_CONFIG, or the decoder emits a phantom output frame for it.
+    const bool configOnly = !mAuHasVcl;
+    feedAccessUnit(mAuBuffer.data(), mAuBuffer.size(), configOnly, 0);
+    feedAccessUnit(mAuBuffer.data(), mAuBuffer.size(), configOnly, 1);
+    mAuBuffer.clear();
+    mAuHasVcl = false;
+}
+
+void VideoDecoder::feedAccessUnit(const uint8_t* data, size_t size, bool configOnly, int idx)
+{
+    if (!decoder.codec[idx])
+    {
+        return;
+    }
+    const auto now          = std::chrono::steady_clock::now();
+    const auto deltaParsing = now - mAuFirstNaluTime;
+    while (true)
+    {
+        const auto index = AMediaCodec_dequeueInputBuffer(decoder.codec[idx], BUFFER_TIMEOUT_US);
+        if (index >= 0)
+        {
+            size_t   inputBufferSize;
+            uint8_t* buf = AMediaCodec_getInputBuffer(decoder.codec[idx], (size_t) index, &inputBufferSize);
+            if (size > inputBufferSize)
+            {
+                MLOGD << "Access unit too big " << size << " > " << inputBufferSize;
+                // Hand the dequeued buffer back empty: an index that is never
+                // queued is lost to the codec for good.
+                AMediaCodec_queueInputBuffer(decoder.codec[idx], (size_t) index, 0, 0, 0, 0);
+                return;
+            }
+            const int flag = configOnly ? AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG : 0;
+            std::memcpy(buf, data, size);
+            const uint64_t presentationTimeUS =
+                (uint64_t) duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();
+            AMediaCodec_queueInputBuffer(decoder.codec[idx], (size_t) index, 0, size, presentationTimeUS, flag);
+            waitForInputB.add(steady_clock::now() - now);
+            parsingTime.add(deltaParsing);
+            return;
+        }
+        else if (index == AMEDIACODEC_INFO_TRY_AGAIN_LATER)
+        {
+            if (std::chrono::steady_clock::now() - now > std::chrono::seconds(1))
+            {
+                MLOGE << "AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second, dropping an access unit";
+                return;
+            }
+        }
+        else
+        {
+            MLOGD << "dequeueInputBuffer idx " << (int) index << " return.";
+            return;
         }
     }
 }
@@ -203,60 +319,6 @@ void VideoDecoder::configureStartDecoder(int idx)
     mCheckOutputThread[idx] = std::make_unique<std::thread>(&VideoDecoder::checkOutputLoop, this, idx);
     NDKThreadHelper::setName(mCheckOutputThread[idx]->native_handle(), "LLDCheckOutput");
     decoder.configured[idx] = true;
-}
-
-void VideoDecoder::feedDecoder(const NALU& nalu, int idx)
-{
-    if (!decoder.codec[idx]) return;
-    const auto now          = std::chrono::steady_clock::now();
-    const auto deltaParsing = now - nalu.creationTime;
-    while (true)
-    {
-        const auto index = AMediaCodec_dequeueInputBuffer(decoder.codec[idx], BUFFER_TIMEOUT_US);
-        if (index >= 0)
-        {
-            size_t   inputBufferSize;
-            uint8_t* buf = AMediaCodec_getInputBuffer(decoder.codec[idx], (size_t) index, &inputBufferSize);
-            // I have not seen any case where the input buffer returned by MediaCodec is too small to hold the NALU
-            // But better be safe than crashing with a memory exception
-            if (nalu.getSize() > inputBufferSize)
-            {
-                MLOGD << "Nalu too big" << nalu.getSize();
-                return;
-            }
-
-            int flag =
-                (IS_H265 && (nalu.isSPS() || nalu.isPPS() || nalu.isVPS())) ? AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG : 0;
-            std::memcpy(buf, nalu.getData(), (size_t) nalu.getSize());
-            const uint64_t presentationTimeUS =
-                (uint64_t) duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count();
-            AMediaCodec_queueInputBuffer(
-                decoder.codec[idx], (size_t) index, 0, (size_t) nalu.getSize(), presentationTimeUS, flag);
-            waitForInputB.add(steady_clock::now() - now);
-            parsingTime.add(deltaParsing);
-            return;
-        }
-        else if (index == AMEDIACODEC_INFO_TRY_AGAIN_LATER)
-        {
-            // just try again. But if we had no success in the last 1 second,log a warning and return.
-            const auto elapsedTimeTryingForBuffer = std::chrono::steady_clock::now() - now;
-            if (elapsedTimeTryingForBuffer > std::chrono::seconds(1))
-            {
-                // Since OpenHD provides a lossy link it is really unlikely, but possible that we somehow 'break' the
-                // codec by feeding corrupt data. It will probably recover itself as soon as we feed enough valid data
-                // though;
-                MLOGE << "AMEDIACODEC_INFO_TRY_AGAIN_LATER for more than 1 second "
-                      << MyTimeHelper::R(elapsedTimeTryingForBuffer) << "return.";
-                return;
-            }
-        }
-        else
-        {
-            // Something went wrong. But we will feed the next NALU soon anyways
-            MLOGD << "dequeueInputBuffer idx " << (int) index << "return.";
-            return;
-        }
-    }
 }
 
 void VideoDecoder::checkOutputLoop(int idx)

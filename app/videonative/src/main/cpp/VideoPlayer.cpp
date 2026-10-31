@@ -15,6 +15,7 @@ VideoPlayer::VideoPlayer(JNIEnv* env, jobject context)
     : mParser{std::bind(&VideoPlayer::onNewNALU, this, std::placeholders::_1)}, videoDecoder(env)
 {
     env->GetJavaVM(&javaVm);
+    mParser.onAccessUnitEnd = [this]() { videoDecoder.endAccessUnit(); };
     videoDecoder.registerOnDecoderRatioChangedCallback(
         [this](const VideoRatio ratio)
         {

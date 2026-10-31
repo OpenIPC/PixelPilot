@@ -39,6 +39,14 @@ void H26XParser::parse_rtp_stream(const uint8_t* rtp_data, const size_t data_len
         IS_H265 = true;
         mDecodeRTP.parseRTPH265toNALU(rtp_data, data_length);
     }
+    else
+    {
+        return;
+    }
+    if (rtpPacket.header.marker && onAccessUnitEnd)
+    {
+        onAccessUnitEnd();
+    }
 }
 
 void H26XParser::onNewNaluDataExtracted(
