@@ -195,30 +195,31 @@ public class OSDManager {
         binding.tvRoll.setText(formatFloat(data.telemetryRoll, " degree", ""));
         binding.tvPitch.setText(formatFloat(data.telemetryPitch, " degree", ""));
 
+        // data.flight_mode carries the FLIGHT_MODE_* values from mavlink.h,
+        // not the ArduPlane custom_mode numbers.
         String flightMode = switch (data.flight_mode) {
-            case 0 -> "MANUAL";
-            case 1 -> "CIRCLE";
+            case 1 -> "MANUAL";
             case 2 -> "STABILIZE";
-            case 3 -> "TRAINING";
-            case 4 -> "ACRO";
-            case 5 -> "FLY_BY_WIRE_A";
-            case 6 -> "FLY_BY_WIRE_B";
-            case 7 -> "CRUISE";
+            case 3 -> "ALT_HOLD";
+            case 4 -> "LOITER";
+            case 5 -> "RTL";
+            case 6 -> "LAND";
+            case 7 -> "POS_HOLD";
             case 8 -> "AUTOTUNE";
-            case 10 -> "AUTO";
-            case 11 -> "RTL";
-            case 12 -> "LOITER";
+            case 9 -> "ACRO";
+            case 10 -> "FBWA";
+            case 11 -> "FBWB";
+            case 12 -> "CRUISE";
             case 13 -> "TAKEOFF";
-            case 14 -> "AVOID_ADSB";
-            case 15 -> "GUIDED";
-            case 16 -> "INITIALIZING";
-            case 17 -> "QSTABILIZE";
-            case 18 -> "QHOVER";
-            case 19 -> "QLOITER";
-            case 20 -> "QLAND";
-            case 21 -> "QRTL";
-            case 22 -> "QAUTOTUNE";
-            case 23 -> "ENUM_END";
+            case 15 -> "RATE";
+            case 16 -> "HORIZON";
+            case 17 -> "CIRCLE";
+            case 18 -> "AUTO";
+            case 20 -> "QSTABILIZE";
+            case 21 -> "QHOVER";
+            case 22 -> "QLOITER";
+            case 23 -> "QLAND";
+            case 24 -> "QRTL";
             default -> "Unknown";
         };
         binding.tvFlightMode.setText(flightMode);
