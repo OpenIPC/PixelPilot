@@ -48,8 +48,27 @@ std::string generate_random_string(size_t length) {
     return result;
 }
 
+// The app's files dir, taken from the Context so it follows the applicationId.
+static std::string appFilesDir(JNIEnv *env, jobject context) {
+    jclass ctxClass = env->GetObjectClass(context);
+    jobject dir = env->CallObjectMethod(context, env->GetMethodID(ctxClass, "getFilesDir", "()Ljava/io/File;"));
+    jclass fileClass = env->GetObjectClass(dir);
+    auto path =
+        (jstring)env->CallObjectMethod(dir, env->GetMethodID(fileClass, "getAbsolutePath", "()Ljava/lang/String;"));
+    const char *c = env->GetStringUTFChars(path, nullptr);
+    std::string out(c);
+    env->ReleaseStringUTFChars(path, c);
+    env->DeleteLocalRef(path);
+    env->DeleteLocalRef(fileClass);
+    env->DeleteLocalRef(dir);
+    env->DeleteLocalRef(ctxClass);
+    return out;
+}
+
 WfbngLink::WfbngLink(JNIEnv *env, jobject context)
         : current_fd(-1), adaptive_link_enabled(true), adaptive_tx_power(30) {
+    filesDir = appFilesDir(env, context);
+    keyPath = filesDir + "/gs.key";
     initAgg();
     log = std::make_shared<Logger>(); // routes to logcat under the "devourer" tag
     wifi_driver = std::make_unique<WiFiDriver>(log);
@@ -118,7 +137,7 @@ int WfbngLink::run(JNIEnv *env, jobject context, jint wifiChannel, jint bw, jint
     cfg.rx.enable_with_tx = true;
     // The per-adapter advisory lock defaults to /tmp, which doesn't exist on
     // Android — use the app's files dir (same location as gs.key).
-    cfg.usb.lock_dir = "/data/user/0/com.openipc.pixelpilot/files";
+    cfg.usb.lock_dir = filesDir;
     // Keep the RX ring on plain heap buffers. The zerocopy dev-mem path
     // (libusb_dev_mem_alloc / USBDEVFS mmap) is unvalidated on Android vendor
     // kernels; if the mmap succeeds but the HCD's zerocopy path is broken,

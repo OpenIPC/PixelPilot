@@ -92,9 +92,8 @@ TUN 10.5.0.0/24 egress -> WfbNgVpnService -> :8001 -> TxFrame (FEC k=1,n=5, radi
   decaying 0–5 `fec_change` value and the thresholds are user-tunable (README "Auto-FEC" section,
   `nativeSetFecThresholds`). `SignalQualityCalculator` is a singleton fed from the RX callback.
 - `gs.key` is copied from assets (or a user-picked file) to the app files dir; native code opens
-  it by the hard-coded path in `WfbngLink.hpp` (`/data/user/0/com.openipc.pixelpilot/files/gs.key`),
-  so the applicationId cannot change without updating that constant. devourer's per-adapter lock
-  file is pointed at the same dir because `/tmp` does not exist on Android.
+  it from the same dir, which `WfbngLink` takes from `Context.getFilesDir()` at construction.
+  devourer's per-adapter lock file is pointed at the same dir because `/tmp` does not exist on Android.
 - One `WfbNgLink.start()` per USB device spawns a thread running `nativeRun`, which blocks in
   devourer's `StartRxLoop` until `nativeStop` → `StopRxLoop`. Multi-adapter is supported by
   keying `rtl_devices` on the USB fd. Hot-plug is handled by `WfbLinkManager` (a

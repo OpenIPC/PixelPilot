@@ -183,7 +183,8 @@ class WfbngLink {
         withDevice(current_fd.load(), [](IRtlDevice &dev) { dev.StopRxLoop(); });
     }
 
-    const char *keyPath = "/data/user/0/com.openipc.pixelpilot/files/gs.key";
+    std::string filesDir; // Context.getFilesDir(): where VideoActivity copies gs.key
+    std::string keyPath;  // filesDir + "/gs.key"
     std::recursive_mutex thread_mutex;
     std::unique_ptr<WiFiDriver> wifi_driver;
     std::shared_ptr<TxFrame> txFrame;
