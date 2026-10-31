@@ -113,13 +113,13 @@ void RTPDecoder::h264_reconstruct_and_forward_one_nalu(const uint8_t* data, cons
     m_nalu_data_length = 0;
 }
 
-void RTPDecoder::parseRTPH264toNALU(const uint8_t* rtp_data, const size_t data_length)
+bool RTPDecoder::parseRTPH264toNALU(const uint8_t* rtp_data, const size_t data_length)
 {
     // 12 rtp header bytes and 1 nalu_header_t type byte
     if (data_length <= sizeof(rtp_header_t) + sizeof(nalu_header_t))
     {
         MLOGD << "Not enough rtp data";
-        return;
+        return false;
     }
     // MLOGD<<"Got h264 rtp data";
     const RTP::RTPPacketH264 rtpPacket(rtp_data, data_length);
@@ -127,13 +127,13 @@ void RTPDecoder::parseRTPH264toNALU(const uint8_t* rtp_data, const size_t data_l
     if (rtpPacket.rtpPayloadSize == 0)
     {
         MLOGD << "RTP packet is empty";
-        return;
+        return false;
     }
 
     // MLOGD<<"RTP Header: "<<rtp_header->asString();
     if (!validateRTPPacket(rtpPacket.header))
     {
-        return;
+        return false;
     }
     const auto& nalu_header = rtpPacket.getNALUHeaderH264();
     if (nalu_header.type == 28)
@@ -223,7 +223,9 @@ void RTPDecoder::parseRTPH264toNALU(const uint8_t* rtp_data, const size_t data_l
     else
     {
         MLOGD << "Got unsupported H264 RTP packet. NALU type:" << (int) nalu_header.type;
+        return false;
     }
+    return true;
 }
 
 // https://github.com/ireader/media-server/blob/master/librtp/payload/rtp-h265-unpack.c
@@ -248,13 +250,13 @@ void RTPDecoder::h265_forward_one_nalu(const uint8_t* data, int data_size, bool 
     m_nalu_data_length = 0;
 }
 
-void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length)
+bool RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_length)
 {
     // 12 rtp header bytes and 1 nalu_header_t type byte
     if (data_length <= sizeof(rtp_header_t) + sizeof(nal_unit_header_h265_t))
     {
         MLOGD << "Not enough rtp data";
-        return;
+        return false;
     }
     // MLOGD<<"Got h265 rtp data";
     const RTP::RTPPacketH265 rtpPacket(rtp_data, data_length);
@@ -262,13 +264,13 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
     if (!validateRTPPacket(rtpPacket.header))
     {
         MLOGD << "Invalid rtp packet";
-        return;
+        return false;
     }
     const auto& nal_unit_header_h265 = rtpPacket.getNALUHeaderH265();
     if (nal_unit_header_h265.type > 50)
     {
         MLOGD << "Unsupported (HEVC) NAL type " << (int) nal_unit_header_h265.type;
-        return;
+        return false;
     }
     if (nal_unit_header_h265.type == 48)
     {
@@ -296,7 +298,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
                 break;
             }
         }
-        return;
+        return true;
     }
     else if (nal_unit_header_h265.type == 49)
     {
@@ -346,6 +348,7 @@ void RTPDecoder::parseRTPH265toNALU(const uint8_t* rtp_data, const size_t data_l
         // h265_forward_one_nalu(rtpPacket.rtpPayload,rtpPacket.rtpPayloadSize,false);
         h265_forward_one_nalu(rtpPacket.rtpPayload, rtpPacket.rtpPayloadSize, true);
     }
+    return true;
 }
 
 // MJPEG

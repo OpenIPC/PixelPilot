@@ -60,6 +60,10 @@ class H26XParser
 
     int  maxFPS  = 0;
     bool IS_H265 = false;
+    // Sequence number of the newest accepted video RTP packet, -1 before the first.
+    int mNewestSeq = -1;
+    // Further behind than this is a new stream, not a late packet.
+    static constexpr uint16_t kSeqResyncWindow = 512;
     // First time a NALU was succesfully decoded
     // std::chrono::steady_clock::time_point timeFirstNALUArrived=std::chrono::steady_clock::time_point(0);
 };

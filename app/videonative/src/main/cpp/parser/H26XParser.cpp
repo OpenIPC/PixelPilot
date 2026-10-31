@@ -22,6 +22,7 @@ H26XParser::H26XParser(NALU_DATA_CALLBACK onNewNALU)
 void H26XParser::reset()
 {
     mDecodeRTP.reset();
+    mNewestSeq                 = -1;
     nParsedNALUs               = 0;
     nParsedKonfigurationFrames = 0;
 }
@@ -29,21 +30,37 @@ void H26XParser::reset()
 void H26XParser::parse_rtp_stream(const uint8_t* rtp_data, const size_t data_length)
 {
     const RTP::RTPPacket rtpPacket(rtp_data, data_length);
+    bool                 accepted = false;
     if (rtpPacket.header.payload == RTP_PAYLOAD_TYPE_H264)
     {
-        IS_H265 = false;
-        mDecodeRTP.parseRTPH264toNALU(rtp_data, data_length);
+        IS_H265  = false;
+        accepted = mDecodeRTP.parseRTPH264toNALU(rtp_data, data_length);
     }
     else if (rtpPacket.header.payload == RTP_PAYLOAD_TYPE_H265)
     {
-        IS_H265 = true;
-        mDecodeRTP.parseRTPH265toNALU(rtp_data, data_length);
+        IS_H265  = true;
+        accepted = mDecodeRTP.parseRTPH265toNALU(rtp_data, data_length);
     }
-    else
+    if (!accepted)
     {
         return;
     }
-    if (rtpPacket.header.marker && onAccessUnitEnd)
+    // A marker ends the current access unit only from a packet the RTP decoder
+    // took and that is newer than any seen so far: a late copy of the previous
+    // frame's last packet, or a second copy of the newest one, must not cut the
+    // current frame short. A jump far behind is a restarted sender: resync.
+    const uint16_t seq    = rtpPacket.header.getSequence();
+    bool           newest = true;
+    if (mNewestSeq >= 0)
+    {
+        const uint16_t ahead = static_cast<uint16_t>(seq - mNewestSeq);
+        newest = ahead != 0 && (ahead < 0x8000 || static_cast<uint16_t>(mNewestSeq - seq) > kSeqResyncWindow);
+    }
+    if (newest)
+    {
+        mNewestSeq = seq;
+    }
+    if (rtpPacket.header.marker && newest && onAccessUnitEnd)
     {
         onAccessUnitEnd();
     }
