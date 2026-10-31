@@ -12,6 +12,7 @@
 #include <atomic>
 #include <iostream>
 #include <thread>
+#include <vector>
 #include "NALU/KeyFrameFinder.hpp"
 #include "NALU/NALU.hpp"
 #include "helper/TimeHelper.hpp"
@@ -95,13 +96,20 @@ class VideoDecoder
     //  If the input pipe was closed (surface has been removed or is not set yet), only buffer key frames
     void interpretNALU(const NALU& nalu);
 
+    // End of an access unit, from the RTP marker bit: queue the NALs gathered
+    // since the last one as one input buffer. Some decoders show only the
+    // first slice of a multi-slice frame fed one NAL per buffer.
+    void endAccessUnit();
+
   private:
     // Initialize decoder with SPS / PPS data from KeyFrameFinder
     // Set Decoder.configured to true on success
     void configureStartDecoder(int idx);
 
-    // Wait for input buffer to become available before feeding NALU
-    void feedDecoder(const NALU& nalu, int idx);
+    // Queue the gathered access unit as one input buffer (both decoder
+    // instances) and clear it. Caller holds mMutexInputPipe.
+    void flushAccessUnitLocked();
+    void feedAccessUnit(const uint8_t* data, size_t size, bool configOnly, int idx);
 
     // Runs until EOS arrives at output buffer or decoder is stopped
     void checkOutputLoop(int idx);
@@ -119,10 +127,16 @@ class VideoDecoder
     Decoder      decoder{};
     DecodingInfo decodingInfo;
     // The input pipe is closed until we set a valid surface
-    bool                           inputPipeClosed = true;
-    std::mutex                     mMutexInputPipe;
-    DECODER_RATIO_CHANGED          onDecoderRatioChangedCallback = nullptr;
-    DECODING_INFO_CHANGED_CALLBACK onDecodingInfoChangedCallback = nullptr;
+    bool       inputPipeClosed = true;
+    std::mutex mMutexInputPipe;
+    // Access-unit accumulator (endAccessUnit): the NALs of the current AU,
+    // flushed on the transport's AU end or on the next first-slice NAL.
+    std::vector<uint8_t>                  mAuBuffer;
+    static constexpr size_t               kMaxAccessUnitBytes = 4 * 1024 * 1024;
+    bool                                  mAuHasVcl           = false;
+    std::chrono::steady_clock::time_point mAuFirstNaluTime;
+    DECODER_RATIO_CHANGED                 onDecoderRatioChangedCallback = nullptr;
+    DECODING_INFO_CHANGED_CALLBACK        onDecodingInfoChangedCallback = nullptr;
     // So we can temporarily attach the output thread to the vm and make ndk calls
     JavaVM*                               javaVm  = nullptr;
     std::chrono::steady_clock::time_point lastLog = std::chrono::steady_clock::now();
