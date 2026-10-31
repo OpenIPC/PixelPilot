@@ -733,4 +733,18 @@
         </com.openipc.pixelpilot.osd.MovableLayout>
     </FrameLayout>
 
+    <!-- Centre dot. Both video views are 16:9 and centred in the parent, so the
+         parent's centre is the video centre. Not movable. -->
+    <View
+        android:id="@+id/imgCenterDot"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:background="@drawable/osd_center_dot"
+        android:translationZ="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

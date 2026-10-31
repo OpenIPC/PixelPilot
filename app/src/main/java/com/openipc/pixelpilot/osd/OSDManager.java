@@ -38,7 +38,8 @@ public class OSDManager {
 
     public void lockOSD(Boolean isLocked) {
         for (int i = 0; i < listOSDItems.size(); i++) {
-            listOSDItems.get(i).layout.setMovable(!isLocked);
+            MovableLayout layout = listOSDItems.get(i).layout;
+            if (layout != null) layout.setMovable(!isLocked);
         }
         osdLocked = isLocked;
     }
@@ -52,8 +53,12 @@ public class OSDManager {
     }
 
     public void onOSDItemCheckChanged(OSDElement element, boolean isChecked) {
-        // Show or hide the ImageView corresponding to the checkbox position
-        element.layout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        // Show or hide the ImageView corresponding to the checkbox position.
+        // The centre dot stays hidden in VR mode, where there is no single video view.
+        boolean show = isChecked && (element.layout != null
+                || binding.mainVideoSurface.getVisibility() == View.VISIBLE
+                || binding.mainVideo.getVisibility() == View.VISIBLE);
+        element.view().setVisibility(show ? View.VISIBLE : View.GONE);
         SharedPreferences prefs = context.getSharedPreferences("osd_config", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(element.prefName() + "_enabled", isChecked);
@@ -81,6 +86,7 @@ public class OSDManager {
         listOSDItems.add(new OSDElement("Battery Air", binding.itemBat));
         listOSDItems.add(new OSDElement("Battery Cell Air", binding.itemBatCell));
         listOSDItems.add(new OSDElement("Battery GS", binding.itemGSBattery));
+        listOSDItems.add(new OSDElement("Center Dot", binding.imgCenterDot, true));
         listOSDItems.add(new OSDElement("Current", binding.itemCurrent));
         listOSDItems.add(new OSDElement("Flight Mode", binding.itemFlightMode));
         listOSDItems.add(new OSDElement("Ground Speed", binding.itemGndSpeed));
@@ -106,14 +112,13 @@ public class OSDManager {
 
     public boolean isElementEnabled(OSDElement elem) {
         SharedPreferences prefs = context.getSharedPreferences("osd_config", MODE_PRIVATE);
-        return prefs.getBoolean(elem.prefName() + "_enabled", false);
+        return prefs.getBoolean(elem.prefName() + "_enabled", elem.defaultEnabled);
     }
 
     public void restoreOSDConfig() {
-        SharedPreferences prefs = context.getSharedPreferences("osd_config", MODE_PRIVATE);
         for (OSDElement element : listOSDItems) {
-            boolean enabled = prefs.getBoolean(element.prefName() + "_enabled", false);
-            onOSDItemCheckChanged(element, enabled);
+            onOSDItemCheckChanged(element, isElementEnabled(element));
+            if (element.layout == null) continue;  // fixed item: no saved position
             element.layout.restorePosition(element.prefName());
             element.layout.setMovable(!isOSDLocked());
         }
